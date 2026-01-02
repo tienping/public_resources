@@ -61,6 +61,12 @@
             right: 1.5rem;
             z-index: 100;
         }
+
+        /* Modal styling */
+        .modal-overlay {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 flex flex-col">
@@ -140,12 +146,31 @@ Isi 4 & Kesimpulan</textarea>
         </div>
     </div>
 
-    <!-- Footer Controls -->
-    <div class="max-w-3xl mx-auto w-full pb-8 flex justify-center">
+    <!-- Footer Controls & Copyright -->
+    <div class="max-w-3xl mx-auto w-full pb-8 flex flex-col items-center gap-6">
         <button id="snailToggle" onclick="toggleSnailMode()" class="flex items-center gap-3 px-6 py-3 bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:bg-slate-50 transition-all group">
             <span id="snailIcon" class="text-2xl group-hover:scale-125 transition-transform">🐌</span>
             <span id="snailLabel" class="font-bold text-slate-700 text-sm">Switch to Snail Mode</span>
         </button>
+
+        <footer id="copyrightFooter" onclick="handleCopyrightClick()" class="cursor-pointer select-none py-4 text-slate-400 text-xs font-medium tracking-widest uppercase hover:text-slate-600 transition-colors">
+            © TienPing @ 2026
+        </footer>
+    </div>
+
+    <!-- Hidden Info Modal -->
+    <div id="infoModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full border border-slate-100 scale-90 transition-transform duration-300 transform opacity-0" id="modalContent">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">👨‍🏫</div>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-2">Lim Tien Ping</h3>
+                <div class="space-y-2 mb-6">
+                    <p class="text-slate-500 text-sm font-medium break-all">petwesley@gmail.com</p>
+                    <p class="text-slate-500 text-sm font-medium break-all">g-39576509@moe-dl.edu.my</p>
+                </div>
+                <button onclick="closeInfoModal()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Celebration Layer -->
@@ -165,10 +190,43 @@ Isi 4 & Kesimpulan</textarea>
         const ctx = raceCanvas.getContext('2d');
         const resultsSection = document.getElementById('results-section');
         const volumeIcon = document.getElementById('volumeIcon');
+        const infoModal = document.getElementById('infoModal');
+        const modalContent = document.getElementById('modalContent');
 
         let isSnailMode = false;
-        let isMuted = false; // Default to unmuted
+        let isMuted = false; 
         
+        // Copyright Click Tracking
+        let clickTimes = [];
+        function handleCopyrightClick() {
+            const now = Date.now();
+            clickTimes.push(now);
+            
+            // Filter clicks to only those within the last 2 seconds
+            clickTimes = clickTimes.filter(t => now - t < 2000);
+            
+            if (clickTimes.length >= 8) {
+                showInfoModal();
+                clickTimes = []; // Reset
+            }
+        }
+
+        function showInfoModal() {
+            infoModal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-90', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeInfoModal() {
+            modalContent.classList.add('scale-90', 'opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                infoModal.classList.add('hidden');
+            }, 300);
+        }
+
         // Audio elements
         const quackAudio = new Audio('https://tienping.github.io/public_resources/audio/quak.mp3');
         const snailAudio = new Audio('https://tienping.github.io/public_resources/audio/snail.mp3');
@@ -209,9 +267,7 @@ Isi 4 & Kesimpulan</textarea>
             if (isMuted) return;
             
             if (type === 'duck') {
-                // Triple Quack Logic: a set of 3 quacks
                 for (let i = 0; i < 3; i++) {
-                    // Random delay between 0.2s to 0.6s
                     const delay = (Math.random() * 400 + 200) * i; 
                     setTimeout(() => {
                         if (isMuted) return;
@@ -291,7 +347,6 @@ Isi 4 & Kesimpulan</textarea>
                 this.isBoosted = false;
                 this.rank = 0;
                 this.colorTheme = SPLASH_PALETTE[laneIndex % SPLASH_PALETTE.length];
-                // Sound frequency increased by ~3 folds
                 this.nextSoundTime = Math.random() * 1000 + 500;
             }
 
@@ -313,7 +368,6 @@ Isi 4 & Kesimpulan</textarea>
                 this.x += this.speed;
                 this.wobble += (this.isBoosted ? 0.5 : 0.3);
 
-                // Sound Logic
                 this.nextSoundTime -= deltaTime;
                 if (this.nextSoundTime <= 0) {
                     playSound(isSnailMode ? 'snail' : 'duck');
