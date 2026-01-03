@@ -46,13 +46,14 @@
         }
 
         .result-row {
-            animation: slideIn 0.4s ease-out forwards;
-            opacity: 0;
-            transform: translateX(-10px);
+            transition: all 0.5s ease;
         }
 
-        @keyframes slideIn {
-            to { opacity: 1; transform: translateX(0); }
+        .result-finished {
+            background-color: white !important;
+            border-color: #38bdf8 !important;
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         #volumeBtn {
@@ -62,7 +63,6 @@
             z-index: 100;
         }
 
-        /* Modal styling */
         .modal-overlay {
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
@@ -132,11 +132,11 @@ Isi 4 & Kesimpulan</textarea>
         <div id="results-section" class="hidden max-w-xl mx-auto">
             <div class="flex justify-between items-end mb-6">
                 <div>
-                    <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Race Rankings</h2>
-                    <p class="text-slate-500 text-sm font-medium">Final assignments based on arrival order</p>
+                    <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Final Assignments</h2>
+                    <p class="text-slate-500 text-sm font-medium">List matches your entry order</p>
                 </div>
                 <button id="copyBtn" onclick="copyResults()" class="px-4 py-2 bg-emerald-500 text-white text-xs font-bold rounded-lg hover:bg-emerald-600 transition-all flex items-center gap-2 shadow-lg shadow-emerald-100">
-                    <span>📋</span> Copy Results
+                    <span>📋</span> Copy for WhatsApp
                 </button>
             </div>
             
@@ -196,18 +196,14 @@ Isi 4 & Kesimpulan</textarea>
         let isSnailMode = false;
         let isMuted = false; 
         
-        // Copyright Click Tracking
         let clickTimes = [];
         function handleCopyrightClick() {
             const now = Date.now();
             clickTimes.push(now);
-            
-            // Filter clicks to only those within the last 2 seconds
             clickTimes = clickTimes.filter(t => now - t < 2000);
-            
             if (clickTimes.length >= 8) {
                 showInfoModal();
-                clickTimes = []; // Reset
+                clickTimes = [];
             }
         }
 
@@ -227,7 +223,6 @@ Isi 4 & Kesimpulan</textarea>
             }, 300);
         }
 
-        // Audio elements
         const quackAudio = new Audio('https://tienping.github.io/public_resources/audio/quak.mp3');
         const snailAudio = new Audio('https://tienping.github.io/public_resources/audio/snail.mp3');
 
@@ -247,9 +242,9 @@ Isi 4 & Kesimpulan</textarea>
 
         let ducks = [];
         let tasksList = [];
-        let resultsData = [];
+        let resultsData = []; // Stores objects { name, task, rank, originalIndex }
         let animationId;
-        let finishedDucks = 0;
+        let finishedDucksCount = 0;
         let lastSpeedUpdate = 0;
         const SPEED_UPDATE_INTERVAL = 800; 
 
@@ -265,7 +260,6 @@ Isi 4 & Kesimpulan</textarea>
 
         function playSound(type) {
             if (isMuted) return;
-            
             if (type === 'duck') {
                 for (let i = 0; i < 3; i++) {
                     const delay = (Math.random() * 400 + 200) * i; 
@@ -352,52 +346,32 @@ Isi 4 & Kesimpulan</textarea>
 
             setRandomSpeed(isLast = false) {
                 let baseSpeed = (Math.random() * 1.2 + 0.05);
-                if (isSnailMode) {
-                    baseSpeed /= 3; 
-                }
+                if (isSnailMode) { baseSpeed /= 3; }
                 this.speed = baseSpeed;
                 this.isBoosted = isLast;
-                if (isLast) {
-                    this.speed *= (isSnailMode ? 1.3 : 1.6); 
-                }
+                if (isLast) { this.speed *= (isSnailMode ? 1.3 : 1.6); }
             }
 
             update(finishLineX, deltaTime) {
                 if (this.finished) return;
-                
                 this.x += this.speed;
                 this.wobble += (this.isBoosted ? 0.5 : 0.3);
-
                 this.nextSoundTime -= deltaTime;
                 if (this.nextSoundTime <= 0) {
                     playSound(isSnailMode ? 'snail' : 'duck');
-                    const baseDelay = isSnailMode ? 1600 : 1000;
-                    const randomRange = isSnailMode ? 1000 : 600;
-                    this.nextSoundTime = Math.random() * randomRange + baseDelay;
+                    this.nextSoundTime = Math.random() * (isSnailMode ? 1000 : 600) + (isSnailMode ? 1600 : 1000);
                 }
-
                 const currentSplashColor = this.isBoosted ? this.colorTheme.boost : this.colorTheme.normal;
-
                 if (isSnailMode) {
-                    if (Math.random() < 0.5) {
-                        this.splashes.push(new Splash(this.x - 5, this.y + 12, this.speed, false, currentSplashColor));
-                    }
+                    if (Math.random() < 0.5) this.splashes.push(new Splash(this.x - 5, this.y + 12, this.speed, false, currentSplashColor));
                 } else {
-                    if (Math.random() < this.speed * 0.8) {
-                        this.splashes.push(new Splash(this.x - 10, this.y + 10, this.speed, this.isBoosted, currentSplashColor));
-                    }
-                    if (this.isBoosted) {
-                        for(let i=0; i<3; i++) {
-                            this.splashes.push(new Splash(this.x - 5, this.y + 10, this.speed, true, currentSplashColor));
-                        }
-                    }
+                    if (Math.random() < this.speed * 0.8) this.splashes.push(new Splash(this.x - 10, this.y + 10, this.speed, this.isBoosted, currentSplashColor));
+                    if (this.isBoosted) for(let i=0; i<3; i++) this.splashes.push(new Splash(this.x - 5, this.y + 10, this.speed, true, currentSplashColor));
                 }
-
                 this.splashes.forEach((s, i) => {
                     s.update();
                     if (s.alpha <= 0) this.splashes.splice(i, 1);
                 });
-
                 if (this.x >= finishLineX) {
                     this.finished = true;
                     this.x = finishLineX;
@@ -407,9 +381,7 @@ Isi 4 & Kesimpulan</textarea>
 
             draw(ctx) {
                 this.splashes.forEach(s => s.draw(ctx));
-
                 const bounceY = Math.sin(this.wobble) * (this.isBoosted ? 5 : 3);
-                
                 ctx.beginPath();
                 ctx.strokeStyle = "rgba(255,255,255,0.4)";
                 ctx.lineWidth = 1;
@@ -417,7 +389,6 @@ Isi 4 & Kesimpulan</textarea>
                 ctx.moveTo(0, (this.laneIndex + 1) * LANE_HEIGHT + TOP_PADDING);
                 ctx.lineTo(ctx.canvas.width, (this.laneIndex + 1) * LANE_HEIGHT + TOP_PADDING);
                 ctx.stroke();
-
                 if (isSnailMode) {
                     ctx.font = `${DUCK_DISPLAY_SIZE}px serif`;
                     ctx.textAlign = "center";
@@ -430,38 +401,26 @@ Isi 4 & Kesimpulan</textarea>
                         ctx.rotate(-0.1); 
                         ctx.drawImage(duckImage, -DUCK_DISPLAY_SIZE/2, -DUCK_DISPLAY_SIZE/2, DUCK_DISPLAY_SIZE, DUCK_DISPLAY_SIZE);
                     } else {
-                        ctx.drawImage(
-                            duckImage, 
-                            this.x - DUCK_DISPLAY_SIZE / 2, 
-                            this.y + bounceY - DUCK_DISPLAY_SIZE / 2, 
-                            DUCK_DISPLAY_SIZE, 
-                            DUCK_DISPLAY_SIZE
-                        );
+                        ctx.drawImage(duckImage, this.x - DUCK_DISPLAY_SIZE / 2, this.y + bounceY - DUCK_DISPLAY_SIZE / 2, DUCK_DISPLAY_SIZE, DUCK_DISPLAY_SIZE);
                     }
                     ctx.restore();
                 }
-
                 ctx.fillStyle = this.isBoosted && !this.finished ? "#b45309" : "#334155";
-                ctx.font = this.isBoosted && !this.finished ? "bold 13px 'Plus Jakarta Sans'" : "bold 11px 'Plus Jakarta Sans'";
+                ctx.font = "bold 11px 'Plus Jakarta Sans'";
                 ctx.textAlign = "center";
-                ctx.fillText(this.name + (this.isBoosted && !this.finished ? " ⚡" : ""), this.x, this.y + bounceY - 28);
-                
+                ctx.fillText(this.name, this.x, this.y + bounceY - 28);
                 if (this.finished && this.rank > 0) {
                     ctx.save();
                     ctx.translate(this.x + 40, this.y + bounceY); 
                     ctx.beginPath();
                     ctx.arc(0, 0, 16, 0, Math.PI * 2);
-                    let color = "#e2e8f0"; 
-                    let textColor = "#475569";
+                    let color = "#e2e8f0"; let textColor = "#475569";
                     if (this.rank === 1) { color = "#fcd34d"; textColor = "#92400e"; } 
                     else if (this.rank === 2) { color = "#cbd5e1"; textColor = "#334155"; } 
                     else if (this.rank === 3) { color = "#fdba74"; textColor = "#9a3412"; } 
-                    ctx.fillStyle = color;
-                    ctx.fill();
-                    ctx.fillStyle = textColor;
-                    ctx.font = "bold 14px 'Plus Jakarta Sans'";
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = color; ctx.fill();
+                    ctx.fillStyle = textColor; ctx.font = "bold 14px 'Plus Jakarta Sans'";
+                    ctx.textAlign = "center"; ctx.textBaseline = "middle";
                     ctx.fillText("#" + this.rank, 0, 0);
                     ctx.restore();
                 }
@@ -473,34 +432,46 @@ Isi 4 & Kesimpulan</textarea>
         function prepareRace() {
             const names = getList(namesInput.value);
             const rawTasks = getList(tasksInput.value);
-
             if (names.length === 0 || rawTasks.length === 0) {
                 errorMsg.textContent = "Please provide both students and tasks!";
-                errorMsg.classList.remove('hidden');
-                return;
+                errorMsg.classList.remove('hidden'); return;
             }
             errorMsg.classList.add('hidden');
-
             tasksList = [...rawTasks];
-            while (tasksList.length < names.length) {
-                tasksList = tasksList.concat(rawTasks);
-            }
+            while (tasksList.length < names.length) tasksList = tasksList.concat(rawTasks);
 
             startBtn.disabled = true;
-            resultsSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
             resultsContainer.innerHTML = '';
-            resultsData = [];
+            resultsData = names.map((name, i) => ({ name, task: "Waiting...", rank: 0, originalIndex: i }));
+            
+            // Build placeholders in entry order
+            resultsData.forEach((item, i) => {
+                const row = document.createElement('div');
+                row.id = `result-row-${i}`;
+                row.className = "result-row bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between opacity-60";
+                row.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="rank-badge w-8 h-8 shrink-0 flex items-center justify-center font-black rounded-lg text-xs bg-slate-200 text-slate-400">
+                            -
+                        </div>
+                        <span class="font-bold text-slate-400">${item.name}</span>
+                    </div>
+                    <div class="task-badge flex items-center gap-2">
+                        <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
+                        <span class="px-3 py-1 bg-slate-100 text-slate-300 font-bold rounded-md text-sm italic">Waiting...</span>
+                    </div>
+                `;
+                resultsContainer.appendChild(row);
+            });
+
             raceContainer.classList.remove('hidden');
-
-            const containerWidth = raceContainer.clientWidth;
-            raceCanvas.width = containerWidth;
+            raceCanvas.width = raceContainer.clientWidth;
             raceCanvas.height = names.length * LANE_HEIGHT + TOP_PADDING + 30;
-
             ducks = names.map((name, i) => new Duck(name, i));
-            finishedDucks = 0;
+            finishedDucksCount = 0;
             lastSpeedUpdate = performance.now();
             lastFrameTime = performance.now();
-
             if (animationId) cancelAnimationFrame(animationId);
             animate(performance.now());
             raceContainer.scrollIntoView({ behavior: 'smooth' });
@@ -509,105 +480,69 @@ Isi 4 & Kesimpulan</textarea>
         function animate(currentTime) {
             const deltaTime = currentTime - lastFrameTime;
             lastFrameTime = currentTime;
-
             const finishLineX = raceCanvas.width - FINISH_LINE_PADDING;
             ctx.clearRect(0, 0, raceCanvas.width, raceCanvas.height);
-
             const grd = ctx.createLinearGradient(0, 0, 0, raceCanvas.height);
-            grd.addColorStop(0, "#bae6fd");
-            grd.addColorStop(1, "#7dd3fc");
-            ctx.fillStyle = grd;
-            ctx.fillRect(0, 0, raceCanvas.width, raceCanvas.height);
-
-            ctx.fillStyle = "#fff";
-            ctx.fillRect(finishLineX, 0, 6, raceCanvas.height);
-            
+            grd.addColorStop(0, "#bae6fd"); grd.addColorStop(1, "#7dd3fc");
+            ctx.fillStyle = grd; ctx.fillRect(0, 0, raceCanvas.width, raceCanvas.height);
+            ctx.fillStyle = "#fff"; ctx.fillRect(finishLineX, 0, 6, raceCanvas.height);
             const cS = 12;
             for(let y=0; y<raceCanvas.height; y+=cS) {
                 ctx.fillStyle = (Math.floor(y/cS) % 2 === 0) ? "#1e293b" : "#fff";
                 ctx.fillRect(finishLineX + 6, y, cS, cS);
             }
-
             if (currentTime - lastSpeedUpdate >= SPEED_UPDATE_INTERVAL) {
-                let lastDuck = null;
-                let minX = Infinity;
-                
+                let lastDuck = null; let minX = Infinity;
                 const activeDucks = ducks.filter(d => !d.finished);
-                activeDucks.forEach(d => {
-                    if (d.x < minX) {
-                        minX = d.x;
-                        lastDuck = d;
-                    }
-                });
-
-                ducks.forEach(d => {
-                    if (!d.finished) {
-                        d.setRandomSpeed(d === lastDuck);
-                    } else {
-                        d.isBoosted = false;
-                    }
-                });
+                activeDucks.forEach(d => { if (d.x < minX) { minX = d.x; lastDuck = d; } });
+                ducks.forEach(d => { if (!d.finished) d.setRandomSpeed(d === lastDuck); else d.isBoosted = false; });
                 lastSpeedUpdate = currentTime;
             }
-
             let allDone = true;
-            ducks.forEach(d => {
-                d.update(finishLineX, deltaTime);
-                d.draw(ctx);
-                if (!d.finished) allDone = false;
-            });
-
-            if (!allDone) {
-                animationId = requestAnimationFrame(animate);
-            } else {
-                finishBtnState();
-            }
+            ducks.forEach(d => { d.update(finishLineX, deltaTime); d.draw(ctx); if (!d.finished) allDone = false; });
+            if (!allDone) animationId = requestAnimationFrame(animate);
+            else finishBtnState();
         }
 
         function handleDuckFinish(duck) {
-            finishedDucks++;
-            duck.rank = finishedDucks; 
-            const task = tasksList[finishedDucks - 1];
-            resultsData.push({ name: duck.name, task, rank: finishedDucks });
+            finishedDucksCount++;
+            duck.rank = finishedDucksCount; 
+            const task = tasksList[finishedDucksCount - 1];
             
-            const row = document.createElement('div');
-            row.className = "result-row bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between";
-            row.style.animationDelay = `${finishedDucks * 0.1}s`;
+            // Update the data storage
+            resultsData[duck.laneIndex].task = task;
+            resultsData[duck.laneIndex].rank = finishedDucksCount;
+
+            // Update the UI row (which stays in original position)
+            const row = document.getElementById(`result-row-${duck.laneIndex}`);
+            row.classList.remove('opacity-60');
+            row.classList.add('result-finished');
             
             let rankStyle = "bg-slate-100 text-slate-500";
-            if (finishedDucks === 1) rankStyle = "bg-amber-100 text-amber-600 ring-2 ring-amber-300";
-            if (finishedDucks === 2) rankStyle = "bg-slate-200 text-slate-700 ring-2 ring-slate-300";
-            if (finishedDucks === 3) rankStyle = "bg-orange-100 text-orange-600 ring-2 ring-orange-200";
+            if (finishedDucksCount === 1) rankStyle = "bg-amber-100 text-amber-600 ring-2 ring-amber-300";
+            else if (finishedDucksCount === 2) rankStyle = "bg-slate-200 text-slate-700 ring-2 ring-slate-300";
+            else if (finishedDucksCount === 3) rankStyle = "bg-orange-100 text-orange-600 ring-2 ring-orange-200";
 
-            row.innerHTML = `
-                <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 shrink-0 flex items-center justify-center font-black rounded-lg text-xs ${rankStyle}">
-                        ${finishedDucks}
-                    </div>
-                    <span class="font-bold text-slate-800">${duck.name}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
-                    <span class="px-3 py-1 bg-sky-50 text-sky-600 font-bold rounded-md text-sm">${task}</span>
-                </div>
+            row.querySelector('.rank-badge').className = `rank-badge w-8 h-8 shrink-0 flex items-center justify-center font-black rounded-lg text-xs ${rankStyle}`;
+            row.querySelector('.rank-badge').textContent = finishedDucksCount;
+            row.querySelector('span.font-bold').className = "font-bold text-slate-800";
+            row.querySelector('.task-badge').innerHTML = `
+                <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
+                <span class="px-3 py-1 bg-sky-50 text-sky-600 font-bold rounded-md text-sm">${task}</span>
             `;
-            resultsContainer.appendChild(row);
         }
 
         function finishBtnState() {
             startBtn.disabled = false;
             startBtn.innerHTML = `<span>🔄 Re-run ${isSnailMode ? 'Snail ' : ''}Race</span>`;
-            resultsSection.classList.remove('hidden');
             fireConfetti();
-            setTimeout(() => {
-                resultsSection.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
         }
 
         function copyResults() {
+            // Generates WhatsApp friendly text with extra line breaks
             const text = resultsData
-                .map(r => `${r.name} - ${r.task}`)
-                .join('\n');
+                .map(r => `*${r.name}*\nPart: ${r.task}`)
+                .join('\n\n'); 
             
             const el = document.createElement('textarea');
             el.value = text;
@@ -630,37 +565,23 @@ Isi 4 & Kesimpulan</textarea>
             const c = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            
             let particles = Array.from({ length: 100 }).map(() => ({
-                x: Math.random() * canvas.width,
-                y: -20,
-                r: Math.random() * 4 + 4,
-                color: `hsl(${Math.random() * 360}, 80%, 60%)`,
-                speed: Math.random() * 4 + 2,
-                wobble: Math.random() * 10,
-                wobbleSpeed: Math.random() * 0.1
+                x: Math.random() * canvas.width, y: -20, r: Math.random() * 4 + 4,
+                color: `hsl(${Math.random() * 360}, 80%, 60%)`, speed: Math.random() * 4 + 2,
+                wobble: Math.random() * 10, wobbleSpeed: Math.random() * 0.1
             }));
-
             function drawConfetti() {
                 c.clearRect(0, 0, canvas.width, canvas.height);
-                let activeParticles = false;
+                let active = false;
                 particles.forEach(p => {
-                    p.y += p.speed;
-                    p.wobble += p.wobbleSpeed;
-                    p.x += Math.sin(p.wobble);
+                    p.y += p.speed; p.wobble += p.wobbleSpeed; p.x += Math.sin(p.wobble);
                     if (p.y < canvas.height + 20) {
-                        activeParticles = true;
-                        c.beginPath();
-                        c.fillStyle = p.color;
-                        c.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                        c.fill();
+                        active = true; c.beginPath(); c.fillStyle = p.color;
+                        c.arc(p.x, p.y, p.r, 0, Math.PI * 2); c.fill();
                     }
                 });
-                if (activeParticles) {
-                    requestAnimationFrame(drawConfetti);
-                } else {
-                    c.clearRect(0, 0, canvas.width, canvas.height);
-                }
+                if (active) requestAnimationFrame(drawConfetti);
+                else c.clearRect(0, 0, canvas.width, canvas.height);
             }
             drawConfetti();
         }
