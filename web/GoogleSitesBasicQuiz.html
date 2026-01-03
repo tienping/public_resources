@@ -1,0 +1,653 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Trophy, 
+  Lightbulb, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  Award, 
+  RefreshCcw, 
+  BookOpen, 
+  ChevronRight,
+  AlertCircle,
+  ShieldCheck,
+  Star,
+  Users,
+  Mail,
+  User,
+  X
+} from 'lucide-react';
+
+/**
+ * GOOGLE SITES RECRUITMENT QUIZ
+ * A gamified experience for students to master web migration and design.
+ */
+
+// --- CELEBRATION COMPONENT ---
+const FallingBalls = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let balls = [];
+
+    const colors = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+
+    const createBalls = () => {
+      for (let i = 0; i < 50; i++) {
+        balls.push({
+          x: Math.random() * canvas.width,
+          y: -Math.random() * canvas.height,
+          radius: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          velocity: {
+            x: (Math.random() - 0.5) * 4,
+            y: Math.random() * 5 + 3
+          }
+        });
+      }
+    };
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    createBalls();
+
+    const render = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      balls.forEach(ball => {
+        ball.x += ball.velocity.x;
+        ball.y += ball.velocity.y;
+        ball.velocity.y += 0.15; // Gravity
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+      });
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[100]" />;
+};
+
+// --- DATASET ---
+const QUESTION_BANK = [
+  {
+    id: 1,
+    type: 'basic',
+    question: "What is the primary way to add content (Text, Images, Drive files) to a Google Site?",
+    options: ["File > Open", "The 'Insert' panel on the right", "Right-click anywhere", "Settings menu"],
+    correct: 1,
+    hint: "Look for the sidebar menu when in the editor.",
+    explanation: "The 'Insert' panel is your main toolbox for adding text boxes, images, layouts, and Drive components."
+  },
+  {
+    id: 2,
+    type: 'basic',
+    question: "How do you preview what your site looks like on a mobile device before publishing?",
+    options: ["Send the link to your phone", "You can't until you publish", "Click the 'Preview' button (laptop icon) in the top bar", "Resize your browser window"],
+    correct: 2,
+    hint: "Look for an icon that looks like a laptop and phone combined.",
+    explanation: "The Preview mode allows you to switch between Desktop, Tablet, and Mobile views instantly."
+  },
+  {
+    id: 3,
+    type: 'basic',
+    question: "Which feature allows multiple students to work on the site at the same time?",
+    options: ["Share with others (Add editors)", "Emailing screenshots", "Only one person can edit at a time", "Publishing settings"],
+    correct: 0,
+    hint: "It works just like Google Docs collaboration.",
+    explanation: "By adding students as 'Editors' via the Share button, real-time collaboration is enabled."
+  },
+  {
+    id: 4,
+    type: 'basic',
+    question: "Where do you change the main color scheme and font style of your site?",
+    options: ["In every text box manually", "The 'Themes' tab", "The 'Pages' tab", "Site Settings"],
+    correct: 1,
+    hint: "It's one of the three main tabs in the sidebar.",
+    explanation: "The Themes tab controls global styles, including color palettes and font families."
+  },
+  {
+    id: 5,
+    type: 'basic',
+    question: "How do you create a drop-down menu in the navigation bar?",
+    options: ["Drag one page onto another in the 'Pages' tab", "Use a special code", "Create a 'Folder' option", "You can only have a flat menu"],
+    correct: 0,
+    hint: "Think about nesting pages.",
+    explanation: "Dragging a page on top of another in the Pages tab creates a sub-page, forming a drop-down menu."
+  },
+  {
+    id: 16,
+    type: 'scenario',
+    question: "SCENARIO: The Principal wants a weekly 'School News' update. What is the best way to display this so it is easy to read on mobile?",
+    options: ["Upload a PDF of the newsletter", "Take a picture of the printed newsletter", "Type the text directly into the site using text boxes and headings", "Upload a Word Doc link"],
+    correct: 2,
+    hint: "PDFs are hard to read on small phone screens.",
+    explanation: "Direct text flows and resizes for mobile screens (responsive design), whereas PDFs require pinching and zooming."
+  },
+  {
+    id: 17,
+    type: 'scenario',
+    question: "SCENARIO: You need to showcase 50 photos from Sports Day. What is the cleanest layout?",
+    options: ["Put 50 huge images one after another", "Use the 'Image Carousel' or a Grid layout", "Create 50 different pages", "Zip them and add a download link"],
+    correct: 1,
+    hint: "Nobody likes scrolling forever.",
+    explanation: "An Image Carousel or Grid keeps the page short and allows users to browse photos interactively."
+  },
+  {
+    id: 18,
+    type: 'scenario',
+    question: "SCENARIO: The Student Council wants to collect feedback from students about the canteen food.",
+    options: ["Put an email address in a text box", "Embed a Google Form", "Ask them to comment on the site", "Write a letter"],
+    correct: 1,
+    hint: "You want the data to go into a spreadsheet automatically.",
+    explanation: "Embedding a Google Form allows for secure, organized data collection directly on the site."
+  },
+  {
+    id: 21,
+    type: 'scenario',
+    question: "SCENARIO: You want to introduce the 5 main committee members with their photos and roles.",
+    options: ["Use the 'Team' Content Block (Image + Text)", "One big photo of everyone", "Just list their names", "Make a video"],
+    correct: 0,
+    hint: "Check the 'Layouts' section in the Insert tab.",
+    explanation: "The pre-made Content Blocks are designed perfectly for profiles (Image + Heading + Description)."
+  },
+  {
+    id: 25,
+    type: 'scenario',
+    question: "SCENARIO: You want to embed a Calendar showing all school holidays.",
+    options: ["Type dates in a list", "Upload an Excel file", "Embed a Google Calendar", "Use a screenshot of a calendar"],
+    correct: 2,
+    hint: "Updates to the calendar should show up automatically on the site.",
+    explanation: "Embedding a Google Calendar ensures that if the school admin updates a date, the site updates automatically."
+  }
+];
+
+const MOTIVATION = [
+  "Not quite! Mistakes are how we learn.",
+  "Keep going! You'll get it next time.",
+  "Close, but review the hint!",
+  "Don't give up, future webmaster!",
+  "Growth mindset: You just learned something new.",
+  "That was a tricky one. Try to remember the logic."
+];
+
+export default function App() {
+  const [gameState, setGameState] = useState('menu');
+  const [gameMode, setGameMode] = useState('standard');
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [userName, setUserName] = useState('');
+  const [wrongQueue, setWrongQueue] = useState([]);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(600);
+  const [showCelebration, setShowCelebration] = useState(false);
+  
+  // Hidden Feature State
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
+  const [showContactPopup, setShowContactPopup] = useState(false);
+
+  const activeQueue = isRetrying ? wrongQueue.map(id => QUESTION_BANK.find(q => q.id === id)) : QUESTION_BANK;
+  const currentQuestion = activeQueue[currentQIndex];
+
+  useEffect(() => {
+    let timer;
+    if (gameState === 'playing' && gameMode === 'challenge' && timeLeft > 0 && !showCelebration) {
+      timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0 && gameState === 'playing' && gameMode === 'challenge') {
+      setGameState('summary');
+    }
+    return () => clearInterval(timer);
+  }, [gameState, gameMode, timeLeft, showCelebration]);
+
+  const startGame = (mode) => {
+    setGameMode(mode);
+    setGameState('playing');
+    setCurrentQIndex(0);
+    setScore(0);
+    setUserAnswers([]);
+    setWrongQueue([]);
+    setIsRetrying(false);
+    setShowCelebration(false);
+    setTimeLeft(mode === 'challenge' ? 600 : 0);
+  };
+
+  const handleAnswer = (optionIndex) => {
+    if (showCelebration) return;
+    const isCorrect = optionIndex === currentQuestion.correct;
+    
+    const answerRecord = {
+      questionId: currentQuestion.id,
+      selected: optionIndex,
+      isCorrect: isCorrect,
+      explanation: currentQuestion.explanation
+    };
+
+    setUserAnswers(prev => [...prev, answerRecord]);
+
+    if (isCorrect) {
+      if (!isRetrying) setScore(prev => prev + 1);
+      setShowCelebration(true);
+      setTimeout(() => {
+        setShowCelebration(false);
+        if (gameMode === 'challenge') nextQuestion();
+        else setGameState('feedback');
+      }, 800);
+    } else {
+      if (!wrongQueue.includes(currentQuestion.id)) {
+        setWrongQueue(prev => [...prev, currentQuestion.id]);
+      }
+      setGameState('feedback');
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQIndex < activeQueue.length - 1) {
+      setCurrentQIndex(prev => prev + 1);
+      setGameState('playing');
+    } else {
+      setGameState('summary');
+    }
+  };
+
+  const startRetry = () => {
+    setIsRetrying(true);
+    setCurrentQIndex(0);
+    setGameState('playing');
+  };
+
+  // --- HIDDEN FEATURE HANDLER ---
+  const handleFooterClick = () => {
+    const now = Date.now();
+    if (now - lastClickTime < 2000) {
+      const newCount = clickCount + 1;
+      setClickCount(newCount);
+      if (newCount >= 8) {
+        setShowContactPopup(true);
+        setClickCount(0);
+      }
+    } else {
+      setClickCount(1);
+    }
+    setLastClickTime(now);
+  };
+
+  // --- UI COMPONENTS ---
+
+  const renderMenu = () => (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+      <div className="max-w-4xl w-full grid md:grid-cols-2 gap-8 items-center flex-grow">
+        <div className="space-y-6">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold tracking-wider uppercase">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Official Certification</span>
+          </div>
+          <h1 className="text-5xl font-black text-slate-900 leading-tight">
+            Google Sites <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Builder Academy</span>
+          </h1>
+          <p className="text-lg text-slate-600">
+            Prove your skills in web design and content strategy. Join the elite school web migration team by passing our rigorous assessment.
+          </p>
+          <div className="flex flex-col space-y-3">
+             <div className="flex items-center text-slate-700">
+                <Users className="w-5 h-5 mr-3 text-blue-500" />
+                <span>150+ Students Certified This Month</span>
+             </div>
+             <div className="flex items-center text-slate-700">
+                <Star className="w-5 h-5 mr-3 text-yellow-500" />
+                <span>Industry-standard content strategy</span>
+             </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-3xl shadow-2xl shadow-blue-100 border border-slate-100 space-y-4">
+          <h3 className="text-xl font-bold text-slate-800 mb-2 text-center">Select Your Path</h3>
+          <button 
+            onClick={() => startGame('standard')}
+            className="w-full group p-5 text-left rounded-2xl border-2 border-blue-50 hover:border-blue-500 hover:bg-blue-50 transition-all"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-slate-800 text-lg">Training Mode</span>
+              <Lightbulb className="w-6 h-6 text-yellow-500" />
+            </div>
+            <p className="text-sm text-slate-500">Includes hints, explanations, and retries for incorrect answers.</p>
+          </button>
+
+          <button 
+            onClick={() => startGame('challenge')}
+            className="w-full group p-5 text-left rounded-2xl border-2 border-red-50 hover:border-red-500 hover:bg-red-50 transition-all"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-slate-800 text-lg">Challenge Mode</span>
+              <Clock className="w-6 h-6 text-red-500" />
+            </div>
+            <p className="text-sm text-slate-500">10-minute timer. No hints. One shot at glory.</p>
+          </button>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <footer 
+        onClick={handleFooterClick}
+        className="w-full py-8 mt-12 border-t border-slate-200 text-center select-none cursor-pointer group"
+      >
+        <p className="text-slate-400 font-medium transition-colors group-hover:text-slate-600">
+          Copyright &copy; TienPing @ 2026
+        </p>
+        <p className="text-[10px] text-slate-300 uppercase tracking-widest mt-1">
+          SMK Sacred Heart • Educational Technology Division
+        </p>
+      </footer>
+
+      {/* CONTACT POPUP */}
+      {showContactPopup && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-100">
+            <div className="bg-blue-600 p-8 text-center text-white relative">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setShowContactPopup(false); }}
+                className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                <User size={40} className="text-white" />
+              </div>
+              <h2 className="text-2xl font-black">Lim Tien Ping</h2>
+              <p className="text-blue-100 text-sm font-medium">Lead Developer & Instructor</p>
+            </div>
+            <div className="p-8 space-y-4">
+              <div className="flex items-center space-x-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <Mail className="text-blue-500 shrink-0" size={20} />
+                <div className="overflow-hidden">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Personal Email</p>
+                  <p className="text-slate-700 font-bold truncate">petwesley@gmail.com</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <Mail className="text-emerald-500 shrink-0" size={20} />
+                <div className="overflow-hidden">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Education Email</p>
+                  <p className="text-slate-700 font-bold truncate">g-39576509@moe-dl.edu.my</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  const renderPlaying = () => (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center py-12 px-6 relative">
+      {showCelebration && <FallingBalls />}
+      
+      <div className="w-full max-w-2xl mb-8 flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+        <div className="flex items-center space-x-4">
+          <div className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest">
+            {currentQuestion.type}
+          </div>
+          <div className="text-slate-400 font-bold text-sm">
+            PAGE {currentQIndex + 1} OF {activeQueue.length}
+          </div>
+        </div>
+        {gameMode === 'challenge' && (
+          <div className={`font-mono text-xl font-black ${timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-slate-700'}`}>
+            {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+          </div>
+        )}
+      </div>
+
+      <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-slate-200 border border-slate-100 overflow-hidden">
+        <div className="h-2 w-full bg-slate-100">
+          <div 
+            className="h-full bg-blue-600 transition-all duration-500" 
+            style={{ width: `${((currentQIndex + 1) / activeQueue.length) * 100}%` }}
+          />
+        </div>
+
+        <div className="p-10">
+          <h2 className="text-2xl font-bold text-slate-800 mb-8 leading-tight">
+            {currentQuestion.question}
+          </h2>
+
+          <div className="grid gap-4">
+            {currentQuestion.options.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleAnswer(idx)}
+                disabled={showCelebration}
+                className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex items-center group
+                  ${showCelebration && idx === currentQuestion.correct 
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-900' 
+                    : 'border-slate-100 hover:border-blue-400 hover:bg-blue-50/50 text-slate-700'}`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 font-black text-sm
+                  ${showCelebration && idx === currentQuestion.correct 
+                    ? 'bg-emerald-500 text-white' 
+                    : 'bg-slate-100 text-slate-500 group-hover:bg-blue-500 group-hover:text-white'}`}>
+                  {String.fromCharCode(65 + idx)}
+                </div>
+                <span className="font-semibold text-lg">{option}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {gameMode === 'standard' && (
+          <div className="bg-slate-50/80 p-6 border-t border-slate-100">
+            <details className="group">
+              <summary className="flex items-center text-sm font-bold text-slate-400 cursor-pointer list-none hover:text-blue-600 transition-colors">
+                <Lightbulb className="w-4 h-4 mr-2" />
+                STUCK? REVEAL HINT
+              </summary>
+              <div className="mt-4 p-4 bg-white rounded-xl border border-blue-100 text-blue-800 italic text-sm">
+                {currentQuestion.hint}
+              </div>
+            </details>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderFeedback = () => {
+    const lastAnswer = userAnswers[userAnswers.length - 1];
+    const isCorrect = lastAnswer.isCorrect;
+
+    return (
+      <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6 z-[200] animate-in fade-in duration-300">
+        <div className="bg-white rounded-[40px] shadow-2xl max-w-lg w-full overflow-hidden border border-white/20">
+          <div className={`p-10 text-center ${isCorrect ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${isCorrect ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+              {isCorrect ? <CheckCircle size={48} /> : <XCircle size={48} />}
+            </div>
+            <h2 className={`text-3xl font-black mb-3 ${isCorrect ? 'text-emerald-900' : 'text-rose-900'}`}>
+              {isCorrect ? "Spot On!" : "Not Quite."}
+            </h2>
+            {!isCorrect && (
+              <p className="text-rose-600 font-bold mb-6 italic">"{MOTIVATION[Math.floor(Math.random() * MOTIVATION.length)]}"</p>
+            )}
+            
+            <div className="bg-white/80 p-6 rounded-3xl text-left border border-slate-100">
+              <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase block mb-2">Expert Review</span>
+              <p className="text-slate-700 leading-relaxed font-medium">
+                {lastAnswer.explanation}
+              </p>
+            </div>
+          </div>
+          
+          <div className="p-6 bg-slate-50 flex justify-center">
+            <button 
+              onClick={nextQuestion}
+              className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-transform active:scale-95 flex items-center justify-center text-lg"
+            >
+              Continue <ChevronRight className="w-5 h-5 ml-2" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSummary = () => {
+    const percentage = Math.round((score / QUESTION_BANK.length) * 100);
+    
+    return (
+      <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center justify-center">
+        <div className="max-w-2xl w-full bg-white rounded-[40px] shadow-2xl border border-slate-100 p-12 text-center">
+          <div className="relative inline-block mb-10">
+            <div className="absolute -inset-4 bg-yellow-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+            <Trophy className="w-24 h-24 text-yellow-500 relative" />
+          </div>
+          
+          <h2 className="text-4xl font-black text-slate-900 mb-2">Assessment Results</h2>
+          <p className="text-slate-500 mb-10 text-lg">Performance review for the Web Migration Team.</p>
+
+          <div className="grid grid-cols-2 gap-6 mb-12">
+            <div className="bg-blue-50/50 p-8 rounded-[32px] border border-blue-100">
+              <div className="text-4xl font-black text-blue-600 mb-1">{score}</div>
+              <div className="text-xs font-bold text-blue-400 uppercase tracking-widest">Questions Correct</div>
+            </div>
+            <div className="bg-indigo-50/50 p-8 rounded-[32px] border border-indigo-100">
+              <div className="text-4xl font-black text-indigo-600 mb-1">{percentage}%</div>
+              <div className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Skill Level</div>
+            </div>
+          </div>
+
+          {wrongQueue.length > 0 && !isRetrying && (
+            <div className="mb-12 bg-orange-50 border border-orange-200 p-8 rounded-[32px] text-left relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center space-x-3 mb-3">
+                  <AlertCircle className="w-6 h-6 text-orange-600" />
+                  <h3 className="font-black text-orange-900 text-xl uppercase tracking-tight">Growth Opportunity</h3>
+                </div>
+                <p className="text-orange-800 mb-6 font-medium">
+                  We identified {wrongQueue.length} areas for improvement. Review these specific concepts to secure your spot on the team.
+                </p>
+                <button 
+                  onClick={startRetry}
+                  className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-orange-200 flex items-center justify-center"
+                >
+                  <RefreshCcw className="w-5 h-5 mr-3" />
+                  Review Mistakes
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+             <h3 className="text-xl font-black text-slate-800">Final Step: Issue Certification</h3>
+             <input
+                type="text"
+                placeholder="Student Full Name"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-center text-xl font-bold focus:border-blue-500 focus:bg-white outline-none transition-all"
+             />
+             <button 
+                onClick={() => { if(userName.trim()) setGameState('certificate'); else alert("Name required!"); }}
+                className="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl hover:shadow-2xl hover:scale-[1.02] transition-all"
+             >
+                Generate Certificate
+             </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCertificate = () => (
+    <div className="min-h-screen bg-slate-900 p-8 flex flex-col items-center justify-center">
+      <div className="text-center mb-10 text-white space-y-2 animate-bounce">
+        <p className="text-xl font-black uppercase tracking-[0.2em]">Success!</p>
+        <p className="text-slate-400">Save your digital credential below.</p>
+      </div>
+      
+      <div className="bg-white p-16 rounded-xl shadow-[0_40px_100px_rgba(0,0,0,0.5)] max-w-5xl w-full border-[12px] border-double border-slate-800 text-center relative">
+        <div className="absolute inset-4 border-2 border-slate-200 pointer-events-none rounded-sm"></div>
+        
+        <div className="flex justify-between items-start mb-12 relative z-10">
+          <div className="text-left">
+             <Award className="w-20 h-20 text-blue-900 mb-2" />
+             <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+          </div>
+          <div className="text-right">
+             <h1 className="text-6xl font-serif text-slate-900 mb-0 leading-none">CERTIFICATE</h1>
+             <p className="text-slate-400 font-bold uppercase tracking-[0.5em] text-sm">Of Proficiency</p>
+          </div>
+        </div>
+
+        <div className="space-y-8 relative z-10">
+          <p className="text-2xl font-serif text-slate-600 italic">This is to officially recognize that</p>
+          
+          <div className="text-6xl font-black text-blue-900 border-b-4 border-slate-900 inline-block px-20 pb-4 mb-4">
+            {userName}
+          </div>
+
+          <p className="text-2xl text-slate-700 leading-relaxed font-medium">
+            Has successfully completed the assessment for <br/>
+            <span className="text-3xl font-black text-slate-900">GOOGLE SITES WEB ARCHITECT</span><br/>
+            demonstrating advanced mastery of interactive design and content optimization.
+          </p>
+
+          <div className="grid grid-cols-3 gap-12 mt-16 pt-10 border-t border-slate-100 items-end">
+            <div className="text-center">
+              <div className="font-black text-xl text-slate-800">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Completion Date</div>
+            </div>
+            <div className="flex items-center justify-center">
+               <ShieldCheck className="w-16 h-16 text-blue-900 opacity-20" />
+            </div>
+            <div className="text-center flex flex-col items-center">
+              <img 
+                src="https://tienping.github.io/public_resources/images/signature.png" 
+                alt="Authorized Signature" 
+                className="h-20 object-contain mb-2"
+                onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+              />
+              <div className="hidden font-serif text-2xl italic text-slate-800">Authorized Signature</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 border-t border-slate-200 pt-1 w-full">Authorized Digitally</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button 
+        onClick={() => setGameState('menu')}
+        className="mt-12 text-slate-400 hover:text-white font-bold transition-colors uppercase tracking-widest text-sm"
+      >
+        Return to Academy Home
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="font-sans antialiased text-slate-900">
+      {gameState === 'menu' && renderMenu()}
+      {gameState === 'playing' && renderPlaying()}
+      {gameState === 'feedback' && renderFeedback()}
+      {gameState === 'summary' && renderSummary()}
+      {gameState === 'certificate' && renderCertificate()}
+    </div>
+  );
+}
