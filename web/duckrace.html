@@ -85,7 +85,7 @@
             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
                 <span id="titlePrefix">Duck</span> Race <span class="text-sky-500">Assigner</span>
             </h1>
-            <p class="text-slate-500 text-lg font-medium">Assigning presentation parts for Science class!</p>
+            <p class="text-slate-500 text-lg font-medium">Assigning presentation tasks!</p>
         </header>
 
         <!-- Input Section -->
@@ -102,7 +102,7 @@ Lim</textarea>
 
             <div class="glass-panel p-5 rounded-3xl shadow-lg">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tasks (Parts)</label>
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tasks</label>
                     <span id="taskCount" class="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-black rounded-full">0</span>
                 </div>
                 <textarea id="tasksInput" class="w-full h-32 p-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-400 transition-all resize-none custom-scrollbar outline-none text-slate-600 text-sm font-medium" placeholder="Pengenalan & Isi 1&#10;Isi 2 & Isi 3&#10;Isi 4 & Kesimpulan">Pengenalan & Isi 1
@@ -458,7 +458,7 @@ Isi 4 & Kesimpulan</textarea>
                         <span class="font-bold text-slate-400">${item.name}</span>
                     </div>
                     <div class="task-badge flex items-center gap-2">
-                        <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
+                        <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Task:</span>
                         <span class="px-3 py-1 bg-slate-100 text-slate-300 font-bold rounded-md text-sm italic">Waiting...</span>
                     </div>
                 `;
@@ -527,7 +527,7 @@ Isi 4 & Kesimpulan</textarea>
             row.querySelector('.rank-badge').textContent = finishedDucksCount;
             row.querySelector('span.font-bold').className = "font-bold text-slate-800";
             row.querySelector('.task-badge').innerHTML = `
-                <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
+                <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Task:</span>
                 <span class="px-3 py-1 bg-sky-50 text-sky-600 font-bold rounded-md text-sm">${task}</span>
             `;
         }
@@ -541,7 +541,7 @@ Isi 4 & Kesimpulan</textarea>
         function copyResults() {
             // Generates WhatsApp friendly text with extra line breaks
             const text = resultsData
-                .map(r => `*${r.name}*\nPart: ${r.task}`)
+                .map(r => `*${r.name}*\Task: ${r.task}`)
                 .join('\n\n'); 
             
             const el = document.createElement('textarea');
