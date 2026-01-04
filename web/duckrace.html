@@ -541,7 +541,7 @@ Isi 4 & Kesimpulan</textarea>
         function copyResults() {
             // Generates WhatsApp friendly text with extra line breaks
             const text = resultsData
-                .map(r => `*${r.name}*\Task: ${r.task}`)
+                .map(r => `*${r.name}*\nTask: ${r.task}`)
                 .join('\n\n'); 
             
             const el = document.createElement('textarea');
