@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Auditori</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        .reveal h1, .reveal h2, .reveal h3, .reveal p {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-transform: none;
+        }
+        .play-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .play-btn:active {
+            transform: scale(0.95);
+            background: #2563eb;
+        }
+        .play-btn:hover {
+            background: #60a5fa;
+        }
+        .img-frame {
+            border: 5px solid white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-height: 400px;
+            object-fit: cover;
+        }
+        .song-card {
+            background-color: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 2rem;
+            border-radius: 1rem;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        /* Custom Navigation Styles */
+        .custom-nav {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            background-color: rgba(75, 85, 99, 0.8); /* Gray-600 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .nav-btn:hover {
+            background-color: rgba(55, 65, 81, 1); /* Gray-700 */
+            transform: translateY(-2px);
+        }
+        .nav-btn.next-btn {
+            background-color: #3b82f6; /* Blue-500 */
+        }
+        .nav-btn.next-btn:hover {
+            background-color: #2563eb; /* Blue-600 */
+        }
+        /* Style for slide numbers to ensure visibility over custom nav */
+        .reveal .slide-number {
+            font-size: 20px !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            right: auto !important;
+            background-color: rgba(255, 255, 255, 0.8) !important;
+            color: #333 !important;
+            border-radius: 4px;
+            padding: 5px 10px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Title -->
+            <section data-background-color="#eff6ff">
+                <h1 class="text-6xl font-bold text-blue-800 mb-6">Simulasi Auditori</h1>
+                <p class="text-xl text-blue-600">Sila pasang pembesar suara anda 🔊</p>
+                <div class="mt-8 text-6xl">👂🎼</div>
+            </section>
+
+            <!-- Slide 2: Audio Kucing -->
+            <section style="text-align: center;">
+                <h2 class="text-3xl font-bold mb-8 text-gray-700">Cuba teka bunyi binatang apa ini?</h2>
+                
+                <button onclick="playAudio('cat-sound')" class="play-btn">
+                    <span>▶️</span> Mainkan Bunyi
+                </button>
+                
+                <audio id="cat-sound" src="https://www.google.com/logos/fnbx/animal_sounds/cat.mp3"></audio>
+                
+                <p class="mt-8 text-sm text-gray-500 italic fragment">Dengar dengan teliti...</p>
+            </section>
+
+            <!-- Slide 3: Gambar Kucing -->
+            <section>
+                <h2 class="text-4xl font-bold text-orange-500 mb-4">Ia adalah KUCING! 🐱</h2>
+                <div class="flex justify-center">
+                    <img src="https://www.thesprucepets.com/thmb/rYn5DKWNTE3lcS_ho4KKuwPaFEo=/1999x0/filters:no_upscale():strip_icc()/GettyImages-1041780090-6f44ac47638a4f1b85fed77ed6cc0e25.jpg" alt="Kucing Comel" class="img-frame">
+                </div>
+            </section>
+
+            <!-- Slide 4: Audio Burung -->
+            <section style="text-align: center;">
+                <h2 class="text-3xl font-bold mb-8 text-gray-700">Cuba teka bunyi binatang apa ini?</h2>
+                
+                <button onclick="playAudio('bird-sound')" class="play-btn bg-green-500 hover:bg-green-400">
+                    <span>▶️</span> Mainkan Bunyi
+                </button>
+                
+                <audio id="bird-sound" src="https://tienping.github.io/public_resources/audio/bird-chipping-sound.mp3"></audio>
+                
+                <p class="mt-8 text-sm text-gray-500 italic fragment">Bunyi yang lebih besar...</p>
+            </section>
+
+            <!-- Slide 5: Gambar Burung -->
+            <section>
+                <h2 class="text-4xl font-bold text-green-700 mb-4">Ia adalah Burung! 🐮</h2>
+                <div class="flex justify-center">
+                    <img src="https://images.birdfact.com/production/why-do-birds-open-their-wings.jpg?w=1200&h=630&q=82&auto=format&fit=crop&dm=1659955109&s=27521b96539e95dafb45af31b5cfac45" alt="Burung" class="img-frame">
+                </div>
+            </section>
+
+            <!-- Slide 5: Audio Lembu -->
+            <section style="text-align: center;">
+                <h2 class="text-3xl font-bold mb-8 text-gray-700">Cuba teka bunyi binatang apa ini?</h2>
+                
+                <button onclick="playAudio('cow-sound')" class="play-btn bg-green-500 hover:bg-green-400">
+                    <span>▶️</span> Mainkan Bunyi
+                </button>
+                
+                <audio id="cow-sound" src="https://www.google.com/logos/fnbx/animal_sounds/cow.mp3"></audio>
+                
+                <p class="mt-8 text-sm text-gray-500 italic fragment">Bunyi yang lebih besar...</p>
+            </section>
+
+            <!-- Slide 6: Gambar Lembu -->
+            <section>
+                <h2 class="text-4xl font-bold text-green-700 mb-4">Ia adalah Lembu! 🐮</h2>
+                <div class="flex justify-center">
+                    <img src="https://media2.fishtank.my/media/era/assets/gambar-artikel-2019/ogos-19/cow-eats-grass-in-green-field_rbbkporw__f0007.png" alt="Lembu Gagah" class="img-frame">
+                </div>
+            </section>
+
+            <!-- Slide 7: Audio Ikan -->
+            <section style="text-align: center;">
+                <h2 class="text-3xl font-bold mb-8 text-gray-700">Cuba teka bunyi binatang apa ini?</h2>
+                
+                <button onclick="playAudio('fish-sound')" class="play-btn bg-green-500 hover:bg-green-400">
+                    <span>▶️</span> Mainkan Bunyi
+                </button>
+                
+                <audio id="fish-sound" src="https://tienping.github.io/public_resources/audio/great-white-sound.mp3"></audio>
+                
+                <p class="mt-8 text-sm text-gray-500 italic fragment">Bunyi yang lebih besar...</p>
+            </section>
+
+            <!-- Slide 8: Gambar Ikan -->
+            <section>
+                <h2 class="text-4xl font-bold text-green-700 mb-4">Ia adalah Ikan! 🐮</h2>
+                <div class="flex justify-center">
+                    <img src="https://media.istockphoto.com/id/816877130/photo/bull-shark-gills.jpg?s=612x612&w=0&k=20&c=4-FxuEwNQCdjyPjD8zFppOvZx1qyEkAXBPRqpdMAKfc=" alt="Ikan" class="img-frame">
+                </div>
+            </section>
+
+            <!-- Slide 9: Confetti (Triggered via data-state) -->
+            <section data-state="trigger-confetti" style="text-align: center;">
+                <h1 class="text-8xl mb-4">🌟 BAGUS! 🌟</h1>
+                <h3 class="text-3xl text-gray-600">Tahniah kerana meneka dengan tepat!</h3>
+            </section>
+
+            <!-- Slide 10: Info Kucing -->
+            <section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <img src="https://www.thesprucepets.com/thmb/rYn5DKWNTE3lcS_ho4KKuwPaFEo=/1999x0/filters:no_upscale():strip_icc()/GettyImages-1041780090-6f44ac47638a4f1b85fed77ed6cc0e25.jpg" alt="Kucing" class="rounded-lg shadow-lg">
+                    <div class="text-left bg-white p-6 rounded shadow border-l-4 border-orange-400">
+                        <h3 class="text-2xl font-bold mb-4 text-orange-600">Kucing</h3>
+                        <p class="text-xl leading-relaxed">
+                            "Kucing ialah haiwan peliharaan yang hidup di darat dan badannya berbulu lembut."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 11: Info Lembu -->
+            <section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="text-left bg-white p-6 rounded shadow border-l-4 border-green-600">
+                        <h3 class="text-2xl font-bold mb-4 text-green-700">Lembu</h3>
+                        <p class="text-xl leading-relaxed">
+                            "Lembu juga hidup di darat dan makan rumput."
+                        </p>
+                    </div>
+                    <img src="https://media2.fishtank.my/media/era/assets/gambar-artikel-2019/ogos-19/cow-eats-grass-in-green-field_rbbkporw__f0007.png" alt="Lembu Makan Rumput" class="rounded-lg shadow-lg">
+                </div>
+            </section>
+
+            <!-- Slide 12: Info Ikan -->
+            <section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <img src="https://media.istockphoto.com/id/816877130/photo/bull-shark-gills.jpg?s=612x612&w=0&k=20&c=4-FxuEwNQCdjyPjD8zFppOvZx1qyEkAXBPRqpdMAKfc=" alt="Ikan" class="rounded-lg shadow-lg">
+                    <div class="text-left bg-white p-6 rounded shadow border-l-4 border-blue-400">
+                        <h3 class="text-2xl font-bold mb-4 text-blue-600">Ikan</h3>
+                        <p class="text-xl leading-relaxed">
+                            "Ikan hidup di air dan bernafas menggunakan insang."
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 13: Info Burung -->
+            <section>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="text-left bg-white p-6 rounded shadow border-l-4 border-yellow-400">
+                        <h3 class="text-2xl font-bold mb-4 text-yellow-600">Burung</h3>
+                        <p class="text-xl leading-relaxed">
+                            "Burung tinggal di pokok dan boleh terbang kerana ada sayap."
+                        </p>
+                    </div>
+                    <img src="https://images.birdfact.com/production/why-do-birds-open-their-wings.jpg?w=1200&h=630&q=82&auto=format&fit=crop&dm=1659955109&s=27521b96539e95dafb45af31b5cfac45" alt="Burung di Pokok" class="rounded-lg shadow-lg">
+                </div>
+            </section>
+
+            <!-- Slide 14: Soalan -->
+            <section style="text-align: center;" data-background-color="#f3f4f6">
+                <div class="text-6xl mb-6">🤔❓</div>
+                <h2 class="text-4xl font-bold text-gray-800 leading-normal">
+                    Siapa boleh ulang apa yang kamu dengar tadi?
+                </h2>
+            </section>
+
+            <!-- Slide 15: Nyanyi Lagu -->
+            <section style="text-align: center;">
+                <h2 class="text-4xl font-bold text-purple-600 mb-8">🎵 Jom Nyanyi Lagu 🎵</h2>
+                
+                <div class="song-card shadow-2xl mx-auto max-w-2xl">
+                    <p class="text-2xl mb-4">🐮 Lembu darat makan rumput,</p>
+                    <p class="text-2xl mb-4">🐟 Ikan air ada insang,</p>
+                    <p class="text-2xl mb-4">🐦 Burung pokok terbang tinggi,</p>
+                    <p class="text-2xl text-orange-600 font-bold">🐱 Kucing rumah berbulu sayang.</p>
+                </div>
+
+                <button onclick="playAudio('song-audio')" class="play-btn bg-purple-500 hover:bg-purple-400 mt-8">
+                    <span>▶️</span> Mainkan Lagu
+                </button>
+                <audio id="song-audio" src="https://cdn9.ilovesong.ai/audios/2bf86e4b-ad2c-4aa7-b534-62eec49d0bca.mp3"></audio>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Custom Navigation Buttons -->
+    <div class="custom-nav">
+        <button onclick="Reveal.prev()" class="nav-btn">Previous</button>
+        <button onclick="Reveal.next()" class="nav-btn next-btn">Next</button>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+    <script>
+        // Init Reveal
+        Reveal.initialize({
+            controls: false, // Turn off default arrows since we have custom buttons
+            progress: true,
+            center: true,
+            hash: false,
+            history: false,
+            transition: 'convex',
+            slideNumber: 'c/t', // Format: current / total
+        });
+
+        // Audio Player Function
+        function playAudio(id) {
+            const audio = document.getElementById(id);
+            if(audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => alert("Sila benarkan audio di pelayar anda / Please allow audio in your browser"));
+            }
+        }
+
+        // Confetti Trigger Logic
+        Reveal.on('slidechanged', event => {
+            if (event.currentSlide.getAttribute('data-state') === 'trigger-confetti') {
+                fireConfetti();
+            }
+        });
+
+        // Also trigger if we load directly onto that slide (rare in this setup but good practice)
+        // Fix: Added check for null to prevent "Cannot read properties of null" error
+        var currentSlide = document.querySelector('section.present');
+        if (currentSlide && currentSlide.getAttribute('data-state') === 'trigger-confetti') {
+            fireConfetti();
+        }
+
+        function fireConfetti() {
+            var duration = 2000; // 2 seconds
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#bb0000', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#bb0000', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
