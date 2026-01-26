@@ -1,924 +1,1033 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Beaker, 
-  Flame, 
-  Zap, 
-  Atom, 
-  Microscope, 
-  Globe, 
-  CloudRain, 
-  Trophy, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
-  HelpCircle,
-  Timer,
-  Award,
-  Share2,
-  RefreshCw,
-  FlaskConical,
-  Thermometer,
-  Pipette,
-  Skull,
-  LayoutGrid,
-  List
-} from 'lucide-react';
-
-/**
- * --- SVG ASSETS & ICONS ---
- * Custom SVG components to remove dependency on external images.
- */
-
-const HazardIcon = ({ type }: { type: string }) => {
-  const baseClass = "w-24 h-24 mx-auto mb-2";
-  switch(type.toLowerCase()) {
-    case 'corrosive':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <path d="M30 40 L40 60 M70 40 L60 60" stroke="black" strokeWidth="3"/>
-          <rect x="25" y="65" width="20" height="10" fill="#4b5563"/>
-          <rect x="55" y="65" width="30" height="5" fill="#4b5563"/>
-        </svg>
-      );
-    case 'explosive':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <circle cx="50" cy="55" r="10" fill="black" />
-          <path d="M50 55 L50 30 M50 55 L70 45 M50 55 L70 75 M50 55 L30 75 M50 55 L30 45" stroke="black" strokeWidth="3" />
-        </svg>
-      );
-    case 'flammable':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <path d="M50 30 Q30 60 50 80 Q70 60 50 30" fill="black" />
-          <path d="M50 30 Q55 50 50 60" stroke="white" strokeWidth="1"/>
-        </svg>
-      );
-    case 'radioactive':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <circle cx="50" cy="55" r="5" fill="black" />
-          <path d="M50 55 L50 35 M50 55 L68 65 M50 55 L32 65" stroke="black" strokeWidth="8" />
-          <circle cx="50" cy="55" r="15" stroke="black" strokeWidth="3" fill="none" />
-        </svg>
-      );
-    case 'poisonous':
-    case 'toxic':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <circle cx="38" cy="45" r="6" fill="black"/>
-          <circle cx="62" cy="45" r="6" fill="black"/>
-          <path d="M40 60 Q50 50 60 60" stroke="black" strokeWidth="3" fill="none"/>
-          <path d="M30 70 L70 70" stroke="black" strokeWidth="4"/>
-          <path d="M30 70 L20 80 M70 70 L80 80" stroke="black" strokeWidth="4"/>
-        </svg>
-      );
-    case 'irritant':
-      return (
-        <svg viewBox="0 0 100 100" className={baseClass}>
-          <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
-          <path d="M40 35 L60 75 M60 35 L40 75" stroke="black" strokeWidth="8"/>
-        </svg>
-      );
-    default:
-      return <AlertTriangle className="w-24 h-24 text-yellow-500 mx-auto" />;
-  }
-};
-
-const ApparatusIcon = ({ type }: { type: string }) => {
-  const baseClass = "w-32 h-32 mx-auto text-blue-600 mb-2 p-2 bg-white rounded shadow-sm border";
-  // Simple SVG drawings for apparatus
-  switch(type.toLowerCase().replace(/ /g, '-')) {
-    case 'test-tube':
-      return <svg viewBox="0 0 100 100" className={baseClass}><path d="M40 10 L40 80 Q40 95 50 95 Q60 95 60 80 L60 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M40 25 L60 25" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
-    case 'boiling-tube':
-      return <svg viewBox="0 0 100 100" className={baseClass}><path d="M35 10 L35 80 Q35 95 50 95 Q65 95 65 80 L65 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M35 30 L65 30" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
-    case 'beaker':
-      return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 10 L30 80 Q30 90 40 90 L60 90 Q70 90 70 80 L70 15 L65 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M30 30 L70 30 M30 50 L70 50" stroke="currentColor" strokeWidth="1" opacity="0.5"/></svg>;
-    case 'conical-flask':
-      return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 L75 85 Q80 95 70 95 L30 95 Q20 95 25 85 L45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M35 60 L65 60" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
-    case 'measuring-cylinder':
-      return <svg viewBox="0 0 100 100" className={baseClass}><rect x="40" y="10" width="20" height="80" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M30 90 L70 90" stroke="currentColor" strokeWidth="3"/><path d="M40 20 L50 20 M40 30 L55 30 M40 40 L50 40 M40 50 L55 50 M40 60 L50 60 M40 70 L55 70" stroke="currentColor" strokeWidth="2"/></svg>;
-    case 'burette':
-       return <svg viewBox="0 0 100 100" className={baseClass}><rect x="45" y="5" width="10" height="70" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M50 75 L50 95" stroke="currentColor" strokeWidth="2"/><path d="M40 80 L60 80" stroke="currentColor" strokeWidth="3"/><path d="M45 15 L55 15 M45 25 L55 25 M45 35 L55 35" stroke="currentColor" strokeWidth="1"/></svg>;
-    case 'pipette':
-      return <svg viewBox="0 0 100 100" className={baseClass}><path d="M48 5 L52 5 L52 30 Q55 35 60 45 L60 65 Q55 75 52 80 L52 95 L48 95 L48 80 Q45 75 40 65 L40 45 Q45 35 48 30 Z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
-    case 'tripod-stand':
-       return <svg viewBox="0 0 100 100" className={baseClass}><ellipse cx="50" cy="30" rx="30" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M25 32 L15 90 M50 35 L50 90 M75 32 L85 90" stroke="currentColor" strokeWidth="3"/></svg>;
-    case 'retort-stand-with-clamps':
-       return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="90" width="40" height="5" fill="currentColor"/><rect x="30" y="10" width="5" height="80" fill="currentColor"/><path d="M35 30 L60 30" stroke="currentColor" strokeWidth="3"/><circle cx="65" cy="30" r="5" stroke="currentColor" fill="none"/></svg>;
-    case 'wire-gauze':
-        return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M20 30 L80 30 M20 40 L80 40 M20 50 L80 50 M20 60 L80 60 M20 70 L80 70 M30 20 L30 80 M40 20 L40 80 M50 20 L50 80 M60 20 L60 80 M70 20 L70 80" stroke="currentColor" opacity="0.5"/></svg>;
-    case 'filter-funnel':
-        return <svg viewBox="0 0 100 100" className={baseClass}><path d="M20 20 L80 20 L55 50 L55 90 L45 90 L45 50 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
-    case 'gas-jar':
-        return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 10 L30 90 L70 90 L70 10" fill="none" stroke="currentColor" strokeWidth="3"/><ellipse cx="50" cy="10" rx="20" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
-    case 'evaporating-dish':
-        return <svg viewBox="0 0 100 100" className={baseClass}><path d="M10 40 Q50 90 90 40" fill="none" stroke="currentColor" strokeWidth="3"/><line x1="10" y1="40" x2="90" y2="40" stroke="currentColor" strokeWidth="3"/></svg>;
-    case 'crucible':
-         return <svg viewBox="0 0 100 100" className={baseClass}><path d="M20 30 Q20 80 50 80 Q80 80 80 30" fill="none" stroke="currentColor" strokeWidth="3"/><line x1="15" y1="30" x2="85" y2="30" stroke="currentColor" strokeWidth="3"/><path d="M20 25 Q50 15 80 25" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
-    case 'flat-bottom-flask':
-        return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 Q80 40 80 70 Q80 90 60 90 L40 90 Q20 90 20 70 Q20 40 45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
-    case 'round-bottom-flask':
-        return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 Q80 40 80 65 Q80 90 50 90 Q20 90 20 65 Q20 40 45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
-    default:
-      return <FlaskConical className={baseClass} />;
-  }
-};
-
-
-/**
- * --- DATA BANK ---
- */
-const questions = [
-  // --- PART A: Natural Phenomena (30 questions planned, sample included) ---
-  {
-    id: 'a1', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-    question: "Which of the following is a natural phenomenon?",
-    options: [
-      { id: 'opt1', text: "Volcanic Eruption", icon: <Flame className="w-12 h-12 text-red-500" /> },
-      { id: 'opt2', text: "Car Accident", icon: <AlertTriangle className="w-12 h-12 text-gray-500" /> },
-      { id: 'opt3', text: "Building Construction", icon: <div className="text-4xl">🏗️</div> },
-      { id: 'opt4', text: "Fireworks", icon: <div className="text-4xl">🎆</div> }
-    ],
-    correct: 'opt1',
-    explanation: "Volcanic eruptions occur naturally due to Earth's internal heat, unlike cars or buildings which are man-made."
-  },
-  {
-    id: 'a2', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-    question: "Identify the natural phenomenon.",
-    options: [
-      { id: 'opt1', text: "Tsunami", icon: <div className="text-4xl">🌊</div> },
-      { id: 'opt2', text: "Swimming Pool", icon: <div className="text-4xl">🏊</div> },
-      { id: 'opt3', text: "Dam Release", icon: <div className="text-4xl">💧</div> },
-      { id: 'opt4', text: "Water Fountain", icon: <div className="text-4xl">⛲</div> }
-    ],
-    correct: 'opt1',
-    explanation: "Tsunamis are natural large waves caused by earthquakes, unlike artificial water structures."
-  },
-  {
-    id: 'a3', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-    question: "Which image represents a natural phenomenon?",
-    options: [
-      { id: 'opt1', text: "Lightning", icon: <Zap className="w-12 h-12 text-yellow-400" /> },
-      { id: 'opt2', text: "Street Light", icon: <div className="text-4xl">💡</div> },
-      { id: 'opt3', text: "Flashlight", icon: <div className="text-4xl">🔦</div> },
-      { id: 'opt4', text: "Neon Sign", icon: <div className="text-4xl">🏮</div> }
-    ],
-    correct: 'opt1',
-    explanation: "Lightning is a natural electrostatic discharge, unlike artificial lights."
-  },
-  {
-    id: 'a4', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-    question: "Select the natural phenomenon.",
-    options: [
-      { id: 'opt1', text: "Rainbow", icon: <div className="text-4xl">🌈</div> },
-      { id: 'opt2', text: "Painting", icon: <div className="text-4xl">🎨</div> },
-      { id: 'opt3', text: "Disco Lights", icon: <div className="text-4xl">💃</div> },
-      { id: 'opt4', text: "Prism Lab Experiment", icon: <div className="text-4xl">🔬</div> }
-    ],
-    correct: 'opt1',
-    explanation: "Rainbows form naturally when sunlight is refracted by rain droplets."
-  },
-  {
-    id: 'a5', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-    question: "Which of these happens without human intervention?",
-    options: [
-      { id: 'opt1', text: "Plant Growth", icon: <div className="text-4xl">🌱</div> },
-      { id: 'opt2', text: "Plastic Flower", icon: <div className="text-4xl">💐</div> },
-      { id: 'opt3', text: "3D Printed Tree", icon: <div className="text-4xl">🌲</div> },
-      { id: 'opt4', text: "Paper Rose", icon: <div className="text-4xl">🌹</div> }
-    ],
-    correct: 'opt1',
-    explanation: "Biological growth is a natural life process."
-  },
-
-  // --- PART B: Science Fields Definitions (Sample) ---
-  {
-    id: 'b1', part: 'B', category: 'Science Definitions', type: 'standard',
-    question: "The study of life and living organisms, including their structure, function, growth, and evolution.",
-    options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
-    correct: 'b',
-    explanation: "Biology comes from 'bios' (life) and 'logos' (study)."
-  },
-  {
-    id: 'b2', part: 'B', category: 'Science Definitions', type: 'standard',
-    question: "The study of matter and energy and the interactions between them.",
-    options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}],
-    correct: 'p',
-    explanation: "Physics deals with the fundamental laws of the universe, energy, and matter."
-  },
-  {
-    id: 'b3', part: 'B', category: 'Science Definitions', type: 'standard',
-    question: "The study of the composition, structure, properties, and change of matter.",
-    options: [{id:'c', text:'Chemistry'}, {id:'m', text:'Meteorology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
-    correct: 'c',
-    explanation: "Chemistry focuses on substances, atoms, molecules, and chemical reactions."
-  },
-  {
-    id: 'b4', part: 'B', category: 'Science Definitions', type: 'standard',
-    question: "The study of the Earth, the rocks of which it is composed, and the processes by which they change.",
-    options: [{id:'g', text:'Geology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'b', text:'Biology'}],
-    correct: 'g',
-    explanation: "Geology involves studying Earth's physical structure and substance."
-  },
-  {
-    id: 'b5', part: 'B', category: 'Science Definitions', type: 'standard',
-    question: "The study of the universe beyond Earth, including stars, galaxies, and planets.",
-    options: [{id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}],
-    correct: 'a',
-    explanation: "Astronomy is the scientific study of celestial objects and phenomena."
-  },
-
-  // --- PART C: Careers (With Translations) ---
-  {
-    id: 'c1', part: 'C', category: 'Careers', type: 'career-match',
-    career: { en: "Doctor", bm: "Doktor", cn: "医生", icon: "🩺" },
-    question: "Which field of science does this career belong to?",
-    options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
-    correct: 'b',
-    explanation: "Doctors study the human body and diseases, which is applied Biology."
-  },
-  {
-    id: 'c2', part: 'C', category: 'Careers', type: 'career-match',
-    career: { en: "Pharmacist", bm: "Ahli Farmasi", cn: "药剂师", icon: "💊" },
-    question: "Which field of science does this career belong to?",
-    options: [{id:'c', text:'Chemistry'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}],
-    correct: 'c',
-    explanation: "Pharmacists deal with chemical compounds in medicines, heavily relying on Chemistry."
-  },
-  {
-    id: 'c3', part: 'C', category: 'Careers', type: 'career-match',
-    career: { en: "Mechanical Engineer", bm: "Jurutera Mekanikal", cn: "机械工程师", icon: "⚙️" },
-    question: "Which field of science does this career belong to?",
-    options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'g', text:'Geology'}, {id:'m', text:'Meteorology'}],
-    correct: 'p',
-    explanation: "Mechanical engineering is based on principles of Physics (forces, energy, motion)."
-  },
-  {
-    id: 'c4', part: 'C', category: 'Careers', type: 'career-match',
-    career: { en: "Weather Forecaster", bm: "Peramal Cuaca", cn: "天气预报员", icon: "🌦️" },
-    question: "Which field of science does this career belong to?",
-    options: [{id:'m', text:'Meteorology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'c', text:'Chemistry'}],
-    correct: 'm',
-    explanation: "Meteorology is specifically the study of weather and climate."
-  },
-  {
-    id: 'c5', part: 'C', category: 'Careers', type: 'career-match',
-    career: { en: "Astronomer", bm: "Ahli Astronomi", cn: "天文学家", icon: "🔭" },
-    question: "Which field of science does this career belong to?",
-    options: [{id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
-    correct: 'a',
-    explanation: "Astronomers study space and celestial bodies."
-  },
-
-  // --- PART D: Apparatus Identification (Using SVGs) ---
-  {
-    id: 'd1', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-    apparatusType: 'Test Tube',
-    question: "Identify this apparatus.",
-    options: [{id:'1', text:'Test Tube'}, {id:'2', text:'Boiling Tube'}, {id:'3', text:'Measuring Cylinder'}, {id:'4', text:'Beaker'}],
-    correct: '1',
-    explanation: "It is a narrow glass tube closed at one end, used for small amounts of liquids."
-  },
-  {
-    id: 'd2', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-    apparatusType: 'Beaker',
-    question: "Identify this apparatus.",
-    options: [{id:'1', text:'Conical Flask'}, {id:'2', text:'Beaker'}, {id:'3', text:'Gas Jar'}, {id:'4', text:'Crucible'}],
-    correct: '2',
-    explanation: "A beaker is a cylindrical container with a flat bottom and a lip for pouring."
-  },
-  {
-    id: 'd3', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-    apparatusType: 'Conical Flask',
-    question: "Identify this apparatus.",
-    options: [{id:'1', text:'Round-bottom flask'}, {id:'2', text:'Flat-bottom flask'}, {id:'3', text:'Conical Flask'}, {id:'4', text:'Filter Funnel'}],
-    correct: '3',
-    explanation: "Also known as an Erlenmeyer flask, it has a cone-shaped body and cylindrical neck."
-  },
-  {
-    id: 'd4', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-    apparatusType: 'Tripod Stand',
-    question: "Identify this apparatus.",
-    options: [{id:'1', text:'Retort Stand'}, {id:'2', text:'Tripod Stand'}, {id:'3', text:'Wire Gauze'}, {id:'4', text:'Bunsen Burner'}],
-    correct: '2',
-    explanation: "A three-legged stand used to support apparatus during heating."
-  },
-  {
-    id: 'd5', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-    apparatusType: 'Burette',
-    question: "Identify this apparatus.",
-    options: [{id:'1', text:'Pipette'}, {id:'2', text:'Burette'}, {id:'3', text:'Thermometer'}, {id:'4', text:'Measuring Cylinder'}],
-    correct: '2',
-    explanation: "A burette is a long graduated tube with a tap at the bottom, used for titration."
-  },
-
-  // --- PART E1: Apparatus Function ---
-  {
-    id: 'e1', part: 'E1', category: 'Apparatus Function', type: 'standard',
-    question: "What is the function of a Measuring Cylinder?",
-    options: [
-      {id:'a', text:'To measure the volume of liquid accurately'}, 
-      {id:'b', text:'To heat chemicals'}, 
-      {id:'c', text:'To hold solids'}, 
-      {id:'d', text:'To filter mixtures'}
-    ],
-    correct: 'a',
-    explanation: "Measuring cylinders are designed to measure liquid volume, though less accurately than a pipette or burette."
-  },
-  {
-    id: 'e2', part: 'E1', category: 'Apparatus Function', type: 'standard',
-    question: "What is the primary use of a Wire Gauze?",
-    options: [
-      {id:'a', text:'To hold a test tube'}, 
-      {id:'b', text:'To spread heat evenly during heating'}, 
-      {id:'c', text:'To extinguish fire'}, 
-      {id:'d', text:'To mix chemicals'}
-    ],
-    correct: 'b',
-    explanation: "Placed on a tripod stand, it distributes the flame's heat to prevent the glass apparatus from cracking."
-  },
-  {
-    id: 'e3', part: 'E1', category: 'Apparatus Function', type: 'standard',
-    question: "What is a Filter Funnel used for?",
-    options: [
-      {id:'a', text:'Separating insoluble solids from liquids'}, 
-      {id:'b', text:'Measuring liquid volume'}, 
-      {id:'c', text:'Evaporating liquids'}, 
-      {id:'d', text:'Storing gas'}
-    ],
-    correct: 'a',
-    explanation: "Used with filter paper to separate solids from liquids via filtration."
-  },
-
-  // --- PART E2 (F): Hazard Symbols ---
-  {
-    id: 'f1', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-    symbolType: 'Explosive',
-    question: "What does this hazard symbol mean?",
-    options: [{id:'a', text:'Explosive'}, {id:'b', text:'Flammable'}, {id:'c', text:'Toxic'}, {id:'d', text:'Corrosive'}],
-    correct: 'a',
-    explanation: "This symbol indicates substances that may explode under certain conditions."
-  },
-  {
-    id: 'f2', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-    symbolType: 'Corrosive',
-    question: "Identify the meaning of this symbol.",
-    options: [{id:'a', text:'Irritant'}, {id:'b', text:'Corrosive'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Flammable'}],
-    correct: 'b',
-    explanation: "Corrosive substances can burn skin and eat through metals."
-  },
-  {
-    id: 'f3', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-    symbolType: 'Radioactive',
-    question: "What is the danger associated with this symbol?",
-    options: [{id:'a', text:'Emits radiation'}, {id:'b', text:'Catches fire easily'}, {id:'c', text:'Explodes on contact'}, {id:'d', text:'Causes itching'}],
-    correct: 'a',
-    explanation: "This is the trefoil symbol for radioactivity."
-  },
-  {
-    id: 'f4', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-    symbolType: 'Flammable',
-    question: "Which example matches this symbol?",
-    options: [{id:'a', text:'Petrol / Alcohol'}, {id:'b', text:'Uranium'}, {id:'c', text:'Strong Acid'}, {id:'d', text:'Dynamite'}],
-    correct: 'a',
-    explanation: "Petrol and alcohol catch fire easily."
-  },
-  {
-    id: 'f5', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-    symbolType: 'Irritant',
-    question: "What does this symbol (X) usually indicate?",
-    options: [{id:'a', text:'Irritant / Harmful'}, {id:'b', text:'Safe to eat'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Explosive'}],
-    correct: 'a',
-    explanation: "Substances that may cause irritation to skin, eyes, or respiratory system."
-  }
-];
-
-const motivationalQuotes = [
-  "Don't give up! Science is about learning from mistakes.",
-  "Keep trying! You are building your brain power.",
-  "Almost there! Review the notes and try again.",
-  "Mistakes are proof that you are trying!",
-  "Take a deep breath and focus. You got this!"
-];
-
-const affirmationQuotes = [
-  "Excellent work! You're a natural scientist.",
-  "Spot on! Keep up the momentum.",
-  "Fantastic! Your understanding is solid.",
-  "Great job! You've mastered this concept.",
-  "Perfect! You are doing amazing."
-];
-
-
-export default function ScienceQuizApp() {
-  // State Management
-  const [currentMode, setCurrentMode] = useState<'menu' | 'part-selection' | 'quiz' | 'review' | 'certificate'>('menu');
-  const [isChallengeMode, setIsChallengeMode] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [wrongAnswers, setWrongAnswers] = useState<any[]>([]);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [feedbackData, setFeedbackData] = useState({ correct: false, message: '', explanation: '' });
-  const [userName, setUserName] = useState('');
-  const [quizSet, setQuizSet] = useState<any[]>([]);
-  const [timer, setTimer] = useState(0);
-  const [hintUsed, setHintUsed] = useState(false);
-  const [hiddenOptions, setHiddenOptions] = useState<string[]>([]);
-  
-  // Easter Egg State
-  const [clickCount, setClickCount] = useState(0);
-  const lastClickTime = useRef(0);
-
-  // Initialize Quiz
-  const startQuiz = (challenge: boolean) => {
-    setIsChallengeMode(challenge);
-    setScore(0);
-    setWrongAnswers([]);
-    setTimer(0);
-    setHintUsed(false);
-    setHiddenOptions([]);
-
-    if (challenge) {
-        // Challenge mode always uses all questions shuffled
-        const shuffled = [...questions].sort(() => 0.5 - Math.random());
-        setQuizSet(shuffled);
-        setCurrentQuestionIndex(0);
-        setCurrentMode('quiz');
-    } else {
-        // Learning mode goes to selection screen
-        setCurrentMode('part-selection');
-    }
-  };
-
-  const startLearningPart = (partId: string) => {
-      let subset = questions;
-      if (partId !== 'ALL') {
-          subset = questions.filter(q => q.part === partId);
-      }
-      // Shuffle subset
-      const shuffled = [...subset].sort(() => 0.5 - Math.random());
-      
-      if (shuffled.length === 0) {
-          alert("No questions available for this part yet!");
-          return;
-      }
-
-      setQuizSet(shuffled);
-      setCurrentQuestionIndex(0);
-      setHiddenOptions([]);
-      setHintUsed(false);
-      setCurrentMode('quiz');
-  };
-
-  const startReview = () => {
-    if (wrongAnswers.length === 0) return;
-    setQuizSet([...wrongAnswers]);
-    setCurrentQuestionIndex(0);
-    setWrongAnswers([]); // Clear generic wrong list so we don't double loop easily without logic
-    setHiddenOptions([]);
-    setHintUsed(false);
-    setCurrentMode('review');
-  };
-
-  // Timer for Challenge Mode
-  useEffect(() => {
-    let interval: any;
-    if (currentMode === 'quiz' && isChallengeMode) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [currentMode, isChallengeMode]);
-
-  // Handle Answer Selection
-  const handleAnswer = (optionId: string) => {
-    const currentQ = quizSet[currentQuestionIndex];
-    const isCorrect = optionId === currentQ.correct;
-
-    if (isCorrect) {
-      if (currentMode !== 'review') setScore((prev) => prev + 1);
-      const quote = affirmationQuotes[Math.floor(Math.random() * affirmationQuotes.length)];
-      setFeedbackData({
-        correct: true,
-        message: quote,
-        explanation: currentQ.explanation
-      });
-    } else {
-      if (currentMode !== 'review') {
-        setWrongAnswers((prev) => [...prev, currentQ]);
-      }
-      const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-      setFeedbackData({
-        correct: false,
-        message: quote,
-        explanation: currentQ.explanation
-      });
-    }
-    setShowFeedback(true);
-  };
-
-  const nextQuestion = () => {
-    setShowFeedback(false);
-    setHintUsed(false);
-    setHiddenOptions([]);
-    if (currentQuestionIndex < quizSet.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-    } else {
-      setCurrentMode('certificate');
-    }
-  };
-
-  const useHint = () => {
-    if (isChallengeMode || hintUsed) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Hero: Form 1 Quiz</title>
     
-    const currentQ = quizSet[currentQuestionIndex];
-    // Get all wrong option IDs
-    const wrongOptionIds = currentQ.options
-        .filter((opt: any) => opt.id !== currentQ.correct)
-        .map((opt: any) => opt.id);
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    // Randomly select 2 to hide (if available), leaving 1 wrong + 1 correct usually
-    const shuffled = wrongOptionIds.sort(() => 0.5 - Math.random());
-    const toHide = shuffled.slice(0, 2); 
+    <!-- Google Fonts for Certificate -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
-    setHiddenOptions(toHide);
-    setHintUsed(true);
-  };
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  // Easter Egg Logic
-  const handleFooterClick = () => {
-    const now = Date.now();
-    if (now - lastClickTime.current < 250) { // Fast clicks
-      setClickCount((prev) => prev + 1);
-    } else {
-      setClickCount(1);
-    }
-    lastClickTime.current = now;
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+        .font-cursive { font-family: 'Great Vibes', cursive; }
+        /* Custom scrollbar for better mobile landscape experience */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
 
-    if (clickCount >= 7) { // 8th click triggers this (0-indexed effectively or logic flow)
-      alert("Creator: Lim Tien Ping\nEmail: petwesley@gmail.com\nMOE ID: g-39576509@moe-dl.edu.my");
-      setClickCount(0);
-    }
-  };
+    <div id="root"></div>
 
-  // --- RENDER FUNCTIONS ---
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-  const renderOption = (opt: any, currentQ: any) => {
-    let isDisabled = showFeedback;
-    let baseClass = "w-full p-4 mb-3 rounded-lg border-2 flex items-center transition-all duration-200 ";
-    const isHidden = hiddenOptions.includes(opt.id);
+        // --- ICONS ---
+        // Simplified SVG Icon components to replace Lucide imports
+        const IconBase = ({ children, className, ...props }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className} 
+                {...props}
+            >
+                {children}
+            </svg>
+        );
 
-    // Style logic
-    if (isHidden) {
-         baseClass += "bg-gray-50 border-gray-100 text-gray-300 opacity-30 cursor-not-allowed";
-    } else if (isDisabled) {
-        if (opt.id === currentQ.correct) baseClass += "bg-green-100 border-green-500 text-green-900";
-        else baseClass += "bg-gray-100 border-gray-300 opacity-60";
-    } else {
-        baseClass += "bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-400 active:bg-blue-100 cursor-pointer";
-    }
+        const Atom = (props) => <IconBase {...props}><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></IconBase>;
+        const BookOpen = (props) => <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
+        const Timer = (props) => <IconBase {...props}><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></IconBase>;
+        const Trophy = (props) => <IconBase {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></IconBase>;
+        const AlertTriangle = (props) => <IconBase {...props}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></IconBase>;
+        const CheckCircle = (props) => <IconBase {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></IconBase>;
+        const XCircle = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></IconBase>;
+        const HelpCircle = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></IconBase>;
+        const Award = (props) => <IconBase {...props}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></IconBase>;
+        const RefreshCw = (props) => <IconBase {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></IconBase>;
+        const Flame = (props) => <IconBase {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></IconBase>;
+        const Zap = (props) => <IconBase {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></IconBase>;
+        const CloudRain = (props) => <IconBase {...props}><line x1="16" y1="13" x2="16" y2="21"/><line x1="8" y1="13" x2="8" y2="21"/><line x1="12" y1="15" x2="12" y2="23"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></IconBase>;
+        const Microscope = (props) => <IconBase {...props}><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></IconBase>;
+        const Globe = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></IconBase>;
+        const Beaker = (props) => <IconBase {...props}><path d="M4.5 3h15"/><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"/><path d="M6 14h12"/></IconBase>;
+        const FlaskConical = (props) => <IconBase {...props}><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></IconBase>;
+        const ArrowRight = (props) => <IconBase {...props}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></IconBase>;
+        const Star = (props) => <IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
 
-    return (
-      <button 
-        key={opt.id} 
-        onClick={() => !isDisabled && !isHidden && handleAnswer(opt.id)}
-        disabled={isDisabled || isHidden}
-        className={baseClass}
-      >
-        {/* Render Icon if available */}
-        {opt.icon && <div className="mr-4 flex-shrink-0">{opt.icon}</div>}
+        // Custom Hazard Symbols (SVG)
+        const HazardIcon = ({ type }) => {
+            const baseClass = "w-24 h-24 mx-auto mb-2";
+            switch(type.toLowerCase()) {
+                case 'corrosive':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <path d="M30 40 L40 60 M70 40 L60 60" stroke="black" strokeWidth="3"/>
+                    <rect x="25" y="65" width="20" height="10" fill="#4b5563"/>
+                    <rect x="55" y="65" width="30" height="5" fill="#4b5563"/>
+                    </svg>
+                );
+                case 'explosive':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <circle cx="50" cy="55" r="10" fill="black" />
+                    <path d="M50 55 L50 30 M50 55 L70 45 M50 55 L70 75 M50 55 L30 75 M50 55 L30 45" stroke="black" strokeWidth="3" />
+                    </svg>
+                );
+                case 'flammable':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <path d="M50 30 Q30 60 50 80 Q70 60 50 30" fill="black" />
+                    <path d="M50 30 Q55 50 50 60" stroke="white" strokeWidth="1"/>
+                    </svg>
+                );
+                case 'radioactive':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <circle cx="50" cy="55" r="5" fill="black" />
+                    <path d="M50 55 L50 35 M50 55 L68 65 M50 55 L32 65" stroke="black" strokeWidth="8" />
+                    <circle cx="50" cy="55" r="15" stroke="black" strokeWidth="3" fill="none" />
+                    </svg>
+                );
+                case 'poisonous':
+                case 'toxic':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <circle cx="38" cy="45" r="6" fill="black"/>
+                    <circle cx="62" cy="45" r="6" fill="black"/>
+                    <path d="M40 60 Q50 50 60 60" stroke="black" strokeWidth="3" fill="none"/>
+                    <path d="M30 70 L70 70" stroke="black" strokeWidth="4"/>
+                    <path d="M30 70 L20 80 M70 70 L80 80" stroke="black" strokeWidth="4"/>
+                    </svg>
+                );
+                case 'irritant':
+                return (
+                    <svg viewBox="0 0 100 100" className={baseClass}>
+                    <path d="M50 5 L95 90 L5 90 Z" fill="#fbbf24" stroke="black" strokeWidth="3"/>
+                    <path d="M40 35 L60 75 M60 35 L40 75" stroke="black" strokeWidth="8"/>
+                    </svg>
+                );
+                default:
+                return <AlertTriangle className="w-24 h-24 text-yellow-500 mx-auto" />;
+            }
+        };
+
+        // Custom Apparatus Icons (SVG)
+        const ApparatusIcon = ({ type }) => {
+            const baseClass = "w-32 h-32 mx-auto text-blue-600 mb-2 p-2 bg-white rounded shadow-sm border";
+            switch(type.toLowerCase().replace(/ /g, '-')) {
+                case 'test-tube':
+                return <svg viewBox="0 0 100 100" className={baseClass}><path d="M40 10 L40 80 Q40 95 50 95 Q60 95 60 80 L60 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M40 25 L60 25" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
+                case 'boiling-tube':
+                return <svg viewBox="0 0 100 100" className={baseClass}><path d="M35 10 L35 80 Q35 95 50 95 Q65 95 65 80 L65 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M35 30 L65 30" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
+                case 'beaker':
+                return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 10 L30 80 Q30 90 40 90 L60 90 Q70 90 70 80 L70 15 L65 10 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M30 30 L70 30 M30 50 L70 50" stroke="currentColor" strokeWidth="1" opacity="0.5"/></svg>;
+                case 'conical-flask':
+                return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 L75 85 Q80 95 70 95 L30 95 Q20 95 25 85 L45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M35 60 L65 60" stroke="currentColor" strokeWidth="1" strokeDasharray="4"/></svg>;
+                case 'measuring-cylinder':
+                return <svg viewBox="0 0 100 100" className={baseClass}><rect x="40" y="10" width="20" height="80" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M30 90 L70 90" stroke="currentColor" strokeWidth="3"/><path d="M40 20 L50 20 M40 30 L55 30 M40 40 L50 40 M40 50 L55 50 M40 60 L50 60 M40 70 L55 70" stroke="currentColor" strokeWidth="2"/></svg>;
+                case 'burette':
+                return <svg viewBox="0 0 100 100" className={baseClass}><rect x="45" y="5" width="10" height="70" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M50 75 L50 95" stroke="currentColor" strokeWidth="2"/><path d="M40 80 L60 80" stroke="currentColor" strokeWidth="3"/><path d="M45 15 L55 15 M45 25 L55 25 M45 35 L55 35" stroke="currentColor" strokeWidth="1"/></svg>;
+                case 'pipette':
+                return <svg viewBox="0 0 100 100" className={baseClass}><path d="M48 5 L52 5 L52 30 Q55 35 60 45 L60 65 Q55 75 52 80 L52 95 L48 95 L48 80 Q45 75 40 65 L40 45 Q45 35 48 30 Z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
+                case 'tripod-stand':
+                return <svg viewBox="0 0 100 100" className={baseClass}><ellipse cx="50" cy="30" rx="30" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M25 32 L15 90 M50 35 L50 90 M75 32 L85 90" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'retort-stand-with-clamps':
+                return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="90" width="40" height="5" fill="currentColor"/><rect x="30" y="10" width="5" height="80" fill="currentColor"/><path d="M35 30 L60 30" stroke="currentColor" strokeWidth="3"/><circle cx="65" cy="30" r="5" stroke="currentColor" fill="none"/></svg>;
+                case 'wire-gauze':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M20 30 L80 30 M20 40 L80 40 M20 50 L80 50 M20 60 L80 60 M20 70 L80 70 M30 20 L30 80 M40 20 L40 80 M50 20 L50 80 M60 20 L60 80 M70 20 L70 80" stroke="currentColor" opacity="0.5"/></svg>;
+                case 'filter-funnel':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M20 20 L80 20 L55 50 L55 90 L45 90 L45 50 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'gas-jar':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 10 L30 90 L70 90 L70 10" fill="none" stroke="currentColor" strokeWidth="3"/><ellipse cx="50" cy="10" rx="20" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'evaporating-dish':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M10 40 Q50 90 90 40" fill="none" stroke="currentColor" strokeWidth="3"/><line x1="10" y1="40" x2="90" y2="40" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'crucible':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M20 30 Q20 80 50 80 Q80 80 80 30" fill="none" stroke="currentColor" strokeWidth="3"/><line x1="15" y1="30" x2="85" y2="30" stroke="currentColor" strokeWidth="3"/><path d="M20 25 Q50 15 80 25" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
+                case 'flat-bottom-flask':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 Q80 40 80 70 Q80 90 60 90 L40 90 Q20 90 20 70 Q20 40 45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'round-bottom-flask':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M45 10 L55 10 L55 35 Q80 40 80 65 Q80 90 50 90 Q20 90 20 65 Q20 40 45 35 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+                default:
+                return <FlaskConical className={baseClass} />;
+            }
+        };
+
+
+        /**
+         * --- DATA BANK ---
+         */
+        const questions = [
+        // --- PART A: Natural Phenomena (30 questions planned, sample included) ---
+        {
+            id: 'a1', part: 'A', category: 'Natural Phenomena', type: 'text-match',
+            question: "Which of the following is a natural phenomenon?",
+            options: [
+            { id: 'opt1', text: "Volcanic Eruption", icon: <Flame className="w-12 h-12 text-red-500" /> },
+            { id: 'opt2', text: "Car Accident", icon: <AlertTriangle className="w-12 h-12 text-gray-500" /> },
+            { id: 'opt3', text: "Building Construction", icon: <div className="text-4xl">🏗️</div> },
+            { id: 'opt4', text: "Fireworks", icon: <div className="text-4xl">🎆</div> }
+            ],
+            correct: 'opt1',
+            explanation: "Volcanic eruptions occur naturally due to Earth's internal heat, unlike cars or buildings which are man-made."
+        },
+        {
+            id: 'a2', part: 'A', category: 'Natural Phenomena', type: 'text-match',
+            question: "Identify the natural phenomenon.",
+            options: [
+            { id: 'opt1', text: "Tsunami", icon: <div className="text-4xl">🌊</div> },
+            { id: 'opt2', text: "Swimming Pool", icon: <div className="text-4xl">🏊</div> },
+            { id: 'opt3', text: "Dam Release", icon: <div className="text-4xl">💧</div> },
+            { id: 'opt4', text: "Water Fountain", icon: <div className="text-4xl">⛲</div> }
+            ],
+            correct: 'opt1',
+            explanation: "Tsunamis are natural large waves caused by earthquakes, unlike artificial water structures."
+        },
+        {
+            id: 'a3', part: 'A', category: 'Natural Phenomena', type: 'text-match',
+            question: "Which image represents a natural phenomenon?",
+            options: [
+            { id: 'opt1', text: "Lightning", icon: <Zap className="w-12 h-12 text-yellow-400" /> },
+            { id: 'opt2', text: "Street Light", icon: <div className="text-4xl">💡</div> },
+            { id: 'opt3', text: "Flashlight", icon: <div className="text-4xl">🔦</div> },
+            { id: 'opt4', text: "Neon Sign", icon: <div className="text-4xl">🏮</div> }
+            ],
+            correct: 'opt1',
+            explanation: "Lightning is a natural electrostatic discharge, unlike artificial lights."
+        },
+        {
+            id: 'a4', part: 'A', category: 'Natural Phenomena', type: 'text-match',
+            question: "Select the natural phenomenon.",
+            options: [
+            { id: 'opt1', text: "Rainbow", icon: <div className="text-4xl">🌈</div> },
+            { id: 'opt2', text: "Painting", icon: <div className="text-4xl">🎨</div> },
+            { id: 'opt3', text: "Disco Lights", icon: <div className="text-4xl">💃</div> },
+            { id: 'opt4', text: "Prism Lab Experiment", icon: <div className="text-4xl">🔬</div> }
+            ],
+            correct: 'opt1',
+            explanation: "Rainbows form naturally when sunlight is refracted by rain droplets."
+        },
+        {
+            id: 'a5', part: 'A', category: 'Natural Phenomena', type: 'text-match',
+            question: "Which of these happens without human intervention?",
+            options: [
+            { id: 'opt1', text: "Plant Growth", icon: <div className="text-4xl">🌱</div> },
+            { id: 'opt2', text: "Plastic Flower", icon: <div className="text-4xl">💐</div> },
+            { id: 'opt3', text: "3D Printed Tree", icon: <div className="text-4xl">🌲</div> },
+            { id: 'opt4', text: "Paper Rose", icon: <div className="text-4xl">🌹</div> }
+            ],
+            correct: 'opt1',
+            explanation: "Biological growth is a natural life process."
+        },
+
+        // --- PART B: Science Fields Definitions (Sample) ---
+        {
+            id: 'b1', part: 'B', category: 'Science Definitions', type: 'standard',
+            question: "The study of life and living organisms, including their structure, function, growth, and evolution.",
+            options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
+            correct: 'b',
+            explanation: "Biology comes from 'bios' (life) and 'logos' (study)."
+        },
+        {
+            id: 'b2', part: 'B', category: 'Science Definitions', type: 'standard',
+            question: "The study of matter and energy and the interactions between them.",
+            options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}],
+            correct: 'p',
+            explanation: "Physics deals with the fundamental laws of the universe, energy, and matter."
+        },
+        {
+            id: 'b3', part: 'B', category: 'Science Definitions', type: 'standard',
+            question: "The study of the composition, structure, properties, and change of matter.",
+            options: [{id:'c', text:'Chemistry'}, {id:'m', text:'Meteorology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
+            correct: 'c',
+            explanation: "Chemistry focuses on substances, atoms, molecules, and chemical reactions."
+        },
+        {
+            id: 'b4', part: 'B', category: 'Science Definitions', type: 'standard',
+            question: "The study of the Earth, the rocks of which it is composed, and the processes by which they change.",
+            options: [{id:'g', text:'Geology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'b', text:'Biology'}],
+            correct: 'g',
+            explanation: "Geology involves studying Earth's physical structure and substance."
+        },
+        {
+            id: 'b5', part: 'B', category: 'Science Definitions', type: 'standard',
+            question: "The study of the universe beyond Earth, including stars, galaxies, and planets.",
+            options: [{id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}],
+            correct: 'a',
+            explanation: "Astronomy is the scientific study of celestial objects and phenomena."
+        },
+
+        // --- PART C: Careers (With Translations) ---
+        {
+            id: 'c1', part: 'C', category: 'Careers', type: 'career-match',
+            career: { en: "Doctor", bm: "Doktor", cn: "医生", icon: "🩺" },
+            question: "Which field of science does this career belong to?",
+            options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
+            correct: 'b',
+            explanation: "Doctors study the human body and diseases, which is applied Biology."
+        },
+        {
+            id: 'c2', part: 'C', category: 'Careers', type: 'career-match',
+            career: { en: "Pharmacist", bm: "Ahli Farmasi", cn: "药剂师", icon: "💊" },
+            question: "Which field of science does this career belong to?",
+            options: [{id:'c', text:'Chemistry'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}],
+            correct: 'c',
+            explanation: "Pharmacists deal with chemical compounds in medicines, heavily relying on Chemistry."
+        },
+        {
+            id: 'c3', part: 'C', category: 'Careers', type: 'career-match',
+            career: { en: "Mechanical Engineer", bm: "Jurutera Mekanikal", cn: "机械工程师", icon: "⚙️" },
+            question: "Which field of science does this career belong to?",
+            options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'g', text:'Geology'}, {id:'m', text:'Meteorology'}],
+            correct: 'p',
+            explanation: "Mechanical engineering is based on principles of Physics (forces, energy, motion)."
+        },
+        {
+            id: 'c4', part: 'C', category: 'Careers', type: 'career-match',
+            career: { en: "Weather Forecaster", bm: "Peramal Cuaca", cn: "天气预报员", icon: "🌦️" },
+            question: "Which field of science does this career belong to?",
+            options: [{id:'m', text:'Meteorology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'c', text:'Chemistry'}],
+            correct: 'm',
+            explanation: "Meteorology is specifically the study of weather and climate."
+        },
+        {
+            id: 'c5', part: 'C', category: 'Careers', type: 'career-match',
+            career: { en: "Astronomer", bm: "Ahli Astronomi", cn: "天文学家", icon: "🔭" },
+            question: "Which field of science does this career belong to?",
+            options: [{id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
+            correct: 'a',
+            explanation: "Astronomers study space and celestial bodies."
+        },
+
+        // --- PART D: Apparatus Identification (Using SVGs) ---
+        {
+            id: 'd1', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
+            apparatusType: 'Test Tube',
+            question: "Identify this apparatus.",
+            options: [{id:'1', text:'Test Tube'}, {id:'2', text:'Boiling Tube'}, {id:'3', text:'Measuring Cylinder'}, {id:'4', text:'Beaker'}],
+            correct: '1',
+            explanation: "It is a narrow glass tube closed at one end, used for small amounts of liquids."
+        },
+        {
+            id: 'd2', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
+            apparatusType: 'Beaker',
+            question: "Identify this apparatus.",
+            options: [{id:'1', text:'Conical Flask'}, {id:'2', text:'Beaker'}, {id:'3', text:'Gas Jar'}, {id:'4', text:'Crucible'}],
+            correct: '2',
+            explanation: "A beaker is a cylindrical container with a flat bottom and a lip for pouring."
+        },
+        {
+            id: 'd3', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
+            apparatusType: 'Conical Flask',
+            question: "Identify this apparatus.",
+            options: [{id:'1', text:'Round-bottom flask'}, {id:'2', text:'Flat-bottom flask'}, {id:'3', text:'Conical Flask'}, {id:'4', text:'Filter Funnel'}],
+            correct: '3',
+            explanation: "Also known as an Erlenmeyer flask, it has a cone-shaped body and cylindrical neck."
+        },
+        {
+            id: 'd4', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
+            apparatusType: 'Tripod Stand',
+            question: "Identify this apparatus.",
+            options: [{id:'1', text:'Retort Stand'}, {id:'2', text:'Tripod Stand'}, {id:'3', text:'Wire Gauze'}, {id:'4', text:'Bunsen Burner'}],
+            correct: '2',
+            explanation: "A three-legged stand used to support apparatus during heating."
+        },
+        {
+            id: 'd5', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
+            apparatusType: 'Burette',
+            question: "Identify this apparatus.",
+            options: [{id:'1', text:'Pipette'}, {id:'2', text:'Burette'}, {id:'3', text:'Thermometer'}, {id:'4', text:'Measuring Cylinder'}],
+            correct: '2',
+            explanation: "A burette is a long graduated tube with a tap at the bottom, used for titration."
+        },
+
+        // --- PART E1: Apparatus Function ---
+        {
+            id: 'e1', part: 'E1', category: 'Apparatus Function', type: 'standard',
+            question: "What is the function of a Measuring Cylinder?",
+            options: [
+            {id:'a', text:'To measure the volume of liquid accurately'}, 
+            {id:'b', text:'To heat chemicals'}, 
+            {id:'c', text:'To hold solids'}, 
+            {id:'d', text:'To filter mixtures'}
+            ],
+            correct: 'a',
+            explanation: "Measuring cylinders are designed to measure liquid volume, though less accurately than a pipette or burette."
+        },
+        {
+            id: 'e2', part: 'E1', category: 'Apparatus Function', type: 'standard',
+            question: "What is the primary use of a Wire Gauze?",
+            options: [
+            {id:'a', text:'To hold a test tube'}, 
+            {id:'b', text:'To spread heat evenly during heating'}, 
+            {id:'c', text:'To extinguish fire'}, 
+            {id:'d', text:'To mix chemicals'}
+            ],
+            correct: 'b',
+            explanation: "Placed on a tripod stand, it distributes the flame's heat to prevent the glass apparatus from cracking."
+        },
+        {
+            id: 'e3', part: 'E1', category: 'Apparatus Function', type: 'standard',
+            question: "What is a Filter Funnel used for?",
+            options: [
+            {id:'a', text:'Separating insoluble solids from liquids'}, 
+            {id:'b', text:'Measuring liquid volume'}, 
+            {id:'c', text:'Evaporating liquids'}, 
+            {id:'d', text:'Storing gas'}
+            ],
+            correct: 'a',
+            explanation: "Used with filter paper to separate solids from liquids via filtration."
+        },
+
+        // --- PART E2 (F): Hazard Symbols ---
+        {
+            id: 'f1', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
+            symbolType: 'Explosive',
+            question: "What does this hazard symbol mean?",
+            options: [{id:'a', text:'Explosive'}, {id:'b', text:'Flammable'}, {id:'c', text:'Toxic'}, {id:'d', text:'Corrosive'}],
+            correct: 'a',
+            explanation: "This symbol indicates substances that may explode under certain conditions."
+        },
+        {
+            id: 'f2', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
+            symbolType: 'Corrosive',
+            question: "Identify the meaning of this symbol.",
+            options: [{id:'a', text:'Irritant'}, {id:'b', text:'Corrosive'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Flammable'}],
+            correct: 'b',
+            explanation: "Corrosive substances can burn skin and eat through metals."
+        },
+        {
+            id: 'f3', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
+            symbolType: 'Radioactive',
+            question: "What is the danger associated with this symbol?",
+            options: [{id:'a', text:'Emits radiation'}, {id:'b', text:'Catches fire easily'}, {id:'c', text:'Explodes on contact'}, {id:'d', text:'Causes itching'}],
+            correct: 'a',
+            explanation: "This is the trefoil symbol for radioactivity."
+        },
+        {
+            id: 'f4', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
+            symbolType: 'Flammable',
+            question: "Which example matches this symbol?",
+            options: [{id:'a', text:'Petrol / Alcohol'}, {id:'b', text:'Uranium'}, {id:'c', text:'Strong Acid'}, {id:'d', text:'Dynamite'}],
+            correct: 'a',
+            explanation: "Petrol and alcohol catch fire easily."
+        },
+        {
+            id: 'f5', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
+            symbolType: 'Irritant',
+            question: "What does this symbol (X) usually indicate?",
+            options: [{id:'a', text:'Irritant / Harmful'}, {id:'b', text:'Safe to eat'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Explosive'}],
+            correct: 'a',
+            explanation: "Substances that may cause irritation to skin, eyes, or respiratory system."
+        }
+        ];
+
+        const motivationalQuotes = [
+        "Don't give up! Science is about learning from mistakes.",
+        "Keep trying! You are building your brain power.",
+        "Almost there! Review the notes and try again.",
+        "Mistakes are proof that you are trying!",
+        "Take a deep breath and focus. You got this!"
+        ];
+
+        const affirmationQuotes = [
+        "Excellent work! You're a natural scientist.",
+        "Spot on! Keep up the momentum.",
+        "Fantastic! Your understanding is solid.",
+        "Great job! You've mastered this concept.",
+        "Perfect! You are doing amazing."
+        ];
+
+
+        function ScienceQuizApp() {
+        // State Management
+        const [currentMode, setCurrentMode] = useState('menu');
+        const [isChallengeMode, setIsChallengeMode] = useState(false);
+        const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+        const [score, setScore] = useState(0);
+        const [wrongAnswers, setWrongAnswers] = useState([]);
+        const [showFeedback, setShowFeedback] = useState(false);
+        const [feedbackData, setFeedbackData] = useState({ correct: false, message: '', explanation: '' });
+        const [userName, setUserName] = useState('');
+        const [quizSet, setQuizSet] = useState([]);
+        const [timer, setTimer] = useState(0);
+        const [hintUsed, setHintUsed] = useState(false);
+        const [hiddenOptions, setHiddenOptions] = useState([]);
         
-        {/* Render Text */}
-        <div className="text-left">
-           <span className="text-lg font-semibold">{opt.text}</span>
-        </div>
-      </button>
-    );
-  };
+        // Easter Egg State
+        const [clickCount, setClickCount] = useState(0);
+        const lastClickTime = useRef(0);
 
-  // Main Menu View
-  if (currentMode === 'menu') {
-    return (
-      <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center">
-          <Atom className="w-20 h-20 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2">Science Hero: Form 1</h1>
-          <p className="text-gray-600 mb-8">Master Phenomena, Fields, Careers, Apparatus & Hazards!</p>
-          
-          <div className="space-y-4">
-            <button 
-              onClick={() => startQuiz(false)}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105"
-            >
-              <BookOpenIcon /> Start Learning Mode
-              <span className="text-sm font-normal opacity-90">(Hints Enabled)</span>
-            </button>
+        // Initialize Quiz
+        const startQuiz = (challenge) => {
+            setIsChallengeMode(challenge);
+            setScore(0);
+            setWrongAnswers([]);
+            setTimer(0);
+            setHintUsed(false);
+            setHiddenOptions([]);
+
+            if (challenge) {
+                // Challenge mode always uses all questions shuffled
+                const shuffled = [...questions].sort(() => 0.5 - Math.random());
+                setQuizSet(shuffled);
+                setCurrentQuestionIndex(0);
+                setCurrentMode('quiz');
+            } else {
+                // Learning mode goes to selection screen
+                setCurrentMode('part-selection');
+            }
+        };
+
+        const startLearningPart = (partId) => {
+            let subset = questions;
+            if (partId !== 'ALL') {
+                subset = questions.filter(q => q.part === partId);
+            }
+            // Shuffle subset
+            const shuffled = [...subset].sort(() => 0.5 - Math.random());
             
+            if (shuffled.length === 0) {
+                alert("No questions available for this part yet!");
+                return;
+            }
+
+            setScore(0);
+            setWrongAnswers([]);
+            setQuizSet(shuffled);
+            setCurrentQuestionIndex(0);
+            setHiddenOptions([]);
+            setHintUsed(false);
+            setCurrentMode('quiz');
+        };
+
+        const startReview = () => {
+            if (wrongAnswers.length === 0) return;
+            setQuizSet([...wrongAnswers]);
+            setCurrentQuestionIndex(0);
+            setWrongAnswers([]); // Clear generic wrong list so we don't double loop easily without logic
+            setHiddenOptions([]);
+            setHintUsed(false);
+            setCurrentMode('review');
+        };
+
+        // Timer for Challenge Mode
+        useEffect(() => {
+            let interval;
+            if (currentMode === 'quiz' && isChallengeMode) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev + 1);
+            }, 1000);
+            }
+            return () => clearInterval(interval);
+        }, [currentMode, isChallengeMode]);
+
+        // Handle Answer Selection
+        const handleAnswer = (optionId) => {
+            const currentQ = quizSet[currentQuestionIndex];
+            const isCorrect = optionId === currentQ.correct;
+
+            if (isCorrect) {
+            if (currentMode !== 'review') setScore((prev) => prev + 1);
+            const quote = affirmationQuotes[Math.floor(Math.random() * affirmationQuotes.length)];
+            setFeedbackData({
+                correct: true,
+                message: quote,
+                explanation: currentQ.explanation
+            });
+            } else {
+            if (currentMode !== 'review') {
+                setWrongAnswers((prev) => [...prev, currentQ]);
+            }
+            const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            setFeedbackData({
+                correct: false,
+                message: quote,
+                explanation: currentQ.explanation
+            });
+            }
+            setShowFeedback(true);
+        };
+
+        const nextQuestion = () => {
+            setShowFeedback(false);
+            setHintUsed(false);
+            setHiddenOptions([]);
+            if (currentQuestionIndex < quizSet.length - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1);
+            } else {
+            if (isChallengeMode) {
+                setCurrentMode('certificate');
+            } else {
+                setCurrentMode('part-summary');
+            }
+            }
+        };
+
+        const useHint = () => {
+            if (isChallengeMode || hintUsed) return;
+            
+            const currentQ = quizSet[currentQuestionIndex];
+            // Get all wrong option IDs
+            const wrongOptionIds = currentQ.options
+                .filter((opt) => opt.id !== currentQ.correct)
+                .map((opt) => opt.id);
+            
+            // Randomly select 2 to hide (if available), leaving 1 wrong + 1 correct usually
+            const shuffled = wrongOptionIds.sort(() => 0.5 - Math.random());
+            const toHide = shuffled.slice(0, 2); 
+            
+            setHiddenOptions(toHide);
+            setHintUsed(true);
+        };
+
+        // Easter Egg Logic
+        const handleFooterClick = () => {
+            const now = Date.now();
+            if (now - lastClickTime.current < 250) { // Fast clicks
+            setClickCount((prev) => prev + 1);
+            } else {
+            setClickCount(1);
+            }
+            lastClickTime.current = now;
+
+            if (clickCount >= 7) { // 8th click triggers this (0-indexed effectively or logic flow)
+            alert("Creator: Lim Tien Ping\nEmail: petwesley@gmail.com\nMOE ID: g-39576509@moe-dl.edu.my");
+            setClickCount(0);
+            }
+        };
+
+        // --- RENDER FUNCTIONS ---
+
+        const renderOption = (opt, currentQ) => {
+            let isDisabled = showFeedback;
+            let baseClass = "w-full p-4 mb-3 rounded-lg border-2 flex items-center transition-all duration-200 ";
+            const isHidden = hiddenOptions.includes(opt.id);
+
+            // Style logic
+            if (isHidden) {
+                baseClass += "bg-gray-50 border-gray-100 text-gray-300 opacity-30 cursor-not-allowed";
+            } else if (isDisabled) {
+                if (opt.id === currentQ.correct) baseClass += "bg-green-100 border-green-500 text-green-900";
+                else baseClass += "bg-gray-100 border-gray-300 opacity-60";
+            } else {
+                baseClass += "bg-white border-blue-200 hover:bg-blue-50 hover:border-blue-400 active:bg-blue-100 cursor-pointer";
+            }
+
+            return (
             <button 
-              onClick={() => startQuiz(true)}
-              className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105 shadow-red-200 shadow-lg"
+                key={opt.id} 
+                onClick={() => !isDisabled && !isHidden && handleAnswer(opt.id)}
+                disabled={isDisabled || isHidden}
+                className={baseClass}
             >
-              <Timer className="w-6 h-6" /> Challenge Mode
-              <span className="text-sm font-normal opacity-90">(No Hints, Timed)</span>
+                {/* Render Icon if available */}
+                {opt.icon && <div className="mr-4 flex-shrink-0">{opt.icon}</div>}
+                
+                {/* Render Text */}
+                <div className="text-left">
+                <span className="text-lg font-semibold">{opt.text}</span>
+                </div>
             </button>
-          </div>
-        </div>
-        <div 
-            onClick={handleFooterClick}
-            className="mt-8 text-gray-400 text-sm cursor-pointer select-none"
-        >
-            &copy; TienPing @ 2026
-        </div>
-      </div>
-    );
-  }
+            );
+        };
 
-  // Part Selection View
-  if (currentMode === 'part-selection') {
-      return (
-        <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6 font-sans">
-            <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl text-center">
-                <div className="flex items-center justify-center gap-2 mb-6 text-green-700">
-                     <BookOpenIcon />
-                     <h2 className="text-3xl font-bold">Select a Topic</h2>
-                </div>
+        // Main Menu View
+        if (currentMode === 'menu') {
+            return (
+            <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6 font-sans">
+                <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center">
+                <Atom className="w-20 h-20 text-blue-600 mx-auto mb-4" />
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2">Science Hero: Form 1</h1>
+                <p className="text-gray-600 mb-8">Master Phenomena, Fields, Careers, Apparatus & Hazards!</p>
                 
-                <p className="text-gray-500 mb-8">Choose a specific part to practice, or mix them all up.</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onClick={() => startLearningPart('A')} className="p-6 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-200"><CloudRain className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part A: Natural Phenomena</span>
-                            <span className="text-xs text-gray-500">Phenomena vs Artificial</span>
-                        </div>
-                    </button>
-
-                    <button onClick={() => startLearningPart('B')} className="p-6 bg-white border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-purple-100 p-3 rounded-full text-purple-600 group-hover:bg-purple-200"><Microscope className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part B: Science Definitions</span>
-                            <span className="text-xs text-gray-500">Biology, Physics, Chemistry...</span>
-                        </div>
-                    </button>
-
-                    <button onClick={() => startLearningPart('C')} className="p-6 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-orange-100 p-3 rounded-full text-orange-600 group-hover:bg-orange-200"><Globe className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part C: Careers</span>
-                            <span className="text-xs text-gray-500">Match Careers to Fields</span>
-                        </div>
-                    </button>
-
-                    <button onClick={() => startLearningPart('D')} className="p-6 bg-white border-2 border-teal-200 rounded-xl hover:bg-teal-50 hover:border-teal-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-teal-100 p-3 rounded-full text-teal-600 group-hover:bg-teal-200"><Beaker className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part D: Apparatus ID</span>
-                            <span className="text-xs text-gray-500">Identify Lab Equipment</span>
-                        </div>
-                    </button>
-
-                    <button onClick={() => startLearningPart('E1')} className="p-6 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-indigo-100 p-3 rounded-full text-indigo-600 group-hover:bg-indigo-200"><FlaskConical className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part E1: Functions</span>
-                            <span className="text-xs text-gray-500">Apparatus Usage & Safety</span>
-                        </div>
-                    </button>
-
-                    <button onClick={() => startLearningPart('E2')} className="p-6 bg-white border-2 border-red-200 rounded-xl hover:bg-red-50 hover:border-red-400 transition flex items-center gap-4 text-left group">
-                        <div className="bg-red-100 p-3 rounded-full text-red-600 group-hover:bg-red-200"><AlertTriangle className="w-6 h-6" /></div>
-                        <div>
-                            <span className="block font-bold text-gray-800">Part E2: Hazard Symbols</span>
-                            <span className="text-xs text-gray-500">Safety Signs & Meanings</span>
-                        </div>
-                    </button>
-                </div>
-                
-                <div className="mt-6 flex flex-col md:flex-row gap-4">
-                    <button onClick={() => startLearningPart('ALL')} className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition shadow-lg">
-                        Mix All Topics
-                    </button>
-                    <button onClick={() => setCurrentMode('menu')} className="md:w-32 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300 transition">
-                        Back
-                    </button>
-                </div>
-            </div>
-        </div>
-      )
-  }
-
-  // Certificate View
-  if (currentMode === 'certificate') {
-    const totalQ = isChallengeMode ? quizSet.length : quizSet.length; 
-    const percentage = Math.round((score / totalQ) * 100);
-    
-    return (
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-        {/* Input Name Screen if not set */}
-        {!userName ? (
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
-                <h2 className="text-2xl font-bold mb-4">Quiz Complete!</h2>
-                <p className="mb-4">Enter your name to generate your certificate.</p>
-                <input 
-                    type="text" 
-                    placeholder="Student Name" 
-                    className="w-full p-3 border rounded-lg mb-4 text-center text-lg"
-                    onChange={(e) => setUserName(e.target.value)}
-                />
-                <button 
-                    disabled={!userName.trim()}
-                    onClick={() => setUserName(userName.trim() || 'Student')}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50"
-                >
-                    Generate Report
-                </button>
-            </div>
-        ) : (
-            <div className="w-full max-w-4xl">
-                {/* Certificate Display */}
-                <div className="bg-white border-8 border-double border-yellow-500 p-10 rounded-lg shadow-2xl text-center relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-yellow-200 rounded-br-full opacity-50"></div>
-                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-200 rounded-tl-full opacity-50"></div>
-                    
-                    <Award className="w-24 h-24 text-yellow-500 mx-auto mb-4" />
-                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-2">Certificate of Achievement</h1>
-                    <p className="text-xl text-gray-600 mb-8">This certifies that</p>
-                    <h2 className="text-3xl md:text-6xl font-cursive text-blue-700 mb-8 underline decoration-wavy decoration-yellow-400">{userName}</h2>
-                    <p className="text-xl text-gray-600 mb-4">has completed the Form 1 Science Assessment with a score of</p>
-                    
-                    <div className="text-6xl font-bold text-gray-800 mb-2">{score} / {quizSet.length}</div>
-                    <div className={`text-2xl font-bold mb-8 ${percentage >= 80 ? 'text-green-500' : 'text-orange-500'}`}>
-                        ({percentage}%) - {percentage >= 80 ? 'Distinction' : percentage >= 50 ? 'Credit' : 'Completed'}
-                    </div>
-
-                    <p className="text-sm text-gray-400">Date: {new Date().toLocaleDateString()}</p>
-                    <p className="text-sm text-gray-400 mb-8">Mode: {isChallengeMode ? 'Challenge' : 'Learning'}</p>
-                    
-                    <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-500 mx-auto max-w-md">
-                        Please take a screenshot of this certificate and share it in the Telegram group.
-                    </div>
-                </div>
-
-                <div className="mt-6 flex flex-col md:flex-row gap-4 justify-center">
-                    {wrongAnswers.length > 0 && (
-                        <button 
-                            onClick={startReview}
-                            className="bg-orange-500 text-white py-3 px-8 rounded-full shadow-lg flex items-center justify-center gap-2 hover:bg-orange-600"
-                        >
-                            <RefreshCw className="w-5 h-5" /> Review Wrong Answers ({wrongAnswers.length})
-                        </button>
-                    )}
+                <div className="space-y-4">
                     <button 
-                        onClick={() => setCurrentMode('menu')}
-                        className="bg-blue-600 text-white py-3 px-8 rounded-full shadow-lg hover:bg-blue-700"
+                    onClick={() => startQuiz(false)}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105"
                     >
-                        Main Menu
+                    <BookOpen /> Start Learning Mode
+                    <span className="text-sm font-normal opacity-90">(Hints Enabled)</span>
+                    </button>
+                    
+                    <button 
+                    onClick={() => startQuiz(true)}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105 shadow-red-200 shadow-lg"
+                    >
+                    <Timer className="w-6 h-6" /> Challenge Mode
+                    <span className="text-sm font-normal opacity-90">(No Hints, Timed)</span>
                     </button>
                 </div>
-            </div>
-        )}
-      </div>
-    );
-  }
-
-  // Quiz Interface
-  const currentQ = quizSet[currentQuestionIndex];
-  
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      {/* Header */}
-      <div className="bg-white p-4 shadow flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-600">Q{currentQuestionIndex + 1}/{quizSet.length}</span>
-            <span className={`px-2 py-1 rounded text-xs text-white ${currentQ.part.startsWith('A') ? 'bg-green-500' : currentQ.part.startsWith('B') ? 'bg-blue-500' : 'bg-purple-500'}`}>
-                Part {currentQ.part}
-            </span>
-        </div>
-        <div className="flex items-center gap-4">
-            {isChallengeMode && (
-                <div className="flex items-center text-red-500 font-mono font-bold">
-                    <Timer className="w-5 h-5 mr-1" />
-                    {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
                 </div>
-            )}
-            <div className="font-bold text-blue-600">Score: {score}</div>
-        </div>
-      </div>
+                <div 
+                    onClick={handleFooterClick}
+                    className="mt-8 text-gray-400 text-sm cursor-pointer select-none"
+                >
+                    &copy; TienPing @ 2026
+                </div>
+            </div>
+            );
+        }
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 max-w-4xl mx-auto w-full">
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-            <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex) / quizSet.length) * 100}%` }}></div>
-        </div>
+        // Part Selection View
+        if (currentMode === 'part-selection') {
+            return (
+                <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6 font-sans">
+                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl text-center">
+                        <div className="flex items-center justify-center gap-2 mb-6 text-green-700">
+                            <BookOpen />
+                            <h2 className="text-3xl font-bold">Select a Topic</h2>
+                        </div>
+                        
+                        <p className="text-gray-500 mb-8">Choose a specific part to practice, or mix them all up.</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button onClick={() => startLearningPart('A')} className="p-6 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-200"><CloudRain className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part A: Natural Phenomena</span>
+                                    <span className="text-xs text-gray-500">Phenomena vs Artificial</span>
+                                </div>
+                            </button>
 
-        {/* Question Card */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm mb-6">
-            
-            {/* Context/Category Header */}
-            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-2">{currentQ.category}</h2>
-            
-            {/* Visuals based on Question Type */}
-            {currentQ.type === 'career-match' && currentQ.career && (
-                <div className="mb-6 p-4 bg-blue-50 rounded-xl text-center border border-blue-100">
-                    <div className="text-6xl mb-2">{currentQ.career.icon}</div>
-                    <h3 className="text-2xl font-bold text-blue-900">{currentQ.career.en}</h3>
-                    <div className="flex justify-center gap-4 text-gray-600 mt-2 text-lg">
-                        <span>{currentQ.career.bm}</span>
-                        <span className="text-gray-300">|</span>
-                        <span>{currentQ.career.cn}</span>
+                            <button onClick={() => startLearningPart('B')} className="p-6 bg-white border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-purple-100 p-3 rounded-full text-purple-600 group-hover:bg-purple-200"><Microscope className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part B: Science Definitions</span>
+                                    <span className="text-xs text-gray-500">Biology, Physics, Chemistry...</span>
+                                </div>
+                            </button>
+
+                            <button onClick={() => startLearningPart('C')} className="p-6 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-orange-100 p-3 rounded-full text-orange-600 group-hover:bg-orange-200"><Globe className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part C: Careers</span>
+                                    <span className="text-xs text-gray-500">Match Careers to Fields</span>
+                                </div>
+                            </button>
+
+                            <button onClick={() => startLearningPart('D')} className="p-6 bg-white border-2 border-teal-200 rounded-xl hover:bg-teal-50 hover:border-teal-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-teal-100 p-3 rounded-full text-teal-600 group-hover:bg-teal-200"><Beaker className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part D: Apparatus ID</span>
+                                    <span className="text-xs text-gray-500">Identify Lab Equipment</span>
+                                </div>
+                            </button>
+
+                            <button onClick={() => startLearningPart('E1')} className="p-6 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-indigo-100 p-3 rounded-full text-indigo-600 group-hover:bg-indigo-200"><FlaskConical className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part E1: Functions</span>
+                                    <span className="text-xs text-gray-500">Apparatus Usage & Safety</span>
+                                </div>
+                            </button>
+
+                            <button onClick={() => startLearningPart('E2')} className="p-6 bg-white border-2 border-red-200 rounded-xl hover:bg-red-50 hover:border-red-400 transition flex items-center gap-4 text-left group">
+                                <div className="bg-red-100 p-3 rounded-full text-red-600 group-hover:bg-red-200"><AlertTriangle className="w-6 h-6" /></div>
+                                <div>
+                                    <span className="block font-bold text-gray-800">Part E2: Hazard Symbols</span>
+                                    <span className="text-xs text-gray-500">Safety Signs & Meanings</span>
+                                </div>
+                            </button>
+                        </div>
+                        
+                        <div className="mt-6 flex flex-col md:flex-row gap-4">
+                            <button onClick={() => startLearningPart('ALL')} className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition shadow-lg">
+                                Mix All Topics
+                            </button>
+                            <button onClick={() => setCurrentMode('menu')} className="md:w-32 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300 transition">
+                                Back
+                            </button>
+                        </div>
                     </div>
                 </div>
-            )}
+            )
+        }
 
-            {currentQ.type === 'apparatus-id' && (
-                <div className="mb-6 bg-white p-4 rounded-xl flex justify-center">
-                    <ApparatusIcon type={currentQ.apparatusType} />
+        // Part Summary View (for Training Mode)
+        if (currentMode === 'part-summary') {
+            const total = quizSet.length;
+            const percentage = Math.round((score / total) * 100);
+            const category = quizSet[0]?.category || "Mixed Topic";
+
+            return (
+                <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6 font-sans">
+                    <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg text-center border-4 border-green-200">
+                        <Star className="w-20 h-20 text-yellow-400 mx-auto mb-4 fill-current animate-bounce" />
+                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Topic Completed!</h2>
+                        <p className="text-green-600 font-bold uppercase tracking-wider mb-6">{category}</p>
+                        
+                        <div className="mb-8">
+                            <div className="text-6xl font-bold text-gray-800 mb-2">{score} <span className="text-2xl text-gray-400">/ {total}</span></div>
+                            <div className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full font-bold">
+                                {percentage}% Correct
+                            </div>
+                        </div>
+
+                        <p className="text-gray-500 italic mb-8">
+                            {percentage === 100 ? "Flawless victory! You are a master." : 
+                            percentage >= 80 ? "Amazing job! Keep it up." :
+                            percentage >= 50 ? "Good effort! Try again to improve." : "Keep practicing, you will get there!"}
+                        </p>
+
+                        <div className="flex flex-col gap-3">
+                            {wrongAnswers.length > 0 && (
+                                <button 
+                                    onClick={startReview}
+                                    className="w-full bg-orange-500 text-white py-3 px-6 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2"
+                                >
+                                    <RefreshCw className="w-5 h-5" /> Review Mistakes ({wrongAnswers.length})
+                                </button>
+                            )}
+                            
+                            <button 
+                                onClick={() => setCurrentMode('part-selection')}
+                                className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                            >
+                                Choose Another Topic <ArrowRight className="w-5 h-5" />
+                            </button>
+
+                            <button 
+                                onClick={() => setCurrentMode('menu')}
+                                className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-bold hover:bg-gray-300 transition"
+                            >
+                                Main Menu
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            )}
+            );
+        }
 
-            {currentQ.type === 'hazard-match' && (
-                <div className="mb-6 bg-yellow-50 p-4 rounded-xl flex justify-center border border-yellow-200">
-                    <HazardIcon type={currentQ.symbolType} />
+        // Certificate View
+        if (currentMode === 'certificate') {
+            const totalQ = isChallengeMode ? quizSet.length : quizSet.length; 
+            const percentage = Math.round((score / totalQ) * 100);
+            
+            return (
+            <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+                {/* Input Name Screen if not set */}
+                {!userName ? (
+                    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+                        <h2 className="text-2xl font-bold mb-4">Quiz Complete!</h2>
+                        <p className="mb-4">Enter your name to generate your certificate.</p>
+                        <input 
+                            type="text" 
+                            placeholder="Student Name" 
+                            className="w-full p-3 border rounded-lg mb-4 text-center text-lg"
+                            onChange={(e) => setUserName(e.target.value)}
+                        />
+                        <button 
+                            disabled={!userName.trim()}
+                            onClick={() => setUserName(userName.trim() || 'Student')}
+                            className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50"
+                        >
+                            Generate Report
+                        </button>
+                    </div>
+                ) : (
+                    <div className="w-full max-w-4xl">
+                        {/* Certificate Display */}
+                        <div className="bg-white border-8 border-double border-yellow-500 p-10 rounded-lg shadow-2xl text-center relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-32 h-32 bg-yellow-200 rounded-br-full opacity-50"></div>
+                            <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-200 rounded-tl-full opacity-50"></div>
+                            
+                            <Award className="w-24 h-24 text-yellow-500 mx-auto mb-4" />
+                            <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-2">Certificate of Achievement</h1>
+                            <p className="text-xl text-gray-600 mb-8">This certifies that</p>
+                            <h2 className="text-3xl md:text-6xl font-cursive text-blue-700 mb-8 underline decoration-wavy decoration-yellow-400">{userName}</h2>
+                            <p className="text-xl text-gray-600 mb-4">has completed the Form 1 Science Assessment with a score of</p>
+                            
+                            <div className="text-6xl font-bold text-gray-800 mb-2">{score} / {quizSet.length}</div>
+                            <div className={`text-2xl font-bold mb-8 ${percentage >= 80 ? 'text-green-500' : 'text-orange-500'}`}>
+                                ({percentage}%) - {percentage >= 80 ? 'Distinction' : percentage >= 50 ? 'Credit' : 'Completed'}
+                            </div>
+
+                            <p className="text-sm text-gray-400">Date: {new Date().toLocaleDateString()}</p>
+                            <p className="text-sm text-gray-400 mb-8">Mode: {isChallengeMode ? 'Challenge' : 'Learning'}</p>
+                            
+                            <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-500 mx-auto max-w-md">
+                                Please take a screenshot of this certificate and share it in the Telegram group.
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex flex-col md:flex-row gap-4 justify-center">
+                            {wrongAnswers.length > 0 && (
+                                <button 
+                                    onClick={startReview}
+                                    className="bg-orange-500 text-white py-3 px-8 rounded-full shadow-lg flex items-center justify-center gap-2 hover:bg-orange-600"
+                                >
+                                    <RefreshCw className="w-5 h-5" /> Review Wrong Answers ({wrongAnswers.length})
+                                </button>
+                            )}
+                            <button 
+                                onClick={() => setCurrentMode('menu')}
+                                className="bg-blue-600 text-white py-3 px-8 rounded-full shadow-lg hover:bg-blue-700"
+                            >
+                                Main Menu
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+            );
+        }
+
+        // Quiz Interface
+        const currentQ = quizSet[currentQuestionIndex];
+        
+        return (
+            <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+            {/* Header */}
+            <div className="bg-white p-4 shadow flex justify-between items-center sticky top-0 z-10">
+                <div className="flex items-center gap-2">
+                    <span className="font-bold text-gray-600">Q{currentQuestionIndex + 1}/{quizSet.length}</span>
+                    <span className={`px-2 py-1 rounded text-xs text-white ${currentQ.part.startsWith('A') ? 'bg-green-500' : currentQ.part.startsWith('B') ? 'bg-blue-500' : 'bg-purple-500'}`}>
+                        Part {currentQ.part}
+                    </span>
                 </div>
-            )}
-
-            {/* The Question Text */}
-            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 leading-snug">{currentQ.question}</h3>
-
-            {/* Options Grid */}
-            <div className={`grid ${currentQ.options.length > 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
-                {currentQ.options.map((opt: any) => renderOption(opt, currentQ))}
-            </div>
-        </div>
-
-        {/* Tools */}
-        {!isChallengeMode && !showFeedback && (
-            <div className="flex justify-end mb-8">
-                <button 
-                    onClick={useHint}
-                    disabled={hintUsed}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition ${hintUsed ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
-                >
-                    <HelpCircle className="w-5 h-5" /> Need a Hint?
-                </button>
-            </div>
-        )}
-      </div>
-
-      {/* Feedback Modal Overlay */}
-      {showFeedback && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-            <div className={`bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl border-t-8 ${feedbackData.correct ? 'border-green-500' : 'border-red-500'}`}>
-                <div className="flex items-center gap-4 mb-4">
-                    {feedbackData.correct ? (
-                        <CheckCircle className="w-12 h-12 text-green-500" />
-                    ) : (
-                        <XCircle className="w-12 h-12 text-red-500" />
+                <div className="flex items-center gap-4">
+                    {isChallengeMode && (
+                        <div className="flex items-center text-red-500 font-mono font-bold">
+                            <Timer className="w-5 h-5 mr-1" />
+                            {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+                        </div>
                     )}
-                    <div>
-                        <h3 className={`text-2xl font-bold ${feedbackData.correct ? 'text-green-700' : 'text-red-700'}`}>
-                            {feedbackData.correct ? 'Correct!' : 'Not quite right.'}
-                        </h3>
-                        <p className="font-medium text-gray-600 italic">"{feedbackData.message}"</p>
+                    <div className="font-bold text-blue-600">Score: {score}</div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 p-4 max-w-4xl mx-auto w-full">
+                {/* Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                    <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex) / quizSet.length) * 100}%` }}></div>
+                </div>
+
+                {/* Question Card */}
+                <div className="bg-white p-6 rounded-2xl shadow-sm mb-6">
+                    
+                    {/* Context/Category Header */}
+                    <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-2">{currentQ.category}</h2>
+                    
+                    {/* Visuals based on Question Type */}
+                    {currentQ.type === 'career-match' && currentQ.career && (
+                        <div className="mb-6 p-4 bg-blue-50 rounded-xl text-center border border-blue-100">
+                            <div className="text-6xl mb-2">{currentQ.career.icon}</div>
+                            <h3 className="text-2xl font-bold text-blue-900">{currentQ.career.en}</h3>
+                            <div className="flex justify-center gap-4 text-gray-600 mt-2 text-lg">
+                                <span>{currentQ.career.bm}</span>
+                                <span className="text-gray-300">|</span>
+                                <span>{currentQ.career.cn}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {currentQ.type === 'apparatus-id' && (
+                        <div className="mb-6 bg-white p-4 rounded-xl flex justify-center">
+                            <ApparatusIcon type={currentQ.apparatusType} />
+                        </div>
+                    )}
+
+                    {currentQ.type === 'hazard-match' && (
+                        <div className="mb-6 bg-yellow-50 p-4 rounded-xl flex justify-center border border-yellow-200">
+                            <HazardIcon type={currentQ.symbolType} />
+                        </div>
+                    )}
+
+                    {/* The Question Text */}
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 leading-snug">{currentQ.question}</h3>
+
+                    {/* Options Grid */}
+                    <div className={`grid ${currentQ.options.length > 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
+                        {currentQ.options.map((opt) => renderOption(opt, currentQ))}
                     </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg mb-6 text-gray-700 text-lg leading-relaxed border-l-4 border-blue-400">
-                    <span className="font-bold block mb-1 text-blue-600">Did you know?</span>
-                    {feedbackData.explanation}
-                </div>
-
-                <button 
-                    onClick={nextQuestion}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95"
-                >
-                    {currentQuestionIndex < quizSet.length - 1 ? 'Next Question' : 'Finish Quiz'}
-                </button>
+                {/* Tools */}
+                {!isChallengeMode && !showFeedback && (
+                    <div className="flex justify-end mb-8">
+                        <button 
+                            onClick={useHint}
+                            disabled={hintUsed}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition ${hintUsed ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
+                        >
+                            <HelpCircle className="w-5 h-5" /> Need a Hint?
+                        </button>
+                    </div>
+                )}
             </div>
-        </div>
-      )}
-      
-      {/* Footer Copy */}
-      <div className="bg-gray-800 text-gray-400 py-6 text-center text-sm">
-        <p onClick={handleFooterClick} className="cursor-pointer select-none hover:text-white transition">
-            &copy; TienPing @ 2026
-        </p>
-      </div>
-    </div>
-  );
-}
 
-// Icon Helper
-const BookOpenIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-);
+            {/* Feedback Modal Overlay */}
+            {showFeedback && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+                    <div className={`bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl border-t-8 ${feedbackData.correct ? 'border-green-500' : 'border-red-500'}`}>
+                        <div className="flex items-center gap-4 mb-4">
+                            {feedbackData.correct ? (
+                                <CheckCircle className="w-12 h-12 text-green-500" />
+                            ) : (
+                                <XCircle className="w-12 h-12 text-red-500" />
+                            )}
+                            <div>
+                                <h3 className={`text-2xl font-bold ${feedbackData.correct ? 'text-green-700' : 'text-red-700'}`}>
+                                    {feedbackData.correct ? 'Correct!' : 'Not quite right.'}
+                                </h3>
+                                <p className="font-medium text-gray-600 italic">"{feedbackData.message}"</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg mb-6 text-gray-700 text-lg leading-relaxed border-l-4 border-blue-400">
+                            <span className="font-bold block mb-1 text-blue-600">Did you know?</span>
+                            {feedbackData.explanation}
+                        </div>
+
+                        <button 
+                            onClick={nextQuestion}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95"
+                        >
+                            {currentQuestionIndex < quizSet.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {/* Footer Copy */}
+            <div className="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+                <p onClick={handleFooterClick} className="cursor-pointer select-none hover:text-white transition">
+                    &copy; TienPing @ 2026
+                </p>
+            </div>
+            </div>
+        );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ScienceQuizApp />);
+    </script>
+</body>
+</html>
