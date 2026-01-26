@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science Hero: Form 1 Quiz</title>
+    <title>Science Hero: Form 1 Quiz (Dual Language)</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts for Certificate -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Noto+Sans+SC:wght@400;500;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -19,9 +22,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        body { font-family: 'Roboto', sans-serif; }
+        body { font-family: 'Roboto', 'Noto Sans SC', sans-serif; }
         .font-cursive { font-family: 'Great Vibes', cursive; }
-        /* Custom scrollbar for better mobile landscape experience */
+        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
@@ -36,7 +39,6 @@
         const { useState, useEffect, useRef } = React;
 
         // --- ICONS ---
-        // Simplified SVG Icon components to replace Lucide imports
         const IconBase = ({ children, className, ...props }) => (
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -58,7 +60,6 @@
         const Atom = (props) => <IconBase {...props}><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/></IconBase>;
         const BookOpen = (props) => <IconBase {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></IconBase>;
         const Timer = (props) => <IconBase {...props}><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></IconBase>;
-        const Trophy = (props) => <IconBase {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></IconBase>;
         const AlertTriangle = (props) => <IconBase {...props}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></IconBase>;
         const CheckCircle = (props) => <IconBase {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></IconBase>;
         const XCircle = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></IconBase>;
@@ -74,6 +75,7 @@
         const FlaskConical = (props) => <IconBase {...props}><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></IconBase>;
         const ArrowRight = (props) => <IconBase {...props}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></IconBase>;
         const Star = (props) => <IconBase {...props}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
+        const AlertOctagon = (props) => <IconBase {...props}><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></IconBase>;
 
         // Custom Hazard Symbols (SVG)
         const HazardIcon = ({ type }) => {
@@ -159,12 +161,16 @@
                 return <svg viewBox="0 0 100 100" className={baseClass}><ellipse cx="50" cy="30" rx="30" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/><path d="M25 32 L15 90 M50 35 L50 90 M75 32 L85 90" stroke="currentColor" strokeWidth="3"/></svg>;
                 case 'retort-stand-with-clamps':
                 return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="90" width="40" height="5" fill="currentColor"/><rect x="30" y="10" width="5" height="80" fill="currentColor"/><path d="M35 30 L60 30" stroke="currentColor" strokeWidth="3"/><circle cx="65" cy="30" r="5" stroke="currentColor" fill="none"/></svg>;
+                case 'retort-stand-with-ring':
+                return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="90" width="40" height="5" fill="currentColor"/><rect x="30" y="10" width="5" height="80" fill="currentColor"/><path d="M35 40 L50 40" stroke="currentColor" strokeWidth="3"/><ellipse cx="65" cy="40" rx="15" ry="5" stroke="currentColor" fill="none" strokeWidth="3"/></svg>;
                 case 'wire-gauze':
                     return <svg viewBox="0 0 100 100" className={baseClass}><rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M20 30 L80 30 M20 40 L80 40 M20 50 L80 50 M20 60 L80 60 M20 70 L80 70 M30 20 L30 80 M40 20 L40 80 M50 20 L50 80 M60 20 L60 80 M70 20 L70 80" stroke="currentColor" opacity="0.5"/></svg>;
                 case 'filter-funnel':
                     return <svg viewBox="0 0 100 100" className={baseClass}><path d="M20 20 L80 20 L55 50 L55 90 L45 90 L45 50 Z" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
                 case 'gas-jar':
                     return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 10 L30 90 L70 90 L70 10" fill="none" stroke="currentColor" strokeWidth="3"/><ellipse cx="50" cy="10" rx="20" ry="5" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+                case 'bell-jar':
+                    return <svg viewBox="0 0 100 100" className={baseClass}><path d="M30 90 L30 40 Q30 10 50 10 Q70 10 70 40 L70 90" fill="none" stroke="currentColor" strokeWidth="3"/><rect x="25" y="90" width="50" height="5" fill="currentColor"/><circle cx="50" cy="5" r="5" fill="currentColor"/></svg>;
                 case 'evaporating-dish':
                     return <svg viewBox="0 0 100 100" className={baseClass}><path d="M10 40 Q50 90 90 40" fill="none" stroke="currentColor" strokeWidth="3"/><line x1="10" y1="40" x2="90" y2="40" stroke="currentColor" strokeWidth="3"/></svg>;
                 case 'crucible':
@@ -178,289 +184,206 @@
             }
         };
 
+        // --- DUAL TEXT HELPER COMPONENT ---
+        const Dual = ({ en, zh, size="normal", className="" }) => (
+            <div className={`flex flex-col ${className}`}>
+                <span className={size === 'large' ? 'text-xl md:text-2xl font-bold leading-tight' : 'font-semibold leading-tight'}>{en}</span>
+                <span className={`${size === 'large' ? 'text-lg mt-1' : 'text-sm'} text-gray-500 font-normal`}>{zh}</span>
+            </div>
+        );
+
+        // --- UTILS ---
+        const shuffleArray = (array) => {
+            const newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        };
+
 
         /**
-         * --- DATA BANK ---
+         * --- DATA BANK (Bilingual) ---
          */
         const questions = [
-        // --- PART A: Natural Phenomena (30 questions planned, sample included) ---
-        {
-            id: 'a1', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-            question: "Which of the following is a natural phenomenon?",
-            options: [
-            { id: 'opt1', text: "Volcanic Eruption", icon: <Flame className="w-12 h-12 text-red-500" /> },
-            { id: 'opt2', text: "Car Accident", icon: <AlertTriangle className="w-12 h-12 text-gray-500" /> },
-            { id: 'opt3', text: "Building Construction", icon: <div className="text-4xl">🏗️</div> },
-            { id: 'opt4', text: "Fireworks", icon: <div className="text-4xl">🎆</div> }
-            ],
-            correct: 'opt1',
-            explanation: "Volcanic eruptions occur naturally due to Earth's internal heat, unlike cars or buildings which are man-made."
-        },
-        {
-            id: 'a2', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-            question: "Identify the natural phenomenon.",
-            options: [
-            { id: 'opt1', text: "Tsunami", icon: <div className="text-4xl">🌊</div> },
-            { id: 'opt2', text: "Swimming Pool", icon: <div className="text-4xl">🏊</div> },
-            { id: 'opt3', text: "Dam Release", icon: <div className="text-4xl">💧</div> },
-            { id: 'opt4', text: "Water Fountain", icon: <div className="text-4xl">⛲</div> }
-            ],
-            correct: 'opt1',
-            explanation: "Tsunamis are natural large waves caused by earthquakes, unlike artificial water structures."
-        },
-        {
-            id: 'a3', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-            question: "Which image represents a natural phenomenon?",
-            options: [
-            { id: 'opt1', text: "Lightning", icon: <Zap className="w-12 h-12 text-yellow-400" /> },
-            { id: 'opt2', text: "Street Light", icon: <div className="text-4xl">💡</div> },
-            { id: 'opt3', text: "Flashlight", icon: <div className="text-4xl">🔦</div> },
-            { id: 'opt4', text: "Neon Sign", icon: <div className="text-4xl">🏮</div> }
-            ],
-            correct: 'opt1',
-            explanation: "Lightning is a natural electrostatic discharge, unlike artificial lights."
-        },
-        {
-            id: 'a4', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-            question: "Select the natural phenomenon.",
-            options: [
-            { id: 'opt1', text: "Rainbow", icon: <div className="text-4xl">🌈</div> },
-            { id: 'opt2', text: "Painting", icon: <div className="text-4xl">🎨</div> },
-            { id: 'opt3', text: "Disco Lights", icon: <div className="text-4xl">💃</div> },
-            { id: 'opt4', text: "Prism Lab Experiment", icon: <div className="text-4xl">🔬</div> }
-            ],
-            correct: 'opt1',
-            explanation: "Rainbows form naturally when sunlight is refracted by rain droplets."
-        },
-        {
-            id: 'a5', part: 'A', category: 'Natural Phenomena', type: 'text-match',
-            question: "Which of these happens without human intervention?",
-            options: [
-            { id: 'opt1', text: "Plant Growth", icon: <div className="text-4xl">🌱</div> },
-            { id: 'opt2', text: "Plastic Flower", icon: <div className="text-4xl">💐</div> },
-            { id: 'opt3', text: "3D Printed Tree", icon: <div className="text-4xl">🌲</div> },
-            { id: 'opt4', text: "Paper Rose", icon: <div className="text-4xl">🌹</div> }
-            ],
-            correct: 'opt1',
-            explanation: "Biological growth is a natural life process."
-        },
+        // --- PART A: Natural Phenomena (30 Questions) ---
+        { id: 'a1', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a natural phenomenon?", zh: "哪一个是自然现象？" }, options: [{ id: '1', text: { en: "Volcanic Eruption", zh: "火山爆发" }, icon: <Flame className="w-12 h-12 text-red-500" /> }, { id: '2', text: { en: "Car Accident", zh: "车祸" } }, { id: '3', text: { en: "Building Construction", zh: "建筑施工" } }, { id: '4', text: { en: "Fireworks", zh: "烟花" } }], correct: '1', explanation: { en: "Volcanic eruptions are natural geological events.", zh: "火山爆发是自然地质事件。" } },
+        { id: 'a2', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Identify the natural phenomenon.", zh: "识别自然现象。" }, options: [{ id: '1', text: { en: "Tsunami", zh: "海啸" }, icon: <div className="text-4xl">🌊</div> }, { id: '2', text: { en: "Swimming Pool", zh: "游泳池" } }, { id: '3', text: { en: "Dam Release", zh: "水坝泄洪" } }, { id: '4', text: { en: "Fountain", zh: "喷泉" } }], correct: '1', explanation: { en: "Tsunamis are natural waves caused by earthquakes.", zh: "海啸是由地震引起的自然巨浪。" } },
+        { id: 'a3', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Select the natural light source.", zh: "选择自然光源。" }, options: [{ id: '1', text: { en: "Lightning", zh: "闪电" }, icon: <Zap className="w-12 h-12 text-yellow-400" /> }, { id: '2', text: { en: "Street Light", zh: "路灯" } }, { id: '3', text: { en: "Flashlight", zh: "手电筒" } }, { id: '4', text: { en: "Neon Sign", zh: "霓虹灯" } }], correct: '1', explanation: { en: "Lightning is natural electricity.", zh: "闪电是自然电现象。" } },
+        { id: 'a4', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which represents nature?", zh: "哪个代表自然？" }, options: [{ id: '1', text: { en: "Rainbow", zh: "彩虹" }, icon: <div className="text-4xl">🌈</div> }, { id: '2', text: { en: "Painting", zh: "绘画" } }, { id: '3', text: { en: "Disco Lights", zh: "迪斯科灯光" } }, { id: '4', text: { en: "Laser Show", zh: "激光秀" } }], correct: '1', explanation: { en: "Rainbows form by sunlight refraction.", zh: "彩虹由阳光折射形成。" } },
+        { id: 'a5', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which occurs naturally?", zh: "哪个是自然发生的？" }, options: [{ id: '1', text: { en: "Plant Growth", zh: "植物生长" }, icon: <div className="text-4xl">🌱</div> }, { id: '2', text: { en: "Plastic Flower", zh: "塑料花" } }, { id: '3', text: { en: "3D Printed Tree", zh: "3D打印树" } }, { id: '4', text: { en: "Paper Rose", zh: "纸玫瑰" } }], correct: '1', explanation: { en: "Growth is a biological process.", zh: "生长是一个生物过程。" } },
+        { id: 'a6', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is NOT man-made?", zh: "哪个不是人造的？" }, options: [{ id: '1', text: { en: "Solar Eclipse", zh: "日食" }, icon: <div className="text-4xl">🌑</div> }, { id: '2', text: { en: "Shadow Puppet", zh: "皮影戏" } }, { id: '3', text: { en: "Cinema Screen", zh: "电影屏幕" } }, { id: '4', text: { en: "Sunglasses", zh: "太阳镜" } }], correct: '1', explanation: { en: "Eclipses are astronomical events.", zh: "日食是天文现象。" } },
+        { id: 'a7', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Select the natural weather.", zh: "选择自然天气。" }, options: [{ id: '1', text: { en: "Snowstorm", zh: "暴风雪" }, icon: <div className="text-4xl">❄️</div> }, { id: '2', text: { en: "Snow Globe", zh: "雪球玩具" } }, { id: '3', text: { en: "Foam Party", zh: "泡沫派对" } }, { id: '4', text: { en: "Air Conditioner", zh: "空调" } }], correct: '1', explanation: { en: "Snowstorms are natural weather patterns.", zh: "暴风雪是自然天气模式。" } },
+        { id: 'a8', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Identify natural sound.", zh: "识别自然声音。" }, options: [{ id: '1', text: { en: "Thunder", zh: "雷声" }, icon: <div className="text-4xl">⛈️</div> }, { id: '2', text: { en: "Drum", zh: "鼓" } }, { id: '3', text: { en: "Speaker", zh: "扬声器" } }, { id: '4', text: { en: "Explosion", zh: "爆炸" } }], correct: '1', explanation: { en: "Thunder comes from lightning.", zh: "雷声来自闪电。" } },
+        { id: 'a9', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which process is natural?", zh: "哪个过程是自然的？" }, options: [{ id: '1', text: { en: "Photosynthesis", zh: "光合作用" }, icon: <div className="text-4xl">🍃</div> }, { id: '2', text: { en: "Photography", zh: "摄影" } }, { id: '3', text: { en: "Photocopying", zh: "复印" } }, { id: '4', text: { en: "Painting", zh: "绘画" } }], correct: '1', explanation: { en: "Plants make food via photosynthesis.", zh: "植物通过光合作用制造食物。" } },
+        { id: 'a10', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "What causes tides?", zh: "什么引起潮汐？" }, options: [{ id: '1', text: { en: "Moon's Gravity", zh: "月球引力" }, icon: <div className="text-4xl">🌔</div> }, { id: '2', text: { en: "Ships", zh: "船只" } }, { id: '3', text: { en: "Submarines", zh: "潜水艇" } }, { id: '4', text: { en: "Pumps", zh: "水泵" } }], correct: '1', explanation: { en: "Gravity from the moon pulls the ocean.", zh: "月球的引力牵引海洋。" } },
+        { id: 'a11', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a natural disaster?", zh: "哪个是自然灾害？" }, options: [{ id: '1', text: { en: "Earthquake", zh: "地震" }, icon: <div className="text-4xl">🏚️</div> }, { id: '2', text: { en: "Building Demolition", zh: "建筑物拆除" } }, { id: '3', text: { en: "Bombing", zh: "轰炸" } }, { id: '4', text: { en: "Mining", zh: "采矿" } }], correct: '1', explanation: { en: "Earthquakes happen due to tectonic plates.", zh: "地震是由于构造板块运动发生的。" } },
+        { id: 'a12', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Select the natural formation.", zh: "选择自然形成物。" }, options: [{ id: '1', text: { en: "Cave", zh: "洞穴" }, icon: <div className="text-4xl">🕳️</div> }, { id: '2', text: { en: "Tunnel", zh: "隧道" } }, { id: '3', text: { en: "Basement", zh: "地下室" } }, { id: '4', text: { en: "Subway", zh: "地铁" } }], correct: '1', explanation: { en: "Caves form by erosion over time.", zh: "洞穴由长时间的侵蚀形成。" } },
+        { id: 'a13', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which water flow is natural?", zh: "哪个水流是自然的？" }, options: [{ id: '1', text: { en: "River", zh: "河流" }, icon: <div className="text-4xl">🏞️</div> }, { id: '2', text: { en: "Canal", zh: "运河" } }, { id: '3', text: { en: "Drain", zh: "排水沟" } }, { id: '4', text: { en: "Pipe", zh: "管道" } }], correct: '1', explanation: { en: "Rivers flow naturally to the sea.", zh: "河流自然流向大海。" } },
+        { id: 'a14', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Identify the celestial body.", zh: "识别天体。" }, options: [{ id: '1', text: { en: "Comet", zh: "彗星" }, icon: <div className="text-4xl">☄️</div> }, { id: '2', text: { en: "Satellite", zh: "卫星" } }, { id: '3', text: { en: "Rocket", zh: "火箭" } }, { id: '4', text: { en: "Space Station", zh: "空间站" } }], correct: '1', explanation: { en: "Comets are natural icy bodies in space.", zh: "彗星是太空中自然的冰体。" } },
+        { id: 'a15', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which represents morning?", zh: "哪个代表早晨？" }, options: [{ id: '1', text: { en: "Sunrise", zh: "日出" }, icon: <div className="text-4xl">🌅</div> }, { id: '2', text: { en: "Alarm Clock", zh: "闹钟" } }, { id: '3', text: { en: "Street Lamp off", zh: "路灯熄灭" } }, { id: '4', text: { en: "Breakfast", zh: "早餐" } }], correct: '1', explanation: { en: "Sunrise is a natural daily event.", zh: "日出是自然的日常事件。" } },
+        { id: 'a16', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "What is natural condensation?", zh: "什么是自然凝结？" }, options: [{ id: '1', text: { en: "Dew", zh: "露水" }, icon: <div className="text-4xl">💧</div> }, { id: '2', text: { en: "Sweat", zh: "汗水" } }, { id: '3', text: { en: "Spilled Water", zh: "泼出的水" } }, { id: '4', text: { en: "Shower", zh: "淋浴" } }], correct: '1', explanation: { en: "Dew forms on grass in the morning.", zh: "早晨草地上会形成露水。" } },
+        { id: 'a17', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which change is biological?", zh: "哪个变化是生物性的？" }, options: [{ id: '1', text: { en: "Fruit Rotting", zh: "水果腐烂" }, icon: <div className="text-4xl">🍎</div> }, { id: '2', text: { en: "Fruit Slicing", zh: "切水果" } }, { id: '3', text: { en: "Cooking", zh: "烹饪" } }, { id: '4', text: { en: "Canning", zh: "罐装" } }], correct: '1', explanation: { en: "Rotting is natural decomposition.", zh: "腐烂是自然分解。" } },
+        { id: 'a18', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Select the natural light display.", zh: "选择自然光展示。" }, options: [{ id: '1', text: { en: "Aurora (Northern Lights)", zh: "极光" }, icon: <div className="text-4xl">🌌</div> }, { id: '2', text: { en: "Fireworks", zh: "烟花" } }, { id: '3', text: { en: "Spotlight", zh: "聚光灯" } }, { id: '4', text: { en: "Traffic Light", zh: "红绿灯" } }], correct: '1', explanation: { en: "Auroras are caused by solar wind.", zh: "极光是由太阳风引起的。" } },
+        { id: 'a19', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "What is a natural heater?", zh: "什么是天然加热器？" }, options: [{ id: '1', text: { en: "Hot Spring", zh: "温泉" }, icon: <div className="text-4xl">♨️</div> }, { id: '2', text: { en: "Kettle", zh: "水壶" } }, { id: '3', text: { en: "Oven", zh: "烤箱" } }, { id: '4', text: { en: "Microwave", zh: "微波炉" } }], correct: '1', explanation: { en: "Hot springs are heated by Earth's magma.", zh: "温泉由地球岩浆加热。" } },
+        { id: 'a20', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a natural air movement?", zh: "哪个是自然空气流动？" }, options: [{ id: '1', text: { en: "Hurricane", zh: "飓风" }, icon: <div className="text-4xl">🌀</div> }, { id: '2', text: { en: "Fan", zh: "风扇" } }, { id: '3', text: { en: "Hairdryer", zh: "吹风机" } }, { id: '4', text: { en: "Vacuum", zh: "吸尘器" } }], correct: '1', explanation: { en: "Hurricanes are large natural storms.", zh: "飓风是巨大的自然风暴。" } },
+        { id: 'a21', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which crystal is natural?", zh: "哪种晶体是天然的？" }, options: [{ id: '1', text: { en: "Snowflake", zh: "雪花" }, icon: <div className="text-4xl">❄️</div> }, { id: '2', text: { en: "Glass Marble", zh: "玻璃弹珠" } }, { id: '3', text: { en: "Plastic Bead", zh: "塑料珠" } }, { id: '4', text: { en: "Cut Diamond", zh: "切割钻石" } }], correct: '1', explanation: { en: "Snowflakes crystallize naturally in clouds.", zh: "雪花在云中自然结晶。" } },
+        { id: 'a22', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Identify the natural barrier.", zh: "识别自然屏障。" }, options: [{ id: '1', text: { en: "Mountain Range", zh: "山脉" }, icon: <div className="text-4xl">🏔️</div> }, { id: '2', text: { en: "Great Wall", zh: "长城" } }, { id: '3', text: { en: "Fence", zh: "栅栏" } }, { id: '4', text: { en: "Dam", zh: "水坝" } }], correct: '1', explanation: { en: "Mountains form naturally over millions of years.", zh: "山脉是数百万年自然形成的。" } },
+        { id: 'a23', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a sign of life?", zh: "哪个是生命的迹象？" }, options: [{ id: '1', text: { en: "Breathing", zh: "呼吸" }, icon: <div className="text-4xl">😤</div> }, { id: '2', text: { en: "Robot Moving", zh: "机器人移动" } }, { id: '3', text: { en: "Engine Running", zh: "引擎运转" } }, { id: '4', text: { en: "Clock Ticking", zh: "时钟滴答" } }], correct: '1', explanation: { en: "Breathing is a vital biological process.", zh: "呼吸是重要的生物过程。" } },
+        { id: 'a24', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "What causes rust naturally?", zh: "什么自然导致生锈？" }, options: [{ id: '1', text: { en: "Oxidation", zh: "氧化" }, icon: <div className="text-4xl">⛓️</div> }, { id: '2', text: { en: "Painting", zh: "绘画" } }, { id: '3', text: { en: "Cleaning", zh: "清洁" } }, { id: '4', text: { en: "Melting", zh: "熔化" } }], correct: '1', explanation: { en: "Rust happens when iron reacts with oxygen.", zh: "铁与氧气反应时会生锈。" } },
+        { id: 'a25', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a natural bridge?", zh: "哪个是天然桥梁？" }, options: [{ id: '1', text: { en: "Rock Arch", zh: "岩拱" }, icon: <div className="text-4xl">🪨</div> }, { id: '2', text: { en: "Golden Gate Bridge", zh: "金门大桥" } }, { id: '3', text: { en: "Overpass", zh: "立交桥" } }, { id: '4', text: { en: "Wooden Plank", zh: "木板" } }], correct: '1', explanation: { en: "Rock arches form by wind and water erosion.", zh: "岩拱由风和水侵蚀形成。" } },
+        { id: 'a26', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Select the natural gem.", zh: "选择天然宝石。" }, options: [{ id: '1', text: { en: "Pearl in Oyster", zh: "牡蛎中的珍珠" }, icon: <div className="text-4xl">🦪</div> }, { id: '2', text: { en: "Plastic Bead", zh: "塑料珠" } }, { id: '3', text: { en: "Glass Crystal", zh: "玻璃水晶" } }, { id: '4', text: { en: "LED Light", zh: "LED灯" } }], correct: '1', explanation: { en: "Pearls grow naturally inside oysters.", zh: "珍珠在牡蛎内自然生长。" } },
+        { id: 'a27', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which is a natural cycle?", zh: "哪个是自然循环？" }, options: [{ id: '1', text: { en: "Water Cycle", zh: "水循环" }, icon: <div className="text-4xl">♻️</div> }, { id: '2', text: { en: "Traffic Cycle", zh: "交通循环" } }, { id: '3', text: { en: "Washing Machine Cycle", zh: "洗衣机循环" } }, { id: '4', text: { en: "Recycling Plant", zh: "回收厂" } }], correct: '1', explanation: { en: "The water cycle moves water naturally around Earth.", zh: "水循环使水在地球上自然移动。" } },
+        { id: 'a28', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Identify the natural trap.", zh: "识别自然陷阱。" }, options: [{ id: '1', text: { en: "Spider Web", zh: "蜘蛛网" }, icon: <div className="text-4xl">🕸️</div> }, { id: '2', text: { en: "Mouse Trap", zh: "老鼠夹" } }, { id: '3', text: { en: "Net", zh: "网" } }, { id: '4', text: { en: "Cage", zh: "笼子" } }], correct: '1', explanation: { en: "Spiders build webs naturally to catch prey.", zh: "蜘蛛自然结网以捕捉猎物。" } },
+        { id: 'a29', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "What is a natural explosion?", zh: "什么是自然爆炸？" }, options: [{ id: '1', text: { en: "Supernova", zh: "超新星" }, icon: <div className="text-4xl">💥</div> }, { id: '2', text: { en: "Dynamite", zh: "炸药" } }, { id: '3', text: { en: "Firecracker", zh: "鞭炮" } }, { id: '4', text: { en: "Balloon Popping", zh: "气球爆裂" } }], correct: '1', explanation: { en: "A supernova is the explosion of a star.", zh: "超新星是恒星的爆炸。" } },
+        { id: 'a30', part: 'A', category: 'Natural Phenomena', type: 'text-match', question: { en: "Which represents natural fuel?", zh: "哪个代表天然燃料？" }, options: [{ id: '1', text: { en: "Coal", zh: "煤" }, icon: <div className="text-4xl">⚫</div> }, { id: '2', text: { en: "Battery", zh: "电池" } }, { id: '3', text: { en: "Candle Wax", zh: "蜡烛蜡" } }, { id: '4', text: { en: "Nuclear Reactor", zh: "核反应堆" } }], correct: '1', explanation: { en: "Coal is a fossil fuel formed naturally.", zh: "煤是自然形成的化石燃料。" } },
 
-        // --- PART B: Science Fields Definitions (Sample) ---
-        {
-            id: 'b1', part: 'B', category: 'Science Definitions', type: 'standard',
-            question: "The study of life and living organisms, including their structure, function, growth, and evolution.",
-            options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
-            correct: 'b',
-            explanation: "Biology comes from 'bios' (life) and 'logos' (study)."
-        },
-        {
-            id: 'b2', part: 'B', category: 'Science Definitions', type: 'standard',
-            question: "The study of matter and energy and the interactions between them.",
-            options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}],
-            correct: 'p',
-            explanation: "Physics deals with the fundamental laws of the universe, energy, and matter."
-        },
-        {
-            id: 'b3', part: 'B', category: 'Science Definitions', type: 'standard',
-            question: "The study of the composition, structure, properties, and change of matter.",
-            options: [{id:'c', text:'Chemistry'}, {id:'m', text:'Meteorology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
-            correct: 'c',
-            explanation: "Chemistry focuses on substances, atoms, molecules, and chemical reactions."
-        },
-        {
-            id: 'b4', part: 'B', category: 'Science Definitions', type: 'standard',
-            question: "The study of the Earth, the rocks of which it is composed, and the processes by which they change.",
-            options: [{id:'g', text:'Geology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'b', text:'Biology'}],
-            correct: 'g',
-            explanation: "Geology involves studying Earth's physical structure and substance."
-        },
-        {
-            id: 'b5', part: 'B', category: 'Science Definitions', type: 'standard',
-            question: "The study of the universe beyond Earth, including stars, galaxies, and planets.",
-            options: [{id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}],
-            correct: 'a',
-            explanation: "Astronomy is the scientific study of celestial objects and phenomena."
-        },
+        // --- PART B: Science Fields Definitions (20 Questions) ---
+        { id: 'b1', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of life and living organisms.", zh: "对生命和生物体的研究。" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'b', explanation: { en: "Biology comes from 'bios' (life).", zh: "生物学（Biology）源自 'bios'（生命）。" } },
+        { id: 'b2', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of matter and energy.", zh: "对物质和能量的研究。" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'p', explanation: { en: "Physics deals with the laws of the universe.", zh: "物理学研究宇宙的定律。" } },
+        { id: 'b3', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of the composition of matter.", zh: "对物质组成的研究。" }, options: [{id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}], correct: 'c', explanation: { en: "Chemistry focuses on atoms and reactions.", zh: "化学关注原子和反应。" } },
+        { id: 'b4', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of the Earth and rocks.", zh: "对地球和岩石的研究。" }, options: [{id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}], correct: 'g', explanation: { en: "Geology involves Earth's structure.", zh: "地质学涉及地球的结构。" } },
+        { id: 'b5', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of the universe beyond Earth.", zh: "对地球以外宇宙的研究。" }, options: [{id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}], correct: 'a', explanation: { en: "Astronomy studies stars and planets.", zh: "天文学研究星星和行星。" } },
+        { id: 'b6', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of weather and climate.", zh: "对天气和气候的研究。" }, options: [{id:'m', text:{en:'Meteorology', zh:'气象学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}], correct: 'm', explanation: { en: "Meteorology involves forecasting weather.", zh: "气象学涉及天气预报。" } },
+        { id: 'b7', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of plants.", zh: "对植物的研究。" }, options: [{id:'b', text:{en:'Botany', zh:'植物学'}}, {id:'z', text:{en:'Zoology', zh:'动物学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'b', explanation: { en: "Botany is the science of plant life.", zh: "植物学是研究生植物生命的科学。" } },
+        { id: 'b8', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of animals.", zh: "对动物的研究。" }, options: [{id:'z', text:{en:'Zoology', zh:'动物学'}}, {id:'b', text:{en:'Botany', zh:'植物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'z', explanation: { en: "Zoology focuses on the animal kingdom.", zh: "动物学专注于动物界。" } },
+        { id: 'b9', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of the ocean.", zh: "对海洋的研究。" }, options: [{id:'o', text:{en:'Oceanography', zh:'海洋学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'o', explanation: { en: "Oceanography covers marine systems.", zh: "海洋学涵盖海洋系统。" } },
+        { id: 'b10', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "The study of microscopic organisms.", zh: "对微生物的研究。" }, options: [{id:'m', text:{en:'Microbiology', zh:'微生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}], correct: 'm', explanation: { en: "Microbiology studies bacteria and viruses.", zh: "微生物学研究细菌和病毒。" } },
+        { id: 'b11', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of heredity and genes.", zh: "对遗传和基因的研究。" }, options: [{id:'g', text:{en:'Genetics', zh:'遗传学'}}, {id:'b', text:{en:'Botany', zh:'植物学'}}, {id:'e', text:{en:'Ecology', zh:'生态学'}}, {id:'z', text:{en:'Zoology', zh:'动物学'}}], correct: 'g', explanation: { en: "Genetics explains how traits are passed down.", zh: "遗传学解释性状如何遗传。" } },
+        { id: 'b12', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of relationships between organisms.", zh: "对生物之间关系的研究。" }, options: [{id:'e', text:{en:'Ecology', zh:'生态学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}], correct: 'e', explanation: { en: "Ecology looks at ecosystems.", zh: "生态学着眼于生态系统。" } },
+        { id: 'b13', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of motion and forces.", zh: "对运动和力的研究。" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'p', explanation: { en: "Force and motion are core to Physics.", zh: "力和运动是物理学的核心。" } },
+        { id: 'b14', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of chemical reactions.", zh: "对化学反应的研究。" }, options: [{id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'c', explanation: { en: "Reactions create new substances.", zh: "反应产生新物质。" } },
+        { id: 'b15', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of earthquakes.", zh: "对地震的研究。" }, options: [{id:'s', text:{en:'Seismology', zh:'地震学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 's', explanation: { en: "Seismology is a branch of Geology.", zh: "地震学是地质学的一个分支。" } },
+        { id: 'b16', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of stars and galaxies.", zh: "对恒星和星系的研究。" }, options: [{id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'a', explanation: { en: "Astronomy explores the universe.", zh: "天文学探索宇宙。" } },
+        { id: 'b17', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of fossils.", zh: "对化石的研究。" }, options: [{id:'p', text:{en:'Paleontology', zh:'古生物学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'p', explanation: { en: "Paleontology studies ancient life.", zh: "古生物学研究古代生命。" } },
+        { id: 'b18', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of the human body structure.", zh: "对人体结构的研究。" }, options: [{id:'a', text:{en:'Anatomy', zh:'解剖学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'a', explanation: { en: "Anatomy maps the body parts.", zh: "解剖学绘制身体部位图。" } },
+        { id: 'b19', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of poisons.", zh: "对毒物的研究。" }, options: [{id:'t', text:{en:'Toxicology', zh:'毒理学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}], correct: 't', explanation: { en: "Toxicology studies harmful effects.", zh: "毒理学研究有害影响。" } },
+        { id: 'b20', part: 'B', category: 'Science Definitions', type: 'standard', question: { en: "Study of insects.", zh: "对昆虫的研究。" }, options: [{id:'e', text:{en:'Entomology', zh:'昆虫学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}], correct: 'e', explanation: { en: "Entomology focuses on insects.", zh: "昆虫学专注于昆虫。" } },
 
-        // --- PART C: Careers (With Translations) ---
-        {
-            id: 'c1', part: 'C', category: 'Careers', type: 'career-match',
-            career: { en: "Doctor", bm: "Doktor", cn: "医生", icon: "🩺" },
-            question: "Which field of science does this career belong to?",
-            options: [{id:'b', text:'Biology'}, {id:'c', text:'Chemistry'}, {id:'p', text:'Physics'}, {id:'g', text:'Geology'}],
-            correct: 'b',
-            explanation: "Doctors study the human body and diseases, which is applied Biology."
-        },
-        {
-            id: 'c2', part: 'C', category: 'Careers', type: 'career-match',
-            career: { en: "Pharmacist", bm: "Ahli Farmasi", cn: "药剂师", icon: "💊" },
-            question: "Which field of science does this career belong to?",
-            options: [{id:'c', text:'Chemistry'}, {id:'b', text:'Biology'}, {id:'a', text:'Astronomy'}, {id:'m', text:'Meteorology'}],
-            correct: 'c',
-            explanation: "Pharmacists deal with chemical compounds in medicines, heavily relying on Chemistry."
-        },
-        {
-            id: 'c3', part: 'C', category: 'Careers', type: 'career-match',
-            career: { en: "Mechanical Engineer", bm: "Jurutera Mekanikal", cn: "机械工程师", icon: "⚙️" },
-            question: "Which field of science does this career belong to?",
-            options: [{id:'p', text:'Physics'}, {id:'b', text:'Biology'}, {id:'g', text:'Geology'}, {id:'m', text:'Meteorology'}],
-            correct: 'p',
-            explanation: "Mechanical engineering is based on principles of Physics (forces, energy, motion)."
-        },
-        {
-            id: 'c4', part: 'C', category: 'Careers', type: 'career-match',
-            career: { en: "Weather Forecaster", bm: "Peramal Cuaca", cn: "天气预报员", icon: "🌦️" },
-            question: "Which field of science does this career belong to?",
-            options: [{id:'m', text:'Meteorology'}, {id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'c', text:'Chemistry'}],
-            correct: 'm',
-            explanation: "Meteorology is specifically the study of weather and climate."
-        },
-        {
-            id: 'c5', part: 'C', category: 'Careers', type: 'career-match',
-            career: { en: "Astronomer", bm: "Ahli Astronomi", cn: "天文学家", icon: "🔭" },
-            question: "Which field of science does this career belong to?",
-            options: [{id:'a', text:'Astronomy'}, {id:'g', text:'Geology'}, {id:'p', text:'Physics'}, {id:'b', text:'Biology'}],
-            correct: 'a',
-            explanation: "Astronomers study space and celestial bodies."
-        },
+        // --- PART C: Careers (20 Questions) ---
+        { id: 'c1', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Doctor", bm: "Doktor", cn: "医生", icon: "🩺" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'b', explanation: { en: "Doctors treat living bodies.", zh: "医生治疗生物体。" } },
+        { id: 'c2', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Pharmacist", bm: "Ahli Farmasi", cn: "药剂师", icon: "💊" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'c', explanation: { en: "Pharmacists mix chemicals for medicine.", zh: "药剂师混合化学品制药。" } },
+        { id: 'c3', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Mechanical Engineer", bm: "Jurutera Mekanikal", cn: "机械工程师", icon: "⚙️" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'p', explanation: { en: "Engineering relies on Physics.", zh: "工程学依赖于物理学。" } },
+        { id: 'c4', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Weather Forecaster", bm: "Peramal Cuaca", cn: "天气预报员", icon: "🌦️" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'m', text:{en:'Meteorology', zh:'气象学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'm', explanation: { en: "They study weather patterns.", zh: "他们研究天气模式。" } },
+        { id: 'c5', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Astronomer", bm: "Ahli Astronomi", cn: "天文学家", icon: "🔭" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}], correct: 'a', explanation: { en: "They study stars and space.", zh: "他们研究星星和太空。" } },
+        { id: 'c6', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Geologist", bm: "Ahli Geologi", cn: "地质学家", icon: "🪨" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'g', explanation: { en: "They study rocks.", zh: "他们研究岩石。" } },
+        { id: 'c7', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Botanist", bm: "Ahli Botani", cn: "植物学家", icon: "🌿" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'b', explanation: { en: "They study plants.", zh: "他们研究植物。" } },
+        { id: 'c8', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Chemist", bm: "Ahli Kimia", cn: "化学家", icon: "⚗️" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'c', explanation: { en: "They study chemical reactions.", zh: "他们研究化学反应。" } },
+        { id: 'c9', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Electrician", bm: "Juruelektrik", cn: "电工", icon: "⚡" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'p', explanation: { en: "Electricity is part of Physics.", zh: "电力是物理学的一部分。" } },
+        { id: 'c10', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Marine Biologist", bm: "Ahli Biologi Marin", cn: "海洋生物学家", icon: "🐬" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'b', explanation: { en: "They study ocean life.", zh: "他们研究海洋生物。" } },
+        { id: 'c11', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Forensic Scientist", bm: "Saintis Forensik", cn: "法医科学家", icon: "🔍" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'c', explanation: { en: "They analyse chemical evidence.", zh: "他们分析化学证据。" } },
+        { id: 'c12', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Zoologist", bm: "Ahli Zoologi", cn: "动物学家", icon: "🦁" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'b', explanation: { en: "They study animals.", zh: "他们研究动物。" } },
+        { id: 'c13', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Civil Engineer", bm: "Jurutera Awam", cn: "土木工程师", icon: "🌉" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'p', explanation: { en: "Building requires physics.", zh: "建筑需要物理学。" } },
+        { id: 'c14', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Astronaut", bm: "Angkasawan", cn: "宇航员", icon: "👩‍🚀" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}], correct: 'a', explanation: { en: "They explore space.", zh: "他们探索太空。" } },
+        { id: 'c15', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Volcanologist", bm: "Ahli Vulkanologi", cn: "火山学家", icon: "🌋" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'g', explanation: { en: "They study volcanoes.", zh: "他们研究火山。" } },
+        { id: 'c16', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Pilot", bm: "Juruterbang", cn: "飞行员", icon: "✈️" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}], correct: 'p', explanation: { en: "Flight relies on aerodynamics (Physics).", zh: "飞行依赖于空气动力学（物理学）。" } },
+        { id: 'c17', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Architect", bm: "Arkitek", cn: "建筑师", icon: "🏛️" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}, {id:'m', text:{en:'Meteorology', zh:'气象学'}}], correct: 'p', explanation: { en: "Structures require physics.", zh: "结构需要物理学。" } },
+        { id: 'c18', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Nurse", bm: "Jururawat", cn: "护士", icon: "💉" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'b', explanation: { en: "Nurses care for living bodies.", zh: "护士照顾生物体。" } },
+        { id: 'c19', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Oceanographer", bm: "Ahli Oseanografi", cn: "海洋学家", icon: "🌊" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'g', text:{en:'Geology (Marine)', zh:'地质学（海洋）'}}, {id:'c', text:{en:'Chemistry', zh:'化学'}}, {id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'g', explanation: { en: "Often overlaps, but maps ocean floor.", zh: "通常重叠，但绘制海底地图。" } },
+        { id: 'c20', part: 'C', category: 'Careers', type: 'career-match', career: { en: "Radiologist", bm: "Ahli Radiologi", cn: "放射科医生", icon: "🩻" }, question: { en: "Which field of science?", zh: "哪个科学领域？" }, options: [{id:'p', text:{en:'Physics', zh:'物理学'}}, {id:'b', text:{en:'Biology', zh:'生物学'}}, {id:'g', text:{en:'Geology', zh:'地质学'}}, {id:'a', text:{en:'Astronomy', zh:'天文学'}}], correct: 'p', explanation: { en: "X-rays are high energy physics.", zh: "X射线是高能物理学。" } },
 
-        // --- PART D: Apparatus Identification (Using SVGs) ---
-        {
-            id: 'd1', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-            apparatusType: 'Test Tube',
-            question: "Identify this apparatus.",
-            options: [{id:'1', text:'Test Tube'}, {id:'2', text:'Boiling Tube'}, {id:'3', text:'Measuring Cylinder'}, {id:'4', text:'Beaker'}],
-            correct: '1',
-            explanation: "It is a narrow glass tube closed at one end, used for small amounts of liquids."
-        },
-        {
-            id: 'd2', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-            apparatusType: 'Beaker',
-            question: "Identify this apparatus.",
-            options: [{id:'1', text:'Conical Flask'}, {id:'2', text:'Beaker'}, {id:'3', text:'Gas Jar'}, {id:'4', text:'Crucible'}],
-            correct: '2',
-            explanation: "A beaker is a cylindrical container with a flat bottom and a lip for pouring."
-        },
-        {
-            id: 'd3', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-            apparatusType: 'Conical Flask',
-            question: "Identify this apparatus.",
-            options: [{id:'1', text:'Round-bottom flask'}, {id:'2', text:'Flat-bottom flask'}, {id:'3', text:'Conical Flask'}, {id:'4', text:'Filter Funnel'}],
-            correct: '3',
-            explanation: "Also known as an Erlenmeyer flask, it has a cone-shaped body and cylindrical neck."
-        },
-        {
-            id: 'd4', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-            apparatusType: 'Tripod Stand',
-            question: "Identify this apparatus.",
-            options: [{id:'1', text:'Retort Stand'}, {id:'2', text:'Tripod Stand'}, {id:'3', text:'Wire Gauze'}, {id:'4', text:'Bunsen Burner'}],
-            correct: '2',
-            explanation: "A three-legged stand used to support apparatus during heating."
-        },
-        {
-            id: 'd5', part: 'D', category: 'Apparatus ID', type: 'apparatus-id',
-            apparatusType: 'Burette',
-            question: "Identify this apparatus.",
-            options: [{id:'1', text:'Pipette'}, {id:'2', text:'Burette'}, {id:'3', text:'Thermometer'}, {id:'4', text:'Measuring Cylinder'}],
-            correct: '2',
-            explanation: "A burette is a long graduated tube with a tap at the bottom, used for titration."
-        },
+        // --- PART D: Apparatus Identification (30 Questions) ---
+        { id: 'd1', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Test Tube', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Test Tube', zh:'试管'}}, {id:'2', text:{en:'Boiling Tube', zh:'沸腾管'}}, {id:'3', text:{en:'Beaker', zh:'烧杯'}}, {id:'4', text:{en:'Pipette', zh:'移液管'}}], correct: '1', explanation: { en: "Small glass tube.", zh: "小玻璃管。" } },
+        { id: 'd2', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Boiling Tube', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'2', text:{en:'Boiling Tube', zh:'沸腾管'}}, {id:'1', text:{en:'Test Tube', zh:'试管'}}, {id:'3', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'4', text:{en:'Measuring Cylinder', zh:'量筒'}}], correct: '2', explanation: { en: "Wider than a test tube for heating.", zh: "比试管宽，用于加热。" } },
+        { id: 'd3', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Beaker', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'3', text:{en:'Beaker', zh:'烧杯'}}, {id:'1', text:{en:'Conical Flask', zh:'锥形瓶'}}, {id:'2', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'4', text:{en:'Crucible', zh:'坩埚'}}], correct: '3', explanation: { en: "Flat bottom container.", zh: "平底容器。" } },
+        { id: 'd4', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Conical Flask', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Conical Flask', zh:'锥形瓶'}}, {id:'2', text:{en:'Flat-bottom flask', zh:'平底烧瓶'}}, {id:'3', text:{en:'Round-bottom flask', zh:'圆底烧瓶'}}, {id:'4', text:{en:'Beaker', zh:'烧杯'}}], correct: '1', explanation: { en: "Cone shape reduces splashing.", zh: "锥形减少溅出。" } },
+        { id: 'd5', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Flat-bottom flask', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'2', text:{en:'Flat-bottom flask', zh:'平底烧瓶'}}, {id:'1', text:{en:'Round-bottom flask', zh:'圆底烧瓶'}}, {id:'3', text:{en:'Conical Flask', zh:'锥形瓶'}}, {id:'4', text:{en:'Retort Stand', zh:'铁架台'}}], correct: '2', explanation: { en: "Flask that stands on its own.", zh: "可以独自站立的烧瓶。" } },
+        { id: 'd6', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Round-bottom flask', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Round-bottom flask', zh:'圆底烧瓶'}}, {id:'2', text:{en:'Flat-bottom flask', zh:'平底烧瓶'}}, {id:'3', text:{en:'Beaker', zh:'烧杯'}}, {id:'4', text:{en:'Crucible', zh:'坩埚'}}], correct: '1', explanation: { en: "Round base for even heating.", zh: "圆底用于均匀加热。" } },
+        { id: 'd7', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Measuring Cylinder', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'3', text:{en:'Measuring Cylinder', zh:'量筒'}}, {id:'1', text:{en:'Test Tube', zh:'试管'}}, {id:'2', text:{en:'Burette', zh:'滴定管'}}, {id:'4', text:{en:'Pipette', zh:'移液管'}}], correct: '3', explanation: { en: "Measures volume.", zh: "测量体积。" } },
+        { id: 'd8', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Burette', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'2', text:{en:'Burette', zh:'滴定管'}}, {id:'1', text:{en:'Pipette', zh:'移液管'}}, {id:'3', text:{en:'Thermometer', zh:'温度计'}}, {id:'4', text:{en:'Measuring Cylinder', zh:'量筒'}}], correct: '2', explanation: { en: "Has a tap for titration.", zh: "有活塞用于滴定。" } },
+        { id: 'd9', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Pipette', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Pipette', zh:'移液管'}}, {id:'2', text:{en:'Burette', zh:'滴定管'}}, {id:'3', text:{en:'Test Tube', zh:'试管'}}, {id:'4', text:{en:'Gas Jar', zh:'集气瓶'}}], correct: '1', explanation: { en: "Measures fixed volume.", zh: "测量固定体积。" } },
+        { id: 'd10', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Tripod Stand', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'2', text:{en:'Tripod Stand', zh:'三脚架'}}, {id:'1', text:{en:'Retort Stand', zh:'铁架台'}}, {id:'3', text:{en:'Bunsen Burner', zh:'本生灯'}}, {id:'4', text:{en:'Wire Gauze', zh:'石棉网'}}], correct: '2', explanation: { en: "Three legs support.", zh: "三条腿支撑。" } },
+        { id: 'd11', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Wire Gauze', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'3', text:{en:'Wire Gauze', zh:'石棉网'}}, {id:'1', text:{en:'Filter Paper', zh:'滤纸'}}, {id:'2', text:{en:'Evaporating Dish', zh:'蒸发皿'}}, {id:'4', text:{en:'Tripod Stand', zh:'三脚架'}}], correct: '3', explanation: { en: "Metal mesh.", zh: "金属网。" } },
+        { id: 'd12', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Filter Funnel', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Filter Funnel', zh:'漏斗'}}, {id:'2', text:{en:'Thistle Funnel', zh:'长颈漏斗'}}, {id:'3', text:{en:'Conical Flask', zh:'锥形瓶'}}, {id:'4', text:{en:'Pipette', zh:'移液管'}}], correct: '1', explanation: { en: "Cone shape for filtering.", zh: "用于过滤的锥形。" } },
+        { id: 'd13', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Gas Jar', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Test Tube', zh:'试管'}}, {id:'4', text:{en:'Bell Jar', zh:'钟罩'}}], correct: '1', explanation: { en: "Used to hold gas.", zh: "用于盛装气体。" } },
+        { id: 'd14', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Bell Jar', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'4', text:{en:'Bell Jar', zh:'钟罩'}}, {id:'1', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Flask', zh:'烧瓶'}}], correct: '4', explanation: { en: "Large jar for vacuum experiments.", zh: "用于真空实验的大罐子。" } },
+        { id: 'd15', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Retort Stand with Clamps', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Retort Stand with Clamps', zh:'带夹子的铁架台'}}, {id:'2', text:{en:'Tripod Stand', zh:'三脚架'}}, {id:'3', text:{en:'Burette', zh:'滴定管'}}, {id:'4', text:{en:'Test Tube Holder', zh:'试管夹'}}], correct: '1', explanation: { en: "Stand with clamps.", zh: "带夹子的架子。" } },
+        { id: 'd16', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Retort Stand with Ring', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'2', text:{en:'Retort Stand with Ring', zh:'带铁圈的铁架台'}}, {id:'1', text:{en:'Tripod Stand', zh:'三脚架'}}, {id:'3', text:{en:'Bunsen Burner', zh:'本生灯'}}, {id:'4', text:{en:'Clamp', zh:'夹子'}}], correct: '2', explanation: { en: "Stand with a ring.", zh: "带环的架子。" } },
+        { id: 'd17', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Evaporating Dish', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'3', text:{en:'Evaporating Dish', zh:'蒸发皿'}}, {id:'1', text:{en:'Crucible', zh:'坩埚'}}, {id:'2', text:{en:'Watch Glass', zh:'表面皿'}}, {id:'4', text:{en:'Beaker', zh:'烧杯'}}], correct: '3', explanation: { en: "Shallow dish for heating.", zh: "用于加热的浅盘。" } },
+        { id: 'd18', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Crucible', question: { en: "Identify this apparatus.", zh: "识别此仪器。" }, options: [{id:'1', text:{en:'Crucible', zh:'坩埚'}}, {id:'2', text:{en:'Evaporating Dish', zh:'蒸发皿'}}, {id:'3', text:{en:'Beaker', zh:'烧杯'}}, {id:'4', text:{en:'Mortar', zh:'研钵'}}], correct: '1', explanation: { en: "Used for very strong heating.", zh: "用于强热。" } },
+        { id: 'd19', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Beaker', question: { en: "Which apparatus holds liquid?", zh: "哪种仪器盛装液体？" }, options: [{id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'1', text:{en:'Wire Gauze', zh:'石棉网'}}, {id:'3', text:{en:'Tripod', zh:'三脚架'}}, {id:'4', text:{en:'Spatula', zh:'药匙'}}], correct: '2', explanation: { en: "Beakers hold liquids.", zh: "烧杯盛装液体。" } },
+        { id: 'd20', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Measuring Cylinder', question: { en: "Which measures volume?", zh: "哪个测量体积？" }, options: [{id:'3', text:{en:'Measuring Cylinder', zh:'量筒'}}, {id:'1', text:{en:'Boiling Tube', zh:'沸腾管'}}, {id:'2', text:{en:'Funnel', zh:'漏斗'}}, {id:'4', text:{en:'Glass Rod', zh:'玻璃棒'}}], correct: '3', explanation: { en: "Cylinders measure volume.", zh: "量筒测量体积。" } },
+        { id: 'd21', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Test Tube', question: { en: "Which is for small reactions?", zh: "哪个用于小型反应？" }, options: [{id:'1', text:{en:'Test Tube', zh:'试管'}}, {id:'2', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'3', text:{en:'Burette', zh:'滴定管'}}, {id:'4', text:{en:'Pipette', zh:'移液管'}}], correct: '1', explanation: { en: "Test tubes are for small amounts.", zh: "试管用于少量物质。" } },
+        { id: 'd22', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Tripod Stand', question: { en: "Which supports heating?", zh: "哪个支撑加热？" }, options: [{id:'2', text:{en:'Tripod Stand', zh:'三脚架'}}, {id:'1', text:{en:'Test Tube', zh:'试管'}}, {id:'3', text:{en:'Thermometer', zh:'温度计'}}, {id:'4', text:{en:'Funnel', zh:'漏斗'}}], correct: '2', explanation: { en: "Tripods support wire gauze.", zh: "三脚架支撑石棉网。" } },
+        { id: 'd23', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Wire Gauze', question: { en: "Which spreads heat?", zh: "哪个散发热量？" }, options: [{id:'3', text:{en:'Wire Gauze', zh:'石棉网'}}, {id:'1', text:{en:'Beaker', zh:'烧杯'}}, {id:'2', text:{en:'Flask', zh:'烧瓶'}}, {id:'4', text:{en:'Stand', zh:'架子'}}], correct: '3', explanation: { en: "Gauze spreads flame heat.", zh: "石棉网散发火焰热量。" } },
+        { id: 'd24', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Filter Funnel', question: { en: "Which is for filtration?", zh: "哪个用于过滤？" }, options: [{id:'1', text:{en:'Filter Funnel', zh:'漏斗'}}, {id:'2', text:{en:'Crucible', zh:'坩埚'}}, {id:'3', text:{en:'Basin', zh:'水槽'}}, {id:'4', text:{en:'Jar', zh:'瓶子'}}], correct: '1', explanation: { en: "Funnels hold filter paper.", zh: "漏斗放置滤纸。" } },
+        { id: 'd25', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Gas Jar', question: { en: "Which collects gas?", zh: "哪个收集气体？" }, options: [{id:'1', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Dish', zh:'碟子'}}, {id:'4', text:{en:'Rod', zh:'棒'}}], correct: '1', explanation: { en: "Gas jars store gas.", zh: "集气瓶储存气体。" } },
+        { id: 'd26', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Evaporating Dish', question: { en: "Which is for evaporation?", zh: "哪个用于蒸发？" }, options: [{id:'3', text:{en:'Evaporating Dish', zh:'蒸发皿'}}, {id:'1', text:{en:'Funnel', zh:'漏斗'}}, {id:'2', text:{en:'Tube', zh:'管子'}}, {id:'4', text:{en:'Cylinder', zh:'圆柱体'}}], correct: '3', explanation: { en: "Dishes allow evaporation.", zh: "蒸发皿允许蒸发。" } },
+        { id: 'd27', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Crucible', question: { en: "Which withstands high heat?", zh: "哪个耐高温？" }, options: [{id:'1', text:{en:'Crucible', zh:'坩埚'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Flask', zh:'烧瓶'}}, {id:'4', text:{en:'Funnel', zh:'漏斗'}}], correct: '1', explanation: { en: "Crucibles get very hot.", zh: "坩埚可以变得非常热。" } },
+        { id: 'd28', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Burette', question: { en: "Which has a tap?", zh: "哪个有活塞？" }, options: [{id:'2', text:{en:'Burette', zh:'滴定管'}}, {id:'1', text:{en:'Pipette', zh:'移液管'}}, {id:'3', text:{en:'Cylinder', zh:'量筒'}}, {id:'4', text:{en:'Tube', zh:'管子'}}], correct: '2', explanation: { en: "Burettes have taps.", zh: "滴定管有活塞。" } },
+        { id: 'd29', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Pipette', question: { en: "Which measures fixed volume?", zh: "哪个测量固定体积？" }, options: [{id:'1', text:{en:'Pipette', zh:'移液管'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Jar', zh:'瓶子'}}, {id:'4', text:{en:'Funnel', zh:'漏斗'}}], correct: '1', explanation: { en: "Pipettes are precise.", zh: "移液管很精确。" } },
+        { id: 'd30', part: 'D', category: 'Apparatus ID', type: 'apparatus-id', apparatusType: 'Bell Jar', question: { en: "Which creates a vacuum?", zh: "哪个产生真空？" }, options: [{id:'4', text:{en:'Bell Jar', zh:'钟罩'}}, {id:'1', text:{en:'Gas Jar', zh:'集气瓶'}}, {id:'2', text:{en:'Beaker', zh:'烧杯'}}, {id:'3', text:{en:'Flask', zh:'烧瓶'}}], correct: '4', explanation: { en: "Bell jars isolate environment.", zh: "钟罩隔离环境。" } },
 
-        // --- PART E1: Apparatus Function ---
-        {
-            id: 'e1', part: 'E1', category: 'Apparatus Function', type: 'standard',
-            question: "What is the function of a Measuring Cylinder?",
-            options: [
-            {id:'a', text:'To measure the volume of liquid accurately'}, 
-            {id:'b', text:'To heat chemicals'}, 
-            {id:'c', text:'To hold solids'}, 
-            {id:'d', text:'To filter mixtures'}
-            ],
-            correct: 'a',
-            explanation: "Measuring cylinders are designed to measure liquid volume, though less accurately than a pipette or burette."
-        },
-        {
-            id: 'e2', part: 'E1', category: 'Apparatus Function', type: 'standard',
-            question: "What is the primary use of a Wire Gauze?",
-            options: [
-            {id:'a', text:'To hold a test tube'}, 
-            {id:'b', text:'To spread heat evenly during heating'}, 
-            {id:'c', text:'To extinguish fire'}, 
-            {id:'d', text:'To mix chemicals'}
-            ],
-            correct: 'b',
-            explanation: "Placed on a tripod stand, it distributes the flame's heat to prevent the glass apparatus from cracking."
-        },
-        {
-            id: 'e3', part: 'E1', category: 'Apparatus Function', type: 'standard',
-            question: "What is a Filter Funnel used for?",
-            options: [
-            {id:'a', text:'Separating insoluble solids from liquids'}, 
-            {id:'b', text:'Measuring liquid volume'}, 
-            {id:'c', text:'Evaporating liquids'}, 
-            {id:'d', text:'Storing gas'}
-            ],
-            correct: 'a',
-            explanation: "Used with filter paper to separate solids from liquids via filtration."
-        },
+        // --- PART E: Apparatus Function (20 Questions) ---
+        { id: 'e1', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What is the function of a Measuring Cylinder?", zh: "量筒的功能是什么？" }, options: [{id:'a', text:{en:'To measure volume', zh:'测量体积'}}, {id:'b', text:{en:'To heat chemicals', zh:'加热化学品'}}, {id:'c', text:{en:'To hold solids', zh:'盛装固体'}}, {id:'d', text:{en:'To filter', zh:'过滤'}}], correct: 'a', explanation: { en: "Measures liquid volume.", zh: "测量液体体积。" } },
+        { id: 'e2', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What is a Wire Gauze for?", zh: "石棉网是做什么用的？" }, options: [{id:'b', text:{en:'Spreading heat', zh:'散发热量'}}, {id:'a', text:{en:'Holding tubes', zh:'夹持试管'}}, {id:'c', text:{en:'Filtering', zh:'过滤'}}, {id:'d', text:{en:'Mixing', zh:'混合'}}], correct: 'b', explanation: { en: "Prevents glass cracking.", zh: "防止玻璃破裂。" } },
+        { id: 'e3', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What does a Filter Funnel do?", zh: "漏斗做什么？" }, options: [{id:'a', text:{en:'Separates solids from liquids', zh:'分离固体和液体'}}, {id:'b', text:{en:'Measures volume', zh:'测量体积'}}, {id:'c', text:{en:'Evaporates', zh:'蒸发'}}, {id:'d', text:{en:'Stores gas', zh:'储存气体'}}], correct: 'a', explanation: { en: "Used with filter paper.", zh: "与滤纸一起使用。" } },
+        { id: 'e4', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What is a Pipette used for?", zh: "移液管是做什么用的？" }, options: [{id:'b', text:{en:'Measuring fixed volumes', zh:'测量固定体积'}}, {id:'a', text:{en:'Mixing', zh:'混合'}}, {id:'c', text:{en:'Heating', zh:'加热'}}, {id:'d', text:{en:'Storing', zh:'储存'}}], correct: 'b', explanation: { en: "Very accurate for one volume.", zh: "对单一体积非常准确。" } },
+        { id: 'e5', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Retort Stand?", zh: "铁架台的功能？" }, options: [{id:'a', text:{en:'Supporting apparatus', zh:'支撑仪器'}}, {id:'b', text:{en:'Heating', zh:'加热'}}, {id:'c', text:{en:'Measuring', zh:'测量'}}, {id:'d', text:{en:'Filtering', zh:'过滤'}}], correct: 'a', explanation: { en: "Holds clamps.", zh: "固定夹子。" } },
+        { id: 'e6', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of Evaporating Dish?", zh: "蒸发皿的用途？" }, options: [{id:'a', text:{en:'Evaporating liquids', zh:'蒸发液体'}}, {id:'b', text:{en:'Filtering', zh:'过滤'}}, {id:'c', text:{en:'Collecting gas', zh:'收集气体'}}, {id:'d', text:{en:'Titration', zh:'滴定'}}], correct: 'a', explanation: { en: "Wide surface area.", zh: "宽阔的表面积。" } },
+        { id: 'e7', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of a Gas Jar?", zh: "集气瓶的用途？" }, options: [{id:'c', text:{en:'Collecting gas', zh:'收集气体'}}, {id:'a', text:{en:'Heating', zh:'加热'}}, {id:'b', text:{en:'Filtering', zh:'过滤'}}, {id:'d', text:{en:'Measuring', zh:'测量'}}], correct: 'c', explanation: { en: "Collects gas fumes.", zh: "收集气体烟雾。" } },
+        { id: 'e8', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Burette?", zh: "滴定管的功能？" }, options: [{id:'d', text:{en:'Titration (variable volume)', zh:'滴定（可变体积）'}}, {id:'a', text:{en:'Heating', zh:'加热'}}, {id:'b', text:{en:'Weighing', zh:'称重'}}, {id:'c', text:{en:'Filtering', zh:'过滤'}}], correct: 'd', explanation: { en: "Delivers known volumes.", zh: "输送已知体积。" } },
+        { id: 'e9', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What is a Crucible for?", zh: "坩埚是做什么用的？" }, options: [{id:'a', text:{en:'Strong heating', zh:'强热'}}, {id:'b', text:{en:'Measuring', zh:'测量'}}, {id:'c', text:{en:'Filtering', zh:'过滤'}}, {id:'d', text:{en:'Mixing', zh:'混合'}}], correct: 'a', explanation: { en: "Withstands high heat.", zh: "耐高温。" } },
+        { id: 'e10', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of a Tripod Stand?", zh: "三脚架的用途？" }, options: [{id:'b', text:{en:'Supporting wire gauze', zh:'支撑石棉网'}}, {id:'a', text:{en:'Measuring', zh:'测量'}}, {id:'c', text:{en:'Holding gas', zh:'盛装气体'}}, {id:'d', text:{en:'Cutting', zh:'切割'}}], correct: 'b', explanation: { en: "Holds items over a burner.", zh: "在燃烧器上方支撑物品。" } },
+        { id: 'e11', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Beaker?", zh: "烧杯的功能？" }, options: [{id:'c', text:{en:'Holding chemicals', zh:'盛装化学品'}}, {id:'a', text:{en:'Accurate measuring', zh:'精确测量'}}, {id:'b', text:{en:'Filtering', zh:'过滤'}}, {id:'d', text:{en:'Dropping', zh:'滴加'}}], correct: 'c', explanation: { en: "General container.", zh: "通用容器。" } },
+        { id: 'e12', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of a Test Tube?", zh: "试管的用途？" }, options: [{id:'a', text:{en:'Small reactions', zh:'小型反应'}}, {id:'b', text:{en:'Large storage', zh:'大量储存'}}, {id:'c', text:{en:'Measuring', zh:'测量'}}, {id:'d', text:{en:'Weighing', zh:'称重'}}], correct: 'a', explanation: { en: "Small quantities.", zh: "少量。" } },
+        { id: 'e13', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "What does a Flat-bottom flask do?", zh: "平底烧瓶做什么？" }, options: [{id:'b', text:{en:'Holds liquids (stable)', zh:'盛装液体（稳定）'}}, {id:'a', text:{en:'Measures', zh:'测量'}}, {id:'c', text:{en:'Strong heating', zh:'强热'}}, {id:'d', text:{en:'Filters', zh:'过滤'}}], correct: 'b', explanation: { en: "Stable on a bench.", zh: "在实验台上稳定。" } },
+        { id: 'e14', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Round-bottom flask?", zh: "圆底烧瓶的功能？" }, options: [{id:'a', text:{en:'Uniform heating', zh:'均匀加热'}}, {id:'b', text:{en:'Standing alone', zh:'独自站立'}}, {id:'c', text:{en:'Measuring', zh:'测量'}}, {id:'d', text:{en:'Filtering', zh:'过滤'}}], correct: 'a', explanation: { en: "Needs a stand, heats evenly.", zh: "需要架子，加热均匀。" } },
+        { id: 'e15', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of a Bell Jar?", zh: "钟罩的用途？" }, options: [{id:'d', text:{en:'Vacuum experiments', zh:'真空实验'}}, {id:'a', text:{en:'Heating', zh:'加热'}}, {id:'b', text:{en:'Boiling', zh:'沸腾'}}, {id:'c', text:{en:'Measuring', zh:'测量'}}], correct: 'd', explanation: { en: "Creates isolated space.", zh: "创造隔离空间。" } },
+        { id: 'e16', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Conical Flask?", zh: "锥形瓶的功能？" }, options: [{id:'a', text:{en:'Swirling without spilling', zh:'摇动不溅出'}}, {id:'b', text:{en:'Measuring', zh:'测量'}}, {id:'c', text:{en:'Evaporating', zh:'蒸发'}}, {id:'d', text:{en:'Strong heating', zh:'强热'}}], correct: 'a', explanation: { en: "Narrow neck prevents splash.", zh: "窄颈防止溅出。" } },
+        { id: 'e17', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Use of a Boiling Tube?", zh: "沸腾管的用途？" }, options: [{id:'b', text:{en:'Heating small amounts', zh:'加热少量'}}, {id:'a', text:{en:'Measuring', zh:'测量'}}, {id:'c', text:{en:'Filtering', zh:'过滤'}}, {id:'d', text:{en:'Collecting gas', zh:'收集气体'}}], correct: 'b', explanation: { en: "Thicker glass than test tube.", zh: "比试管玻璃厚。" } },
+        { id: 'e18', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Function of a Retort Ring?", zh: "铁圈的功能？" }, options: [{id:'c', text:{en:'Holds funnels/flasks', zh:'固定漏斗/烧瓶'}}, {id:'a', text:{en:'Heats', zh:'加热'}}, {id:'b', text:{en:'Cuts', zh:'切割'}}, {id:'d', text:{en:'Measures', zh:'测量'}}], correct: 'c', explanation: { en: "Supports apparatus on stand.", zh: "在架子上支撑仪器。" } },
+        { id: 'e19', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Which apparatus is NOT for heating?", zh: "哪种仪器不用于加热？" }, options: [{id:'d', text:{en:'Measuring Cylinder', zh:'量筒'}}, {id:'a', text:{en:'Beaker', zh:'烧杯'}}, {id:'b', text:{en:'Boiling Tube', zh:'沸腾管'}}, {id:'c', text:{en:'Flask', zh:'烧瓶'}}], correct: 'd', explanation: { en: "Glass may break if heated.", zh: "受热时玻璃可能会破裂。" } },
+        { id: 'e20', part: 'E1', category: 'Apparatus Function', type: 'standard', question: { en: "Best for mixing by shaking?", zh: "最适合摇动混合？" }, options: [{id:'a', text:{en:'Conical Flask', zh:'锥形瓶'}}, {id:'b', text:{en:'Beaker', zh:'烧杯'}}, {id:'c', text:{en:'Dish', zh:'碟子'}}, {id:'d', text:{en:'Watch glass', zh:'表面皿'}}], correct: 'a', explanation: { en: "Shape allows safe swirling.", zh: "形状允许安全摇动。" } },
 
-        // --- PART E2 (F): Hazard Symbols ---
-        {
-            id: 'f1', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-            symbolType: 'Explosive',
-            question: "What does this hazard symbol mean?",
-            options: [{id:'a', text:'Explosive'}, {id:'b', text:'Flammable'}, {id:'c', text:'Toxic'}, {id:'d', text:'Corrosive'}],
-            correct: 'a',
-            explanation: "This symbol indicates substances that may explode under certain conditions."
-        },
-        {
-            id: 'f2', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-            symbolType: 'Corrosive',
-            question: "Identify the meaning of this symbol.",
-            options: [{id:'a', text:'Irritant'}, {id:'b', text:'Corrosive'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Flammable'}],
-            correct: 'b',
-            explanation: "Corrosive substances can burn skin and eat through metals."
-        },
-        {
-            id: 'f3', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-            symbolType: 'Radioactive',
-            question: "What is the danger associated with this symbol?",
-            options: [{id:'a', text:'Emits radiation'}, {id:'b', text:'Catches fire easily'}, {id:'c', text:'Explodes on contact'}, {id:'d', text:'Causes itching'}],
-            correct: 'a',
-            explanation: "This is the trefoil symbol for radioactivity."
-        },
-        {
-            id: 'f4', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-            symbolType: 'Flammable',
-            question: "Which example matches this symbol?",
-            options: [{id:'a', text:'Petrol / Alcohol'}, {id:'b', text:'Uranium'}, {id:'c', text:'Strong Acid'}, {id:'d', text:'Dynamite'}],
-            correct: 'a',
-            explanation: "Petrol and alcohol catch fire easily."
-        },
-        {
-            id: 'f5', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match',
-            symbolType: 'Irritant',
-            question: "What does this symbol (X) usually indicate?",
-            options: [{id:'a', text:'Irritant / Harmful'}, {id:'b', text:'Safe to eat'}, {id:'c', text:'Radioactive'}, {id:'d', text:'Explosive'}],
-            correct: 'a',
-            explanation: "Substances that may cause irritation to skin, eyes, or respiratory system."
-        }
+        // --- PART E2 (F): Hazard Symbols (30 Questions) ---
+        { id: 'f1', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Explosive', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'a', text:{en:'Explosive', zh:'爆炸性'}}, {id:'b', text:{en:'Flammable', zh:'易燃'}}, {id:'c', text:{en:'Toxic', zh:'有毒'}}, {id:'d', text:{en:'Corrosive', zh:'腐蚀性'}}], correct: 'a', explanation: { en: "May explode.", zh: "可能爆炸。" } },
+        { id: 'f2', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Corrosive', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'b', text:{en:'Corrosive', zh:'腐蚀性'}}, {id:'a', text:{en:'Irritant', zh:'刺激性'}}, {id:'c', text:{en:'Radioactive', zh:'放射性'}}, {id:'d', text:{en:'Flammable', zh:'易燃'}}], correct: 'b', explanation: { en: "Burns skin.", zh: "灼伤皮肤。" } },
+        { id: 'f3', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Radioactive', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'c', text:{en:'Radioactive', zh:'放射性'}}, {id:'a', text:{en:'Biohazard', zh:'生物危害'}}, {id:'b', text:{en:'Toxic', zh:'有毒'}}, {id:'d', text:{en:'Explosive', zh:'爆炸性'}}], correct: 'c', explanation: { en: "Radiation danger.", zh: "辐射危险。" } },
+        { id: 'f4', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'b', text:{en:'Flammable', zh:'易燃'}}, {id:'a', text:{en:'Oxidising', zh:'氧化性'}}, {id:'c', text:{en:'Explosive', zh:'爆炸性'}}, {id:'d', text:{en:'Corrosive', zh:'腐蚀性'}}], correct: 'b', explanation: { en: "Catches fire easily.", zh: "容易着火。" } },
+        { id: 'f5', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Irritant', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'a', text:{en:'Irritant', zh:'刺激性'}}, {id:'b', text:{en:'Toxic', zh:'有毒'}}, {id:'c', text:{en:'Corrosive', zh:'腐蚀性'}}, {id:'d', text:{en:'Safe', zh:'安全'}}], correct: 'a', explanation: { en: "Causes inflammation.", zh: "引起炎症。" } },
+        { id: 'f6', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Toxic', question: { en: "Meaning?", zh: "含义？" }, options: [{id:'c', text:{en:'Toxic / Poison', zh:'有毒/毒药'}}, {id:'a', text:{en:'Irritant', zh:'刺激性'}}, {id:'b', text:{en:'Radioactive', zh:'放射性'}}, {id:'d', text:{en:'Explosive', zh:'爆炸性'}}], correct: 'c', explanation: { en: "Can kill if swallowed.", zh: "吞食可能致死。" } },
+        { id: 'f7', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Example?", zh: "例子？" }, options: [{id:'a', text:{en:'Petrol', zh:'汽油'}}, {id:'b', text:{en:'Water', zh:'水'}}, {id:'c', text:{en:'Sand', zh:'沙子'}}, {id:'d', text:{en:'Iron', zh:'铁'}}], correct: 'a', explanation: { en: "Petrol burns.", zh: "汽油会燃烧。" } },
+        { id: 'f8', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Corrosive', question: { en: "Example?", zh: "例子？" }, options: [{id:'b', text:{en:'Strong Acid', zh:'强酸'}}, {id:'a', text:{en:'Soap', zh:'肥皂'}}, {id:'c', text:{en:'Milk', zh:'牛奶'}}, {id:'d', text:{en:'Oil', zh:'油'}}], correct: 'b', explanation: { en: "Acid burns.", zh: "酸会灼伤。" } },
+        { id: 'f9', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Radioactive', question: { en: "Example?", zh: "例子？" }, options: [{id:'c', text:{en:'Uranium', zh:'铀'}}, {id:'a', text:{en:'Gold', zh:'金'}}, {id:'b', text:{en:'Silver', zh:'银'}}, {id:'d', text:{en:'Lead', zh:'铅'}}], correct: 'c', explanation: { en: "Uranium is radioactive.", zh: "铀具有放射性。" } },
+        { id: 'f10', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Toxic', question: { en: "Example?", zh: "例子？" }, options: [{id:'a', text:{en:'Mercury', zh:'汞'}}, {id:'b', text:{en:'Iron', zh:'铁'}}, {id:'c', text:{en:'Salt', zh:'盐'}}, {id:'d', text:{en:'Sugar', zh:'糖'}}], correct: 'a', explanation: { en: "Mercury is poisonous.", zh: "汞有毒。" } },
+        { id: 'f11', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Explosive', question: { en: "Example?", zh: "例子？" }, options: [{id:'d', text:{en:'Hydrogen Gas', zh:'氢气'}}, {id:'a', text:{en:'Water', zh:'水'}}, {id:'b', text:{en:'Oxygen', zh:'氧气'}}, {id:'c', text:{en:'Nitrogen', zh:'氮气'}}], correct: 'd', explanation: { en: "Hydrogen can explode.", zh: "氢气可能爆炸。" } },
+        { id: 'f12', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Irritant', question: { en: "Example?", zh: "例子？" }, options: [{id:'a', text:{en:'Dilute Acid', zh:'稀酸'}}, {id:'b', text:{en:'Water', zh:'水'}}, {id:'c', text:{en:'Oil', zh:'油'}}, {id:'d', text:{en:'Air', zh:'空气'}}], correct: 'a', explanation: { en: "Dilute acid irritates.", zh: "稀酸会引起刺激。" } },
+        { id: 'f13', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Action?", zh: "行动？" }, options: [{id:'a', text:{en:'Keep away from fire', zh:'远离火源'}}, {id:'b', text:{en:'Wear gloves', zh:'戴手套'}}, {id:'c', text:{en:'Do not eat', zh:'切勿食用'}}, {id:'d', text:{en:'Wash hands', zh:'洗手'}}], correct: 'a', explanation: { en: "Fire hazard.", zh: "火灾隐患。" } },
+        { id: 'f14', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Toxic', question: { en: "Action?", zh: "行动？" }, options: [{id:'c', text:{en:'Do not swallow', zh:'切勿吞食'}}, {id:'a', text:{en:'Keep dry', zh:'保持干燥'}}, {id:'b', text:{en:'Keep cool', zh:'保持凉爽'}}, {id:'d', text:{en:'Shake well', zh:'摇匀'}}], correct: 'c', explanation: { en: "Poison hazard.", zh: "中毒危险。" } },
+        { id: 'f15', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Corrosive', question: { en: "Action?", zh: "行动？" }, options: [{id:'b', text:{en:'Avoid skin contact', zh:'避免皮肤接触'}}, {id:'a', text:{en:'Keep warm', zh:'保暖'}}, {id:'c', text:{en:'Keep in light', zh:'保持光照'}}, {id:'d', text:{en:'Freeze', zh:'冷冻'}}], correct: 'b', explanation: { en: "Skin damage.", zh: "皮肤损伤。" } },
+        { id: 'f16', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Radioactive', question: { en: "Container?", zh: "容器？" }, options: [{id:'a', text:{en:'Lead Box', zh:'铅盒'}}, {id:'b', text:{en:'Plastic Bag', zh:'塑料袋'}}, {id:'c', text:{en:'Glass Jar', zh:'玻璃罐'}}, {id:'d', text:{en:'Paper Box', zh:'纸盒'}}], correct: 'a', explanation: { en: "Lead blocks radiation.", zh: "铅阻挡辐射。" } },
+        { id: 'f17', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Explosive', question: { en: "Precaution?", zh: "预防措施？" }, options: [{id:'d', text:{en:'Handle with care', zh:'小心轻放'}}, {id:'a', text:{en:'Heat it', zh:'加热'}}, {id:'b', text:{en:'Shake it', zh:'摇晃'}}, {id:'c', text:{en:'Mix it', zh:'混合'}}], correct: 'd', explanation: { en: "Shock sensitive.", zh: "对震动敏感。" } },
+        { id: 'f18', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Irritant', question: { en: "Symptom?", zh: "症状？" }, options: [{id:'a', text:{en:'Redness / Itch', zh:'发红/瘙痒'}}, {id:'b', text:{en:'Death', zh:'死亡'}}, {id:'c', text:{en:'Explosion', zh:'爆炸'}}, {id:'d', text:{en:'Radiation Burn', zh:'辐射烧伤'}}], correct: 'a', explanation: { en: "Mild inflammation.", zh: "轻微炎症。" } },
+        { id: 'f19', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Color of symbol?", zh: "标志颜色？" }, options: [{id:'b', text:{en:'Black on Yellow/Orange', zh:'黄/橙底黑字'}}, {id:'a', text:{en:'Red on White', zh:'白底红字'}}, {id:'c', text:{en:'Blue', zh:'蓝色'}}, {id:'d', text:{en:'Green', zh:'绿色'}}], correct: 'b', explanation: { en: "Standard warning color.", zh: "标准警告色。" } },
+        { id: 'f20', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Toxic', question: { en: "Icon shape?", zh: "图标形状？" }, options: [{id:'c', text:{en:'Skull & Bones', zh:'骷髅头'}}, {id:'a', text:{en:'Fire', zh:'火'}}, {id:'b', text:{en:'Hand', zh:'手'}}, {id:'d', text:{en:'Fan', zh:'风扇'}}], correct: 'c', explanation: { en: "Universal poison sign.", zh: "通用毒药标志。" } },
+        { id: 'f21', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Radioactive', question: { en: "Icon shape?", zh: "图标形状？" }, options: [{id:'a', text:{en:'Trefoil (Fan)', zh:'三叶形（风扇）'}}, {id:'b', text:{en:'Cross', zh:'十字'}}, {id:'c', text:{en:'Drop', zh:'水滴'}}, {id:'d', text:{en:'Star', zh:'星星'}}], correct: 'a', explanation: { en: "Radiation symbol.", zh: "辐射标志。" } },
+        { id: 'f22', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Corrosive', question: { en: "Icon shape?", zh: "图标形状？" }, options: [{id:'b', text:{en:'Hand & Metal', zh:'手和金属'}}, {id:'a', text:{en:'Fish', zh:'鱼'}}, {id:'c', text:{en:'Tree', zh:'树'}}, {id:'d', text:{en:'Circle', zh:'圆圈'}}], correct: 'b', explanation: { en: "Shows damage.", zh: "显示损坏。" } },
+        { id: 'f23', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Explosive', question: { en: "Icon shape?", zh: "图标形状？" }, options: [{id:'d', text:{en:'Exploding Bomb', zh:'爆炸的炸弹'}}, {id:'a', text:{en:'Fire', zh:'火'}}, {id:'b', text:{en:'Skull', zh:'头骨'}}, {id:'c', text:{en:'Cross', zh:'十字'}}], correct: 'd', explanation: { en: "Shows blast.", zh: "显示爆炸。" } },
+        { id: 'f24', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Common item?", zh: "常见物品？" }, options: [{id:'a', text:{en:'Alcohol', zh:'酒精'}}, {id:'b', text:{en:'Water', zh:'水'}}, {id:'c', text:{en:'Salt', zh:'盐'}}, {id:'d', text:{en:'Glass', zh:'玻璃'}}], correct: 'a', explanation: { en: "Alcohol burns.", zh: "酒精燃烧。" } },
+        { id: 'f25', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Irritant', question: { en: "Common item?", zh: "常见物品？" }, options: [{id:'b', text:{en:'Detergent', zh:'洗涤剂'}}, {id:'a', text:{en:'Milk', zh:'牛奶'}}, {id:'c', text:{en:'Bread', zh:'面包'}}, {id:'d', text:{en:'Iron', zh:'铁'}}], correct: 'b', explanation: { en: "Chemicals can irritate.", zh: "化学品可能刺激。" } },
+        { id: 'f26', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Corrosive', question: { en: "Common item?", zh: "常见物品？" }, options: [{id:'c', text:{en:'Drain Cleaner', zh:'管道清洁剂'}}, {id:'a', text:{en:'Soap', zh:'肥皂'}}, {id:'b', text:{en:'Juice', zh:'果汁'}}, {id:'d', text:{en:'Tea', zh:'茶'}}], correct: 'c', explanation: { en: "Strong alkali.", zh: "强碱。" } },
+        { id: 'f27', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Toxic', question: { en: "Effect?", zh: "效果？" }, options: [{id:'a', text:{en:'Death / Sickness', zh:'死亡/生病'}}, {id:'b', text:{en:'Growth', zh:'生长'}}, {id:'c', text:{en:'Sleep', zh:'睡眠'}}, {id:'d', text:{en:'Energy', zh:'能量'}}], correct: 'a', explanation: { en: "Harmful to life.", zh: "对生命有害。" } },
+        { id: 'f28', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Flammable', question: { en: "Storage?", zh: "储存？" }, options: [{id:'b', text:{en:'Fireproof Cabinet', zh:'防火柜'}}, {id:'a', text:{en:'Open Shelf', zh:'开放式架子'}}, {id:'c', text:{en:'Near Oven', zh:'烤箱附近'}}, {id:'d', text:{en:'Sunlight', zh:'阳光下'}}], correct: 'b', explanation: { en: "Safety storage.", zh: "安全储存。" } },
+        { id: 'f29', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Radioactive', question: { en: "Used in?", zh: "用于？" }, options: [{id:'c', text:{en:'X-ray machines', zh:'X光机'}}, {id:'a', text:{en:'Cars', zh:'汽车'}}, {id:'b', text:{en:'Toasters', zh:'烤面包机'}}, {id:'d', text:{en:'Lamps', zh:'灯'}}], correct: 'c', explanation: { en: "Medical imaging.", zh: "医学成像。" } },
+        { id: 'f30', part: 'E2', category: 'Hazard Symbols', type: 'hazard-match', symbolType: 'Explosive', question: { en: "Safe handling?", zh: "安全处理？" }, options: [{id:'d', text:{en:'Avoid friction/heat', zh:'避免摩擦/热'}}, {id:'a', text:{en:'Heat it', zh:'加热'}}, {id:'b', text:{en:'Drop it', zh:'扔下'}}, {id:'c', text:{en:'Hit it', zh:'敲击'}}], correct: 'd', explanation: { en: "Prevent detonation.", zh: "防止引爆。" } }
         ];
 
         const motivationalQuotes = [
-        "Don't give up! Science is about learning from mistakes.",
-        "Keep trying! You are building your brain power.",
-        "Almost there! Review the notes and try again.",
-        "Mistakes are proof that you are trying!",
-        "Take a deep breath and focus. You got this!"
+            { en: "Don't give up! Science is about learning from mistakes.", zh: "别放弃！科学就是从错误中学习。" },
+            { en: "Keep trying! You are building your brain power.", zh: "继续努力！你正在增强你的脑力。" },
+            { en: "Almost there! Review the notes and try again.", zh: "差点就对了！复习笔记再试一次。" },
+            { en: "Mistakes are proof that you are trying!", zh: "错误是你努力的证明！" },
+            { en: "Take a deep breath and focus. You got this!", zh: "深呼吸，专注。你能行的！" }
         ];
 
         const affirmationQuotes = [
-        "Excellent work! You're a natural scientist.",
-        "Spot on! Keep up the momentum.",
-        "Fantastic! Your understanding is solid.",
-        "Great job! You've mastered this concept.",
-        "Perfect! You are doing amazing."
+            { en: "Excellent work! You're a natural scientist.", zh: "干得好！你是个天生的科学家。" },
+            { en: "Spot on! Keep up the momentum.", zh: "完全正确！保持势头。" },
+            { en: "Fantastic! Your understanding is solid.", zh: "太棒了！你的理解很扎实。" },
+            { en: "Great job! You've mastered this concept.", zh: "做得好！你已经掌握了这个概念。" },
+            { en: "Perfect! You are doing amazing.", zh: "完美！你表现得很棒。" }
         ];
 
 
@@ -478,6 +401,7 @@
         const [timer, setTimer] = useState(0);
         const [hintUsed, setHintUsed] = useState(false);
         const [hiddenOptions, setHiddenOptions] = useState([]);
+        const [showExitConfirm, setShowExitConfirm] = useState(false);
         
         // Easter Egg State
         const [clickCount, setClickCount] = useState(0);
@@ -493,9 +417,14 @@
             setHiddenOptions([]);
 
             if (challenge) {
-                // Challenge mode always uses all questions shuffled
-                const shuffled = [...questions].sort(() => 0.5 - Math.random());
-                setQuizSet(shuffled);
+                // Challenge mode: Shuffle questions AND options
+                let shuffledQs = shuffleArray([...questions]);
+                shuffledQs = shuffledQs.map(q => ({
+                    ...q,
+                    options: shuffleArray(q.options)
+                }));
+
+                setQuizSet(shuffledQs);
                 setCurrentQuestionIndex(0);
                 setCurrentMode('quiz');
             } else {
@@ -509,17 +438,24 @@
             if (partId !== 'ALL') {
                 subset = questions.filter(q => q.part === partId);
             }
-            // Shuffle subset
-            const shuffled = [...subset].sort(() => 0.5 - Math.random());
             
-            if (shuffled.length === 0) {
+            if (subset.length === 0) {
                 alert("No questions available for this part yet!");
                 return;
             }
 
+            // Shuffle questions AND options
+            let shuffledQs = shuffleArray([...subset]);
+            shuffledQs = shuffledQs.map(q => ({
+                ...q,
+                options: shuffleArray(q.options)
+            }));
+
+            // IMPORTANT: Reset isChallengeMode to false for Learning Mode
+            setIsChallengeMode(false);
             setScore(0);
             setWrongAnswers([]);
-            setQuizSet(shuffled);
+            setQuizSet(shuffledQs);
             setCurrentQuestionIndex(0);
             setHiddenOptions([]);
             setHintUsed(false);
@@ -528,7 +464,15 @@
 
         const startReview = () => {
             if (wrongAnswers.length === 0) return;
-            setQuizSet([...wrongAnswers]);
+            
+            // Randomize options for review too, to prevent positional memory
+            const reviewSet = wrongAnswers.map(q => ({
+                ...q,
+                options: shuffleArray(q.options)
+            }));
+            
+            setScore(0);
+            setQuizSet(reviewSet);
             setCurrentQuestionIndex(0);
             setWrongAnswers([]); // Clear generic wrong list so we don't double loop easily without logic
             setHiddenOptions([]);
@@ -551,25 +495,35 @@
         const handleAnswer = (optionId) => {
             const currentQ = quizSet[currentQuestionIndex];
             const isCorrect = optionId === currentQ.correct;
+            const randIndex = Math.floor(Math.random() * affirmationQuotes.length);
 
             if (isCorrect) {
-            if (currentMode !== 'review') setScore((prev) => prev + 1);
-            const quote = affirmationQuotes[Math.floor(Math.random() * affirmationQuotes.length)];
-            setFeedbackData({
-                correct: true,
-                message: quote,
-                explanation: currentQ.explanation
-            });
+                // Trigger Confetti
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
+                    });
+                }
+
+                setScore((prev) => prev + 1);
+                const quoteObj = affirmationQuotes[randIndex];
+                setFeedbackData({
+                    correct: true,
+                    message: quoteObj,
+                    explanation: currentQ.explanation
+                });
             } else {
-            if (currentMode !== 'review') {
                 setWrongAnswers((prev) => [...prev, currentQ]);
-            }
-            const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-            setFeedbackData({
-                correct: false,
-                message: quote,
-                explanation: currentQ.explanation
-            });
+                
+                const quoteObj = motivationalQuotes[randIndex];
+                setFeedbackData({
+                    correct: false,
+                    message: quoteObj,
+                    explanation: currentQ.explanation
+                });
             }
             setShowFeedback(true);
         };
@@ -650,378 +604,385 @@
                 {opt.icon && <div className="mr-4 flex-shrink-0">{opt.icon}</div>}
                 
                 {/* Render Text */}
-                <div className="text-left">
-                <span className="text-lg font-semibold">{opt.text}</span>
+                <div className="text-left w-full">
+                    <Dual en={opt.text.en} zh={opt.text.zh} />
                 </div>
             </button>
             );
         };
 
-        // Main Menu View
-        if (currentMode === 'menu') {
-            return (
-            <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6 font-sans">
-                <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center">
-                <Atom className="w-20 h-20 text-blue-600 mx-auto mb-4" />
-                <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2">Science Hero: Form 1</h1>
-                <p className="text-gray-600 mb-8">Master Phenomena, Fields, Careers, Apparatus & Hazards!</p>
-                
-                <div className="space-y-4">
-                    <button 
-                    onClick={() => startQuiz(false)}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105"
-                    >
-                    <BookOpen /> Start Learning Mode
-                    <span className="text-sm font-normal opacity-90">(Hints Enabled)</span>
-                    </button>
-                    
-                    <button 
-                    onClick={() => startQuiz(true)}
-                    className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 text-xl transition transform hover:scale-105 shadow-red-200 shadow-lg"
-                    >
-                    <Timer className="w-6 h-6" /> Challenge Mode
-                    <span className="text-sm font-normal opacity-90">(No Hints, Timed)</span>
-                    </button>
-                </div>
-                </div>
-                <div 
-                    onClick={handleFooterClick}
-                    className="mt-8 text-gray-400 text-sm cursor-pointer select-none"
-                >
-                    &copy; TienPing @ 2026
-                </div>
-            </div>
-            );
-        }
-
-        // Part Selection View
-        if (currentMode === 'part-selection') {
-            return (
-                <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6 font-sans">
-                    <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl text-center">
-                        <div className="flex items-center justify-center gap-2 mb-6 text-green-700">
-                            <BookOpen />
-                            <h2 className="text-3xl font-bold">Select a Topic</h2>
-                        </div>
-                        
-                        <p className="text-gray-500 mb-8">Choose a specific part to practice, or mix them all up.</p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button onClick={() => startLearningPart('A')} className="p-6 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-200"><CloudRain className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part A: Natural Phenomena</span>
-                                    <span className="text-xs text-gray-500">Phenomena vs Artificial</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startLearningPart('B')} className="p-6 bg-white border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-purple-100 p-3 rounded-full text-purple-600 group-hover:bg-purple-200"><Microscope className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part B: Science Definitions</span>
-                                    <span className="text-xs text-gray-500">Biology, Physics, Chemistry...</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startLearningPart('C')} className="p-6 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-orange-100 p-3 rounded-full text-orange-600 group-hover:bg-orange-200"><Globe className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part C: Careers</span>
-                                    <span className="text-xs text-gray-500">Match Careers to Fields</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startLearningPart('D')} className="p-6 bg-white border-2 border-teal-200 rounded-xl hover:bg-teal-50 hover:border-teal-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-teal-100 p-3 rounded-full text-teal-600 group-hover:bg-teal-200"><Beaker className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part D: Apparatus ID</span>
-                                    <span className="text-xs text-gray-500">Identify Lab Equipment</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startLearningPart('E1')} className="p-6 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-indigo-100 p-3 rounded-full text-indigo-600 group-hover:bg-indigo-200"><FlaskConical className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part E1: Functions</span>
-                                    <span className="text-xs text-gray-500">Apparatus Usage & Safety</span>
-                                </div>
-                            </button>
-
-                            <button onClick={() => startLearningPart('E2')} className="p-6 bg-white border-2 border-red-200 rounded-xl hover:bg-red-50 hover:border-red-400 transition flex items-center gap-4 text-left group">
-                                <div className="bg-red-100 p-3 rounded-full text-red-600 group-hover:bg-red-200"><AlertTriangle className="w-6 h-6" /></div>
-                                <div>
-                                    <span className="block font-bold text-gray-800">Part E2: Hazard Symbols</span>
-                                    <span className="text-xs text-gray-500">Safety Signs & Meanings</span>
-                                </div>
-                            </button>
-                        </div>
-                        
-                        <div className="mt-6 flex flex-col md:flex-row gap-4">
-                            <button onClick={() => startLearningPart('ALL')} className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition shadow-lg">
-                                Mix All Topics
-                            </button>
-                            <button onClick={() => setCurrentMode('menu')} className="md:w-32 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300 transition">
-                                Back
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )
-        }
-
-        // Part Summary View (for Training Mode)
-        if (currentMode === 'part-summary') {
-            const total = quizSet.length;
-            const percentage = Math.round((score / total) * 100);
-            const category = quizSet[0]?.category || "Mixed Topic";
-
-            return (
-                <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6 font-sans">
-                    <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg text-center border-4 border-green-200">
-                        <Star className="w-20 h-20 text-yellow-400 mx-auto mb-4 fill-current animate-bounce" />
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Topic Completed!</h2>
-                        <p className="text-green-600 font-bold uppercase tracking-wider mb-6">{category}</p>
-                        
-                        <div className="mb-8">
-                            <div className="text-6xl font-bold text-gray-800 mb-2">{score} <span className="text-2xl text-gray-400">/ {total}</span></div>
-                            <div className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full font-bold">
-                                {percentage}% Correct
-                            </div>
-                        </div>
-
-                        <p className="text-gray-500 italic mb-8">
-                            {percentage === 100 ? "Flawless victory! You are a master." : 
-                            percentage >= 80 ? "Amazing job! Keep it up." :
-                            percentage >= 50 ? "Good effort! Try again to improve." : "Keep practicing, you will get there!"}
-                        </p>
-
-                        <div className="flex flex-col gap-3">
-                            {wrongAnswers.length > 0 && (
-                                <button 
-                                    onClick={startReview}
-                                    className="w-full bg-orange-500 text-white py-3 px-6 rounded-xl font-bold hover:bg-orange-600 transition flex items-center justify-center gap-2"
-                                >
-                                    <RefreshCw className="w-5 h-5" /> Review Mistakes ({wrongAnswers.length})
-                                </button>
-                            )}
-                            
-                            <button 
-                                onClick={() => setCurrentMode('part-selection')}
-                                className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2"
-                            >
-                                Choose Another Topic <ArrowRight className="w-5 h-5" />
-                            </button>
-
-                            <button 
-                                onClick={() => setCurrentMode('menu')}
-                                className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-bold hover:bg-gray-300 transition"
-                            >
-                                Main Menu
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-
-        // Certificate View
-        if (currentMode === 'certificate') {
-            const totalQ = isChallengeMode ? quizSet.length : quizSet.length; 
-            const percentage = Math.round((score / totalQ) * 100);
-            
-            return (
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-                {/* Input Name Screen if not set */}
-                {!userName ? (
-                    <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
-                        <h2 className="text-2xl font-bold mb-4">Quiz Complete!</h2>
-                        <p className="mb-4">Enter your name to generate your certificate.</p>
-                        <input 
-                            type="text" 
-                            placeholder="Student Name" 
-                            className="w-full p-3 border rounded-lg mb-4 text-center text-lg"
-                            onChange={(e) => setUserName(e.target.value)}
-                        />
-                        <button 
-                            disabled={!userName.trim()}
-                            onClick={() => setUserName(userName.trim() || 'Student')}
-                            className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50"
-                        >
-                            Generate Report
-                        </button>
-                    </div>
-                ) : (
-                    <div className="w-full max-w-4xl">
-                        {/* Certificate Display */}
-                        <div className="bg-white border-8 border-double border-yellow-500 p-10 rounded-lg shadow-2xl text-center relative overflow-hidden">
-                            <div className="absolute top-0 left-0 w-32 h-32 bg-yellow-200 rounded-br-full opacity-50"></div>
-                            <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-200 rounded-tl-full opacity-50"></div>
-                            
-                            <Award className="w-24 h-24 text-yellow-500 mx-auto mb-4" />
-                            <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-2">Certificate of Achievement</h1>
-                            <p className="text-xl text-gray-600 mb-8">This certifies that</p>
-                            <h2 className="text-3xl md:text-6xl font-cursive text-blue-700 mb-8 underline decoration-wavy decoration-yellow-400">{userName}</h2>
-                            <p className="text-xl text-gray-600 mb-4">has completed the Form 1 Science Assessment with a score of</p>
-                            
-                            <div className="text-6xl font-bold text-gray-800 mb-2">{score} / {quizSet.length}</div>
-                            <div className={`text-2xl font-bold mb-8 ${percentage >= 80 ? 'text-green-500' : 'text-orange-500'}`}>
-                                ({percentage}%) - {percentage >= 80 ? 'Distinction' : percentage >= 50 ? 'Credit' : 'Completed'}
-                            </div>
-
-                            <p className="text-sm text-gray-400">Date: {new Date().toLocaleDateString()}</p>
-                            <p className="text-sm text-gray-400 mb-8">Mode: {isChallengeMode ? 'Challenge' : 'Learning'}</p>
-                            
-                            <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-500 mx-auto max-w-md">
-                                Please take a screenshot of this certificate and share it in the Telegram group.
-                            </div>
-                        </div>
-
-                        <div className="mt-6 flex flex-col md:flex-row gap-4 justify-center">
-                            {wrongAnswers.length > 0 && (
-                                <button 
-                                    onClick={startReview}
-                                    className="bg-orange-500 text-white py-3 px-8 rounded-full shadow-lg flex items-center justify-center gap-2 hover:bg-orange-600"
-                                >
-                                    <RefreshCw className="w-5 h-5" /> Review Wrong Answers ({wrongAnswers.length})
-                                </button>
-                            )}
-                            <button 
-                                onClick={() => setCurrentMode('menu')}
-                                className="bg-blue-600 text-white py-3 px-8 rounded-full shadow-lg hover:bg-blue-700"
-                            >
-                                Main Menu
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-            );
-        }
-
-        // Quiz Interface
-        const currentQ = quizSet[currentQuestionIndex];
-        
+        // --- MAIN APP RENDER ---
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-            {/* Header */}
-            <div className="bg-white p-4 shadow flex justify-between items-center sticky top-0 z-10">
-                <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-600">Q{currentQuestionIndex + 1}/{quizSet.length}</span>
-                    <span className={`px-2 py-1 rounded text-xs text-white ${currentQ.part.startsWith('A') ? 'bg-green-500' : currentQ.part.startsWith('B') ? 'bg-blue-500' : 'bg-purple-500'}`}>
-                        Part {currentQ.part}
-                    </span>
-                </div>
-                <div className="flex items-center gap-4">
-                    {isChallengeMode && (
-                        <div className="flex items-center text-red-500 font-mono font-bold">
-                            <Timer className="w-5 h-5 mr-1" />
-                            {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+            <div className="font-sans text-gray-800">
+                {currentMode === 'menu' && (
+                    <div className="min-h-screen bg-blue-50 flex flex-col items-center justify-center p-6">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl text-center">
+                        <Atom className="w-20 h-20 text-blue-600 mx-auto mb-4" />
+                        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2">Science Hero: Form 1</h1>
+                        <p className="text-gray-600 mb-8">Master Phenomena, Fields, Careers, Apparatus & Hazards! <br/> <span class="text-sm">掌握现象、领域、职业、仪器和危险标志！</span></p>
+                        
+                        <div className="space-y-4">
+                            <button 
+                            onClick={() => startQuiz(false)}
+                            className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition transform hover:scale-105"
+                            >
+                                <BookOpen className="w-8 h-8" /> 
+                                <div class="text-left">
+                                    <div class="font-bold text-lg">Start Learning Mode</div>
+                                    <div class="text-sm font-light">开始学习模式 (Hints Enabled)</div>
+                                </div>
+                            </button>
+                            
+                            <button 
+                            onClick={() => startQuiz(true)}
+                            className="w-full bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition transform hover:scale-105 shadow-red-200 shadow-lg"
+                            >
+                                <Timer className="w-8 h-8" />
+                                <div class="text-left">
+                                    <div class="font-bold text-lg">Challenge Mode</div>
+                                    <div class="text-sm font-light">挑战模式 (No Hints, Timed)</div>
+                                </div>
+                            </button>
                         </div>
-                    )}
-                    <div className="font-bold text-blue-600">Score: {score}</div>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="flex-1 p-4 max-w-4xl mx-auto w-full">
-                {/* Progress Bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-                    <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex) / quizSet.length) * 100}%` }}></div>
-                </div>
-
-                {/* Question Card */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm mb-6">
-                    
-                    {/* Context/Category Header */}
-                    <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide mb-2">{currentQ.category}</h2>
-                    
-                    {/* Visuals based on Question Type */}
-                    {currentQ.type === 'career-match' && currentQ.career && (
-                        <div className="mb-6 p-4 bg-blue-50 rounded-xl text-center border border-blue-100">
-                            <div className="text-6xl mb-2">{currentQ.career.icon}</div>
-                            <h3 className="text-2xl font-bold text-blue-900">{currentQ.career.en}</h3>
-                            <div className="flex justify-center gap-4 text-gray-600 mt-2 text-lg">
-                                <span>{currentQ.career.bm}</span>
-                                <span className="text-gray-300">|</span>
-                                <span>{currentQ.career.cn}</span>
-                            </div>
                         </div>
-                    )}
-
-                    {currentQ.type === 'apparatus-id' && (
-                        <div className="mb-6 bg-white p-4 rounded-xl flex justify-center">
-                            <ApparatusIcon type={currentQ.apparatusType} />
-                        </div>
-                    )}
-
-                    {currentQ.type === 'hazard-match' && (
-                        <div className="mb-6 bg-yellow-50 p-4 rounded-xl flex justify-center border border-yellow-200">
-                            <HazardIcon type={currentQ.symbolType} />
-                        </div>
-                    )}
-
-                    {/* The Question Text */}
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 leading-snug">{currentQ.question}</h3>
-
-                    {/* Options Grid */}
-                    <div className={`grid ${currentQ.options.length > 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
-                        {currentQ.options.map((opt) => renderOption(opt, currentQ))}
-                    </div>
-                </div>
-
-                {/* Tools */}
-                {!isChallengeMode && !showFeedback && (
-                    <div className="flex justify-end mb-8">
-                        <button 
-                            onClick={useHint}
-                            disabled={hintUsed}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition ${hintUsed ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
+                        <div 
+                            onClick={handleFooterClick}
+                            className="mt-8 text-gray-400 text-sm cursor-pointer select-none"
                         >
-                            <HelpCircle className="w-5 h-5" /> Need a Hint?
-                        </button>
+                            &copy; TienPing @ 2026
+                        </div>
                     </div>
                 )}
-            </div>
 
-            {/* Feedback Modal Overlay */}
-            {showFeedback && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-                    <div className={`bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl border-t-8 ${feedbackData.correct ? 'border-green-500' : 'border-red-500'}`}>
-                        <div className="flex items-center gap-4 mb-4">
-                            {feedbackData.correct ? (
-                                <CheckCircle className="w-12 h-12 text-green-500" />
-                            ) : (
-                                <XCircle className="w-12 h-12 text-red-500" />
+                {currentMode === 'part-selection' && (
+                    <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-3xl text-center">
+                            <div className="flex items-center justify-center gap-2 mb-6 text-green-700">
+                                <BookOpen />
+                                <h2 className="text-2xl md:text-3xl font-bold">Select a Topic / 选择话题</h2>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                                <button onClick={() => startLearningPart('A')} className="p-4 bg-white border-2 border-blue-200 rounded-xl hover:bg-blue-50 hover:border-blue-400 transition flex items-center gap-4 group">
+                                    <div className="bg-blue-100 p-3 rounded-full text-blue-600 group-hover:bg-blue-200"><CloudRain className="w-6 h-6" /></div>
+                                    <Dual en="Part A: Natural Phenomena" zh="A部分：自然现象" />
+                                </button>
+
+                                <button onClick={() => startLearningPart('B')} className="p-4 bg-white border-2 border-purple-200 rounded-xl hover:bg-purple-50 hover:border-purple-400 transition flex items-center gap-4 group">
+                                    <div className="bg-purple-100 p-3 rounded-full text-purple-600 group-hover:bg-purple-200"><Microscope className="w-6 h-6" /></div>
+                                    <Dual en="Part B: Science Definitions" zh="B部分：科学定义" />
+                                </button>
+
+                                <button onClick={() => startLearningPart('C')} className="p-4 bg-white border-2 border-orange-200 rounded-xl hover:bg-orange-50 hover:border-orange-400 transition flex items-center gap-4 group">
+                                    <div className="bg-orange-100 p-3 rounded-full text-orange-600 group-hover:bg-orange-200"><Globe className="w-6 h-6" /></div>
+                                    <Dual en="Part C: Careers" zh="C部分：职业" />
+                                </button>
+
+                                <button onClick={() => startLearningPart('D')} className="p-4 bg-white border-2 border-teal-200 rounded-xl hover:bg-teal-50 hover:border-teal-400 transition flex items-center gap-4 group">
+                                    <div className="bg-teal-100 p-3 rounded-full text-teal-600 group-hover:bg-teal-200"><Beaker className="w-6 h-6" /></div>
+                                    <Dual en="Part D: Apparatus ID" zh="D部分：仪器识别" />
+                                </button>
+
+                                <button onClick={() => startLearningPart('E1')} className="p-4 bg-white border-2 border-indigo-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-400 transition flex items-center gap-4 group">
+                                    <div className="bg-indigo-100 p-3 rounded-full text-indigo-600 group-hover:bg-indigo-200"><FlaskConical className="w-6 h-6" /></div>
+                                    <Dual en="Part E1: Functions" zh="E1部分：功能" />
+                                </button>
+
+                                <button onClick={() => startLearningPart('E2')} className="p-4 bg-white border-2 border-red-200 rounded-xl hover:bg-red-50 hover:border-red-400 transition flex items-center gap-4 group">
+                                    <div className="bg-red-100 p-3 rounded-full text-red-600 group-hover:bg-red-200"><AlertTriangle className="w-6 h-6" /></div>
+                                    <Dual en="Part E2: Hazard Symbols" zh="E2部分：危险标志" />
+                                </button>
+                            </div>
+                            
+                            <div className="mt-6 flex flex-col md:flex-row gap-4">
+                                <button onClick={() => startLearningPart('ALL')} className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition shadow-lg">
+                                    <Dual en="Mix All Topics" zh="混合所有话题" className="items-center" />
+                                </button>
+                                <button onClick={() => setCurrentMode('menu')} className="md:w-32 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition">
+                                    <Dual en="Back" zh="返回" className="items-center" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {currentMode === 'part-summary' && (
+                    <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6">
+                        <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-lg text-center border-4 border-green-200">
+                            <Star className="w-20 h-20 text-yellow-400 mx-auto mb-4 fill-current animate-bounce" />
+                            <h2 className="text-3xl font-bold text-gray-800">Session Completed!</h2>
+                            <h3 className="text-xl text-gray-500 mb-2">练习完成！</h3>
+                            
+                            <div className="mb-8">
+                                <div className="text-6xl font-bold text-gray-800 mb-2">{score} <span className="text-2xl text-gray-400">/ {quizSet.length}</span></div>
+                                <div className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full font-bold">
+                                    {Math.round((score / quizSet.length) * 100)}% Correct
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                {wrongAnswers.length > 0 && (
+                                    <button 
+                                        onClick={startReview}
+                                        className="w-full bg-orange-500 text-white py-3 px-6 rounded-xl hover:bg-orange-600 transition flex items-center justify-center gap-2"
+                                    >
+                                        <RefreshCw className="w-5 h-5" /> 
+                                        <div class="text-left leading-tight">
+                                            <div class="font-bold">Review Mistakes</div>
+                                            <div class="text-xs font-normal">复习错误答案 ({wrongAnswers.length})</div>
+                                        </div>
+                                    </button>
+                                )}
+                                
+                                <button 
+                                    onClick={() => setCurrentMode('part-selection')}
+                                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                                >
+                                    <div class="text-left leading-tight">
+                                        <div class="font-bold">Choose Another Topic</div>
+                                        <div class="text-xs font-normal">选择另一个话题</div>
+                                    </div>
+                                    <ArrowRight className="w-5 h-5" />
+                                </button>
+
+                                <button 
+                                    onClick={() => setCurrentMode('menu')}
+                                    className="w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-xl font-bold hover:bg-gray-300 transition"
+                                >
+                                    Main Menu / 主菜单
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {currentMode === 'certificate' && (
+                    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+                        {!userName ? (
+                            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+                                <Dual en="Quiz Complete!" zh="测验完成！" size="large" className="mb-4" />
+                                <p className="mb-2 text-gray-600">Enter your name / 输入你的名字</p>
+                                <input 
+                                    type="text" 
+                                    placeholder="Student Name" 
+                                    className="w-full p-3 border rounded-lg mb-4 text-center text-lg"
+                                    onChange={(e) => setUserName(e.target.value)}
+                                />
+                                <button 
+                                    disabled={!userName.trim()}
+                                    onClick={() => setUserName(userName.trim() || 'Student')}
+                                    className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:opacity-50 font-bold"
+                                >
+                                    Generate Report / 生成报告
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="w-full max-w-4xl">
+                                <div className="bg-white border-8 border-double border-yellow-500 p-10 rounded-lg shadow-2xl text-center relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-32 h-32 bg-yellow-200 rounded-br-full opacity-50"></div>
+                                    <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-200 rounded-tl-full opacity-50"></div>
+                                    
+                                    <Award className="w-24 h-24 text-yellow-500 mx-auto mb-4" />
+                                    <h1 className="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-1">Certificate of Achievement</h1>
+                                    <h2 className="text-2xl font-serif text-gray-500 mb-2">结业证书</h2>
+                                    
+                                    <p className="text-xl text-gray-600 mt-6">This certifies that / 特此证明</p>
+                                    <h2 className="text-3xl md:text-6xl font-cursive text-blue-700 my-6 underline decoration-wavy decoration-yellow-400">{userName}</h2>
+                                    <p className="text-lg text-gray-600">has completed the Form 1 Science Assessment with a score of</p>
+                                    <p className="text-sm text-gray-500 mb-4">已完成中一科学评估，成绩为</p>
+                                    
+                                    <div className="text-6xl font-bold text-gray-800 mb-2">{score} / {quizSet.length}</div>
+                                    <div className={`text-2xl font-bold mb-8 ${Math.round((score / quizSet.length) * 100) >= 80 ? 'text-green-500' : 'text-orange-500'}`}>
+                                        ({Math.round((score / quizSet.length) * 100)}%)
+                                    </div>
+
+                                    <p className="text-sm text-gray-400">Date: {new Date().toLocaleDateString()}</p>
+                                </div>
+
+                                <div className="mt-6 flex flex-col md:flex-row gap-4 justify-center">
+                                    {wrongAnswers.length > 0 && (
+                                        <button 
+                                            onClick={startReview}
+                                            className="bg-orange-500 text-white py-3 px-8 rounded-full shadow-lg flex items-center justify-center gap-2 hover:bg-orange-600"
+                                        >
+                                            <RefreshCw className="w-5 h-5" /> 
+                                            <div class="text-left text-sm">
+                                                <div class="font-bold">Review Mistakes</div>
+                                                <div>复习错误答案 ({wrongAnswers.length})</div>
+                                            </div>
+                                        </button>
+                                    )}
+                                    <button 
+                                        onClick={() => setCurrentMode('menu')}
+                                        className="bg-blue-600 text-white py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 font-bold"
+                                    >
+                                        Main Menu / 主菜单
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {(currentMode === 'quiz' || currentMode === 'review') && (
+                    <div className="min-h-screen bg-gray-50 flex flex-col">
+                    {/* Header */}
+                    <div className="bg-white p-4 shadow flex justify-between items-center sticky top-0 z-10">
+                        <div className="flex items-center gap-2">
+                            <span className="font-bold text-gray-600">Q{currentQuestionIndex + 1}/{quizSet.length}</span>
+                            <span className={`px-2 py-1 rounded text-xs text-white ${quizSet[currentQuestionIndex].part.startsWith('A') ? 'bg-green-500' : quizSet[currentQuestionIndex].part.startsWith('B') ? 'bg-blue-500' : 'bg-purple-500'}`}>
+                                Part {quizSet[currentQuestionIndex].part}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            {isChallengeMode && (
+                                <div className="flex items-center text-red-500 font-mono font-bold">
+                                    <Timer className="w-5 h-5 mr-1" />
+                                    {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+                                </div>
                             )}
-                            <div>
-                                <h3 className={`text-2xl font-bold ${feedbackData.correct ? 'text-green-700' : 'text-red-700'}`}>
-                                    {feedbackData.correct ? 'Correct!' : 'Not quite right.'}
-                                </h3>
-                                <p className="font-medium text-gray-600 italic">"{feedbackData.message}"</p>
+                            <div className="font-bold text-blue-600">Score: {score}</div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="flex-1 p-4 max-w-4xl mx-auto w-full">
+                        {/* Progress Bar */}
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                            <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex) / quizSet.length) * 100}%` }}></div>
+                        </div>
+
+                        {/* Question Card */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm mb-6">
+                            
+                            {/* Visuals */}
+                            {quizSet[currentQuestionIndex].type === 'career-match' && quizSet[currentQuestionIndex].career && (
+                                <div className="mb-6 p-4 bg-blue-50 rounded-xl text-center border border-blue-100">
+                                    <div className="text-6xl mb-2">{quizSet[currentQuestionIndex].career.icon}</div>
+                                    <h3 className="text-2xl font-bold text-blue-900">{quizSet[currentQuestionIndex].career.en}</h3>
+                                    <div className="flex justify-center gap-4 text-gray-600 mt-2 text-lg">
+                                        <span>{quizSet[currentQuestionIndex].career.bm}</span>
+                                        <span className="text-gray-300">|</span>
+                                        <span>{quizSet[currentQuestionIndex].career.cn}</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {quizSet[currentQuestionIndex].type === 'apparatus-id' && (
+                                <div className="mb-6 bg-white p-4 rounded-xl flex justify-center">
+                                    <ApparatusIcon type={quizSet[currentQuestionIndex].apparatusType} />
+                                </div>
+                            )}
+
+                            {quizSet[currentQuestionIndex].type === 'hazard-match' && (
+                                <div className="mb-6 bg-yellow-50 p-4 rounded-xl flex justify-center border border-yellow-200">
+                                    <HazardIcon type={quizSet[currentQuestionIndex].symbolType} />
+                                </div>
+                            )}
+
+                            {/* Question Text */}
+                            <div className="mb-6">
+                                <Dual en={quizSet[currentQuestionIndex].question.en} zh={quizSet[currentQuestionIndex].question.zh} size="large" />
+                            </div>
+
+                            {/* Options */}
+                            <div className={`grid ${quizSet[currentQuestionIndex].options.length > 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
+                                {quizSet[currentQuestionIndex].options.map((opt) => renderOption(opt, quizSet[currentQuestionIndex]))}
                             </div>
                         </div>
 
-                        <div className="bg-gray-50 p-4 rounded-lg mb-6 text-gray-700 text-lg leading-relaxed border-l-4 border-blue-400">
-                            <span className="font-bold block mb-1 text-blue-600">Did you know?</span>
-                            {feedbackData.explanation}
-                        </div>
+                        {/* Tools */}
+                        {!isChallengeMode && !showFeedback && (
+                            <div className="flex justify-between mb-8">
+                                <button 
+                                    onClick={() => setShowExitConfirm(true)}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-gray-500 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition"
+                                >
+                                    <div className="transform rotate-180"><ArrowRight className="w-5 h-5" /></div> 
+                                    <span>Back / 返回</span>
+                                </button>
 
-                        <button 
-                            onClick={nextQuestion}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95"
-                        >
-                            {currentQuestionIndex < quizSet.length - 1 ? 'Next Question' : 'Finish Quiz'}
-                        </button>
+                                <button 
+                                    onClick={useHint}
+                                    disabled={hintUsed}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition ${hintUsed ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'}`}
+                                >
+                                    <HelpCircle className="w-5 h-5" /> Need a Hint? / 需要提示？
+                                </button>
+                            </div>
+                        )}
                     </div>
-                </div>
-            )}
-            
-            {/* Footer Copy */}
-            <div className="bg-gray-800 text-gray-400 py-6 text-center text-sm">
-                <p onClick={handleFooterClick} className="cursor-pointer select-none hover:text-white transition">
-                    &copy; TienPing @ 2026
-                </p>
-            </div>
+
+                    {/* Exit Confirmation Modal */}
+                    {showExitConfirm && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center">
+                                <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                                <h3 className="text-xl font-bold mb-2">Exit Quiz?</h3>
+                                <p className="text-gray-600 mb-6">Your current progress will be lost. <br/><span className="text-sm">退出测验？当前进度将丢失。</span></p>
+                                <div className="flex gap-4">
+                                    <button 
+                                        onClick={() => setShowExitConfirm(false)}
+                                        className="flex-1 py-2 rounded-lg font-bold bg-gray-200 hover:bg-gray-300 text-gray-700"
+                                    >
+                                        Cancel / 取消
+                                    </button>
+                                    <button 
+                                        onClick={() => {
+                                            setShowExitConfirm(false);
+                                            setCurrentMode('part-selection');
+                                        }}
+                                        className="flex-1 py-2 rounded-lg font-bold bg-red-500 hover:bg-red-600 text-white"
+                                    >
+                                        Exit / 退出
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Feedback Modal */}
+                    {showFeedback && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+                            <div className={`bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl border-t-8 ${feedbackData.correct ? 'border-green-500' : 'border-red-500'}`}>
+                                <div className="flex items-center gap-4 mb-4">
+                                    {feedbackData.correct ? (
+                                        <CheckCircle className="w-12 h-12 text-green-500" />
+                                    ) : (
+                                        <XCircle className="w-12 h-12 text-red-500" />
+                                    )}
+                                    <div>
+                                        <h3 className={`text-2xl font-bold ${feedbackData.correct ? 'text-green-700' : 'text-red-700'}`}>
+                                            {feedbackData.correct ? 'Correct!' : 'Not quite right.'}
+                                        </h3>
+                                        <p className="font-medium text-gray-600 italic">"{feedbackData.message.en}"</p>
+                                        <p className="text-sm text-gray-500">"{feedbackData.message.zh}"</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 p-4 rounded-lg mb-6 text-gray-700 text-lg leading-relaxed border-l-4 border-blue-400">
+                                    <span className="font-bold block mb-1 text-blue-600">Did you know? / 你知道吗？</span>
+                                    <div>{feedbackData.explanation.en}</div>
+                                    <div class="text-sm text-gray-500 mt-1">{feedbackData.explanation.zh}</div>
+                                </div>
+
+                                <button 
+                                    onClick={nextQuestion}
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95"
+                                >
+                                    {currentQuestionIndex < quizSet.length - 1 ? 'Next Question / 下一题' : 'Finish Quiz / 完成测验'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="bg-gray-800 text-gray-400 py-6 text-center text-sm">
+                        <p onClick={handleFooterClick} className="cursor-pointer select-none hover:text-white transition">
+                            &copy; TienPing @ 2026
+                        </p>
+                    </div>
+                    </div>
+                )}
             </div>
         );
         }
