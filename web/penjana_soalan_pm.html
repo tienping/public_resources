@@ -207,8 +207,16 @@
         import { getFirestore, doc, addDoc, updateDoc, onSnapshot, collection, query, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Environment Configuration
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1J4l0W_hB5tOLxt2g3aVSwl02B1nhXcE",
+            authDomain: "shs-moral-form2.firebaseapp.com",
+            projectId: "shs-moral-form2",
+            storageBucket: "shs-moral-form2.firebasestorage.app",
+            messagingSenderId: "758477650786",
+            appId: "1:758477650786:web:4f3ba77ace60d26a334a3b",
+            measurementId: "G-03SKZ4E3H2"
+        };
+        const appId = firebaseConfig.projectId;
         const apiKey = ""; // API Key handled by execution environment
 
         // API Configuration
