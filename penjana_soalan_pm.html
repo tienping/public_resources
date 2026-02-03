@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penjana Soalan Pendidikan Moral</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Icon library (lucide) for the robot -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc; /* Light gray background */
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 4, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #06b6d4; /* Cyan/Teal - Techno Accent */
+            color: white;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .btn-primary:hover {
+            background-color: #0891b2;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #f1f5f9; /* Slate 100 */
+            color: #334155; /* Slate 700 */
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        .history-item {
+            border-left: 4px solid #06b6d4;
+        }
+        .lds-dual-ring {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+        }
+        .lds-dual-ring:after {
+            content: " ";
+            display: block;
+            width: 16px;
+            height: 16px;
+            margin: 2px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            border-color: #fff transparent #fff transparent;
+            animation: lds-dual-ring 1.2s linear infinite;
+        }
+        @keyframes lds-dual-ring {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Login Screen specific styles */
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f9ff;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800">
+
+    <!-- LOGIN SCREEN OVERLAY -->
+    <div id="loginScreen" class="flex flex-col p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center space-y-6">
+            <div class="flex justify-center mb-2">
+                <div class="bg-cyan-100 p-4 rounded-full">
+                    <i data-lucide="book-open" class="w-10 h-10 text-cyan-600"></i>
+                </div>
+            </div>
+            
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Pendidikan Moral SPM</h1>
+                <p class="text-gray-500 mt-2">Sila log masuk untuk menjana soalan dan menyimpan rekod latihan anda.</p>
+            </div>
+
+            <div class="space-y-3 pt-2">
+                <button id="loginGoogleBtn" class="w-full btn-secondary bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3 transition duration-200">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" class="w-5 h-5" alt="Google Logo"/>
+                    <span>Log Masuk dengan Google</span>
+                </button>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-gray-200"></div>
+                    <span class="flex-shrink-0 mx-4 text-gray-400 text-xs">ATAU</span>
+                    <div class="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <button id="loginGuestBtn" class="w-full btn-primary py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>Teruskan sebagai Tetamu</span>
+                </button>
+            </div>
+            
+            <p id="loginError" class="text-red-500 text-sm hidden"></p>
+        </div>
+        <p class="text-xs text-gray-400 mt-8 text-center">Dibangunkan dengan Gemini AI</p>
+    </div>
+
+    <!-- MAIN APP CONTENT (Hidden by default) -->
+    <div id="mainApp" class="hidden max-w-4xl mx-auto p-4 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 md:text-left">
+                Penjana Soalan SPM
+            </h1>
+            <button id="signOutBtn" class="btn-secondary py-2 px-4 rounded-lg text-sm flex items-center space-x-2">
+                <i data-lucide="log-out" class="w-4 h-4"></i>
+                <span class="hidden md:inline">Log Keluar</span>
+            </button>
+        </div>
+
+        <!-- Auth Status Banner -->
+        <div id="authStatusContainer" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex flex-col md:flex-row justify-between items-center space-y-3 md:space-y-0 md:space-x-4">
+            <div id="authStatus" class="text-sm text-green-800 font-medium flex-grow">
+                Selamat Datang! Sistem bersedia.
+            </div>
+        </div>
+
+        <!-- Question, User Answer, and AI Suggestion Section -->
+        <div class="card p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Penjana Soalan Rawak</h2>
+            <button id="generateBtn" class="btn-primary w-full py-3 rounded-xl font-semibold flex items-center justify-center space-x-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+                <span id="generateBtnText">Jana Soalan Baharu</span>
+            </button>
+
+            <!-- Display Area for Current Question, User Input, and AI Check -->
+            <div id="questionContainer" class="mt-6 p-4 border border-gray-200 rounded-lg hidden">
+                <!-- 1. SOALAN GENERATED -->
+                <p class="text-lg font-medium text-gray-900 mb-6" id="currentQuestion"></p>
+
+                <!-- 2. JAWAPAN ANDA (USER INPUT) -->
+                <div class="border-t pt-4 mt-4 border-gray-100">
+                    <h3 class="text-base font-semibold text-gray-700 mb-2">Jawapan Anda:</h3>
+                    <textarea id="userAnswerTextarea" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" rows="5" placeholder="Masukkan jawapan anda di sini (Fakta dan Huraian/Contoh)..."></textarea>
+
+                    <div class="flex justify-end mt-2">
+                        <button id="checkAnswerBtn" class="btn-primary py-2 px-6 rounded-xl font-semibold flex items-center space-x-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150" disabled>
+                            <div id="checkLoading" class="lds-dual-ring hidden"></div>
+                            <span id="checkBtnText">Semak Jawapan</span>
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. MAKLUM BALAS AI (FEEDBACK) -->
+                <div id="feedbackContainer" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg hidden">
+                    <h3 class="font-semibold text-yellow-800 mb-2 flex items-center space-x-2">
+                        <i data-lucide="message-square" class="w-5 h-5"></i>
+                        <span>Maklum Balas AI</span>
+                    </h3>
+                    <div id="feedbackText" class="whitespace-pre-wrap text-sm text-yellow-900"></div>
+                </div>
+
+                <!-- 4. JAWAPAN CADANGAN BUTTON -->
+                <div class="flex items-center space-x-4 mt-6 pt-4 border-t border-gray-100">
+                    <button id="answerBtn" class="btn-primary py-2 px-4 rounded-lg text-sm flex items-center space-x-2 disabled:bg-gray-400">
+                        <i data-lucide="brain" class="w-4 h-4"></i>
+                        <span id="answerBtnText">Jawapan Cadangan AI</span>
+                        <div id="answerLoading" class="lds-dual-ring hidden"></div>
+                    </button>
+                    <p id="answerError" class="text-red-500 text-sm hidden"></p>
+                </div>
+            </div>
+
+            <!-- 5. JAWAPAN CADANGAN DISPLAY -->
+            <div id="answerContainer" class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg hidden">
+                <h3 class="font-semibold text-gray-700 mb-2">Jawapan Cadangan:</h3>
+                <div id="currentAnswer" class="whitespace-pre-wrap text-sm text-gray-800"></div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="card p-6 mt-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center space-x-2">
+                <i data-lucide="history" class="w-6 h-6 text-gray-500"></i>
+                <span>Sejarah Soalan (Terkini)</span>
+            </h2>
+            <p id="noHistory" class="text-gray-500 italic mb-4">Tiada soalan dalam sejarah buat masa ini.</p>
+            <div id="historyList" class="space-y-4">
+                <!-- Sejarah soalan akan dimasukkan di sini -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, updateDoc, onSnapshot, collection, query, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Configuration
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const apiKey = ""; // API Key handled by execution environment
+
+        // API Configuration
+        const API_MODEL = "gemini-2.5-flash-preview-09-2025";
+
+        // --- State Management ---
+        let db = null;
+        let auth = null;
+        let userId = null;
+        let isAuthReady = false;
+        let currentQuestionData = null;
+
+        // --- Data Lists ---
+        const FORMATS = ["Huraikan", "Jelaskan", "Nyatakan", "Senaraikan", "Bincangkan", "Apakah", "Terangkan"];
+        const CHECK_FORMATS_WITH_HURAIAN = ["Huraikan", "Jelaskan", "Bincangkan", "Terangkan"];
+        const KEYWORDS = ["kepentingan", "kesan", "kebaikan", "akibat", "cara", "ciri-ciri", "perasaan apabila", "peranan", "contoh", "implikasi", "manfaat", "amalan", "tujuan"];
+        const CHARACTERS = ["anda", "kerajaan", "masyarakat", "negera", "rakyat negara", "kita", "remaja", "orang ramai", "Amanda", "Aisyah"];
+        const TOPICS = [
+            "membuat pilihan bermoral.",
+            "menangani konflik identiti diri.",
+            "menghargai dan melindungi anugerah alam ciptaan tuhan.",
+            "beretika dan mematuhi peraturan semasa mengguna platform siber.",
+            "beradab di tempat awam.",
+            "melindungi hak asasi manusia.",
+            "mengamalkan gaya hidup yang sihat dan selamat.",
+            "membuat pilihan yang mendatangkan kebaikan untuk diri dan orang lain.",
+            "mementingkan amalan 5R.",
+        ];
+        const NEGATIVE_KEYWORDS = ["kesan", "akibat", "implikasi"];
+        const MAX_HISTORY = 100;
+
+        // Element References
+        // Screens
+        const loginScreen = document.getElementById('loginScreen');
+        const mainApp = document.getElementById('mainApp');
+        
+        // Login Elements
+        const loginGoogleBtn = document.getElementById('loginGoogleBtn');
+        const loginGuestBtn = document.getElementById('loginGuestBtn');
+        const loginError = document.getElementById('loginError');
+        
+        // App Elements
+        const userAnswerTextarea = document.getElementById('userAnswerTextarea');
+        const checkAnswerBtn = document.getElementById('checkAnswerBtn');
+        const checkBtnText = document.getElementById('checkBtnText');
+        const checkLoading = document.getElementById('checkLoading');
+        const feedbackContainer = document.getElementById('feedbackContainer');
+        const feedbackText = document.getElementById('feedbackText');
+        const authStatusElement = document.getElementById('authStatus');
+        const signOutBtn = document.getElementById('signOutBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const generateBtnText = document.getElementById('generateBtnText');
+
+        // --- Firebase Initialization and Auth ---
+
+        const initFirebase = async () => {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // --- Auto-Login Check (System Token only) ---
+                // If the system provides a specific token (e.g. from IDE), use it immediately.
+                // Otherwise, wait for user to click login buttons.
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                     try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                     } catch(e) {
+                         console.warn("System token failed, showing login screen", e);
+                     }
+                }
+
+                // --- Auth State Listener ---
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        // User is signed in
+                        userId = user.uid;
+                        isAuthReady = true;
+
+                        // Hide Login Screen, Show Main App
+                        loginScreen.classList.add('hidden');
+                        mainApp.classList.remove('hidden');
+
+                        const displayName = user.displayName || "Tetamu";
+                        authStatusElement.textContent = `Selamat Datang, ${displayName}`;
+                        
+                        setupRealtimeHistory();
+                    } else {
+                         // User is signed out
+                         userId = null;
+                         isAuthReady = false;
+
+                         // Show Login Screen, Hide Main App
+                         loginScreen.classList.remove('hidden');
+                         mainApp.classList.add('hidden');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                loginError.textContent = "Ralat Sistem. Sila muat semula.";
+                loginError.classList.remove('hidden');
+            }
+        };
+
+        // --- Auth Functions ---
+
+        const handleGoogleLogin = async () => {
+            const provider = new GoogleAuthProvider();
+            loginError.classList.add('hidden');
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.error("Google Login Error:", error);
+                let msg = "Log masuk gagal.";
+                if (error.code === 'auth/popup-closed-by-user') {
+                    msg = "Tetingkap log masuk ditutup.";
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    msg = "Domain tidak dibenarkan. Sila gunakan 'Teruskan sebagai Tetamu'.";
+                }
+                loginError.textContent = msg;
+                loginError.classList.remove('hidden');
+            }
+        };
+
+        const handleGuestLogin = async () => {
+            loginError.classList.add('hidden');
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Guest Login Error:", error);
+                loginError.textContent = "Log masuk tetamu gagal.";
+                loginError.classList.remove('hidden');
+            }
+        };
+
+        const handleSignOut = async () => {
+            try {
+                await signOut(auth);
+                // onAuthStateChanged will handle UI switching
+            } catch (error) {
+                console.error("Sign Out Error:", error);
+            }
+        };
+
+        // --- Firestore Helpers ---
+
+        const getCollectionRef = () => {
+            if (!db || !userId) return null;
+            return collection(db, 'artifacts', appId, 'users', userId, 'questions');
+        };
+
+        // --- History Management (Firestore) ---
+
+        const setupRealtimeHistory = () => {
+            const collectionRef = getCollectionRef();
+            if (!collectionRef) return;
+
+            const q = query(collectionRef, orderBy("timestamp", "desc"));
+
+            onSnapshot(q, (snapshot) => {
+                const history = [];
+                snapshot.forEach(doc => {
+                    history.push({ id: doc.id, ...doc.data() });
+                });
+                renderHistory(history);
+            }, (error) => {
+                console.error("Firestore History Snapshot Error:", error);
+            });
+        };
+
+        const renderHistory = (history) => {
+            const listElement = document.getElementById('historyList');
+            const noHistoryElement = document.getElementById('noHistory');
+
+            listElement.innerHTML = '';
+
+            if (history.length === 0) {
+                noHistoryElement.classList.remove('hidden');
+                return;
+            }
+
+            noHistoryElement.classList.add('hidden');
+
+            history.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'history-item p-4 bg-white hover:bg-gray-50 rounded-r-xl transition duration-150 ease-in-out border-gray-200';
+
+                const generatedDate = new Date(item.timestamp).toLocaleString('ms-MY');
+                
+                itemDiv.innerHTML = `
+                    <p class="font-medium text-gray-800 mb-2">${item.question}</p>
+                    <p class="text-xs text-gray-500 mb-2">Dijana: ${generatedDate}</p>
+
+                    ${item.userAnswer ? `
+                        <div class="mt-3 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                            <h4 class="text-sm font-semibold text-indigo-800 mb-1 flex items-center space-x-1">
+                                <i data-lucide="user-check" class="w-4 h-4"></i>
+                                <span>Jawapan Pelajar</span>
+                            </h4>
+                            <p class="text-xs text-indigo-900 font-medium mb-2 whitespace-pre-wrap">${item.userAnswer}</p>
+
+                            ${item.feedbackText ? `
+                                <div class="mt-3 p-2 bg-yellow-100 rounded-md border border-yellow-300">
+                                    <h5 class="text-xs font-bold text-yellow-800 mb-1">Maklum Balas AI:</h5>
+                                    <div class="whitespace-pre-wrap text-xs text-yellow-900">${formatAnswerDisplay(item.feedbackText)}</div>
+                                </div>
+                            ` : `<p class="text-xs text-red-500 italic mt-2">Jawapan pelajar ini belum disemak oleh AI.</p>`}
+                        </div>
+                    ` : ``}
+
+                    ${item.answerText ? `
+                        <div class="mt-4 p-3 bg-cyan-50 rounded-lg border border-cyan-200">
+                            <h4 class="text-sm font-semibold text-cyan-800 mb-1 flex items-center space-x-1">
+                                <i data-lucide="brain" class="w-4 h-4"></i>
+                                <span>Jawapan Cadangan AI</span>
+                            </h4>
+                            <div class="whitespace-pre-wrap text-xs text-cyan-900">${formatAnswerDisplay(item.answerText)}</div>
+                        </div>
+                    ` : ``}
+                `;
+                listElement.appendChild(itemDiv);
+            });
+            lucide.createIcons();
+        };
+
+        const saveQuestion = async (data) => {
+            const collectionRef = getCollectionRef();
+            if (!collectionRef) return;
+            try {
+                const docRef = await addDoc(collectionRef, data);
+                currentQuestionData.id = docRef.id;
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        };
+
+        const updateAnswer = async (qId, updateData) => {
+            const collectionRef = getCollectionRef();
+            if (!collectionRef || !qId) return;
+            try {
+                const docRef = doc(collectionRef, qId);
+                await updateDoc(docRef, updateData);
+            } catch (e) {
+                console.error("Error updating document: ", e);
+            }
+        };
+
+        // --- Utility Functions ---
+
+        const getRandom = (array) => array[Math.floor(Math.random() * array.length)];
+
+        // Exponential backoff retry logic for fetch
+        async function fetchWithBackoff(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 && i < retries - 1) {
+                            throw new Error('Retryable API Error: ' + response.statusText);
+                        }
+                        const errorBody = await response.text();
+                        throw new Error(`Status ${response.status}: ${errorBody}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        const formatAnswerDisplay = (text) => {
+            if (!text) return "";
+            let formattedText = text;
+            formattedText = formattedText.replace(/### (.*)/g, '<h4 class="font-bold text-md mt-3 mb-1">$1</h4>');
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            return formattedText;
+        };
+
+        // --- Core Logic ---
+
+        const generateQuestion = () => {
+            if (!isAuthReady) return;
+
+            // 1. Reset UI
+            userAnswerTextarea.value = '';
+            userAnswerTextarea.disabled = false;
+            checkAnswerBtn.disabled = true;
+            checkBtnText.textContent = 'Semak Jawapan';
+            feedbackContainer.classList.add('hidden');
+            document.getElementById('answerContainer').classList.add('hidden');
+
+            // 2. Random Selection
+            const format = getRandom(FORMATS);
+            const kataKunci = getRandom(KEYWORDS);
+            const watak = getRandom(CHARACTERS);
+            let topik = getRandom(TOPICS);
+
+            // 3. 'Tidak' Logic for negative keywords
+            const isNegativeQuestion = NEGATIVE_KEYWORDS.includes(kataKunci);
+            let combinedTopic = topik;
+
+            if (isNegativeQuestion && !topik.startsWith("tidak ")) {
+                combinedTopic = "tidak " + topik;
+            }
+
+            // 4. Assemble Question
+            const question = `${format} ${kataKunci} ${watak} ${combinedTopic}`;
+
+            // 5. Prepare Data Object
+            const timestamp = Date.now();
+            currentQuestionData = {
+                format,
+                kataKunci,
+                watak,
+                originalTopic: topik,
+                combinedTopic: combinedTopic,
+                question,
+                timestamp,
+                answerText: null,
+                answerTimestamp: null,
+                userAnswer: null,
+                feedbackText: null,
+                feedbackTimestamp: null
+            };
+
+            // 6. Save initial question to Firestore
+            saveQuestion(currentQuestionData);
+
+            // 7. Update UI
+            document.getElementById('currentQuestion').textContent = question;
+            document.getElementById('questionContainer').classList.remove('hidden');
+            document.getElementById('answerBtn').disabled = false;
+            document.getElementById('answerBtnText').textContent = 'Jawapan Cadangan AI';
+            document.getElementById('answerLoading').classList.add('hidden');
+            document.getElementById('answerError').classList.add('hidden');
+        };
+
+        const constructApiPrompt = (data) => {
+            const { question, kataKunci, combinedTopic } = data;
+            let apiPrompt = `Soalan: "${question}". Anda adalah pakar Pendidikan Moral SPM. Jawapan anda harus ringkas dan padat.`;
+
+            if (kataKunci === "perasaan apabila") {
+                const isNegative = combinedTopic.includes("tidak");
+                const startingEmotion = isNegative ? "Sedih." : "Gembira.";
+                const huraianFocus = isNegative ? "kesan" : "kepentingan";
+
+                apiPrompt += ` \n\nIni adalah soalan tentang perasaan. Jawapan harus dimulakan dengan 1 perasaan sahaja sebagai fakta ("${startingEmotion}") tanpa sebarang ayat pengenalan. Ayat kedua mesti bermula dengan "Hal ini dikatakan demikian kerana, " dan diikuti oleh huraian ringkas tentang ${huraianFocus}. Tambahkan satu ayat lagi untuk huraian lanjut. Akhir sekali, sertakan terjemahan jawapan cadangan ke Bahasa Cina dan Bahasa Inggeris di bawah jawapan Bahasa Melayu.`;
+            } else {
+                apiPrompt += ` \n\nJawapan mesti dimulakan dengan satu fakta. Ayat kedua mesti bermula dengan "Hal ini dikatakan demikian kerana, " dan diikuti oleh huraian ringkas untuk fakta tersebut. Akhir sekali, sertakan terjemahan jawapan cadangan ke Bahasa Cina dan Bahasa Inggeris di bawah jawapan Bahasa Melayu.`;
+            }
+
+            return apiPrompt;
+        };
+
+        const generateAnswer = async () => {
+            if (!currentQuestionData || !currentQuestionData.id) {
+                document.getElementById('answerError').textContent = 'Sila jana soalan baharu terlebih dahulu.';
+                document.getElementById('answerError').classList.remove('hidden');
+                return;
+            }
+
+            const answerBtn = document.getElementById('answerBtn');
+            const answerBtnText = document.getElementById('answerBtnText');
+            const answerLoading = document.getElementById('answerLoading');
+            const answerError = document.getElementById('answerError');
+            const currentAnswerDiv = document.getElementById('currentAnswer');
+
+            answerBtn.disabled = true;
+            answerBtnText.textContent = 'Menjana...';
+            answerLoading.classList.remove('hidden');
+            answerError.classList.add('hidden');
+            currentAnswerDiv.textContent = 'Sedang menjana jawapan...';
+            document.getElementById('answerContainer').classList.remove('hidden');
+
+            const apiPrompt = constructApiPrompt(currentQuestionData);
+            // Use environment-injected API key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: apiPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "Anda adalah pakar Pendidikan Moral di Malaysia. Jawab soalan yang diberi dalam Bahasa Melayu. Pastikan format jawapan diikuti dengan tepat." }]
+                },
+            };
+
+            try {
+                const response = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!text) throw new Error("Gagal menjana jawapan. AI tidak memberi respons.");
+
+                const formattedAnswer = formatAnswerDisplay(text);
+                currentAnswerDiv.innerHTML = formattedAnswer;
+
+                await updateAnswer(currentQuestionData.id, {
+                    answerText: text,
+                    answerTimestamp: Date.now()
+                });
+
+                currentQuestionData.answerText = text;
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                answerError.textContent = `Ralat API: ${error.message}.`;
+                answerError.classList.remove('hidden');
+                currentAnswerDiv.textContent = 'Gagal menjana jawapan cadangan. Sila cuba semula.';
+            } finally {
+                answerBtn.disabled = false;
+                answerBtnText.textContent = 'Jawapan Cadangan AI';
+                answerLoading.classList.add('hidden');
+            }
+        };
+
+        const checkUserAnswer = async () => {
+            if (!currentQuestionData || !currentQuestionData.question || !currentQuestionData.id) return;
+            
+            const userText = userAnswerTextarea.value.trim();
+            if (!userText) return;
+
+            // UI Reset
+            checkAnswerBtn.disabled = true;
+            checkBtnText.textContent = 'Menyemak...';
+            checkLoading.classList.remove('hidden');
+            feedbackContainer.classList.add('hidden');
+            feedbackContainer.classList.replace('bg-red-50', 'bg-yellow-50');
+            feedbackContainer.classList.replace('border-red-200', 'border-yellow-200');
+            feedbackText.classList.replace('text-red-900', 'text-yellow-900');
+
+            const question = currentQuestionData.question;
+            const format = currentQuestionData.format;
+
+            let requiredStructure = "Satu Fakta (Isi Utama).";
+            if (CHECK_FORMATS_WITH_HURAIAN.includes(format)) {
+                requiredStructure = "Satu Fakta (Isi Utama) diikuti oleh sekurang-kurangnya satu Huraian/Contoh yang relevan.";
+            }
+
+            const apiPrompt = `Soalan: "${question}"\n\nJawapan Pelajar: "${userText}"\n\nAnda adalah guru pemeriksa Pendidikan Moral SPM. Sila semak jawapan pelajar ini berdasarkan kriteria berikut:
+1. Adakah jawapan mengandungi Isi Utama (Fakta)?
+2. Adakah jawapan memenuhi keperluan soalan (mengandungi ${requiredStructure})?
+3. Berikan komen atau maklum balas ringkas, dan tandakan gred ringkas (Contoh: Cemerlang/Lulus/Gagal).
+4. Pastikan maklum balas adalah profesional dan membina.`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: apiPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "Anda adalah pakar Pendidikan Moral SPM. Berikan maklum balas semakan jawapan pelajar dalam Bahasa Melayu yang ringkas dan padat. Gunakan format Markdown untuk penekanan." }]
+                },
+            };
+
+            try {
+                const response = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const feedback = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!feedback) throw new Error("AI tidak mengembalikan maklum balas.");
+
+                feedbackText.textContent = feedback;
+                feedbackContainer.classList.remove('hidden');
+
+                const updateData = {
+                    userAnswer: userText,
+                    feedbackText: feedback,
+                    feedbackTimestamp: Date.now()
+                };
+
+                await updateAnswer(currentQuestionData.id, updateData);
+                currentQuestionData = { ...currentQuestionData, ...updateData };
+
+            } catch (error) {
+                console.error("Gemini Check API Error:", error);
+                feedbackText.textContent = `Ralat Semakan API: ${error.message}.`;
+                feedbackContainer.classList.remove('hidden');
+                feedbackContainer.classList.replace('bg-yellow-50', 'bg-red-50');
+                feedbackContainer.classList.replace('border-yellow-200', 'border-red-200');
+                feedbackText.classList.replace('text-yellow-900', 'text-red-900');
+
+            } finally {
+                checkAnswerBtn.disabled = false;
+                checkBtnText.textContent = 'Semak Jawapan';
+                checkLoading.classList.add('hidden');
+            }
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initFirebase();
+
+            // Event Listeners
+            loginGoogleBtn.addEventListener('click', handleGoogleLogin);
+            loginGuestBtn.addEventListener('click', handleGuestLogin);
+            signOutBtn.addEventListener('click', handleSignOut);
+            
+            document.getElementById('generateBtn').addEventListener('click', generateQuestion);
+            document.getElementById('answerBtn').addEventListener('click', generateAnswer);
+
+            userAnswerTextarea.addEventListener('input', () => {
+                checkAnswerBtn.disabled = userAnswerTextarea.value.trim() === '';
+                feedbackContainer.classList.add('hidden');
+            });
+
+            checkAnswerBtn.addEventListener('click', checkUserAnswer);
+        });
+
+    </script>
+</body>
+</html>
