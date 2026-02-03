@@ -103,7 +103,7 @@
                     <div class="flex-grow border-t border-gray-200"></div>
                 </div>
 
-                <button id="loginGuestBtn" class="w-full btn-primary py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2">
+                <button id="loginGuestBtn" class="w-full btn-primary py-3 px-4 rounded-xl font-semibold flex items-center justify-center space-x-2 transition-all duration-300">
                     <i data-lucide="user" class="w-5 h-5"></i>
                     <span>Teruskan sebagai Tetamu</span>
                 </button>
@@ -208,13 +208,12 @@
 
         // Environment Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC1J4l0W_hB5tOLxt2g3aVSwl02B1nhXcE",
-            authDomain: "shs-moral-form2.firebaseapp.com",
-            projectId: "shs-moral-form2",
-            storageBucket: "shs-moral-form2.firebasestorage.app",
-            messagingSenderId: "758477650786",
-            appId: "1:758477650786:web:4f3ba77ace60d26a334a3b",
-            measurementId: "G-03SKZ4E3H2"
+            apiKey: "AIzaSyDWlKzx9gQ45lQNJr3zG5B6LhpB6B9T56U",
+            authDomain: "tienping-github.firebaseapp.com",
+            projectId: "tienping-github",
+            storageBucket: "tienping-github.firebasestorage.app",
+            messagingSenderId: "245059586253",
+            appId: "1:245059586253:web:933ae41bc3ad54b9ab8184"
         };
         const appId = firebaseConfig.projectId;
         const apiKey = ""; // API Key handled by execution environment
@@ -327,6 +326,8 @@
         const handleGoogleLogin = async () => {
             const provider = new GoogleAuthProvider();
             loginError.classList.add('hidden');
+            loginGuestBtn.classList.remove('ring-4', 'ring-cyan-300'); // Reset highlight
+
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
@@ -335,7 +336,11 @@
                 if (error.code === 'auth/popup-closed-by-user') {
                     msg = "Tetingkap log masuk ditutup.";
                 } else if (error.code === 'auth/unauthorized-domain') {
-                    msg = "Domain tidak dibenarkan. Sila gunakan 'Teruskan sebagai Tetamu'.";
+                    msg = "Domain aplikasi ini belum disahkan dalam Firebase. Sila gunakan butang 'Teruskan sebagai Tetamu' di bawah.";
+                    // Highlight Guest Button to guide user
+                    loginGuestBtn.classList.add('ring-4', 'ring-cyan-300');
+                } else {
+                    msg = `Ralat: ${error.message}`;
                 }
                 loginError.textContent = msg;
                 loginError.classList.remove('hidden');
