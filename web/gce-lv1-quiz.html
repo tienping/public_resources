@@ -1,0 +1,770 @@
+import React, { useState, useEffect } from 'react';
+import { Lightbulb, CheckCircle2, XCircle, Clock, Trophy, RotateCcw, ArrowRight } from 'lucide-react';
+
+// --- Motivation Phrases ---
+const correctMotivations = ["Great job!", "Spot on!", "Exactly right!", "You nailed it!", "Awesome work!"];
+const incorrectMotivations = ["Don't give up!", "Keep trying, you'll get it!", "Not quite, but you're learning!", "Review the feedback and try again next time!", "Almost there!"];
+
+function getRandomPhrase(phrases) {
+  return phrases[Math.floor(Math.random() * phrases.length)];
+}
+
+// --- Exact Quiz Data ---
+const quizData = [
+  {
+    question: "An educator wants to arrange folders in Google Drive to separate assessments and worksheets. Which organization method would allow the educator to quickly locate a test answer key?",
+    options: [
+      "Set the folders to allow anyone with the link for improved organization.",
+      "Color code the folders to make it easier when searching for the math test answer key.",
+      "Move the documents into a single folder within Google Drive to improve organization.",
+      "Create separate Shared drives for assessments and worksheets for optimal organization."
+    ],
+    correctAnswers: [1],
+    hint: "Think about a visual cue you can apply directly to the folder icon."
+  },
+  {
+    question: "An educator is preparing lesson materials for a diverse classroom that includes students with visual impairments who require accessibility features, students who speak other languages, and students who are using Chromebooks. They want to ensure that all students can access and understand the content using the Google tools. Which two methods should the educator use to successfully achieve this? (Choose two.)",
+    options: [
+      "Advise students to turn on the Live Captions feature within ChromeOS.",
+      "Use the Translate document feature in Google Docs to translate the doc into a different language.",
+      "Grant students View access to the document so that they are able to make the changes necessary for their needs.",
+      "Instruct students to use the Compact controls feature in Google Docs to simplify the user interface.",
+      "Advise students to use the ChromeVox built-in screen reader feature from within ChromeOS."
+    ],
+    correctAnswers: [1, 4],
+    hint: "You need one tool for language barriers and one tool for visual impairments."
+  },
+  {
+    question: "An educator wants to add linkable thumbnails from other webpages to their webpage in Google Sites. What should they do to accomplish this?",
+    options: [
+      "Upload a PDF version of the content from the other pages.",
+      "Hyperlink text to redirect to the new page.",
+      "Embed the content by URL or code.",
+      "Add New link as a page type."
+    ],
+    correctAnswers: [2],
+    hint: "Think about how you insert dynamic content from other sites directly onto your page."
+  },
+  {
+    question: "A staff member has created lesson plans and presentations in Google Drive for a series of upcoming trainings and would like to share them with a group of colleagues for feedback. How can the staff member share collaborative resources?",
+    options: [
+      "Add all of the resources to a shared folder on Google Drive.",
+      "Zip the resources in Google Drive and share by email.",
+      "Submit the resources to the Template Gallery in Google Drive.",
+      "Make a copy for each colleague with view access only."
+    ],
+    correctAnswers: [0],
+    hint: "What is the most efficient way to group multiple files together for others to access?"
+  },
+  {
+    question: "An educator receives an email that needs to be actioned at a later date. How would they be automatically notified at a later time?",
+    options: [
+      "Forward the email to another colleague.",
+      "Mark the email message as Unread.",
+      "Use the Snooze feature to be reminded at a later date.",
+      "Add a label to the email message called Reminders."
+    ],
+    correctAnswers: [2],
+    hint: "What button on an alarm clock makes it go away and come back later?"
+  },
+  {
+    question: "Which Google tool would an education leader use to host a sychronous, virtual training for guardians?",
+    options: [
+      "Google Sites",
+      "Google Groups",
+      "Google Meet",
+      "Google Classroom"
+    ],
+    correctAnswers: [2],
+    hint: "Synchronous means 'real-time video or audio'."
+  },
+  {
+    question: "Which Google for Education tool allows an educator to streamline instruction, collect student work, and provide feedback using a Rubric?",
+    options: [
+      "Classroom",
+      "Sheets",
+      "Forms",
+      "Slides"
+    ],
+    correctAnswers: [0],
+    hint: "This tool is the main hub for assignments and grading."
+  },
+  {
+    question: "An educator would like students to provide feedback on their fellow classmates' work. The educator also wants students to be able to revisit the feedback later to reflect on their learning. Which of the following Google tools will allow students to achieve both of these goals?",
+    options: [
+      "Google Docs, with commenting enabled",
+      "Google Forms, with marks shown immediately after each submission",
+      "Google Slides, when used in presentation mode",
+      "Google Sites, in published mode"
+    ],
+    correctAnswers: [0],
+    hint: "Which tool allows highlighting specific text and leaving marginal notes?"
+  },
+  {
+    question: "How would an educator use Google Chat in their classroom?",
+    options: [
+      "Communicate with students",
+      "Book appointment slots",
+      "Navigate the Internet",
+      "Create presentations"
+    ],
+    correctAnswers: [0],
+    hint: "Chat is a messaging platform."
+  },
+  {
+    question: "Which Google Workspace for Education tool will allow an educator to deliver a virtual training with their colleagues?",
+    options: [
+      "Google Meet",
+      "Gmail",
+      "Google Calendar",
+      "Google Forms"
+    ],
+    correctAnswers: [0],
+    hint: "You need a video conferencing tool to deliver virtual training."
+  },
+  {
+    question: "An educator is planning a video call with colleagues to discuss a future event. Which Google Calendar feature should the educator encourage colleagues to enable to ensure they don't forget to join the meeting?",
+    options: [
+      "Create a Focus time.",
+      "Enable reminders and notifications.",
+      "Attach the agenda.",
+      "Use Time Insights."
+    ],
+    correctAnswers: [1],
+    hint: "What feature actively alerts you when an event is approaching?"
+  },
+  {
+    question: "In a virtual study session, an educator has shared a question on the screen and wants to have all students write a response. Which Google Meet feature would allow the educator to check for understanding for all attendees?",
+    options: [
+      "Screen Share",
+      "Unmute",
+      "Reaction",
+      "Chat"
+    ],
+    correctAnswers: [3],
+    hint: "You want a place where everyone can type text answers at once."
+  },
+  {
+    question: "A staff member has several private Google Calendars. They want to make a public calendar where guardians can view the details of school events. Which Google Calendar feature would the staff member use?",
+    options: [
+      "Browse calendars of interest",
+      "Create new calendar",
+      "Subscribe to calendar",
+      "Appointment schedule"
+    ],
+    correctAnswers: [1],
+    hint: "You shouldn't share a private calendar; you need a blank slate."
+  },
+  {
+    question: "An educator wants documents to automatically convert to Google Docs when added to Google Drive. Which feature would accomplish this?",
+    options: [
+      "Uploads",
+      "Offline",
+      "Density",
+      "Organize"
+    ],
+    correctAnswers: [0],
+    hint: "Look for settings related to bringing files into Drive."
+  },
+  {
+    question: "An education leader is presenting using Google Slides. There are members of staff in the audience who have a hearing impairment. Which feature should be enabled to ensure that the staff members' needs are met during the presentation?",
+    options: [
+      "Apply a theme to enhance the presentation.",
+      "Include speaker notes on each slide to refer to later.",
+      "Toggle captions on while in presentation mode.",
+      "Insert a voice recording on the slide."
+    ],
+    correctAnswers: [2],
+    hint: "You need a tool that converts spoken words to text on the screen."
+  },
+  {
+    question: "An educator decides to create a newsletter that includes student images. The educator wants to take student pictures using the device's webcam and insert them directly into Google Docs. Which feature will allow them to do this?",
+    options: [
+      "Camera",
+      "Google Photos",
+      "By URL",
+      "Google Drive"
+    ],
+    correctAnswers: [0],
+    hint: "Which 'Insert > Image' option turns on your webcam?"
+  },
+  {
+    question: "A staff member decides to start using Google Drive to safely back up and organize files from their computer. What could the staff member do in Google Drive before uploading files to organize them efficiently?",
+    options: [
+      "Create Google Drive folders to upload files into folders.",
+      "Go to settings to turn on Offline Access so files can be viewed offline.",
+      "Buy more storage in Google Drive to ensure the storage of all files.",
+      "Change the setting to convert uploads to Google Docs editor format."
+    ],
+    correctAnswers: [0],
+    hint: "Establish a structure before you start dumping files in."
+  },
+  {
+    question: "An educator is preparing for a conference and is expecting to receive numerous emails from the same sender regarding the same subject as they work together to prepare for the event. Which of the following features in Gmail will allow the educator to view these emails grouped together and displayed chronologically?",
+    options: [
+      "Adjust the display density to show more emails at once.",
+      "Attach files for the recipient to each email.",
+      "Thread emails together using Conversation view.",
+      "Use Confidential mode to send information securely."
+    ],
+    correctAnswers: [2],
+    hint: "This setting stacks replies on top of each other."
+  },
+  {
+    question: "A staff member is planning to transition their physical materials into Google Drive file types to enhance organization and access. Which of the following features of Drive would help to achieve this goal?",
+    options: [
+      "Store different files of varying formats in one location.",
+      "Uncheck the option to convert uploads to Google Docs editor format.",
+      "Automatically convert documents into different languages.",
+      "Print documents directly from the cloud without downloading them."
+    ],
+    correctAnswers: [0],
+    hint: "Think about what happens when you scan documents and save PDFs next to Docs."
+  },
+  {
+    question: "An education leader needs to communicate with faculty and staff in real time while minimizing classroom disruptions. The leader wants to allow staff members to see announcements quickly as well as share urgent questions or requests. How can the education leader achieve this?",
+    options: [
+      "Create a Calendar event.",
+      "Create a YouTube channel.",
+      "Use a faculty/staff Google Form.",
+      "Create a faculty/staff Google Chat."
+    ],
+    correctAnswers: [3],
+    hint: "You need a tool for instant messaging."
+  },
+  {
+    question: "A staff member would like to attach a collaborative meeting document for an upcoming event. Which Google Workspace for Education tool allows this functionality?",
+    options: [
+      "Drawings",
+      "Forms",
+      "Calendar",
+      "YouTube"
+    ],
+    correctAnswers: [2],
+    hint: "Where do you schedule events?"
+  },
+  {
+    question: "An education leader has provided staff with a collaborative document. A staff member realizes the information they entered is missing. What would be done to find and restore the missing information without disrupting other data?",
+    options: [
+      "Click the Version history icon and find an earlier version with the missing information then restore.",
+      "Click the Version history icon and restore to the original document.",
+      "Click the undo arrow until the missing information reappears.",
+      "From Version history, copy and paste the missing information back into the doc."
+    ],
+    correctAnswers: [3],
+    hint: "Restoring a full version deletes everyone's recent work."
+  },
+  {
+    question: "An educator wants to create a Google Site for guardian resources. They want a page on the navigation menu that when clicked leads directly to the district website. Which way of adding pages would allow this?",
+    options: [
+      "New menu section",
+      "New link",
+      "Full page embed",
+      "New page"
+    ],
+    correctAnswers: [1],
+    hint: "You want the menu item to act as an external URL."
+  },
+  {
+    question: "Which Google tool would enable an educator to collaborate, send images and text-based messages, and share resources in real time?",
+    options: [
+      "Google Arts & Culture",
+      "Google Chat",
+      "Google Earth",
+      "Google Sites"
+    ],
+    correctAnswers: [1],
+    hint: "This is the primary messaging application."
+  },
+  {
+    question: "An educator wants to update the font of their entire Google Site. Which of these features would accomplish this?",
+    options: [
+      "Theme",
+      "Pages",
+      "Settings",
+      "Preview"
+    ],
+    correctAnswers: [0],
+    hint: "This feature controls the overall visual design and typography."
+  },
+  {
+    question: "An educator is presenting a lesson on Google Meet and wants to navigate other tabs in the same window to access additional resources while sharing their screen. They need to ensure students only see the intended material and not their entire screen activity. Which screen sharing feature would allow the educator to achieve this?",
+    options: [
+      "Share Chrome Tab",
+      "Turn off camera",
+      "Share Window",
+      "Share Entire screen"
+    ],
+    correctAnswers: [0],
+    hint: "This option isolates presentation to a single webpage."
+  },
+  {
+    question: "Which Google Workspace for Education tool allows an educator to create an in-person or virtual engaging presentation?",
+    options: [
+      "Slides",
+      "Sheets",
+      "Drive",
+      "Forms"
+    ],
+    correctAnswers: [0],
+    hint: "This tool is comparable to PowerPoint."
+  },
+  {
+    question: "An educator working on a Google Doc would like a colleague to help rewrite parts of the document. Which sharing permission should the educator assign to the document?",
+    options: [
+      "Viewer",
+      "Editor",
+      "Sharer",
+      "Publisher"
+    ],
+    correctAnswers: [1],
+    hint: "They need the ability to make direct changes."
+  },
+  {
+    question: "An educator is collaborating with another educator using Google Sheets. What is the benefit of using Google Sheets for collaboration?",
+    options: [
+      "Both educators can download as PDF.",
+      "Both educators can email the file.",
+      "Both educators can edit in real time.",
+      "Both educators can print."
+    ],
+    correctAnswers: [2],
+    hint: "What makes cloud-based apps better than offline files?"
+  },
+  {
+    question: "An educator has gathered a variety of learning materials that have been categorized for different student interest groups. The educator wants to create a personalized learning experience in Google Classroom that gives students access only to materials based on their interests. Which option should be used to organize these materials and share by category to specific students?",
+    options: [
+      "Create an assignment and share with the entire class, then Add a Private Comment for each student indicating the relevant resource.",
+      "Create multiple assignments, each with specific content based on different groups, then assign targeted students for each.",
+      "Share the materials directly with students from the Classroom folder and assign different collaboration permissions for each content.",
+      "Create an assignment and share with the entire class, then write a clear instruction showing how materials are categorized."
+    ],
+    correctAnswers: [1],
+    hint: "You can uncheck 'All Students' when making an assignment."
+  },
+  {
+    question: "At the end of each month, staff submits a budget using Google Drive. To ensure data integrity, the manager needs to prevent staff from modifying their reports after submission. Which Google Drive share setting should staff apply once they submit their budget file that allows the manager to edit their access permissions?",
+    options: [
+      "Transfer owner",
+      "Editor",
+      "Viewer",
+      "Commenter"
+    ],
+    correctAnswers: [0],
+    hint: "The manager needs ultimate control to demote the staff member's permissions."
+  },
+  {
+    question: "Which Google Workspace for Education tool would an educator use to schedule due dates for class projects?",
+    options: [
+      "Calendar",
+      "Google Meet",
+      "Google Chat",
+      "Drawings"
+    ],
+    correctAnswers: [0],
+    hint: "Where do dates live?"
+  },
+  {
+    question: "A school leader created a newsletter in Google Docs and wants to make it available to guardians in multiple languages. Which Google Docs accessibility tool will enable the school leader to convert the newsletter into multiple languages?",
+    options: [
+      "Screen reader support",
+      "Screen magnifier support",
+      "Translate document",
+      "Voice typing"
+    ],
+    correctAnswers: [2],
+    hint: "Look for the word that means converting to another language."
+  },
+  {
+    question: "An educator wants to create a synchronous professional learning event for colleagues around the world. Which Google Calendar feature would allow them to do so?",
+    options: [
+      "Add a Google Meet link from the Event screen.",
+      "Color code the event to make it stand out.",
+      "Use the Search feature.",
+      "Set Working hours and location."
+    ],
+    correctAnswers: [0],
+    hint: "Synchronous means real-time video."
+  },
+  {
+    question: "An educator completed a report and would like to approve their colleague's feedback and suggestions on the document. Which sharing permission should the educator assign?",
+    options: [
+      "Commenter",
+      "Viewer",
+      "Sharer",
+      "Publisher"
+    ],
+    correctAnswers: [0],
+    hint: "You want them to suggest changes, not directly edit."
+  },
+  {
+    question: "An educator uses Search in Gmail to see results that include Google Drive files and emails shared by a certain email address. Which search criteria will accomplish this?",
+    options: [
+      "Subject:",
+      "To:",
+      "From:",
+      "Size:"
+    ],
+    correctAnswers: [2],
+    hint: "You want items sent BY a specific person."
+  },
+  {
+    question: "An educator will begin hosting virtual study sessions and needs to show students how to be recognized when wanting to speak. What Google Meet feature will accomplish this?",
+    options: [
+      "Share screen",
+      "Raise hand",
+      "Unmute",
+      "Send a reaction"
+    ],
+    correctAnswers: [1],
+    hint: "What do students do in a physical classroom to be called on?"
+  },
+  {
+    question: "Select 3 ways how you can create Google Calendar events.",
+    options: [
+      "Click the create button",
+      "Double click on the mini calendar",
+      "Create an event from a Gmail message",
+      "Click an empty time on your calendar",
+      "Right click over an empty time on your calendar"
+    ],
+    correctAnswers: [0, 2, 3],
+    hint: "Think about the main buttons and direct calendar interactions."
+  },
+  {
+    question: "In Google Classroom, select 3 ways a student can join a video meeting?",
+    options: [
+      "On the Stream page, at the top, click the meet link",
+      "On the Classwork page, at the top, click Meet",
+      "On an announcement or post, click the link for the class video meeting",
+      "On the Gmail app, select Meet, then click “New Meeting”"
+    ],
+    correctAnswers: [0, 1, 2],
+    hint: "Look for the options directly inside the Classroom interface."
+  },
+  {
+    question: "When using Google Meet, you can: (Select 3)",
+    options: [
+      "Pin the presentation so that it appears larger on the screen",
+      "Edit the presentation content from the meeting window",
+      "Mute the audio in the presentation from Meet",
+      "Present to select individuals only",
+      "Unpin the presentation to view it as a tile so you can see more students"
+    ],
+    correctAnswers: [0, 2, 4],
+    hint: "Think about managing your view and audio, not editing files."
+  }
+];
+
+export default function App() {
+  const [appState, setAppState] = useState('menu'); // menu, quiz, results
+  const [mode, setMode] = useState('normal'); // normal, challenge
+  const [questionsToAsk, setQuestionsToAsk] = useState(quizData);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [wrongQuestions, setWrongQuestions] = useState([]);
+  const [score, setScore] = useState(0);
+  const [feedbackMsg, setFeedbackMsg] = useState('');
+  const [isCorrect, setIsCorrect] = useState(false);
+  
+  // Challenge mode timer
+  const [timeLeft, setTimeLeft] = useState(30);
+
+  useEffect(() => {
+    let timer;
+    if (appState === 'quiz' && mode === 'challenge' && !hasSubmitted) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleTimeUp();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [appState, mode, hasSubmitted, currentQIndex]);
+
+  const startQuiz = (selectedMode) => {
+    setMode(selectedMode);
+    setAppState('quiz');
+    setQuestionsToAsk(quizData);
+    setCurrentQIndex(0);
+    setWrongQuestions([]);
+    setScore(0);
+    resetQuestionState();
+  };
+
+  const resetQuestionState = () => {
+    setSelectedOptions([]);
+    setHasSubmitted(false);
+    setShowHint(false);
+    setTimeLeft(30);
+  };
+
+  const handleOptionToggle = (index) => {
+    if (hasSubmitted) return;
+    const currentQ = questionsToAsk[currentQIndex];
+    const isMultiSelect = currentQ.correctAnswers.length > 1;
+
+    if (isMultiSelect) {
+      setSelectedOptions(prev => 
+        prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+      );
+    } else {
+      setSelectedOptions([index]);
+    }
+  };
+
+  const handleTimeUp = () => {
+    checkAnswer(true); // true flags it as forced submission due to time
+  };
+
+  const checkAnswer = (forced = false) => {
+    const currentQ = questionsToAsk[currentQIndex];
+    
+    // Check if correct
+    const isAnsCorrect = 
+      currentQ.correctAnswers.length === selectedOptions.length &&
+      currentQ.correctAnswers.every(ans => selectedOptions.includes(ans));
+
+    setIsCorrect(isAnsCorrect);
+    
+    if (isAnsCorrect) {
+      if (!forced) setScore(prev => prev + 1);
+      setFeedbackMsg(getRandomPhrase(correctMotivations) + " That is the right answer.");
+    } else {
+      setFeedbackMsg(getRandomPhrase(incorrectMotivations) + " Let's review this again later.");
+      // Add to wrong questions if not already there
+      if (!wrongQuestions.some(q => q.question === currentQ.question)) {
+        setWrongQuestions(prev => [...prev, currentQ]);
+      }
+    }
+
+    setHasSubmitted(true);
+  };
+
+  const nextQuestion = () => {
+    if (currentQIndex < questionsToAsk.length - 1) {
+      setCurrentQIndex(prev => prev + 1);
+      resetQuestionState();
+    } else {
+      setAppState('results');
+    }
+  };
+
+  const startAdaptiveReview = () => {
+    setQuestionsToAsk([...wrongQuestions]);
+    setWrongQuestions([]);
+    setCurrentQIndex(0);
+    setAppState('quiz');
+    resetQuestionState();
+  };
+
+  // --- RENDERS ---
+
+  if (appState === 'menu') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
+        <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-blue-600 p-8 text-center text-white">
+            <h1 className="text-3xl font-bold mb-2">Google Workspace Master Quiz</h1>
+            <p className="text-blue-100">Test your knowledge on Google for Education tools!</p>
+          </div>
+          <div className="p-8 space-y-6">
+            <div className="grid md:grid-cols-2 gap-4">
+              <button 
+                onClick={() => startQuiz('normal')}
+                className="flex flex-col items-center justify-center p-6 border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+              >
+                <CheckCircle2 size={40} className="text-blue-600 mb-4" />
+                <h3 className="text-lg font-bold text-gray-800">Normal Mode</h3>
+                <p className="text-sm text-gray-500 text-center mt-2">Take your time, use hints, and learn at your own pace.</p>
+              </button>
+
+              <button 
+                onClick={() => startQuiz('challenge')}
+                className="flex flex-col items-center justify-center p-6 border-2 border-orange-100 hover:border-orange-500 hover:bg-orange-50 rounded-xl transition-all"
+              >
+                <Clock size={40} className="text-orange-500 mb-4" />
+                <h3 className="text-lg font-bold text-gray-800">Challenge Mode</h3>
+                <p className="text-sm text-gray-500 text-center mt-2">30 seconds per question. Think fast!</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (appState === 'results') {
+    const totalCurrentQs = questionsToAsk.length;
+    const isPerfect = wrongQuestions.length === 0;
+
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 font-sans">
+        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+          <Trophy size={64} className={`mx-auto mb-6 ${isPerfect ? 'text-yellow-500' : 'text-blue-500'}`} />
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
+          <p className="text-lg text-gray-600 mb-8">
+            You scored <span className="font-bold text-blue-600">{score}</span> out of {totalCurrentQs} on this round.
+          </p>
+
+          {wrongQuestions.length > 0 ? (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8 text-left">
+              <h3 className="font-bold text-orange-800 mb-2 flex items-center gap-2">
+                <RotateCcw size={20} /> Adaptive Learning
+              </h3>
+              <p className="text-orange-700 mb-4">
+                You have {wrongQuestions.length} question(s) to review. Let's practice them again until you master them!
+              </p>
+              <button 
+                onClick={startAdaptiveReview}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              >
+                Review Incorrect Answers
+              </button>
+            </div>
+          ) : (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+              <h3 className="font-bold text-green-800 mb-2">Incredible!</h3>
+              <p className="text-green-700">You've mastered all the questions in this set.</p>
+            </div>
+          )}
+
+          <button 
+            onClick={() => setAppState('menu')}
+            className="text-gray-500 hover:text-gray-800 font-semibold underline"
+          >
+            Return to Main Menu
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // QUIZ STATE
+  const currentQ = questionsToAsk[currentQIndex];
+  const isMultiSelect = currentQ.correctAnswers.length > 1;
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8 px-4 font-sans">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+            Question {currentQIndex + 1} of {questionsToAsk.length}
+          </div>
+          {mode === 'challenge' && (
+            <div className={`flex items-center gap-2 font-bold px-4 py-2 rounded-full ${timeLeft <= 10 ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>
+              <Clock size={18} /> {timeLeft}s
+            </div>
+          )}
+        </div>
+
+        {/* Question Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div className="p-6 md:p-8">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-4 leading-relaxed">
+              {currentQ.question}
+            </h2>
+            {isMultiSelect && (
+              <p className="text-blue-600 text-sm font-semibold mb-6 uppercase tracking-wider bg-blue-50 inline-block px-3 py-1 rounded-md">
+                Select {currentQ.correctAnswers.length} correct answers
+              </p>
+            )}
+
+            <div className="space-y-3">
+              {currentQ.options.map((option, idx) => {
+                const isSelected = selectedOptions.includes(idx);
+                const isCorrectAns = currentQ.correctAnswers.includes(idx);
+                
+                let btnStyle = "border-gray-200 hover:border-blue-400 hover:bg-blue-50";
+                if (isSelected) btnStyle = "border-blue-500 bg-blue-50";
+                
+                // Show answers after submission
+                if (hasSubmitted) {
+                  if (isCorrectAns) {
+                    btnStyle = "border-green-500 bg-green-50 font-medium text-green-800";
+                  } else if (isSelected && !isCorrectAns) {
+                    btnStyle = "border-red-400 bg-red-50 text-red-800 opacity-70";
+                  } else {
+                    btnStyle = "border-gray-200 opacity-50";
+                  }
+                }
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleOptionToggle(idx)}
+                    disabled={hasSubmitted}
+                    className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-start gap-4 ${btnStyle}`}
+                  >
+                    <div className={`shrink-0 w-6 h-6 mt-0.5 rounded flex items-center justify-center border ${isSelected ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300'}`}>
+                      {isSelected && <CheckCircle2 size={16} />}
+                    </div>
+                    <span className="text-gray-700 leading-relaxed">{option}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Controls & Feedback */}
+          <div className="bg-gray-50 border-t border-gray-100 p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            
+            {!hasSubmitted ? (
+              <>
+                <button 
+                  onClick={() => setShowHint(true)}
+                  className="flex items-center gap-2 text-yellow-600 font-medium hover:bg-yellow-50 px-4 py-2 rounded-lg transition-colors"
+                >
+                  <Lightbulb size={20} /> 
+                  Need a hint?
+                </button>
+                <button 
+                  onClick={() => checkAnswer(false)}
+                  disabled={selectedOptions.length === 0}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl transition-colors w-full sm:w-auto"
+                >
+                  Submit Answer
+                </button>
+              </>
+            ) : (
+              <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  {isCorrect ? (
+                    <CheckCircle2 size={28} className="text-green-500 shrink-0" />
+                  ) : (
+                    <XCircle size={28} className="text-red-500 shrink-0" />
+                  )}
+                  <p className={`font-semibold ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                    {feedbackMsg}
+                  </p>
+                </div>
+                <button 
+                  onClick={nextQuestion}
+                  className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-xl transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
+                >
+                  Next <ArrowRight size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Hint Display */}
+        {showHint && !hasSubmitted && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3 animate-fade-in">
+            <Lightbulb className="text-yellow-600 shrink-0" />
+            <p className="text-yellow-800">{currentQ.hint}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
