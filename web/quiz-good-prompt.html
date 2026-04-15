@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Engineering Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fall {
+            0% { transform: translateY(0vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti-particle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            z-index: 50;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-up {
+            animation: fadeUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 antialiased">
+
+    <!-- Container for Confetti -->
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none z-50 overflow-hidden"></div>
+    
+    <!-- Main App Container -->
+    <div id="app-root"></div>
+
+    <script>
+        // --- DATA ---
+        const quizData = [
+            {
+                level: "Level 1: Simple (Spotting the missing basics)",
+                badOption: "Act as a teacher. Write an email to parents about the science fair.",
+                goodOption: "Act as a secondary school science teacher. Write a polite email to parents inviting them to the Form 1 Science Fair next Friday. Format it into 3 short paragraphs.",
+                explanation: "The vague prompt lacks direction. The AI doesn't know the tone, the grade level, or how long the email should be. The structured prompt uses PTCF to give clear boundaries."
+            },
+            {
+                level: "Level 1: Simple (Spotting the missing basics)",
+                badOption: "Act as a science teacher. Give me some science questions.",
+                goodOption: "Act as an SPM examiner. Generate 5 multiple-choice questions about plant cells for Form 4 Biology students. Output as a numbered list with the answer key at the bottom.",
+                explanation: "The simple prompt will just give you random trivia. The detailed prompt gives you exactly what you need for a specific syllabus in an easy-to-copy format."
+            },
+            {
+                level: "Level 1: Simple (Spotting the missing basics)",
+                badOption: "Act as an expert. Explain gravity to a kid.",
+                goodOption: "Act as a fun science communicator. Explain gravity to a 10-year-old. Use one everyday analogy and provide the explanation in bullet points.",
+                explanation: "The structured prompt controls the formatting and forces the AI to use a specific teaching tool (an analogy), saving you from a wall of text."
+            },
+            {
+                level: "Level 2: Medium (Adding constraints & context)",
+                badOption: "Act as a counselor. Make a study timetable for a student who is failing.",
+                goodOption: "Act as an academic counselor. Create a weekly study timetable for a Form 5 student struggling to pass Sejarah and Add Maths. Present it in a clear table format.",
+                explanation: "Providing the exact subjects (Sejarah, Add Maths) gives the AI the context it needs to allocate study blocks realistically rather than generating a generic template."
+            },
+            {
+                level: "Level 2: Medium (Adding constraints & context)",
+                badOption: "Act as a translator. Translate this text into Bahasa Melayu for my class.",
+                goodOption: "Act as a professional educational translator. Translate the following English science text into Bahasa Melayu suitable for Form 2 Dual Language Programme (DLP) students. Provide the output with the English sentence followed immediately by the Malay translation.",
+                explanation: "The detailed prompt gives the AI the specific educational context (DLP) to use correct standardized terminology, and a specific format that is easy for a teacher to read."
+            },
+            {
+                level: "Level 2: Medium (Adding constraints & context)",
+                badOption: "Act as a speaker. I need a speech for sports day.",
+                goodOption: "Act as a school principal. Write a 3-minute opening speech for the annual Hari Sukan Sekolah, emphasizing sportsmanship and unity. Format it with clear headings for Intro, Body, and Conclusion.",
+                explanation: "The structured prompt defines the speaker's authority (Principal), the exact theme (unity), and the duration (3 minutes), which directly dictates the word count."
+            },
+            {
+                level: "Level 3: Hard (Busting the 'Longer is Better' Myth)",
+                badOption: "Act as an AI helper. I was wondering if you could maybe help me out today. I am very tired and I have a class tomorrow and I really need to teach them about the heart. The heart is really important and there are so many things to say about it. Could you please give me some ideas on what to say? I want them to like it and I want it to be good.",
+                goodOption: "Act as an expert biology teacher. Create a lesson outline about the human heart for Form 3 students. Format it as a 4-step bulleted list highlighting key functions.",
+                explanation: "The wordy prompt is a 'word salad'. It's long, but contains zero actual instructions. The concise prompt is short, punchy, and hits all four PTCF points perfectly."
+            },
+            {
+                level: "Level 3: Hard (Busting the 'Longer is Better' Myth)",
+                badOption: "Act as a storyteller. Write a story about a boy who goes to school in Malaysia, specifically in Sibu, Sarawak, and he eats laksa for breakfast, and it's raining, and his cat is named Oyen, and he is late, and then he learns about fractions in math class. Please make the fractions part really good because I have to teach fractions to my class tomorrow.",
+                goodOption: "Act as a primary school math teacher. Write a short, engaging story to introduce fractions to 11-year-olds, using a local context like sharing a bowl of Sarawak Laksa. Format it as a 3-minute read with 2 discussion questions at the end.",
+                explanation: "The rambling prompt overloads the AI with irrelevant details (rain, cat's name) that distract from the learning objective. The structured prompt focuses the context strictly on the goal."
+            },
+            {
+                level: "Level 3: Hard (Busting the 'Longer is Better' Myth)",
+                badOption: "Act as a strict grader. I need a grading rubric. It has to be extremely detailed, covering absolutely everything a student could possibly do wrong. Include grammar, spelling, creativity, effort, handwriting, the way they hold the pen, how fast they wrote it, and if they used a blue or black pen. It needs to be perfect.",
+                goodOption: "Act as an English language evaluator. Create a grading rubric for a Form 4 essay on environmental pollution. Format it as a table evaluating Content, Language, and Organization on a scale of 1-5.",
+                explanation: "The unstructured prompt asks for impossible or irrelevant metrics (how fast they wrote, holding the pen) and lacks format instructions. The PTCF prompt is standardized and professional."
+            },
+            {
+                level: "Level 3: Hard (Busting the 'Longer is Better' Myth)",
+                badOption: "Act as a school administrator. Generate a report on student attendance. Make it sound very serious but also super funny. It should be an email, no wait, make it a formal letter, but use emojis. Tell the parents their kids are absent a lot, which is bad, but also tell them it's okay because we love them. Don't use big words but make it sound academic.",
+                goodOption: "Act as a school discipline master. Draft a formal letter to parents addressing chronic student absenteeism and emphasizing the importance of attendance for SPM prep. Use a professional, firm tone in a standard official letter format without emojis.",
+                explanation: "The contradictory prompt contains conflicting instructions (serious but funny, academic but no big words). This will confuse the AI. The structured prompt provides a clear, unified direction."
+            }
+        ];
+
+        // --- STATE ---
+        let currentIndex = 0;
+        let score = 0;
+        let skipped = 0;
+        let options = [];
+        let selectedAnswer = null;
+
+        // --- LOGIC ---
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        function triggerConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#fce18a', '#ff726d', '#b48def', '#f4306d', '#42e2b8'];
+            
+            for (let i = 0; i < 70; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti-particle';
+                
+                const x = Math.random() * 100;
+                const y = -20 - Math.random() * 20;
+                const rotation = Math.random() * 360;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const scale = 0.5 + Math.random() * 0.5;
+                const speed = 1 + Math.random() * 3;
+                const delay = Math.random() * 0.5;
+
+                particle.style.left = `${x}%`;
+                particle.style.top = `${y}%`;
+                particle.style.backgroundColor = color;
+                particle.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+                particle.style.animation = `fall ${speed}s ease-in forwards ${delay}s`;
+
+                container.appendChild(particle);
+            }
+
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 3000);
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= quizData.length) {
+                renderResult();
+                return;
+            }
+
+            const currentQ = quizData[currentIndex];
+            options = [
+                { text: currentQ.goodOption, isCorrect: true },
+                { text: currentQ.badOption, isCorrect: false }
+            ];
+            
+            shuffleArray(options);
+            selectedAnswer = null;
+            renderQuiz();
+        }
+
+        window.handleSelect = function(idx) {
+            if (selectedAnswer !== null) return; 
+            
+            const isCorrect = options[idx].isCorrect;
+            selectedAnswer = isCorrect ? 'correct' : 'incorrect';
+            
+            if (isCorrect) {
+                score++;
+                triggerConfetti();
+            }
+            
+            renderQuiz();
+        };
+
+        window.handleSkip = function() {
+            if (selectedAnswer !== null) return;
+            skipped++;
+            currentIndex++;
+            loadQuestion();
+        };
+
+        window.handleNext = function() {
+            currentIndex++;
+            loadQuestion();
+        };
+
+        window.restartQuiz = function() {
+            currentIndex = 0;
+            score = 0;
+            skipped = 0;
+            selectedAnswer = null;
+            loadQuestion();
+        };
+
+        // --- RENDERING ---
+        function renderResult() {
+            const appRoot = document.getElementById('app-root');
+            appRoot.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-lg w-full text-center border-t-8 border-blue-600">
+                        <div class="flex justify-center mb-4">
+                            <i data-lucide="award" class="w-20 h-20 text-blue-600"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Quiz Completed!</h1>
+                        <p class="text-gray-600 mb-6">You've mastered the art of PTCF prompt engineering.</p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-8">
+                            <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                                <div class="text-3xl font-bold text-green-600">${score}</div>
+                                <div class="text-sm text-green-800 font-medium">Correct</div>
+                            </div>
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                <div class="text-3xl font-bold text-orange-600">${skipped}</div>
+                                <div class="text-sm text-orange-800 font-medium">Skipped</div>
+                            </div>
+                        </div>
+
+                        <button onclick="restartQuiz()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="refresh-ccw" class="w-5 h-5"></i> Restart Workshop Quiz
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderQuiz() {
+            const currentQ = quizData[currentIndex];
+            const appRoot = document.getElementById('app-root');
+            
+            const progressWidth = ((currentIndex) / quizData.length) * 100;
+
+            let optionsHTML = options.map((opt, idx) => {
+                const isSelected = selectedAnswer !== null;
+                const isThisCorrect = opt.isCorrect;
+                
+                let cardStyle = "border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer";
+                if (isSelected) {
+                    if (isThisCorrect) {
+                        cardStyle = "border-green-500 bg-green-50 shadow-sm ring-1 ring-green-500";
+                    } else {
+                        cardStyle = (selectedAnswer === 'incorrect' && !isThisCorrect) 
+                            ? "border-red-300 bg-red-50 opacity-70" 
+                            : "border-slate-200 opacity-50";
+                    }
+                }
+
+                let iconHTML = '';
+                if (isSelected && isThisCorrect) {
+                    iconHTML = '<i data-lucide="check-circle-2" class="w-6 h-6 text-green-600 flex-shrink-0"></i>';
+                } else if (isSelected && !isThisCorrect && selectedAnswer === 'incorrect') {
+                    iconHTML = '<i data-lucide="x-circle" class="w-6 h-6 text-red-500 flex-shrink-0"></i>';
+                }
+
+                return `
+                    <button onclick="handleSelect(${idx})" ${isSelected ? 'disabled' : ''} class="w-full h-full text-left p-5 rounded-xl border-2 transition-all duration-200 relative ${cardStyle}">
+                        <div class="flex items-start gap-4 h-full">
+                            <div class="flex-1 text-slate-700 leading-relaxed">${opt.text}</div>
+                            ${iconHTML}
+                        </div>
+                    </button>
+                `;
+            }).join('');
+
+            let feedbackHTML = '';
+            if (!selectedAnswer) {
+                feedbackHTML = `
+                    <p class="text-slate-500 text-sm font-medium">Select the best option above.</p>
+                    <button onclick="handleSkip()" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-slate-600 hover:bg-slate-200 transition-colors">
+                        Skip Question <i data-lucide="skip-forward" class="w-4 h-4"></i>
+                    </button>
+                `;
+            } else {
+                const isCorrect = selectedAnswer === 'correct';
+                feedbackHTML = `
+                    <div class="w-full animate-fade-up">
+                        <div class="mb-6 p-4 rounded-xl flex gap-4 ${isCorrect ? 'bg-green-100 text-green-900' : 'bg-orange-100 text-orange-900'}">
+                            <div class="mt-0.5">
+                                ${isCorrect ? '<i data-lucide="check-circle-2" class="w-6 h-6 text-green-600"></i>' : '<i data-lucide="x-circle" class="w-6 h-6 text-orange-600"></i>'}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">${isCorrect ? 'Correct!' : 'Incorrect.'}</h3>
+                                <p class="text-sm opacity-90">${currentQ.explanation}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button onclick="handleNext()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-semibold transition-all hover:pr-6 hover:gap-4">
+                                Next Question <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            appRoot.innerHTML = `
+                <div class="min-h-screen py-8 px-4">
+                    <div class="max-w-3xl mx-auto">
+                        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">AI Prompt Engineering Quiz</h1>
+                                <p class="text-slate-500 font-medium mt-1">Mastering the PTCF Framework</p>
+                            </div>
+                            <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 font-semibold text-blue-600">
+                                Question ${currentIndex + 1} of ${quizData.length}
+                            </div>
+                        </header>
+
+                        <div class="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
+                            <div class="bg-blue-600 h-full transition-all duration-500 ease-out" style="width: ${progressWidth}%"></div>
+                        </div>
+
+                        <main class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50">
+                                <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
+                                    ${currentQ.level}
+                                </span>
+                                <h2 class="text-xl font-semibold text-slate-800">
+                                    Which prompt will yield a better result from the AI?
+                                </h2>
+                            </div>
+
+                            <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                ${optionsHTML}
+                            </div>
+
+                            <div class="bg-slate-50 p-6 md:p-8 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                                ${feedbackHTML}
+                            </div>
+                        </main>
+                        
+                        <div class="mt-8 text-center text-sm text-slate-400 flex items-center justify-center gap-2">
+                            <i data-lucide="lightbulb" class="w-4 h-4"></i> Remember: <span class="font-semibold">Persona, Task, Context, Format (PTCF)</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Re-initialize icons after rendering new HTML
+            lucide.createIcons();
+        }
+
+        // Initialize App
+        loadQuestion();
+
+    </script>
+</body>
+</html>
