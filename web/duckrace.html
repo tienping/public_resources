@@ -85,7 +85,7 @@
             <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
                 <span id="titlePrefix">Duck</span> Race <span class="text-sky-500">Assigner</span>
             </h1>
-            <p class="text-slate-500 text-lg font-medium">Assigning presentation tasks!</p>
+            <p class="text-slate-500 text-lg font-medium">Assigning presentation parts for Science class!</p>
         </header>
 
         <!-- Input Section -->
@@ -102,7 +102,7 @@ Lim</textarea>
 
             <div class="glass-panel p-5 rounded-3xl shadow-lg">
                 <div class="flex justify-between items-center mb-3">
-                    <label class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tasks</label>
+                    <label class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tasks (Parts)</label>
                     <span id="taskCount" class="px-2 py-0.5 bg-indigo-100 text-indigo-600 text-[10px] font-black rounded-full">0</span>
                 </div>
                 <textarea id="tasksInput" class="w-full h-32 p-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-400 transition-all resize-none custom-scrollbar outline-none text-slate-600 text-sm font-medium" placeholder="Pengenalan & Isi 1&#10;Isi 2 & Isi 3&#10;Isi 4 & Kesimpulan">Pengenalan & Isi 1
@@ -148,10 +148,17 @@ Isi 4 & Kesimpulan</textarea>
 
     <!-- Footer Controls & Copyright -->
     <div class="max-w-3xl mx-auto w-full pb-8 flex flex-col items-center gap-6">
-        <button id="snailToggle" onclick="toggleSnailMode()" class="flex items-center gap-3 px-6 py-3 bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:bg-slate-50 transition-all group">
-            <span id="snailIcon" class="text-2xl group-hover:scale-125 transition-transform">🐌</span>
-            <span id="snailLabel" class="font-bold text-slate-700 text-sm">Switch to Snail Mode</span>
-        </button>
+        <div class="flex flex-col items-center gap-3 w-full max-w-xs">
+            <button id="snailToggle" onclick="toggleSnailMode()" class="w-full justify-center flex items-center gap-3 px-6 py-3 bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:bg-slate-50 transition-all group">
+                <span id="snailIcon" class="text-2xl group-hover:scale-125 transition-transform">🐌</span>
+                <span id="snailLabel" class="font-bold text-slate-700 text-sm">Switch to Snail Mode</span>
+            </button>
+
+            <button id="championToggle" onclick="toggleChampionMode()" class="w-full justify-center flex items-center gap-3 px-6 py-3 bg-white border-2 border-amber-200 rounded-2xl shadow-sm hover:bg-amber-50 transition-all group">
+                <span id="championIcon" class="text-2xl group-hover:scale-125 transition-transform">🏆</span>
+                <span id="championLabel" class="font-bold text-amber-700 text-sm">Champion Mode (Off)</span>
+            </button>
+        </div>
 
         <footer id="copyrightFooter" onclick="handleCopyrightClick()" class="cursor-pointer select-none py-4 text-slate-400 text-xs font-medium tracking-widest uppercase hover:text-slate-600 transition-colors">
             © TienPing @ 2026
@@ -170,6 +177,16 @@ Isi 4 & Kesimpulan</textarea>
                 </div>
                 <button onclick="closeInfoModal()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all">Close</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Hidden Champion Modal -->
+    <div id="championModal" class="fixed inset-0 z-[250] hidden flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full border border-amber-200 scale-90 transition-transform duration-300 transform opacity-0 text-center" id="championModalContent">
+            <div class="text-6xl mb-4 animate-bounce">👑</div>
+            <h2 class="text-3xl font-extrabold text-amber-600 mb-2">We have a Winner!</h2>
+            <h3 id="championNameDisplay" class="text-2xl font-bold text-slate-900 mb-6">Name</h3>
+            <button onclick="closeChampionModal()" class="w-full py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all">Celebrate!</button>
         </div>
     </div>
 
@@ -195,6 +212,8 @@ Isi 4 & Kesimpulan</textarea>
 
         let isSnailMode = false;
         let isMuted = false; 
+        let isChampionMode = false;
+        let raceStopped = false;
         
         let clickTimes = [];
         function handleCopyrightClick() {
@@ -220,6 +239,34 @@ Isi 4 & Kesimpulan</textarea>
             modalContent.classList.remove('scale-100', 'opacity-100');
             setTimeout(() => {
                 infoModal.classList.add('hidden');
+            }, 300);
+        }
+
+        function toggleChampionMode() {
+            isChampionMode = !isChampionMode;
+            document.getElementById('championLabel').textContent = isChampionMode ? 'Champion Mode (On)' : 'Champion Mode (Off)';
+            document.getElementById('championToggle').classList.toggle('bg-amber-100', isChampionMode);
+            document.getElementById('championToggle').classList.toggle('bg-white', !isChampionMode);
+        }
+
+        function showChampionModal(name) {
+            document.getElementById('championNameDisplay').textContent = name;
+            const modal = document.getElementById('championModal');
+            const content = document.getElementById('championModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-90', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeChampionModal() {
+            const modal = document.getElementById('championModal');
+            const content = document.getElementById('championModalContent');
+            content.classList.add('scale-90', 'opacity-0');
+            content.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => {
+                modal.classList.add('hidden');
             }, 300);
         }
 
@@ -458,7 +505,7 @@ Isi 4 & Kesimpulan</textarea>
                         <span class="font-bold text-slate-400">${item.name}</span>
                     </div>
                     <div class="task-badge flex items-center gap-2">
-                        <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Task:</span>
+                        <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
                         <span class="px-3 py-1 bg-slate-100 text-slate-300 font-bold rounded-md text-sm italic">Waiting...</span>
                     </div>
                 `;
@@ -470,6 +517,7 @@ Isi 4 & Kesimpulan</textarea>
             raceCanvas.height = names.length * LANE_HEIGHT + TOP_PADDING + 30;
             ducks = names.map((name, i) => new Duck(name, i));
             finishedDucksCount = 0;
+            raceStopped = false;
             lastSpeedUpdate = performance.now();
             lastFrameTime = performance.now();
             if (animationId) cancelAnimationFrame(animationId);
@@ -500,7 +548,7 @@ Isi 4 & Kesimpulan</textarea>
             }
             let allDone = true;
             ducks.forEach(d => { d.update(finishLineX, deltaTime); d.draw(ctx); if (!d.finished) allDone = false; });
-            if (!allDone) animationId = requestAnimationFrame(animate);
+            if (!allDone && !raceStopped) animationId = requestAnimationFrame(animate);
             else finishBtnState();
         }
 
@@ -527,9 +575,14 @@ Isi 4 & Kesimpulan</textarea>
             row.querySelector('.rank-badge').textContent = finishedDucksCount;
             row.querySelector('span.font-bold').className = "font-bold text-slate-800";
             row.querySelector('.task-badge').innerHTML = `
-                <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Task:</span>
+                <span class="text-slate-300 text-xs font-bold uppercase tracking-widest">Part:</span>
                 <span class="px-3 py-1 bg-sky-50 text-sky-600 font-bold rounded-md text-sm">${task}</span>
             `;
+
+            if (isChampionMode && finishedDucksCount === 1) {
+                raceStopped = true;
+                showChampionModal(duck.name);
+            }
         }
 
         function finishBtnState() {
@@ -541,7 +594,7 @@ Isi 4 & Kesimpulan</textarea>
         function copyResults() {
             // Generates WhatsApp friendly text with extra line breaks
             const text = resultsData
-                .map(r => `*${r.name}*\nTask: ${r.task}`)
+                .map(r => `*${r.name}*\nPart: ${r.task}`)
                 .join('\n\n'); 
             
             const el = document.createElement('textarea');
