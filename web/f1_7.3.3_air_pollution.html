@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Air Pollution Defender</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #4ade80; 
+            touch-action: none; 
+            font-family: 'Inter', sans-serif; 
+            user-select: none;
+        }
+        canvas { 
+            display: block; 
+            width: 100vw; 
+            height: 100vh; 
+        }
+        .ui-layer { 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            pointer-events: none; 
+        }
+        .interactive { 
+            pointer-events: auto; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container" class="relative w-screen h-screen overflow-hidden">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="ui-layer flex flex-col justify-between p-4">
+            <!-- Top UI: Extinguisher, Nursery, and Stats -->
+            <div class="flex justify-between items-start">
+                <div class="flex flex-col gap-4">
+                    <!-- Extinguisher Tool -->
+                    <div id="extinguisher-base" class="interactive bg-red-100 border-4 border-red-500 rounded-xl p-2 w-20 h-20 flex items-center justify-center shadow-lg bg-opacity-80 transition hover:scale-105 relative">
+                        <span class="text-4xl pointer-events-none">🧯</span>
+                    </div>
+                    <!-- Tree Nursery -->
+                    <div id="nursery-base" class="interactive bg-green-100 border-4 border-green-600 rounded-xl p-2 w-20 h-20 flex flex-col items-center justify-center shadow-lg bg-opacity-80 transition hover:scale-105 relative">
+                        <span class="text-3xl pointer-events-none">🏡</span>
+                        <span id="nursery-count" class="absolute -top-3 -right-3 bg-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border-2 border-green-600 shadow">5</span>
+                        <div class="absolute -bottom-3 w-[110%] h-3 bg-gray-300 rounded overflow-hidden shadow-inner">
+                            <div id="nursery-progress" class="h-full bg-green-500 w-0 transition-all duration-100"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Stats -->
+                <div class="flex flex-col items-center gap-2 bg-white bg-opacity-95 p-3 rounded-xl shadow-xl border-2 border-gray-200 interactive pointer-events-auto w-64">
+                    <div class="flex justify-between w-full px-2">
+                        <div class="text-xl font-bold text-gray-800">Lvl: <span id="levelDisplay" class="text-purple-600">1</span></div>
+                        <div class="text-xl font-bold text-gray-800">Score: <span id="scoreDisplay" class="text-blue-600">0</span></div>
+                    </div>
+                    <div class="text-sm font-bold text-red-500 w-full text-center -mt-1">Next Level in: <span id="level-timer-display" class="text-lg">30</span>s</div>
+                    <div class="w-full h-8 bg-gray-200 rounded-full overflow-hidden border-2 border-gray-400 relative">
+                        <div id="pollution-bar" class="h-full bg-yellow-400 w-0 transition-all duration-300"></div>
+                        <span class="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-800 pointer-events-none drop-shadow-md">Pollution Level (<span id="pollution-value">0.0</span>/10)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom UI: Rubbish Bin -->
+            <div class="flex justify-end pb-4 pr-4">
+                <div id="rubbish-bin" class="interactive bg-gray-800 border-4 border-gray-600 rounded-2xl p-4 w-28 h-28 flex items-center justify-center shadow-2xl opacity-90 transition transform hover:scale-110">
+                    <span class="text-6xl pointer-events-none">🗑️</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 text-white p-6 interactive backdrop-blur-sm">
+            <h1 class="text-5xl font-extrabold mb-4 text-green-400 text-center drop-shadow-lg">Air Pollution Defender</h1>
+            <p class="text-lg mb-6 text-center max-w-2xl bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-gray-600 shadow-xl leading-relaxed">
+                Learn to control air pollution! (Standard 7.3.3)<br><br>
+                🌲 <b>Trees</b> reduce pollution. Plant them from the Nursery (top left).<br>
+                🚜 <b>Loggers</b> & 👨‍🌾 <b>Farmers</b> harm nature. Drag them to the 🗑️ Rubbish Bin!<br>
+                🔥 <b>Forest Fires</b> spread. Drag the 🧯 Extinguisher to put them out.<br>
+                🚗 <b>Vehicles</b> emit smoke. Drag them to the bin too!<br>
+                <br>Keep the pollution bar empty to survive!
+            </p>
+            <button id="start-btn" class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(74,222,128,0.7)]">Start Mission</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="absolute inset-0 bg-red-900 bg-opacity-95 flex flex-col items-center justify-center z-50 text-white hidden interactive backdrop-blur-md">
+            <h1 class="text-6xl font-black mb-4 drop-shadow-2xl">POLLUTION CRITICAL</h1>
+            <p class="text-2xl mb-2 font-light">The environment was overwhelmed.</p>
+            <p class="text-xl mb-8">Final Score: <span id="final-score" class="font-bold text-yellow-300 text-3xl">0</span></p>
+            <button id="restart-btn" class="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(234,179,8,0.7)]">Try Again</button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Elements
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const levelTimerDisplay = document.getElementById('level-timer-display');
+        const pollutionBar = document.getElementById('pollution-bar');
+        const pollutionValueDisplay = document.getElementById('pollution-value');
+        const nurseryCountDisplay = document.getElementById('nursery-count');
+        const nurseryProgress = document.getElementById('nursery-progress');
+
+        // Bounding rects for UI hit detection
+        let extRect, nurseryRect, binRect;
+        let width, height;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Recalculate hitboxes for interactive UI
+            extRect = document.getElementById('extinguisher-base').getBoundingClientRect();
+            nurseryRect = document.getElementById('nursery-base').getBoundingClientRect();
+            binRect = document.getElementById('rubbish-bin').getBoundingClientRect();
+        }
+        window.addEventListener('resize', resize);
+        
+        // Core Game State
+        let isPlaying = false;
+        let lastTime = 0;
+        let gameLoopId = null;
+        
+        let score = 0;
+        let level = 1;
+        let levelTimer = 0;
+        let pollutionLevel = 0;
+        const MAX_POLLUTION = 10; // Level required to lose the game
+        
+        // Entity Arrays
+        let trees = [];
+        let enemies = [];
+        let floatingTexts = [];
+        
+        // Nursery Mechanics
+        let nurseryTrees = 5;
+        let nurseryTimer = 0;
+        
+        // Spawner Timers
+        let loggerSpawnTimer = 0;
+        let farmerSpawnTimer = 0;
+        let vehicleSpawnTimer = 0;
+        let fireSpawnTimer = 0;
+
+        // Mouse/Touch Interaction State
+        let draggedItem = null; // null | { type: 'extinguisher' } | { type: 'tree' } | { type: 'enemy', index: number }
+        let dragPos = { x: 0, y: 0 };
+        
+        function random(min, max) { return Math.random() * (max - min) + min; }
+        function dist(x1, y1, x2, y2) { return Math.hypot(x2 - x1, y2 - y1); }
+        
+        function addFloatingText(text, x, y, color) {
+            floatingTexts.push({ text, x, y, color, alpha: 1.5, timer: 1.5 });
+        }
+
+        function drawMap() {
+            // Background Grass
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(0, 0, width, height);
+            
+            // River (Y = 15% to 25%)
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(0, height * 0.15, width, height * 0.1);
+            
+            // City Road (Y = 50% to 65%)
+            ctx.fillStyle = '#6b7280';
+            ctx.fillRect(0, height * 0.5, width, height * 0.15);
+            
+            // Road Dashed Line
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([20, 20]);
+            ctx.beginPath();
+            ctx.moveTo(0, height * 0.575);
+            ctx.lineTo(width, height * 0.575);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Mountain Backdrop (Top Right)
+            ctx.fillStyle = '#9ca3af';
+            ctx.beginPath();
+            ctx.moveTo(width, 0);
+            ctx.lineTo(width - 350, 0);
+            ctx.lineTo(width - 150, height * 0.3);
+            ctx.lineTo(width, height * 0.15);
+            ctx.fill();
+            
+            // Snowcap
+            ctx.fillStyle = '#f3f4f6';
+            ctx.beginPath();
+            ctx.moveTo(width - 250, 0);
+            ctx.lineTo(width - 150, height * 0.3);
+            ctx.lineTo(width - 200, height * 0.15);
+            ctx.fill();
+        }
+
+        class Tree {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.isBurning = false;
+                this.burnTimer = 15; // Increased so the tree survives long enough to spread fire at 6s!
+                this.spreadTimer = 6;
+                this.purifyTimer = random(8, 10);
+                this.size = random(35, 50);
+            }
+            update(dt) {
+                if (this.isBurning) {
+                    this.burnTimer -= dt;
+                    this.spreadTimer -= dt;
+                    
+                    // Spread fire every 6 seconds
+                    if (this.spreadTimer <= 0) {
+                        this.spreadTimer = 6; // reset
+                        // Find 2 closest unburnt trees
+                        let nearby = trees.filter(t => !t.isBurning && t !== this && dist(this.x, this.y, t.x, t.y) < 150);
+                        nearby.sort((a, b) => dist(this.x, this.y, a.x, a.y) - dist(this.x, this.y, b.x, b.y));
+                        if (nearby[0]) { nearby[0].ignite(); addFloatingText("Fire Spread!", nearby[0].x, nearby[0].y, "red"); }
+                        if (nearby[1]) { nearby[1].ignite(); }
+                    }
+                } else {
+                    // Purify Air every 8-10 seconds
+                    this.purifyTimer -= dt;
+                    if (this.purifyTimer <= 0) {
+                        pollutionLevel = Math.max(0, pollutionLevel - 0.01);
+                        this.purifyTimer = random(8, 10);
+                        
+                        // Visual cue - Safely wrapped in save/restore to prevent flickering
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y - 20, 8, 0, Math.PI*2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+            }
+            ignite() {
+                if(this.isBurning) return;
+                this.isBurning = true;
+                this.burnTimer = 15; // Match the new burn time
+                this.spreadTimer = 6;
+            }
+            draw() {
+                ctx.save();
+                ctx.font = `${this.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                if (this.isBurning) {
+                    let shakeX = random(-3, 3);
+                    ctx.fillText('🔥', this.x + shakeX, this.y);
+                } else {
+                    ctx.fillText('🌲', this.x, this.y);
+                }
+                ctx.restore();
+            }
+        }
+
+        class Enemy {
+            constructor(type) {
+                this.type = type;
+                this.markedForDeletion = false;
+                
+                if (type === 'logger') {
+                    this.x = -50;
+                    this.y = random(height * 0.3, height * 0.9);
+                    this.speed = 40;
+                    this.size = 45;
+                    this.target = null;
+                    this.actionTimer = 2; // Takes 2s to cut a tree
+                } else if (type === 'farmer') {
+                    this.x = random(width * 0.1, width * 0.8);
+                    this.y = random(height * 0.7, height * 0.95);
+                    this.speed = 25;
+                    this.size = 45;
+                    this.actionTimer = 3; // Pesticide every 3s
+                    this.targetX = this.x + random(-100, 100);
+                    this.targetY = this.y + random(-100, 100);
+                } else if (type === 'vehicle') {
+                    this.direction = Math.random() > 0.5 ? 1 : -1; // 1 = going right, -1 = going left
+                    this.startX = this.direction === 1 ? -50 : width + 50;
+                    this.x = this.startX;
+                    this.y = height * 0.575 + random(-15, 15);
+                    this.speed = random(80, 160);
+                    this.size = 50;
+                    this.actionTimer = 0; // Visual smoke timer
+                    this.nextEmissionPct = 0.25; // Next milestone for pollution (25%)
+                    this.icon = Math.random() > 0.5 ? '🚗' : '🚚';
+                }
+            }
+            update(dt) {
+                if (this.type === 'logger') {
+                    if (!this.target || this.target.isBurning || this.target.burnTimer <= 0 || !trees.includes(this.target)) {
+                        let closest = null, minDist = Infinity;
+                        for (let t of trees) {
+                            if(t.isBurning) continue;
+                            let d = dist(this.x, this.y, t.x, t.y);
+                            if (d < minDist) { minDist = d; closest = t; }
+                        }
+                        this.target = closest;
+                    }
+                    
+                    if (this.target) {
+                        let dx = this.target.x - this.x;
+                        let dy = this.target.y - this.y;
+                        let d = Math.hypot(dx, dy);
+                        if (d > 5) {
+                            this.x += (dx / d) * this.speed * dt;
+                            this.y += (dy / d) * this.speed * dt;
+                        } else {
+                            this.actionTimer -= dt;
+                            if (this.actionTimer <= 0) {
+                                trees.splice(trees.indexOf(this.target), 1);
+                                addFloatingText("Tree Cut!", this.x, this.y - 20, "black");
+                                this.target = null;
+                                this.actionTimer = 2;
+                            }
+                        }
+                    }
+                } else if (this.type === 'farmer') {
+                    let dx = this.targetX - this.x;
+                    let dy = this.targetY - this.y;
+                    let d = Math.hypot(dx, dy);
+                    if (d > 5) {
+                        this.x += (dx / d) * this.speed * dt;
+                        this.y += (dy / d) * this.speed * dt;
+                    } else {
+                        this.targetX = this.x + random(-100, 100);
+                        this.targetY = this.y + random(-100, 100);
+                    }
+                    
+                    this.actionTimer -= dt;
+                    if (this.actionTimer <= 0) {
+                        pollutionLevel += 0.1;
+                        addFloatingText("Pesticide! (+0.1)", this.x, this.y - 20, "purple");
+                        this.actionTimer = 3;
+                    }
+                } else if (this.type === 'vehicle') {
+                    this.x += this.speed * this.direction * dt;
+                    // Delete when off screen
+                    if ((this.direction === 1 && this.x > width + 50) || (this.direction === -1 && this.x < -50)) {
+                        this.markedForDeletion = true;
+                    }
+                    
+                    // Decrease visual smoke aura timer
+                    if (this.actionTimer > 0) this.actionTimer -= dt;
+
+                    // Calculate the percentage of the journey completed
+                    let totalDist = width + 100;
+                    let traveledDist = Math.abs(this.x - this.startX);
+                    let pctTraveled = traveledDist / totalDist;
+
+                    // Trigger pollution at every 25% milestone
+                    if (pctTraveled >= this.nextEmissionPct && this.nextEmissionPct <= 1.0) {
+                        pollutionLevel += 0.1;
+                        addFloatingText("Smoke! (+0.1)", this.x, this.y - 20, "gray");
+                        this.nextEmissionPct += 0.25; // Set next milestone
+                        this.actionTimer = 0.5; // Show visual smoke aura for 0.5 seconds
+                    }
+                }
+            }
+            draw() {
+                ctx.save();
+                
+                // Pesticide aura
+                if (this.type === 'farmer' && this.actionTimer < 0.5) {
+                    ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 40, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                // Vehicle smoke aura
+                if (this.type === 'vehicle' && this.actionTimer > 0) {
+                    ctx.fillStyle = 'rgba(107, 114, 128, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(this.x - (this.direction * 30), this.y, 30, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+                ctx.translate(this.x, this.y);
+                
+                // 🚗 Correctly flip vehicles driving to the right
+                if (this.type === 'vehicle' && this.direction === 1) {
+                    ctx.scale(-1, 1);
+                }
+                // Flip loggers if their target is to the left
+                if (this.type === 'logger' && this.target && this.target.x < this.x) {
+                    ctx.scale(-1, 1);
+                }
+                
+                ctx.font = `${this.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                let icon = this.type === 'logger' ? '🚜' : this.type === 'farmer' ? '👨‍🌾' : this.icon;
+                ctx.fillText(icon, 0, 0);
+                
+                ctx.restore();
+            }
+        }
+
+        function initGame() {
+            resize();
+            score = 0;
+            level = 1;
+            levelTimer = 0;
+            pollutionLevel = 0;
+            trees = [];
+            enemies = [];
+            floatingTexts = [];
+            draggedItem = null;
+            
+            nurseryTrees = 5;
+            nurseryTimer = 0;
+            
+            // Spawn 90 to 110 initial trees
+            let treeCount = Math.floor(random(90, 110));
+            for(let i=0; i < treeCount; i++) {
+                let tx, ty;
+                let valid = false;
+                while(!valid) {
+                    tx = random(20, width - 20);
+                    ty = random(20, height - 20);
+                    
+                    // Don't spawn on UI, River, Road, or Mountain
+                    if (tx < 160 && ty < 280) continue; 
+                    if (tx > width - 160 && ty > height - 160) continue; 
+                    if (ty > height * 0.15 && ty < height * 0.25) continue;
+                    if (ty > height * 0.5 && ty < height * 0.65) continue;
+                    if (tx > width - 350 && ty < height * 0.3) continue;
+                    
+                    valid = true;
+                }
+                trees.push(new Tree(tx, ty));
+            }
+            
+            // Initial exact spawn timers
+            loggerSpawnTimer = random(10, 30);
+            farmerSpawnTimer = random(20, 50);
+            vehicleSpawnTimer = random(0.5, 7);
+            fireSpawnTimer = random(15, 40);
+            
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            
+            isPlaying = true;
+            lastTime = performance.now();
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
+        
+        function updateSpawns(dt) {
+            // Each level reduces spawn times by 10%
+            let spawnMultiplier = Math.pow(0.9, level - 1);
+
+            loggerSpawnTimer -= dt;
+            if (loggerSpawnTimer <= 0) {
+                enemies.push(new Enemy('logger'));
+                loggerSpawnTimer = random(10, 30) * spawnMultiplier;
+            }
+            
+            farmerSpawnTimer -= dt;
+            if (farmerSpawnTimer <= 0) {
+                enemies.push(new Enemy('farmer'));
+                farmerSpawnTimer = random(20, 50) * spawnMultiplier;
+            }
+            
+            vehicleSpawnTimer -= dt;
+            if (vehicleSpawnTimer <= 0) {
+                enemies.push(new Enemy('vehicle'));
+                vehicleSpawnTimer = random(0.5, 7) * spawnMultiplier;
+            }
+            
+            fireSpawnTimer -= dt;
+            if (fireSpawnTimer <= 0) {
+                if (trees.length > 0) {
+                    let rTree = trees[Math.floor(Math.random() * trees.length)];
+                    if (!rTree.isBurning) rTree.ignite();
+                }
+                fireSpawnTimer = random(15, 40) * spawnMultiplier;
+            }
+        }
+
+        function gameLoop(timestamp) {
+            if (!isPlaying) return;
+            
+            let dt = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+            
+            // Critical Fix: Prevent huge time jumps if user switches browser tabs
+            if (dt > 0.1) dt = 0.1; 
+            
+            // Level up every 30 seconds
+            levelTimer += dt;
+            if (levelTimer >= 30) {
+                level++;
+                levelTimer -= 30; // Keep the remainder
+                addFloatingText("LEVEL UP! Faster Spawns!", width/2, height/2, "purple");
+            }
+
+            // Update Nursery
+            if (nurseryTrees < 5) {
+                nurseryTimer += dt;
+                if (nurseryTimer >= 10) {
+                    nurseryTrees++;
+                    nurseryTimer = 0;
+                }
+            } else {
+                nurseryTimer = 0;
+            }
+            
+            updateSpawns(dt);
+            
+            // Update Trees
+            for (let i = trees.length - 1; i >= 0; i--) {
+                trees[i].update(dt);
+                if (trees[i].burnTimer <= 0) {
+                    trees.splice(i, 1);
+                    pollutionLevel += 0.5; // Penalty
+                    addFloatingText("Destroyed!", trees[i]?.x || width/2, trees[i]?.y || height/2, "red");
+                }
+            }
+            
+            // Update Enemies (Ignore the one currently being dragged)
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let isDragged = draggedItem && draggedItem.type === 'enemy' && draggedItem.index === i;
+                if (!isDragged) {
+                    enemies[i].update(dt);
+                }
+                if (enemies[i].markedForDeletion) {
+                    enemies.splice(i, 1);
+                    // Re-align the dragged index if an array shift happens
+                    if (draggedItem && draggedItem.type === 'enemy') {
+                        if (draggedItem.index > i) draggedItem.index--;
+                        else if (draggedItem.index === i) draggedItem = null;
+                    }
+                }
+            }
+            
+            // Render Background
+            ctx.clearRect(0, 0, width, height);
+            drawMap();
+            
+            // Y-Sorting for 2.5D depth perception
+            let renderables = [...trees, ...enemies];
+            renderables.sort((a, b) => a.y - b.y);
+            
+            for (let r of renderables) {
+                // Don't draw the dragged item in its normal position
+                let idx = enemies.indexOf(r);
+                if (draggedItem && draggedItem.type === 'enemy' && draggedItem.index === idx) continue;
+                r.draw();
+            }
+            
+            // Draw currently dragged item on Top
+            if (draggedItem) {
+                ctx.save();
+                ctx.font = '60px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 15;
+                
+                if (draggedItem.type === 'extinguisher') {
+                    ctx.fillText('🧯', dragPos.x, dragPos.y);
+                    // Draw Area of Effect (Expanded to 100px radius)
+                    ctx.beginPath();
+                    ctx.arc(dragPos.x, dragPos.y, 100, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+                    ctx.fill();
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                } else if (draggedItem.type === 'tree') {
+                    ctx.fillText('🌲', dragPos.x, dragPos.y);
+                } else if (draggedItem.type === 'enemy') {
+                    let e = enemies[draggedItem.index];
+                    let icon = e.type === 'logger' ? '🚜' : e.type === 'farmer' ? '👨‍🌾' : e.icon;
+                    if (e.type === 'vehicle' && e.direction === 1) { ctx.scale(-1, 1); ctx.fillText(icon, -dragPos.x, dragPos.y); } 
+                    else { ctx.fillText(icon, dragPos.x, dragPos.y); }
+                }
+                ctx.restore();
+            }
+            
+            // Draw UI Floating Texts
+            ctx.save();
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                let ft = floatingTexts[i];
+                ft.y -= 40 * dt;
+                ft.timer -= dt;
+                ft.alpha = ft.timer;
+                
+                if (ft.alpha <= 0) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+                
+                ctx.globalAlpha = Math.max(0, ft.alpha);
+                ctx.fillStyle = ft.color;
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = "white";
+                ctx.shadowBlur = 6;
+                ctx.fillText(ft.text, ft.x, ft.y);
+            }
+            ctx.restore();
+            
+            // Update UI DOM Elements
+            scoreDisplay.innerText = score;
+            levelDisplay.innerText = level;
+            levelTimerDisplay.innerText = Math.max(0, Math.ceil(30 - levelTimer));
+            nurseryCountDisplay.innerText = nurseryTrees;
+            nurseryProgress.style.width = `${(nurseryTimer / 10) * 100}%`;
+            pollutionBar.style.width = `${Math.min(100, (pollutionLevel / MAX_POLLUTION) * 100)}%`;
+            pollutionValueDisplay.innerText = pollutionLevel.toFixed(1);
+            
+            // Win/Loss Condition
+            if (pollutionLevel >= MAX_POLLUTION) {
+                isPlaying = false;
+                document.getElementById('final-score').innerText = score;
+                gameOverScreen.classList.remove('hidden');
+            } else {
+                gameLoopId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Attach to window to guarantee clicks on the UI are still captured
+        function getPointerPos(e) {
+            if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+        
+        function isInsideRect(x, y, rect) {
+            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        }
+        
+        function handleDown(e) {
+            if (!isPlaying || e.target.tagName === 'BUTTON') return;
+            let pos = getPointerPos(e);
+            dragPos = pos;
+            
+            // Check UI Elements first
+            if (isInsideRect(pos.x, pos.y, extRect)) {
+                draggedItem = { type: 'extinguisher' };
+                document.getElementById('extinguisher-base').style.opacity = '0.3';
+                return;
+            }
+            
+            if (isInsideRect(pos.x, pos.y, nurseryRect) && nurseryTrees > 0) {
+                draggedItem = { type: 'tree' };
+                nurseryTrees--;
+                return;
+            }
+            
+            // Check canvas enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let en = enemies[i];
+                if (dist(pos.x, pos.y, en.x, en.y) < en.size) {
+                    draggedItem = { type: 'enemy', index: i };
+                    return;
+                }
+            }
+        }
+        
+        function handleMove(e) {
+            if (!draggedItem || !isPlaying) return;
+            e.preventDefault(); 
+            dragPos = getPointerPos(e);
+            
+            // Animate Bin if hovering with an enemy
+            if (draggedItem.type === 'enemy') {
+                if (isInsideRect(dragPos.x, dragPos.y, binRect)) {
+                    document.getElementById('rubbish-bin').classList.add('bg-red-600', 'scale-125');
+                } else {
+                    document.getElementById('rubbish-bin').classList.remove('bg-red-600', 'scale-125');
+                }
+            }
+        }
+        
+        function handleUp(e) {
+            if (!draggedItem || !isPlaying) return;
+            
+            if (draggedItem.type === 'extinguisher') {
+                document.getElementById('extinguisher-base').style.opacity = '1';
+                
+                let extinguished = false;
+                for (let t of trees) {
+                    // Larger area of effect (100px)
+                    if (t.isBurning && dist(dragPos.x, dragPos.y, t.x, t.y) < 100) {
+                        t.isBurning = false;
+                        score += 50;
+                        extinguished = true;
+                        addFloatingText("+50", t.x, t.y, "blue");
+                    }
+                }
+                if (extinguished) pollutionLevel = Math.max(0, pollutionLevel - 0.5);
+                
+            } else if (draggedItem.type === 'tree') {
+                let tx = dragPos.x;
+                let ty = dragPos.y;
+                
+                let invalidLocation = (tx < 160 && ty < 280) || 
+                              (tx > width - 160 && ty > height - 160) ||
+                              (ty > height * 0.15 && ty < height * 0.25) ||
+                              (ty > height * 0.5 && ty < height * 0.65) ||
+                              (tx > width - 350 && ty < height * 0.3);
+                
+                if (!invalidLocation) {
+                    trees.push(new Tree(tx, ty));
+                    score += 10;
+                    addFloatingText("+10", tx, ty, "green");
+                } else {
+                    nurseryTrees++; // Refund tree
+                    addFloatingText("Invalid Spot!", tx, ty, "red");
+                }
+                
+            } else if (draggedItem.type === 'enemy') {
+                document.getElementById('rubbish-bin').classList.remove('bg-red-600', 'scale-125');
+                
+                if (isInsideRect(dragPos.x, dragPos.y, binRect)) {
+                    let eType = enemies[draggedItem.index].type;
+                    enemies.splice(draggedItem.index, 1); // Trash it!
+                    let pts = eType === 'logger' ? 100 : eType === 'farmer' ? 80 : 50;
+                    score += pts;
+                    addFloatingText("+" + pts, binRect.left + 50, binRect.top - 20, "white");
+                }
+            }
+            
+            draggedItem = null;
+        }
+        
+        // Window events ensure smooth dragging off the canvas
+        window.addEventListener('mousedown', handleDown);
+        window.addEventListener('mousemove', handleMove, {passive: false});
+        window.addEventListener('mouseup', handleUp);
+        
+        window.addEventListener('touchstart', handleDown, {passive: false});
+        window.addEventListener('touchmove', handleMove, {passive: false});
+        window.addEventListener('touchend', handleUp);
+        
+        startBtn.addEventListener('click', () => { setTimeout(initGame, 100); });
+        restartBtn.addEventListener('click', () => { setTimeout(initGame, 100); });
+        
+        // Initialize bounding rects
+        resize();
+    </script>
+</body>
+</html>
