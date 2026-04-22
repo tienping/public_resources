@@ -45,7 +45,7 @@
                     </div>
                     <!-- Tree Nursery -->
                     <div id="nursery-base" class="interactive bg-green-100 border-4 border-green-600 rounded-xl p-2 w-20 h-20 flex flex-col items-center justify-center shadow-lg bg-opacity-80 transition hover:scale-105 relative">
-                        <span class="text-3xl pointer-events-none">🏡</span>
+                        <span class="text-4xl pointer-events-none">🌲</span>
                         <span id="nursery-count" class="absolute -top-3 -right-3 bg-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold border-2 border-green-600 shadow">5</span>
                         <div class="absolute -bottom-3 w-[110%] h-3 bg-gray-300 rounded overflow-hidden shadow-inner">
                             <div id="nursery-progress" class="h-full bg-green-500 w-0 transition-all duration-100"></div>
@@ -57,7 +57,7 @@
                 <div class="flex flex-col items-center gap-2 bg-white bg-opacity-95 p-3 rounded-xl shadow-xl border-2 border-gray-200 interactive pointer-events-auto w-64">
                     <div class="flex justify-between w-full px-2">
                         <div class="text-xl font-bold text-gray-800">Lvl: <span id="levelDisplay" class="text-purple-600">1</span></div>
-                        <div class="text-xl font-bold text-gray-800">Score: <span id="scoreDisplay" class="text-blue-600">0</span></div>
+                        <div id="score-label" class="text-xl font-bold text-gray-800 cursor-pointer select-none" title="Score">Score: <span id="scoreDisplay" class="text-blue-600">0</span></div>
                     </div>
                     <div class="text-sm font-bold text-red-500 w-full text-center -mt-1">Next Level in: <span id="level-timer-display" class="text-lg">30</span>s</div>
                     <div class="w-full h-8 bg-gray-200 rounded-full overflow-hidden border-2 border-gray-400 relative">
@@ -96,6 +96,15 @@
             <p class="text-xl mb-8">Final Score: <span id="final-score" class="font-bold text-yellow-300 text-3xl">0</span></p>
             <button id="restart-btn" class="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(234,179,8,0.7)]">Try Again</button>
         </div>
+
+        <!-- Developer Parameters Modal -->
+        <div id="dev-modal" class="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-[100] text-white p-6 hidden interactive backdrop-blur-md">
+            <div class="bg-gray-900 border-2 border-green-500 rounded-xl p-6 w-11/12 max-w-2xl max-h-[80vh] flex flex-col shadow-2xl relative">
+                <button id="close-dev-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-4xl font-bold leading-none">&times;</button>
+                <h2 class="text-3xl font-bold text-green-400 mb-4 border-b border-gray-700 pb-4 text-center">⚙️ Developer Parameters</h2>
+                <div id="dev-params-content" class="text-sm font-mono space-y-1 overflow-y-auto flex-1 pr-2"></div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -114,6 +123,49 @@
         const pollutionValueDisplay = document.getElementById('pollution-value');
         const nurseryCountDisplay = document.getElementById('nursery-count');
         const nurseryProgress = document.getElementById('nursery-progress');
+
+        const scoreLabel = document.getElementById('score-label');
+        const devModal = document.getElementById('dev-modal');
+        const closeDevModal = document.getElementById('close-dev-modal');
+        const devParamsContent = document.getElementById('dev-params-content');
+
+        // Centralized Game Configuration Parameters
+        const GAME_CONFIG = {
+            MAX_POLLUTION: 10.0,
+            LEVEL_UP_TIME: 30,
+            SPAWN_REDUCTION_PER_LEVEL: 0.10, // 10%
+            NURSERY_MAX: 5,
+            NURSERY_RESTOCK_TIME: 10,
+            PLANT_TREE_SCORE: 10,
+            TREE_PURIFY_AMT: 0.01,
+            TREE_PURIFY_MIN: 8,
+            TREE_PURIFY_MAX: 10,
+            FIRE_SPAWN_MIN: 15,
+            FIRE_SPAWN_MAX: 40,
+            FIRE_BURN_TIME: 15,
+            FIRE_SPREAD_TIME: 5,
+            FIRE_PENALTY: 0.5,
+            EXTINGUISH_RADIUS: 100,
+            EXTINGUISH_SCORE: 50,
+            EXTINGUISH_REDUCTION: 0.5,
+            LOGGER_SPAWN_MIN: 10,
+            LOGGER_SPAWN_MAX: 30,
+            LOGGER_SPEED: 40,
+            LOGGER_ACTION_TIME: 2,
+            LOGGER_TRASH_SCORE: 100,
+            FARMER_SPAWN_MIN: 20,
+            FARMER_SPAWN_MAX: 50,
+            FARMER_SPEED: 25,
+            FARMER_ACTION_TIME: 3,
+            FARMER_PENALTY: 0.1,
+            FARMER_TRASH_SCORE: 80,
+            VEHICLE_SPAWN_MIN: 0.5,
+            VEHICLE_SPAWN_MAX: 7,
+            VEHICLE_SPEED_MIN: 80,
+            VEHICLE_SPEED_MAX: 160,
+            VEHICLE_PENALTY: 0.1,
+            VEHICLE_TRASH_SCORE: 50
+        };
 
         // Bounding rects for UI hit detection
         let extRect, nurseryRect, binRect;
@@ -141,7 +193,6 @@
         let level = 1;
         let levelTimer = 0;
         let pollutionLevel = 0;
-        const MAX_POLLUTION = 10; // Level required to lose the game
         
         // Entity Arrays
         let trees = [];
@@ -215,9 +266,9 @@
                 this.x = x;
                 this.y = y;
                 this.isBurning = false;
-                this.burnTimer = 15; // Increased so the tree survives long enough to spread fire at 6s!
-                this.spreadTimer = 6;
-                this.purifyTimer = random(8, 10);
+                this.burnTimer = GAME_CONFIG.FIRE_BURN_TIME; 
+                this.spreadTimer = GAME_CONFIG.FIRE_SPREAD_TIME;
+                this.purifyTimer = random(GAME_CONFIG.TREE_PURIFY_MIN, GAME_CONFIG.TREE_PURIFY_MAX);
                 this.size = random(35, 50);
             }
             update(dt) {
@@ -225,9 +276,9 @@
                     this.burnTimer -= dt;
                     this.spreadTimer -= dt;
                     
-                    // Spread fire every 6 seconds
+                    // Spread fire
                     if (this.spreadTimer <= 0) {
-                        this.spreadTimer = 6; // reset
+                        this.spreadTimer = GAME_CONFIG.FIRE_SPREAD_TIME; // reset
                         // Find 2 closest unburnt trees
                         let nearby = trees.filter(t => !t.isBurning && t !== this && dist(this.x, this.y, t.x, t.y) < 150);
                         nearby.sort((a, b) => dist(this.x, this.y, a.x, a.y) - dist(this.x, this.y, b.x, b.y));
@@ -235,11 +286,11 @@
                         if (nearby[1]) { nearby[1].ignite(); }
                     }
                 } else {
-                    // Purify Air every 8-10 seconds
+                    // Purify Air
                     this.purifyTimer -= dt;
                     if (this.purifyTimer <= 0) {
-                        pollutionLevel = Math.max(0, pollutionLevel - 0.01);
-                        this.purifyTimer = random(8, 10);
+                        pollutionLevel = Math.max(0, pollutionLevel - GAME_CONFIG.TREE_PURIFY_AMT);
+                        this.purifyTimer = random(GAME_CONFIG.TREE_PURIFY_MIN, GAME_CONFIG.TREE_PURIFY_MAX);
                         
                         // Visual cue - Safely wrapped in save/restore to prevent flickering
                         ctx.save();
@@ -254,8 +305,8 @@
             ignite() {
                 if(this.isBurning) return;
                 this.isBurning = true;
-                this.burnTimer = 15; // Match the new burn time
-                this.spreadTimer = 6;
+                this.burnTimer = GAME_CONFIG.FIRE_BURN_TIME; 
+                this.spreadTimer = GAME_CONFIG.FIRE_SPREAD_TIME;
             }
             draw() {
                 ctx.save();
@@ -280,16 +331,16 @@
                 if (type === 'logger') {
                     this.x = -50;
                     this.y = random(height * 0.3, height * 0.9);
-                    this.speed = 40;
+                    this.speed = GAME_CONFIG.LOGGER_SPEED;
                     this.size = 45;
                     this.target = null;
-                    this.actionTimer = 2; // Takes 2s to cut a tree
+                    this.actionTimer = GAME_CONFIG.LOGGER_ACTION_TIME;
                 } else if (type === 'farmer') {
                     this.x = random(width * 0.1, width * 0.8);
                     this.y = random(height * 0.7, height * 0.95);
-                    this.speed = 25;
+                    this.speed = GAME_CONFIG.FARMER_SPEED;
                     this.size = 45;
-                    this.actionTimer = 3; // Pesticide every 3s
+                    this.actionTimer = GAME_CONFIG.FARMER_ACTION_TIME;
                     this.targetX = this.x + random(-100, 100);
                     this.targetY = this.y + random(-100, 100);
                 } else if (type === 'vehicle') {
@@ -297,7 +348,7 @@
                     this.startX = this.direction === 1 ? -50 : width + 50;
                     this.x = this.startX;
                     this.y = height * 0.575 + random(-15, 15);
-                    this.speed = random(80, 160);
+                    this.speed = random(GAME_CONFIG.VEHICLE_SPEED_MIN, GAME_CONFIG.VEHICLE_SPEED_MAX);
                     this.size = 50;
                     this.actionTimer = 0; // Visual smoke timer
                     this.nextEmissionPct = 0.25; // Next milestone for pollution (25%)
@@ -329,7 +380,7 @@
                                 trees.splice(trees.indexOf(this.target), 1);
                                 addFloatingText("Tree Cut!", this.x, this.y - 20, "black");
                                 this.target = null;
-                                this.actionTimer = 2;
+                                this.actionTimer = GAME_CONFIG.LOGGER_ACTION_TIME;
                             }
                         }
                     }
@@ -347,9 +398,9 @@
                     
                     this.actionTimer -= dt;
                     if (this.actionTimer <= 0) {
-                        pollutionLevel += 0.1;
-                        addFloatingText("Pesticide! (+0.1)", this.x, this.y - 20, "purple");
-                        this.actionTimer = 3;
+                        pollutionLevel += GAME_CONFIG.FARMER_PENALTY;
+                        addFloatingText("Pesticide! (+" + GAME_CONFIG.FARMER_PENALTY + ")", this.x, this.y - 20, "purple");
+                        this.actionTimer = GAME_CONFIG.FARMER_ACTION_TIME;
                     }
                 } else if (this.type === 'vehicle') {
                     this.x += this.speed * this.direction * dt;
@@ -368,8 +419,8 @@
 
                     // Trigger pollution at every 25% milestone
                     if (pctTraveled >= this.nextEmissionPct && this.nextEmissionPct <= 1.0) {
-                        pollutionLevel += 0.1;
-                        addFloatingText("Smoke! (+0.1)", this.x, this.y - 20, "gray");
+                        pollutionLevel += GAME_CONFIG.VEHICLE_PENALTY;
+                        addFloatingText("Smoke! (+" + GAME_CONFIG.VEHICLE_PENALTY + ")", this.x, this.y - 20, "gray");
                         this.nextEmissionPct += 0.25; // Set next milestone
                         this.actionTimer = 0.5; // Show visual smoke aura for 0.5 seconds
                     }
@@ -425,7 +476,7 @@
             floatingTexts = [];
             draggedItem = null;
             
-            nurseryTrees = 5;
+            nurseryTrees = GAME_CONFIG.NURSERY_MAX;
             nurseryTimer = 0;
             
             // Spawn 90 to 110 initial trees
@@ -438,7 +489,7 @@
                     ty = random(20, height - 20);
                     
                     // Don't spawn on UI, River, Road, or Mountain
-                    if (tx < 160 && ty < 280) continue; 
+                    if (tx < 130 && ty < 230) continue; 
                     if (tx > width - 160 && ty > height - 160) continue; 
                     if (ty > height * 0.15 && ty < height * 0.25) continue;
                     if (ty > height * 0.5 && ty < height * 0.65) continue;
@@ -450,10 +501,10 @@
             }
             
             // Initial exact spawn timers
-            loggerSpawnTimer = random(10, 30);
-            farmerSpawnTimer = random(20, 50);
-            vehicleSpawnTimer = random(0.5, 7);
-            fireSpawnTimer = random(15, 40);
+            loggerSpawnTimer = random(GAME_CONFIG.LOGGER_SPAWN_MIN, GAME_CONFIG.LOGGER_SPAWN_MAX);
+            farmerSpawnTimer = random(GAME_CONFIG.FARMER_SPAWN_MIN, GAME_CONFIG.FARMER_SPAWN_MAX);
+            vehicleSpawnTimer = random(GAME_CONFIG.VEHICLE_SPAWN_MIN, GAME_CONFIG.VEHICLE_SPAWN_MAX);
+            fireSpawnTimer = random(GAME_CONFIG.FIRE_SPAWN_MIN, GAME_CONFIG.FIRE_SPAWN_MAX);
             
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
@@ -465,25 +516,25 @@
         }
         
         function updateSpawns(dt) {
-            // Each level reduces spawn times by 10%
-            let spawnMultiplier = Math.pow(0.9, level - 1);
+            // Each level reduces spawn times
+            let spawnMultiplier = Math.pow(1 - GAME_CONFIG.SPAWN_REDUCTION_PER_LEVEL, level - 1);
 
             loggerSpawnTimer -= dt;
             if (loggerSpawnTimer <= 0) {
                 enemies.push(new Enemy('logger'));
-                loggerSpawnTimer = random(10, 30) * spawnMultiplier;
+                loggerSpawnTimer = random(GAME_CONFIG.LOGGER_SPAWN_MIN, GAME_CONFIG.LOGGER_SPAWN_MAX) * spawnMultiplier;
             }
             
             farmerSpawnTimer -= dt;
             if (farmerSpawnTimer <= 0) {
                 enemies.push(new Enemy('farmer'));
-                farmerSpawnTimer = random(20, 50) * spawnMultiplier;
+                farmerSpawnTimer = random(GAME_CONFIG.FARMER_SPAWN_MIN, GAME_CONFIG.FARMER_SPAWN_MAX) * spawnMultiplier;
             }
             
             vehicleSpawnTimer -= dt;
             if (vehicleSpawnTimer <= 0) {
                 enemies.push(new Enemy('vehicle'));
-                vehicleSpawnTimer = random(0.5, 7) * spawnMultiplier;
+                vehicleSpawnTimer = random(GAME_CONFIG.VEHICLE_SPAWN_MIN, GAME_CONFIG.VEHICLE_SPAWN_MAX) * spawnMultiplier;
             }
             
             fireSpawnTimer -= dt;
@@ -492,7 +543,7 @@
                     let rTree = trees[Math.floor(Math.random() * trees.length)];
                     if (!rTree.isBurning) rTree.ignite();
                 }
-                fireSpawnTimer = random(15, 40) * spawnMultiplier;
+                fireSpawnTimer = random(GAME_CONFIG.FIRE_SPAWN_MIN, GAME_CONFIG.FIRE_SPAWN_MAX) * spawnMultiplier;
             }
         }
 
@@ -505,18 +556,18 @@
             // Critical Fix: Prevent huge time jumps if user switches browser tabs
             if (dt > 0.1) dt = 0.1; 
             
-            // Level up every 30 seconds
+            // Level up
             levelTimer += dt;
-            if (levelTimer >= 30) {
+            if (levelTimer >= GAME_CONFIG.LEVEL_UP_TIME) {
                 level++;
-                levelTimer -= 30; // Keep the remainder
+                levelTimer -= GAME_CONFIG.LEVEL_UP_TIME; // Keep the remainder
                 addFloatingText("LEVEL UP! Faster Spawns!", width/2, height/2, "purple");
             }
 
             // Update Nursery
-            if (nurseryTrees < 5) {
+            if (nurseryTrees < GAME_CONFIG.NURSERY_MAX) {
                 nurseryTimer += dt;
-                if (nurseryTimer >= 10) {
+                if (nurseryTimer >= GAME_CONFIG.NURSERY_RESTOCK_TIME) {
                     nurseryTrees++;
                     nurseryTimer = 0;
                 }
@@ -531,7 +582,7 @@
                 trees[i].update(dt);
                 if (trees[i].burnTimer <= 0) {
                     trees.splice(i, 1);
-                    pollutionLevel += 0.5; // Penalty
+                    pollutionLevel += GAME_CONFIG.FIRE_PENALTY; // Penalty
                     addFloatingText("Destroyed!", trees[i]?.x || width/2, trees[i]?.y || height/2, "red");
                 }
             }
@@ -624,14 +675,14 @@
             // Update UI DOM Elements
             scoreDisplay.innerText = score;
             levelDisplay.innerText = level;
-            levelTimerDisplay.innerText = Math.max(0, Math.ceil(30 - levelTimer));
+            levelTimerDisplay.innerText = Math.max(0, Math.ceil(GAME_CONFIG.LEVEL_UP_TIME - levelTimer));
             nurseryCountDisplay.innerText = nurseryTrees;
-            nurseryProgress.style.width = `${(nurseryTimer / 10) * 100}%`;
-            pollutionBar.style.width = `${Math.min(100, (pollutionLevel / MAX_POLLUTION) * 100)}%`;
+            nurseryProgress.style.width = `${(nurseryTimer / GAME_CONFIG.NURSERY_RESTOCK_TIME) * 100}%`;
+            pollutionBar.style.width = `${Math.min(100, (pollutionLevel / GAME_CONFIG.MAX_POLLUTION) * 100)}%`;
             pollutionValueDisplay.innerText = pollutionLevel.toFixed(1);
             
             // Win/Loss Condition
-            if (pollutionLevel >= MAX_POLLUTION) {
+            if (pollutionLevel >= GAME_CONFIG.MAX_POLLUTION) {
                 isPlaying = false;
                 document.getElementById('final-score').innerText = score;
                 gameOverScreen.classList.remove('hidden');
@@ -701,21 +752,20 @@
                 
                 let extinguished = false;
                 for (let t of trees) {
-                    // Larger area of effect (100px)
-                    if (t.isBurning && dist(dragPos.x, dragPos.y, t.x, t.y) < 100) {
+                    if (t.isBurning && dist(dragPos.x, dragPos.y, t.x, t.y) < GAME_CONFIG.EXTINGUISH_RADIUS) {
                         t.isBurning = false;
-                        score += 50;
+                        score += GAME_CONFIG.EXTINGUISH_SCORE;
                         extinguished = true;
-                        addFloatingText("+50", t.x, t.y, "blue");
+                        addFloatingText("+" + GAME_CONFIG.EXTINGUISH_SCORE, t.x, t.y, "blue");
                     }
                 }
-                if (extinguished) pollutionLevel = Math.max(0, pollutionLevel - 0.5);
+                if (extinguished) pollutionLevel = Math.max(0, pollutionLevel - GAME_CONFIG.EXTINGUISH_REDUCTION);
                 
             } else if (draggedItem.type === 'tree') {
                 let tx = dragPos.x;
                 let ty = dragPos.y;
                 
-                let invalidLocation = (tx < 160 && ty < 280) || 
+                let invalidLocation = (tx < 130 && ty < 230) || 
                               (tx > width - 160 && ty > height - 160) ||
                               (ty > height * 0.15 && ty < height * 0.25) ||
                               (ty > height * 0.5 && ty < height * 0.65) ||
@@ -723,8 +773,8 @@
                 
                 if (!invalidLocation) {
                     trees.push(new Tree(tx, ty));
-                    score += 10;
-                    addFloatingText("+10", tx, ty, "green");
+                    score += GAME_CONFIG.PLANT_TREE_SCORE;
+                    addFloatingText("+" + GAME_CONFIG.PLANT_TREE_SCORE, tx, ty, "green");
                 } else {
                     nurseryTrees++; // Refund tree
                     addFloatingText("Invalid Spot!", tx, ty, "red");
@@ -736,7 +786,7 @@
                 if (isInsideRect(dragPos.x, dragPos.y, binRect)) {
                     let eType = enemies[draggedItem.index].type;
                     enemies.splice(draggedItem.index, 1); // Trash it!
-                    let pts = eType === 'logger' ? 100 : eType === 'farmer' ? 80 : 50;
+                    let pts = eType === 'logger' ? GAME_CONFIG.LOGGER_TRASH_SCORE : eType === 'farmer' ? GAME_CONFIG.FARMER_TRASH_SCORE : GAME_CONFIG.VEHICLE_TRASH_SCORE;
                     score += pts;
                     addFloatingText("+" + pts, binRect.left + 50, binRect.top - 20, "white");
                 }
@@ -756,6 +806,37 @@
         
         startBtn.addEventListener('click', () => { setTimeout(initGame, 100); });
         restartBtn.addEventListener('click', () => { setTimeout(initGame, 100); });
+        
+        // Developer Menu Logic (Secret 10 Clicks in 3 seconds)
+        let scoreClicks = [];
+        scoreLabel.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const now = Date.now();
+            scoreClicks.push(now);
+            
+            // Remove clicks older than 3 seconds
+            scoreClicks = scoreClicks.filter(time => now - time <= 3000);
+            
+            if (scoreClicks.length >= 10) {
+                scoreClicks = []; // Reset
+                showDevModal();
+            }
+        });
+
+        closeDevModal.addEventListener('click', () => {
+            devModal.classList.add('hidden');
+        });
+
+        function showDevModal() {
+            devParamsContent.innerHTML = '';
+            for (const [key, value] of Object.entries(GAME_CONFIG)) {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between items-center border-b border-gray-700 py-3 px-2 hover:bg-gray-800 transition rounded';
+                row.innerHTML = `<span class="text-green-300 font-semibold">${key}</span><span class="text-white bg-gray-950 px-3 py-1 rounded border border-gray-600">${value}</span>`;
+                devParamsContent.appendChild(row);
+            }
+            devModal.classList.remove('hidden');
+        }
         
         // Initialize bounding rects
         resize();
