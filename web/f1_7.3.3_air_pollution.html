@@ -112,8 +112,9 @@
                 🚗 <b>Vehicles</b> emit smoke. Drag them to the bin too!<br>
                 <br>Keep the pollution bar empty to survive!
             </p>
-            <div class="flex gap-6">
+            <div class="flex flex-wrap justify-center gap-4">
                 <button id="start-btn" class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(74,222,128,0.7)]">Start Mission</button>
+                <button id="show-scores-btn" class="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(234,179,8,0.7)]">🏆 Scores</button>
                 <button id="replay-video-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(37,99,235,0.7)]">▶️ Play Video</button>
             </div>
         </div>
@@ -122,13 +123,33 @@
         <div id="game-over-screen" class="absolute inset-0 bg-red-900 bg-opacity-90 bg-blend-luminosity bg-cover bg-center flex flex-col items-center justify-center z-50 text-white hidden interactive backdrop-blur-md" style="background-image: url('https://tienping.github.io/public_resources/images/polluted_city.webp');">
             <h1 class="text-6xl font-black mb-4 drop-shadow-2xl">POLLUTION CRITICAL</h1>
             <p class="text-2xl mb-2 font-light">The environment was overwhelmed.</p>
-            <p class="text-xl mb-8">Final Score: <span id="final-score" class="font-bold text-yellow-300 text-3xl">0</span></p>
+            <p class="text-xl mb-6">Final Score: <span id="final-score" class="font-bold text-yellow-300 text-3xl">0</span></p>
+            
+            <!-- Score Submission Section -->
+            <div id="score-submission-section" class="flex flex-col items-center gap-3 mb-6 bg-black bg-opacity-70 p-5 rounded-2xl border-2 border-gray-600 shadow-xl backdrop-blur-sm">
+                <p class="text-gray-200 font-bold mb-1">Save your score to the Leaderboard!</p>
+                <input type="text" id="player-name-input" placeholder="Enter your name" class="px-4 py-2 text-black rounded-lg text-xl text-center font-bold outline-none border-2 border-transparent focus:border-yellow-400" maxlength="15">
+                <button id="submit-score-btn" class="px-6 py-2 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-full text-xl transition transform hover:scale-105 shadow-[0_0_15px_rgba(59,130,246,0.7)]">Submit Score</button>
+                <p id="submit-score-status" class="text-sm font-bold hidden"></p>
+            </div>
+
             <div class="flex flex-col gap-6 items-center">
                 <div class="flex gap-6">
                     <button id="restart-btn" class="px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(234,179,8,0.7)]">Try Again</button>
                     <button id="home-btn" class="px-8 py-4 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(75,85,99,0.7)]">🏠 Home</button>
                 </div>
                 <button id="feedback-btn" class="px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(147,51,234,0.7)] w-full">📝 Feedback Form</button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Modal -->
+        <div id="scores-modal" class="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center z-[100] text-white p-6 hidden interactive backdrop-blur-md">
+            <div class="bg-gray-900 border-2 border-yellow-500 rounded-xl p-6 w-11/12 max-w-2xl max-h-[80vh] flex flex-col shadow-2xl relative">
+                <button id="close-scores-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-4xl font-bold leading-none">&times;</button>
+                <h2 class="text-4xl font-black text-yellow-400 mb-6 border-b border-gray-700 pb-4 text-center tracking-wider">🏆 Top Scores 🏆</h2>
+                <div id="scores-content" class="text-lg font-mono space-y-3 overflow-y-auto flex-1 pr-2">
+                    <!-- Scores injected here dynamically -->
+                </div>
             </div>
         </div>
 
@@ -157,6 +178,9 @@
         const fireSound = new Audio('https://tienping.github.io/public_resources/audio/fire_burning.mp3');
         fireSound.loop = true;
         
+        // Google Apps Script API URL
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH_AJlLVgJMgoVxDFyJ-pAVXtqIDEP3hJqVwCxkOqjXrt_IgeC67f3HZNlZajzCbYrqg/exec';
+
         // UI Elements
         const startScreen = document.getElementById('start-screen');
         const gameOverScreen = document.getElementById('game-over-screen');
@@ -166,6 +190,7 @@
         const skipVideoBtn = document.getElementById('skip-video-btn');
         const startVideoBtn = document.getElementById('start-video-btn');
         const replayVideoBtn = document.getElementById('replay-video-btn');
+        const showScoresBtn = document.getElementById('show-scores-btn');
         
         const startBtn = document.getElementById('start-btn');
         const restartBtn = document.getElementById('restart-btn');
@@ -186,6 +211,14 @@
         const devModal = document.getElementById('dev-modal');
         const closeDevModal = document.getElementById('close-dev-modal');
         const devParamsContent = document.getElementById('dev-params-content');
+
+        const scoresModal = document.getElementById('scores-modal');
+        const closeScoresModalBtn = document.getElementById('close-scores-modal');
+        const scoresContent = document.getElementById('scores-content');
+
+        const playerNameInput = document.getElementById('player-name-input');
+        const submitScoreBtn = document.getElementById('submit-score-btn');
+        const submitScoreStatus = document.getElementById('submit-score-status');
 
         // Centralized Game Configuration Parameters
         const GAME_CONFIG = {
@@ -827,6 +860,14 @@
                 coughSound.pause();
                 warningSound.pause();
                 fireSound.pause();
+                
+                // Reset Score Submission UI
+                playerNameInput.value = '';
+                playerNameInput.disabled = false;
+                submitScoreBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+                submitScoreBtn.disabled = false;
+                submitScoreStatus.classList.add('hidden');
+                
                 document.getElementById('final-score').innerText = score;
                 gameOverScreen.classList.remove('hidden');
             } else {
@@ -1010,6 +1051,13 @@
             warningSound.pause();
             fireSound.pause();
             
+            // Reset Score Submission UI
+            playerNameInput.value = '';
+            playerNameInput.disabled = false;
+            submitScoreBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+            submitScoreBtn.disabled = false;
+            submitScoreStatus.classList.add('hidden');
+            
             // Show Game Over screen to display score instead of jumping to start
             document.getElementById('final-score').innerText = score;
             gameOverScreen.classList.remove('hidden');
@@ -1026,6 +1074,75 @@
 
         feedbackBtn.addEventListener('click', () => {
             window.open('https://borangpenilaian.my.canva.site/c75pzbyw0qxpp9d8', '_blank');
+        });
+
+        // High Score System Logic
+        showScoresBtn.addEventListener('click', async () => {
+            scoresModal.classList.remove('hidden');
+            scoresContent.innerHTML = '<p class="text-center text-gray-400 animate-pulse mt-10">Fetching live scores...</p>';
+            
+            try {
+                const response = await fetch(APP_SCRIPT_URL);
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.leaderboard) {
+                    scoresContent.innerHTML = '';
+                    if (data.leaderboard.length === 0) {
+                         scoresContent.innerHTML = '<p class="text-center text-gray-400 mt-10">No scores yet. Be the first!</p>';
+                    } else {
+                        data.leaderboard.forEach((entry, index) => {
+                            const row = document.createElement('div');
+                            const rankColor = index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-amber-600' : 'text-gray-500';
+                            row.className = 'flex justify-between items-center bg-gray-800 p-4 rounded-xl border border-gray-700 shadow';
+                            row.innerHTML = `<span class="font-bold text-white text-xl"><span class="${rankColor} mr-3">#${index + 1}</span> ${entry.name}</span><span class="text-green-400 font-black text-2xl">${entry.score}</span>`;
+                            scoresContent.appendChild(row);
+                        });
+                    }
+                } else {
+                    scoresContent.innerHTML = '<p class="text-center text-red-400 mt-10">Failed to load scores from server.</p>';
+                }
+            } catch (e) {
+                scoresContent.innerHTML = '<p class="text-center text-red-400 mt-10">Network error. Please try again later.</p>';
+            }
+        });
+
+        closeScoresModalBtn.addEventListener('click', () => {
+            scoresModal.classList.add('hidden');
+        });
+
+        submitScoreBtn.addEventListener('click', async () => {
+            const name = playerNameInput.value.trim();
+            if (!name) {
+                submitScoreStatus.innerText = 'Please enter your name!';
+                submitScoreStatus.className = 'text-sm font-bold text-red-400 block text-center';
+                submitScoreStatus.classList.remove('hidden');
+                return;
+            }
+            
+            submitScoreBtn.disabled = true;
+            submitScoreBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitScoreStatus.innerText = 'Submitting your score...';
+            submitScoreStatus.className = 'text-sm font-bold text-yellow-300 block text-center';
+            submitScoreStatus.classList.remove('hidden');
+            
+            try {
+                // Sending as text/plain body to safely bypass Google Apps Script strict CORS preflight
+                await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: name, score: score }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
+                
+                submitScoreStatus.innerText = 'Score successfully saved!';
+                submitScoreStatus.className = 'text-sm font-bold text-green-400 block text-center';
+                submitScoreBtn.classList.add('hidden');
+                playerNameInput.disabled = true;
+            } catch (e) {
+                submitScoreStatus.innerText = 'Failed to submit. Check connection.';
+                submitScoreStatus.className = 'text-sm font-bold text-red-400 block text-center';
+                submitScoreBtn.disabled = false;
+                submitScoreBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         });
 
         startBtn.addEventListener('click', initGame);
