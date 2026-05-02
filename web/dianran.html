@@ -95,7 +95,7 @@
     <div class="ui-overlay">
         <!-- 开始界面 -->
         <div id="startScreen" class="start-screen">
-            <h1 class="text-5xl font-black mb-2 text-orange-800 tracking-tighter">点燃</h1>
+            <h1 id="secretTrigger" class="text-5xl font-black mb-2 text-orange-800 tracking-tighter">点燃</h1>
             <p class="mb-8 text-gray-500 text-xs tracking-[0.5em]">ROOM OF LOST MEMORIES</p>
             <div class="mb-8 text-sm text-gray-400 leading-relaxed">
                 <p>在这个静谧的房间里，点燃那些曾经的过去。</p>
@@ -120,16 +120,61 @@
                 <button id="resumeBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
                     继续点燃
                 </button>
+                <button id="showRhythmBtn" class="bg-stone-900 hover:bg-yellow-950 text-yellow-600 border border-yellow-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto hidden">
+                    显示/导出节奏谱
+                </button>
                 <button id="quitBtn" class="bg-transparent hover:bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
                     退出模式选择
                 </button>
             </div>
         </div>
 
+        <!-- 隐藏界面 (开发者/参数调整) -->
+        <div id="secretScreen" class="pause-screen hidden">
+            <h2 class="text-2xl font-bold mb-4 text-red-700 tracking-widest border-b border-red-900 pb-2 inline-block">DEBUG MODE</h2>
+            <div class="flex flex-col gap-4 text-left text-sm text-gray-300 w-64 mx-auto mb-6 mt-4 pointer-events-auto">
+                <div class="flex justify-between items-center">
+                    <label>下落速度 (Speed):</label>
+                    <input type="number" id="cfgSpeed" class="w-16 bg-stone-900 border border-stone-700 rounded px-1 text-center text-orange-500 outline-none focus:border-red-700" step="0.5">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label>节拍速度 (BPM):</label>
+                    <input type="number" id="cfgBpm" class="w-16 bg-stone-900 border border-stone-700 rounded px-1 text-center text-orange-500 outline-none focus:border-red-700" step="1">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label>判定区间 (Hit Win):</label>
+                    <input type="number" id="cfgHitWin" class="w-16 bg-stone-900 border border-stone-700 rounded px-1 text-center text-orange-500 outline-none focus:border-red-700" step="5">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label>火花数量 (Particles):</label>
+                    <input type="number" id="cfgParticles" class="w-16 bg-stone-900 border border-stone-700 rounded px-1 text-center text-orange-500 outline-none focus:border-red-700" step="10">
+                </div>
+            </div>
+            <div class="flex flex-col gap-3">
+                <button id="closeSecretBtn" class="bg-stone-900 hover:bg-red-950 text-red-600 border border-red-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    应用并关闭
+                </button>
+                <button id="startEditBtn" class="bg-stone-900 hover:bg-purple-950 text-purple-500 border border-purple-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    开启编辑模式 (打谱)
+                </button>
+            </div>
+        </div>
+
+        <!-- 节奏谱输出界面 -->
+        <div id="rhythmOutputScreen" class="pause-screen hidden">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-600">导出的节奏谱</h2>
+            <p class="text-gray-400 mb-4 text-xs">全选并复制下方文本。你可以用它替换代码中的 <code>RHYTHM_MAP</code></p>
+            <textarea id="rhythmOutputText" class="w-80 h-32 bg-stone-900 text-yellow-500 p-3 border border-yellow-900 rounded text-sm mb-6 outline-none resize-none pointer-events-auto font-mono" readonly></textarea>
+            <br>
+            <button id="closeRhythmOutputBtn" class="bg-stone-900 hover:bg-yellow-950 text-yellow-600 border border-yellow-900 px-12 py-3 rounded-sm font-bold transition-all pointer-events-auto">
+                返回暂停菜单
+            </button>
+        </div>
+
         <div id="scoreBoard" class="score-board hidden">
             <div class="score-row">
                 <button id="pauseBtn" class="pause-btn">PAUSE</button>
-                <span>点燃: <span id="scoreVal">0</span></span>
+                <span class="cursor-pointer select-none transition-colors hover:text-orange-400" title="?">点燃: <span id="scoreVal">0</span></span>
             </div>
             <div id="modeDisplay" class="mode-badge">节奏模式</div>
         </div>
@@ -148,16 +193,16 @@
             hitY: 600,
             hitWindow: 90,    
             noteSpeed: 2.0,   
-            bpm: 72,          
-            particleCount: 40
+            bpm: 75,          
+            particleCount: 40,
+            countPerBeat: 4
         };
 
-        // 定义节奏谱 (横杠充当分隔符和空拍)
-        const RHYTHM_MAP = "1-1-1-1-----1-2-3-4-----4-3-2-1-----1-2-3-4-----4-3-2-1-12-23-34-14------";
-        // 通过横杠分割，得到一个数组。空字符串代表空拍，"12"代表在轨道1和2同时下落。
-        const mapTokens = RHYTHM_MAP.split('-');
+        // 定义节奏谱 (横杠代表空拍，每个数字代表对应轨道的单点)
+        const RHYTHM_MAP = "-----1234-----------1-1-------1--2-3-4-4---4-3-2--1--2-1-------3---4---3---3-3-3----1-2-1--1--11--------1---2--3---4---3---2--1-------1-1--1-2-----3--4-4-4-4-4-------1-2--1-2-----3-3---4--------1-2-3-----34----1-2-1-21-2-3---4---1-2---3-4----3---2---2---1------1-2---1-2-----1-23-4-3-2-1------1-2---1-2---3--3-4--3-------1-2-1--1--2-1---1-2-3-4-3-2-1---2---3-4---3-4----3--4--44-4--44-4-4-4-4-4------1-2---1---2-2-2-2---2-2---12-2-1-2-2-2-3-----3-4--3--2-------1-2-1-2-3---4---4-3-2-1-2---3-------4-3-2-1---1-2----1--2-------1-2--1---2-3-4--34-3-4-3-4-3------1-2-1-2-3---4-32--1---2-------1-2-3-4-4---4---1-2-3-4-4---4-------1-2-3-4---1-2--------1----2-3------4-3---2--1---1-2-3-4--3--2--1";
+        const mapTokens = RHYTHM_MAP.split(''); // 每个字符算作一拍
         let currentMapIndex = 0;
-        let playMode = 'OBSERVE'; // 'OBSERVE' 或 'RHYTHM'
+        let playMode = 'OBSERVE'; // 'OBSERVE', 'RHYTHM', 或 'EDIT'
 
         // 预加载回忆照片
         const imageUrls = [
@@ -195,6 +240,7 @@
         const startObserveBtn = document.getElementById('startObserveBtn');
         const startRhythmBtn = document.getElementById('startRhythmBtn');
         const resumeBtn = document.getElementById('resumeBtn');
+        const showRhythmBtn = document.getElementById('showRhythmBtn');
         const quitBtn = document.getElementById('quitBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         
@@ -202,6 +248,28 @@
         const scoreVal = document.getElementById('scoreVal');
         const modeDisplay = document.getElementById('modeDisplay');
         const bgMusic = document.getElementById('bgMusic');
+
+        // 隐藏界面相关的 DOM 和变量
+        const secretTrigger = document.getElementById('secretTrigger');
+        const secretScreen = document.getElementById('secretScreen');
+        const closeSecretBtn = document.getElementById('closeSecretBtn');
+        const startEditBtn = document.getElementById('startEditBtn');
+        const cfgSpeed = document.getElementById('cfgSpeed');
+        const cfgBpm = document.getElementById('cfgBpm');
+        const cfgHitWin = document.getElementById('cfgHitWin');
+        const cfgParticles = document.getElementById('cfgParticles');
+        
+        // 节奏输出相关的 DOM
+        const rhythmOutputScreen = document.getElementById('rhythmOutputScreen');
+        const rhythmOutputText = document.getElementById('rhythmOutputText');
+        const closeRhythmOutputBtn = document.getElementById('closeRhythmOutputBtn');
+        
+        let secretClickTimestamps = [];
+        let wasPlayingBeforeSecret = false;
+        
+        // 打谱系统变量
+        let recordedBeats = {};
+        let recordStartTime = 0;
 
         let gameState = 'START';
         let score = 0;
@@ -213,7 +281,6 @@
         let pauseStartTime = 0; 
         let audioCtx;
         
-        // 4个打火机的状态
         let lighters = [
             { flameTime: 0, angle: 0 },
             { flameTime: 0, angle: 0 },
@@ -494,38 +561,32 @@
                 return;
             }
 
-            // 根据当前模式决定照片生成的间隔（观赏模式两拍一个，节奏模式一拍解析一个token）
-            const interval = playMode === 'OBSERVE' 
-                ? (60000 / CONFIG.bpm) * 2 
-                : (60000 / CONFIG.bpm);
+            // 编辑模式下不产生掉落的照片
+            if (playMode !== 'EDIT') {
+                const interval = playMode === 'OBSERVE' 
+                    ? (60000 / CONFIG.bpm) * 2 
+                    : (60000 / CONFIG.bpm);
 
-            if (time - lastNoteTime > interval) {
-                
-                if (playMode === 'OBSERVE') {
-                    // 观赏模式：随机单轨下落
-                    const trackIndex = Math.floor(Math.random() * 4);
-                    notes.push(new Note(trackIndex));
-                    playBeatSound();
-                } 
-                else if (playMode === 'RHYTHM') {
-                    // 节奏模式：根据谱面字符串解析下落
-                    const token = mapTokens[currentMapIndex];
-                    if (token !== '') { // 如果不是空拍
-                        // 解析该拍包含的所有轨道 (支持双押等)
-                        for (let i = 0; i < token.length; i++) {
-                            const trackNum = parseInt(token[i]);
-                            // 确保输入是1到4的数字 (1对应D轨, 4对应K轨)
+                if (time - lastNoteTime > (interval / CONFIG.countPerBeat)) {
+                    if (playMode === 'OBSERVE') {
+                        const trackIndex = Math.floor(Math.random() * 4);
+                        notes.push(new Note(trackIndex));
+                        playBeatSound();
+                    } 
+                    else if (playMode === 'RHYTHM') {
+                        const token = mapTokens[currentMapIndex];
+                        // 遇到数字才掉落相片，遇到 '-' 则空拍
+                        if (token !== '-' && token !== ' ') { 
+                            const trackNum = parseInt(token);
                             if (trackNum >= 1 && trackNum <= 4) {
                                 notes.push(new Note(trackNum - 1));
+                                playBeatSound();
                             }
                         }
-                        playBeatSound();
+                        currentMapIndex = (currentMapIndex + 1) % mapTokens.length;
                     }
-                    // 推进到下一拍，到达末尾循环
-                    currentMapIndex = (currentMapIndex + 1) % mapTokens.length;
+                    lastNoteTime = time;
                 }
-                
-                lastNoteTime = time;
             }
 
             for (let i = notes.length - 1; i >= 0; i--) {
@@ -633,6 +694,24 @@
             if (gameState !== 'PLAYING') return;
 
             lighters[trackIndex].flameTime = 12;
+            playClickSound();
+
+            // 编辑模式：只记录按键的时间点并呈现火花，不消除照片
+            if (playMode === 'EDIT') {
+                const now = performance.now();
+                if (recordStartTime !== 0 && now >= recordStartTime) {
+                    const beatInterval = 60000 / CONFIG.bpm / CONFIG.countPerBeat;
+                    // 将时间流逝转换为当前的“节拍数”(四舍五入到最近的节拍)
+                    const beatIndex = Math.round((now - recordStartTime) / beatInterval);
+                    if (!recordedBeats[beatIndex]) {
+                        recordedBeats[beatIndex] = new Set();
+                    }
+                    recordedBeats[beatIndex].add(trackIndex + 1); // 记录对应轨道 (1, 2, 3, 4)
+                    triggerBurn(CONFIG.trackXs[trackIndex], CONFIG.hitY);
+                    addScore(); // 编辑模式下点火也给分以作视觉反馈
+                }
+                return;
+            }
 
             let targetNote = null;
             let minDistance = Infinity;
@@ -648,19 +727,17 @@
             }
 
             if (targetNote && minDistance < CONFIG.hitWindow) {
-                triggerBurn(targetNote);
+                triggerBurn(targetNote.x, targetNote.y);
                 floatingPhotos.push(new FloatingPhoto(targetNote.x, targetNote.y, targetNote.rotation, targetNote.image));
                 targetNote.active = false;
                 addScore();
-            } else {
-                playClickSound();
             }
         }
 
-        function triggerBurn(note) {
+        function triggerBurn(x, y) {
             for (let i = 0; i < CONFIG.particleCount; i++) {
-                particles.push(new Particle(note.x, note.y, '#f97316'));
-                particles.push(new Particle(note.x, note.y, '#222'));
+                particles.push(new Particle(x, y, '#f97316'));
+                particles.push(new Particle(x, y, '#222'));
             }
             playBurnSound();
         }
@@ -676,12 +753,22 @@
                 pauseStartTime = performance.now();
                 bgMusic.pause();
                 pauseScreen.classList.remove('hidden');
+
+                // 只有在编辑模式下才显示导出谱面按钮
+                if (playMode === 'EDIT') {
+                    showRhythmBtn.classList.remove('hidden');
+                } else {
+                    showRhythmBtn.classList.add('hidden');
+                }
+
             } else if (gameState === 'PAUSED') {
                 const pauseDuration = performance.now() - pauseStartTime;
                 lastNoteTime += pauseDuration; 
+                if (recordStartTime !== 0) recordStartTime += pauseDuration; // 调整记录起始时间，防止断层
                 gameState = 'PLAYING';
                 bgMusic.play();
                 pauseScreen.classList.add('hidden');
+                rhythmOutputScreen.classList.add('hidden');
             }
         }
 
@@ -757,21 +844,44 @@
 
         function startGame(mode) {
             playMode = mode;
-            modeDisplay.innerText = mode === 'OBSERVE' ? '观赏模式' : '节奏模式';
-            modeDisplay.style.color = mode === 'OBSERVE' ? '#a8a29e' : '#b7791f';
+            let modeName = '观赏模式';
+            let modeColor = '#a8a29e';
+            if (mode === 'RHYTHM') { modeName = '节奏模式'; modeColor = '#b7791f'; }
+            if (mode === 'EDIT') { modeName = '编辑模式'; modeColor = '#ef4444'; }
+            
+            modeDisplay.innerText = modeName;
+            modeDisplay.style.color = modeColor;
             
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             gameState = 'PLAYING';
             startScreen.classList.add('hidden');
+            secretScreen.classList.add('hidden');
             scoreBoard.classList.remove('hidden');
             
-            lastNoteTime = performance.now();
+            // 重置状态
             currentMapIndex = 0;
-            bgMusic.play().catch(err => console.log("Music play blocked:", err));
+            recordedBeats = {}; 
+            recordStartTime = 0;
+            score = 0;
+            scoreVal.innerText = score;
+            
+            // 延迟 2000ms 播放音乐
+            setTimeout(() => {
+                if (gameState === 'PLAYING') {
+                    lastNoteTime = performance.now();
+                    recordStartTime = performance.now(); // 音乐播放同时开始记谱时间
+                    bgMusic.play().catch(err => console.log("Music play blocked:", err));
+                }
+            }, 2000);
         }
 
         startObserveBtn.addEventListener('click', () => startGame('OBSERVE'));
         startRhythmBtn.addEventListener('click', () => startGame('RHYTHM'));
+        
+        startEditBtn.addEventListener('click', () => {
+            secretScreen.classList.add('hidden');
+            startGame('EDIT');
+        });
 
         pauseBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -783,7 +893,6 @@
         });
 
         quitBtn.addEventListener('click', () => {
-            // 充置游戏状态
             gameState = 'START';
             score = 0;
             scoreVal.innerText = score;
@@ -791,21 +900,98 @@
             particles = [];
             floatingPhotos = [];
             currentMapIndex = 0;
+            recordedBeats = {};
+            recordStartTime = 0;
             
-            // 充置打火机状态
             lighters.forEach(l => {
                 l.flameTime = 0;
                 l.angle = 0;
             });
 
-            // 停止并重置音乐
             bgMusic.pause();
             bgMusic.currentTime = 0;
 
-            // 切换 UI
             pauseScreen.classList.add('hidden');
             scoreBoard.classList.add('hidden');
             startScreen.classList.remove('hidden');
+        });
+
+        // 打谱导出功能
+        showRhythmBtn.addEventListener('click', () => {
+            let rhythmString = "";
+            let maxBeat = 0;
+            
+            // 寻找记录下的最大节拍数
+            for (let b in recordedBeats) {
+                maxBeat = Math.max(maxBeat, parseInt(b));
+            }
+            
+            // 按格式组装乐谱字符串 (单字符1拍，解除双押)
+            for (let i = 0; i <= maxBeat; i++) {
+                if (recordedBeats[i] && recordedBeats[i].size > 0) {
+                    // 如果同一拍有多个按键，只取第一个（解除双押）
+                    rhythmString += Array.from(recordedBeats[i])[0];
+                } else {
+                    // 没有按键的拍子记为 "-"
+                    rhythmString += "-";
+                }
+            }
+            
+            if(rhythmString === "") rhythmString = "空空如也...请先随音乐按下按键再查看";
+
+            rhythmOutputText.value = rhythmString.slice(25);
+            pauseScreen.classList.add('hidden');
+            rhythmOutputScreen.classList.remove('hidden');
+        });
+
+        closeRhythmOutputBtn.addEventListener('click', () => {
+            rhythmOutputScreen.classList.add('hidden');
+            pauseScreen.classList.remove('hidden');
+        });
+
+        // --- 隐藏界面逻辑 ---
+        secretTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const now = Date.now();
+            secretClickTimestamps = secretClickTimestamps.filter(t => now - t <= 5000);
+            secretClickTimestamps.push(now);
+
+            if (secretClickTimestamps.length >= 10) {
+                secretClickTimestamps = []; 
+                openSecretMenu();
+            }
+        });
+
+        function openSecretMenu() {
+            if (gameState === 'PLAYING') {
+                wasPlayingBeforeSecret = true;
+                togglePause(); 
+            } else {
+                wasPlayingBeforeSecret = false;
+            }
+
+            cfgSpeed.value = CONFIG.noteSpeed;
+            cfgBpm.value = CONFIG.bpm;
+            cfgHitWin.value = CONFIG.hitWindow;
+            cfgParticles.value = CONFIG.particleCount;
+
+            pauseScreen.classList.add('hidden');
+            secretScreen.classList.remove('hidden');
+        }
+
+        closeSecretBtn.addEventListener('click', () => {
+            CONFIG.noteSpeed = parseFloat(cfgSpeed.value) || 2.0;
+            CONFIG.bpm = parseFloat(cfgBpm.value) || 75;
+            CONFIG.hitWindow = parseFloat(cfgHitWin.value) || 90;
+            CONFIG.particleCount = parseInt(cfgParticles.value) || 40;
+
+            secretScreen.classList.add('hidden');
+
+            if (wasPlayingBeforeSecret) {
+                togglePause(); 
+            } else if (gameState === 'PAUSED') {
+                pauseScreen.classList.remove('hidden'); 
+            }
         });
 
         requestAnimationFrame(gameLoop);
