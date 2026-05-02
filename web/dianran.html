@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>点燃：回忆之光 - 深夜房间版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050505;
+            color: #eee;
+            overflow: hidden;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            touch-action: none;
+        }
+        canvas {
+            display: block;
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .start-screen, .pause-screen {
+            pointer-events: auto;
+            background: rgba(10, 10, 10, 0.9);
+            padding: 3rem;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid #442211;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .score-board {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            font-size: 20px;
+            font-weight: 200;
+            color: #d69e2e;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .pause-btn {
+            pointer-events: auto;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .pause-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop>
+        <source src="https://hukaizhe534-cell.github.io/burn/dianran.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="ui-overlay">
+        <!-- 开始界面 -->
+        <div id="startScreen" class="start-screen">
+            <h1 class="text-5xl font-black mb-2 text-orange-800 tracking-tighter">余烬</h1>
+            <p class="mb-8 text-gray-500 text-xs tracking-[0.5em]">ROOM OF LOST MEMORIES</p>
+            <div class="mb-10 text-sm text-gray-400 leading-relaxed">
+                <p>在这个静谧的房间里，</p>
+                <p>点燃那些曾经的过去。</p>
+                <p class="mt-4 text-xs text-orange-900">按下 D, F, J, K 键 或 点击对应轨道 点燃</p>
+            </div>
+            <button id="startBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                进入房间
+            </button>
+        </div>
+
+        <!-- 暂停界面 -->
+        <div id="pauseScreen" class="pause-screen hidden">
+            <h2 class="text-3xl font-bold mb-6 text-orange-700">思绪停滞</h2>
+            <p class="text-gray-400 mb-8 text-sm">火光暂时熄灭，但回忆仍在门外徘徊。</p>
+            <button id="resumeBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                继续点燃
+            </button>
+        </div>
+
+        <div id="scoreBoard" class="score-board hidden">
+            <button id="pauseBtn" class="pause-btn">PAUSE</button>
+            <span>点燃: <span id="scoreVal">0</span></span>
+        </div>
+        
+        <div class="absolute bottom-3 w-full text-center text-[10px] md:text-xs text-stone-600 pointer-events-auto font-sans tracking-wider">
+            Credited to hukaizhe534 for the original idea @ 
+            <a href="https://hukaizhe534-cell.github.io/burn/memoryindex.html" target="_blank" rel="noopener noreferrer" class="text-orange-900 hover:text-orange-600 underline transition-colors">
+                https://hukaizhe534-cell.github.io/burn/memoryindex.html
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const CONFIG = {
+            trackXs: [],      // 4 条轨道的 X 坐标
+            hitY: 600,
+            hitWindow: 90,    
+            noteSpeed: 4.5,     
+            bpm: 72,          
+            particleCount: 40
+        };
+
+        // 预加载回忆照片
+        const imageUrls = [
+            "https://tienping.github.io/public_resources/dianran/1.webp",
+            "https://tienping.github.io/public_resources/dianran/2.webp",
+            "https://tienping.github.io/public_resources/dianran/3.webp",
+            "https://tienping.github.io/public_resources/dianran/4.webp",
+            "https://tienping.github.io/public_resources/dianran/5.webp",
+            "https://tienping.github.io/public_resources/dianran/6.webp",
+            "https://tienping.github.io/public_resources/dianran/7.webp",
+            "https://tienping.github.io/public_resources/dianran/8.webp",
+            "https://tienping.github.io/public_resources/dianran/9.webp",
+            "https://tienping.github.io/public_resources/dianran/10.webp",
+            "https://tienping.github.io/public_resources/dianran/11.webp",
+            "https://tienping.github.io/public_resources/dianran/12.webp",
+            "https://tienping.github.io/public_resources/dianran/13.webp",
+            "https://tienping.github.io/public_resources/dianran/14.webp",
+            "https://tienping.github.io/public_resources/dianran/15.webp",
+            "https://tienping.github.io/public_resources/dianran/16.webp",
+            "https://tienping.github.io/public_resources/dianran/17.webp"
+        ];
+        const preloadedImages = [];
+        imageUrls.forEach(url => {
+            const img = new Image();
+            img.crossOrigin = "anonymous"; // 解决部分情况下的跨域渲染问题
+            img.src = url;
+            preloadedImages.push(img);
+        });
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const startScreen = document.getElementById('startScreen');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const startBtn = document.getElementById('startBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const scoreBoard = document.getElementById('scoreBoard');
+        const scoreVal = document.getElementById('scoreVal');
+        const bgMusic = document.getElementById('bgMusic');
+
+        let gameState = 'START';
+        let score = 0;
+        let notes = [];
+        let particles = [];
+        let dustParticles = []; 
+        let floatingPhotos = [];
+        let lastNoteTime = 0;
+        let pauseStartTime = 0; 
+        let audioCtx;
+        
+        // 4个打火机的状态
+        let lighters = [
+            { flameTime: 0, angle: 0 },
+            { flameTime: 0, angle: 0 },
+            { flameTime: 0, angle: 0 },
+            { flameTime: 0, angle: 0 }
+        ];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // 响应式计算 4 条轨道的位置 (D,F在最左边，J,K在最右边)
+            const trackWidth = Math.min(80, canvas.width / 6);
+            
+            CONFIG.trackXs = [
+                trackWidth,                      // D (最左边)
+                trackWidth * 2.2,                // F (左边第二)
+                canvas.width - trackWidth * 2.2, // J (右边第二)
+                canvas.width - trackWidth        // K (最右边)
+            ];
+            
+            CONFIG.hitY = canvas.height * 0.85;
+            initDust();
+        }
+
+        function initDust() {
+            dustParticles = [];
+            for(let i=0; i<50; i++) {
+                dustParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    opacity: Math.random() * 0.5
+                });
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.6) * 6; 
+                this.vy = (Math.random() - 0.8) * 8 - 2;
+                this.life = 1.0;
+                this.color = color;
+                this.size = Math.random() * 4 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.015;
+            }
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        class Note {
+            constructor(trackIndex) {
+                this.track = trackIndex;
+                this.y = -150; 
+                this.w = 60; 
+                this.h = 80;
+                this.active = true;
+                this.rotation = (Math.random() - 0.5) * 0.15;
+                this.image = preloadedImages[Math.floor(Math.random() * preloadedImages.length)];
+            }
+
+            get x() {
+                return CONFIG.trackXs[this.track];
+            }
+
+            update() {
+                this.y += CONFIG.noteSpeed;
+                if (this.y > canvas.height + 150) {
+                    this.active = false;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.fillStyle = '#e2e2d2';
+                ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+                const p = 4;
+                
+                // 拍立得内框背景设为深色，模拟未曝光或者等待加载的状态
+                ctx.fillStyle = '#111';
+                ctx.fillRect(-this.w/2 + p, -this.h/2 + p, this.w - p*2, this.h - p*4);
+                
+                // 仅当图片成功加载时，绘制真实的随机图片（按比例缩放，居中裁剪，不拉伸变形）
+                if (this.image && this.image.complete && this.image.naturalHeight !== 0) {
+                    const dx = -this.w/2 + p;
+                    const dy = -this.h/2 + p;
+                    const dw = this.w - p*2;
+                    const dh = this.h - p*4;
+                    
+                    const iw = this.image.naturalWidth;
+                    const ih = this.image.naturalHeight;
+                    
+                    // 计算 Cover 缩放比
+                    const r = Math.max(dw / iw, dh / ih);
+                    const sw = dw / r;
+                    const sh = dh / r;
+                    const sx = (iw - sw) / 2;
+                    const sy = (ih - sh) / 2;
+                    
+                    ctx.drawImage(this.image, sx, sy, sw, sh, dx, dy, dw, dh);
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        class FloatingPhoto {
+            constructor(x, y, rotation, image) {
+                this.x = x;
+                this.y = y;
+                this.w = 60;
+                this.h = 80;
+                this.rotation = rotation;
+                this.image = image;
+                this.scale = 1;
+                this.targetScale = 8; // 将目标放大倍数再大一倍（从 4 改为 8）
+                this.opacity = 1;
+                this.targetX = canvas.width / 2; 
+                this.targetY = canvas.height * 0.4; 
+            }
+
+            update() {
+                this.x += (this.targetX - this.x) * 0.05;
+                this.y += (this.targetY - this.y) * 0.05;
+                this.scale += (this.targetScale - this.scale) * 0.05;
+                this.opacity -= 0.004; // 衰减速度减半，停留时间延长一倍
+                this.rotation += 0.001; // 旋转速度调低至原本的 20%
+            }
+
+            draw() {
+                if (this.opacity <= 0) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                ctx.globalAlpha = this.opacity;
+                
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = `rgba(0,0,0,${0.8 * this.opacity})`;
+                ctx.fillStyle = '#e2e2d2';
+                ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
+                const p = 4;
+                
+                ctx.fillStyle = '#111';
+                ctx.fillRect(-this.w/2 + p, -this.h/2 + p, this.w - p*2, this.h - p*4);
+                
+                // 仅当图片成功加载时，绘制真实的随机图片（按比例缩放，居中裁剪，不拉伸变形）
+                if (this.image && this.image.complete && this.image.naturalHeight !== 0) {
+                    const dx = -this.w/2 + p;
+                    const dy = -this.h/2 + p;
+                    const dw = this.w - p*2;
+                    const dh = this.h - p*4;
+                    
+                    const iw = this.image.naturalWidth;
+                    const ih = this.image.naturalHeight;
+                    
+                    // 计算 Cover 缩放比
+                    const r = Math.max(dw / iw, dh / ih);
+                    const sw = dw / r;
+                    const sh = dh / r;
+                    const sx = (iw - sw) / 2;
+                    const sy = (ih - sh) / 2;
+                    
+                    ctx.drawImage(this.image, sx, sy, sw, sh, dx, dy, dw, dh);
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        function drawRoom() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const wallGrad = ctx.createLinearGradient(0, 0, 0, h);
+            wallGrad.addColorStop(0, '#0a0a0c');
+            wallGrad.addColorStop(1, '#1a1410');
+            ctx.fillStyle = wallGrad;
+            ctx.fillRect(0, 0, w, h);
+
+            const winX = w * 0.7;
+            const winY = h * 0.15;
+            const winW = 150;
+            const winH = 250;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(winX, winY, winW, winH);
+            ctx.strokeStyle = '#050505';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(winX, winY, winW, winH);
+            ctx.beginPath();
+            ctx.moveTo(winX + winW/2, winY); ctx.lineTo(winX + winW/2, winY + winH);
+            ctx.moveTo(winX, winY + winH/3); ctx.lineTo(winX + winW, winY + winH/3);
+            ctx.stroke();
+
+            const shadowGrad = ctx.createLinearGradient(winX, winY+winH, winX-100, winY+winH+200);
+            shadowGrad.addColorStop(0, 'rgba(30, 41, 59, 0.2)');
+            shadowGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = shadowGrad;
+            ctx.beginPath();
+            ctx.moveTo(winX, winY+winH);
+            ctx.lineTo(winX-150, h);
+            ctx.lineTo(winX + winW - 150, h);
+            ctx.lineTo(winX + winW, winY+winH);
+            ctx.fill();
+
+            // 绘制4条隐约的轨道背景底纹
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+            if (CONFIG.trackXs.length === 4) {
+                CONFIG.trackXs.forEach(tx => {
+                    ctx.fillRect(tx - 35, 0, 70, h);
+                });
+            }
+
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, h * 0.75, w, h * 0.25);
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, h * 0.75, w, 10);
+        }
+
+        function drawDust() {
+            ctx.fillStyle = '#fff';
+            dustParticles.forEach(p => {
+                if (gameState === 'PLAYING') {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                }
+                if(p.x < 0) p.x = canvas.width;
+                if(p.x > canvas.width) p.x = 0;
+                if(p.y < 0) p.y = canvas.height;
+                if(p.y > canvas.height) p.y = 0;
+                
+                ctx.globalAlpha = p.opacity;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        function gameLoop(time) {
+            drawRoom();
+            drawDust();
+
+            if (gameState === 'PAUSED' || gameState === 'START') {
+                notes.forEach(n => n.draw());
+                floatingPhotos.forEach(f => f.draw());
+                particles.forEach(p => p.draw());
+                for(let i = 0; i < 4; i++) drawAnimatedLighter(i);
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            // 照片掉落间隔增加，2拍下来一张
+            const interval = (60000 / CONFIG.bpm) * 2;
+            if (time - lastNoteTime > interval) {
+                const trackIndex = Math.floor(Math.random() * 4); // 随机分配到 4 条轨道
+                notes.push(new Note(trackIndex));
+                lastNoteTime = time;
+                playBeatSound();
+            }
+
+            for (let i = notes.length - 1; i >= 0; i--) {
+                notes[i].update();
+                notes[i].draw();
+                if (!notes[i].active) notes.splice(i, 1);
+            }
+
+            for (let i = floatingPhotos.length - 1; i >= 0; i--) {
+                floatingPhotos[i].update();
+                floatingPhotos[i].draw();
+                if (floatingPhotos[i].opacity <= 0) floatingPhotos.splice(i, 1);
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            for(let i = 0; i < 4; i++) drawAnimatedLighter(i);
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawAnimatedLighter(index) {
+            const lx = CONFIG.trackXs[index];
+            const ly = CONFIG.hitY + 50; 
+            const state = lighters[index];
+            
+            ctx.save();
+            ctx.translate(lx, ly);
+
+            if (state.flameTime > 0) {
+                state.angle = Math.min(state.angle + 0.4, Math.PI * 0.75);
+                if (gameState === 'PLAYING') state.flameTime--;
+                
+                const ambientGlow = ctx.createRadialGradient(0, -80, 0, 0, -80, 200);
+                ambientGlow.addColorStop(0, 'rgba(255, 100, 0, 0.12)');
+                ambientGlow.addColorStop(1, 'transparent');
+                ctx.globalCompositeOperation = 'screen';
+                ctx.fillStyle = ambientGlow;
+                ctx.beginPath();
+                ctx.arc(0, -80, 200, 0, Math.PI*2);
+                ctx.fill();
+                ctx.globalCompositeOperation = 'source-over';
+
+                const fH = 60 + Math.random() * 30;
+                const fW = 12 + Math.random() * 8;
+                const grad = ctx.createRadialGradient(0, -80, 0, 0, -80, fH);
+                grad.addColorStop(0, '#fff');
+                grad.addColorStop(0.3, '#ffcc00');
+                grad.addColorStop(0.6, '#ff4400');
+                grad.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.ellipse(0, -90, fW, fH, 0, 0, Math.PI*2);
+                ctx.fill();
+            } else {
+                state.angle = Math.max(state.angle - 0.15, 0);
+            }
+
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(-22, -50, 44, 90);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-22, -50, 44, 90);
+
+            ctx.save();
+            ctx.translate(-22, -50);
+            ctx.rotate(-state.angle);
+            ctx.fillStyle = '#222';
+            ctx.fillRect(0, -22, 44, 22);
+            ctx.strokeRect(0, -22, 44, 22);
+            ctx.restore();
+
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(-8, -62, 16, 12);
+            ctx.restore();
+        }
+
+        function handleInput(trackIndex) {
+            if (gameState !== 'PLAYING') return;
+
+            lighters[trackIndex].flameTime = 12;
+
+            let targetNote = null;
+            let minDistance = Infinity;
+
+            for (let note of notes) {
+                if (note.track === trackIndex) {
+                    const dist = Math.abs(note.y - CONFIG.hitY);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        targetNote = note;
+                    }
+                }
+            }
+
+            if (targetNote && minDistance < CONFIG.hitWindow) {
+                triggerBurn(targetNote);
+                floatingPhotos.push(new FloatingPhoto(targetNote.x, targetNote.y, targetNote.rotation, targetNote.image));
+                targetNote.active = false;
+                addScore();
+            } else {
+                playClickSound();
+            }
+        }
+
+        function triggerBurn(note) {
+            for (let i = 0; i < CONFIG.particleCount; i++) {
+                particles.push(new Particle(note.x, note.y, '#f97316'));
+                particles.push(new Particle(note.x, note.y, '#222'));
+            }
+            playBurnSound();
+        }
+
+        function addScore() {
+            score += 1;
+            scoreVal.innerText = score;
+        }
+
+        function togglePause() {
+            if (gameState === 'PLAYING') {
+                gameState = 'PAUSED';
+                pauseStartTime = performance.now();
+                bgMusic.pause();
+                pauseScreen.classList.remove('hidden');
+            } else if (gameState === 'PAUSED') {
+                const pauseDuration = performance.now() - pauseStartTime;
+                lastNoteTime += pauseDuration; 
+                gameState = 'PLAYING';
+                bgMusic.play();
+                pauseScreen.classList.add('hidden');
+            }
+        }
+
+        function playBeatSound() {
+            if (!audioCtx || gameState !== 'PLAYING') return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(50, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playBurnSound() {
+            if (!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 0.3;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const n = audioCtx.createBufferSource();
+            n.buffer = buffer;
+            const g = audioCtx.createGain();
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            n.connect(g); g.connect(audioCtx.destination);
+            n.start();
+        }
+
+        function playClickSound() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.connect(g); g.connect(audioCtx.destination);
+            g.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return; 
+            
+            const keyMap = {
+                'KeyD': 0, 'd': 0, 'D': 0,
+                'KeyF': 1, 'f': 1, 'F': 1,
+                'KeyJ': 2, 'j': 2, 'J': 2,
+                'KeyK': 3, 'k': 3, 'K': 3
+            };
+
+            const trackIndex = keyMap[e.code] !== undefined ? keyMap[e.code] : keyMap[e.key];
+            
+            if (trackIndex !== undefined) {
+                e.preventDefault();
+                handleInput(trackIndex);
+            }
+            
+            if (e.code === 'Escape') {
+                togglePause();
+            }
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (gameState === 'PLAYING') {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const touch = e.changedTouches[i];
+                    const trackIndex = Math.floor(touch.clientX / (window.innerWidth / 4));
+                    handleInput(Math.max(0, Math.min(3, trackIndex)));
+                }
+            }
+        }, {passive: false});
+
+        startBtn.addEventListener('click', () => {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            gameState = 'PLAYING';
+            startScreen.classList.add('hidden');
+            scoreBoard.classList.remove('hidden');
+            lastNoteTime = performance.now();
+            bgMusic.play().catch(err => console.log("Music play blocked:", err));
+        });
+
+        pauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePause();
+        });
+
+        resumeBtn.addEventListener('click', () => {
+            togglePause();
+        });
+
+        requestAnimationFrame(gameLoop);
+
+    </script>
+</body>
+</html>
