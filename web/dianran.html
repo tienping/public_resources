@@ -312,10 +312,14 @@
                 this.rotation = rotation;
                 this.image = image;
                 this.scale = 1;
-                this.targetScale = 8; // 将目标放大倍数再大一倍（从 4 改为 8）
+                
+                // 动态计算目标放大倍数：最大放大8倍，且高度不超过屏幕的 70%
+                const maxScale = (canvas.height * 0.7) / this.h;
+                this.targetScale = Math.min(8, maxScale); 
+                
                 this.opacity = 1;
                 this.targetX = canvas.width / 2; 
-                this.targetY = canvas.height * 0.4; 
+                this.targetY = canvas.height * 0.3; // 向上提10%（从 0.4 调整为 0.3）
                 this.lifeFrames = 0; // 新增帧数计时器
                 
                 // 根据照片初始位置决定旋转方向：左侧顺时针(正)，右侧逆时针(负)
@@ -532,21 +536,43 @@
                 state.angle = Math.max(state.angle - 0.15, 0);
             }
 
-            ctx.fillStyle = '#1a1a1a';
+            // 创建金属渐变质感 (打火机机身)
+            const bodyGrad = ctx.createLinearGradient(-22, 0, 22, 0);
+            bodyGrad.addColorStop(0, '#2a2b30');   // 左侧暗缘
+            bodyGrad.addColorStop(0.2, '#9ba0a8'); // 左侧高光 (反射房间微光)
+            bodyGrad.addColorStop(0.5, '#4a4d54'); // 中间基础金属灰
+            bodyGrad.addColorStop(0.8, '#70747c'); // 右侧次级反光
+            bodyGrad.addColorStop(1, '#1a1b1f');   // 右侧暗缘
+
+            ctx.fillStyle = bodyGrad;
             ctx.fillRect(-22, -50, 44, 90);
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#050505';
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(-22, -50, 44, 90);
 
+            // 打火机盖子
             ctx.save();
             ctx.translate(-22, -50);
             ctx.rotate(-state.angle);
-            ctx.fillStyle = '#222';
+            
+            const capGrad = ctx.createLinearGradient(0, 0, 44, 0);
+            capGrad.addColorStop(0, '#2a2b30');
+            capGrad.addColorStop(0.2, '#a5aab5'); // 盖子的高光稍微亮一点
+            capGrad.addColorStop(0.5, '#4a4d54');
+            capGrad.addColorStop(0.8, '#828791');
+            capGrad.addColorStop(1, '#1a1b1f');
+
+            ctx.fillStyle = capGrad;
             ctx.fillRect(0, -22, 44, 22);
             ctx.strokeRect(0, -22, 44, 22);
             ctx.restore();
 
-            ctx.fillStyle = '#0a0a0a';
+            // 打火机内部点火喷嘴机械结构
+            const mechGrad = ctx.createLinearGradient(-8, 0, 8, 0);
+            mechGrad.addColorStop(0, '#111');
+            mechGrad.addColorStop(0.5, '#666'); // 中间的金属反光
+            mechGrad.addColorStop(1, '#111');
+            ctx.fillStyle = mechGrad;
             ctx.fillRect(-8, -62, 16, 12);
             ctx.restore();
         }
