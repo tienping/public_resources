@@ -120,7 +120,7 @@
             trackXs: [],      // 4 条轨道的 X 坐标
             hitY: 600,
             hitWindow: 90,    
-            noteSpeed: 4.5,     
+            noteSpeed: 2.0,   // 将下落速度从 4.5 减缓至 2.0，让照片缓缓落下
             bpm: 72,          
             particleCount: 40
         };
@@ -233,7 +233,8 @@
                 this.life -= 0.015;
             }
             draw() {
-                ctx.globalAlpha = this.life;
+                // 使用 Math.max 确保透明度不会低于 0，防止 Canvas 忽略负值导致突然变为 100% 亮度
+                ctx.globalAlpha = Math.max(0, this.life);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -315,14 +316,24 @@
                 this.opacity = 1;
                 this.targetX = canvas.width / 2; 
                 this.targetY = canvas.height * 0.4; 
+                this.lifeFrames = 0; // 新增帧数计时器
+                
+                // 根据照片初始位置决定旋转方向：左侧顺时针(正)，右侧逆时针(负)
+                this.rotationSpeed = (this.x < canvas.width / 2) ? 0.001 : -0.001;
             }
 
             update() {
                 this.x += (this.targetX - this.x) * 0.05;
                 this.y += (this.targetY - this.y) * 0.05;
                 this.scale += (this.targetScale - this.scale) * 0.05;
-                this.opacity -= 0.004; // 衰减速度减半，停留时间延长一倍
-                this.rotation += 0.001; // 旋转速度调低至原本的 20%
+                
+                this.lifeFrames++;
+                // 延迟约1秒（60帧）后才开始虚化
+                if (this.lifeFrames > 60) {
+                    this.opacity -= 0.004; // 衰减速度减半，停留时间延长一倍
+                }
+                
+                this.rotation += this.rotationSpeed; // 应用动态旋转方向
             }
 
             draw() {
@@ -462,10 +473,15 @@
                 if (!notes[i].active) notes.splice(i, 1);
             }
 
+            // 倒序更新状态并清理过期照片
             for (let i = floatingPhotos.length - 1; i >= 0; i--) {
                 floatingPhotos[i].update();
-                floatingPhotos[i].draw();
                 if (floatingPhotos[i].opacity <= 0) floatingPhotos.splice(i, 1);
+            }
+            
+            // 正序绘制悬浮照片，确保最新点燃的照片（在数组末尾）最后绘制，从而叠在最顶层
+            for (let i = 0; i < floatingPhotos.length; i++) {
+                floatingPhotos[i].draw();
             }
 
             for (let i = particles.length - 1; i >= 0; i--) {
