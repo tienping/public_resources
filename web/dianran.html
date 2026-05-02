@@ -49,8 +49,22 @@
             letter-spacing: 2px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .score-row {
+            display: flex;
             align-items: center;
             gap: 20px;
+        }
+        .mode-badge {
+            font-size: 12px;
+            background: rgba(214, 158, 46, 0.1);
+            border: 1px solid rgba(214, 158, 46, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: #b7791f;
         }
         .pause-btn {
             pointer-events: auto;
@@ -81,30 +95,43 @@
     <div class="ui-overlay">
         <!-- 开始界面 -->
         <div id="startScreen" class="start-screen">
-            <h1 class="text-5xl font-black mb-2 text-orange-800 tracking-tighter">余烬</h1>
+            <h1 class="text-5xl font-black mb-2 text-orange-800 tracking-tighter">点燃</h1>
             <p class="mb-8 text-gray-500 text-xs tracking-[0.5em]">ROOM OF LOST MEMORIES</p>
-            <div class="mb-10 text-sm text-gray-400 leading-relaxed">
-                <p>在这个静谧的房间里，</p>
-                <p>点燃那些曾经的过去。</p>
+            <div class="mb-8 text-sm text-gray-400 leading-relaxed">
+                <p>在这个静谧的房间里，点燃那些曾经的过去。</p>
                 <p class="mt-4 text-xs text-orange-900">按下 D, F, J, K 键 或 点击对应轨道 点燃</p>
             </div>
-            <button id="startBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
-                进入房间
-            </button>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center mt-2">
+                <button id="startObserveBtn" class="bg-stone-900 hover:bg-stone-800 text-stone-400 border border-stone-700 px-8 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    观赏模式 (随机)
+                </button>
+                <button id="startRhythmBtn" class="bg-orange-950 hover:bg-orange-900 text-orange-600 border border-orange-800 px-8 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    节奏模式 (曲谱)
+                </button>
+            </div>
         </div>
 
         <!-- 暂停界面 -->
         <div id="pauseScreen" class="pause-screen hidden">
             <h2 class="text-3xl font-bold mb-6 text-orange-700">思绪停滞</h2>
             <p class="text-gray-400 mb-8 text-sm">火光暂时熄灭，但回忆仍在门外徘徊。</p>
-            <button id="resumeBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
-                继续点燃
-            </button>
+            <div class="flex flex-col gap-4 w-full">
+                <button id="resumeBtn" class="bg-stone-900 hover:bg-orange-950 text-orange-700 border border-orange-900 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    继续点燃
+                </button>
+                <button id="quitBtn" class="bg-transparent hover:bg-stone-900 text-stone-500 hover:text-stone-300 border border-stone-800 px-12 py-3 rounded-sm font-bold transition-all transform hover:scale-105 pointer-events-auto">
+                    退出模式选择
+                </button>
+            </div>
         </div>
 
         <div id="scoreBoard" class="score-board hidden">
-            <button id="pauseBtn" class="pause-btn">PAUSE</button>
-            <span>点燃: <span id="scoreVal">0</span></span>
+            <div class="score-row">
+                <button id="pauseBtn" class="pause-btn">PAUSE</button>
+                <span>点燃: <span id="scoreVal">0</span></span>
+            </div>
+            <div id="modeDisplay" class="mode-badge">节奏模式</div>
         </div>
         
         <div class="absolute bottom-3 w-full text-center text-[10px] md:text-xs text-stone-600 pointer-events-auto font-sans tracking-wider">
@@ -120,10 +147,17 @@
             trackXs: [],      // 4 条轨道的 X 坐标
             hitY: 600,
             hitWindow: 90,    
-            noteSpeed: 2.0,   // 将下落速度从 4.5 减缓至 2.0，让照片缓缓落下
+            noteSpeed: 2.0,   
             bpm: 72,          
             particleCount: 40
         };
+
+        // 定义节奏谱 (横杠充当分隔符和空拍)
+        const RHYTHM_MAP = "1-1-1-1-----1-2-3-4-----4-3-2-1-----1-2-3-4-----4-3-2-1-12-23-34-14------";
+        // 通过横杠分割，得到一个数组。空字符串代表空拍，"12"代表在轨道1和2同时下落。
+        const mapTokens = RHYTHM_MAP.split('-');
+        let currentMapIndex = 0;
+        let playMode = 'OBSERVE'; // 'OBSERVE' 或 'RHYTHM'
 
         // 预加载回忆照片
         const imageUrls = [
@@ -148,7 +182,7 @@
         const preloadedImages = [];
         imageUrls.forEach(url => {
             const img = new Image();
-            img.crossOrigin = "anonymous"; // 解决部分情况下的跨域渲染问题
+            img.crossOrigin = "anonymous";
             img.src = url;
             preloadedImages.push(img);
         });
@@ -157,11 +191,16 @@
         const ctx = canvas.getContext('2d');
         const startScreen = document.getElementById('startScreen');
         const pauseScreen = document.getElementById('pauseScreen');
-        const startBtn = document.getElementById('startBtn');
+        
+        const startObserveBtn = document.getElementById('startObserveBtn');
+        const startRhythmBtn = document.getElementById('startRhythmBtn');
         const resumeBtn = document.getElementById('resumeBtn');
+        const quitBtn = document.getElementById('quitBtn');
         const pauseBtn = document.getElementById('pauseBtn');
+        
         const scoreBoard = document.getElementById('scoreBoard');
         const scoreVal = document.getElementById('scoreVal');
+        const modeDisplay = document.getElementById('modeDisplay');
         const bgMusic = document.getElementById('bgMusic');
 
         let gameState = 'START';
@@ -186,14 +225,13 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            // 响应式计算 4 条轨道的位置 (D,F在最左边，J,K在最右边)
             const trackWidth = Math.min(80, canvas.width / 6);
             
             CONFIG.trackXs = [
-                trackWidth,                      // D (最左边)
-                trackWidth * 2.2,                // F (左边第二)
-                canvas.width - trackWidth * 2.2, // J (右边第二)
-                canvas.width - trackWidth        // K (最右边)
+                trackWidth,                      // D (1)
+                trackWidth * 2.2,                // F (2)
+                canvas.width - trackWidth * 2.2, // J (3)
+                canvas.width - trackWidth        // K (4)
             ];
             
             CONFIG.hitY = canvas.height * 0.85;
@@ -233,7 +271,6 @@
                 this.life -= 0.015;
             }
             draw() {
-                // 使用 Math.max 确保透明度不会低于 0，防止 Canvas 忽略负值导致突然变为 100% 亮度
                 ctx.globalAlpha = Math.max(0, this.life);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
@@ -275,11 +312,9 @@
                 ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
                 const p = 4;
                 
-                // 拍立得内框背景设为深色，模拟未曝光或者等待加载的状态
                 ctx.fillStyle = '#111';
                 ctx.fillRect(-this.w/2 + p, -this.h/2 + p, this.w - p*2, this.h - p*4);
                 
-                // 仅当图片成功加载时，绘制真实的随机图片（按比例缩放，居中裁剪，不拉伸变形）
                 if (this.image && this.image.complete && this.image.naturalHeight !== 0) {
                     const dx = -this.w/2 + p;
                     const dy = -this.h/2 + p;
@@ -289,7 +324,6 @@
                     const iw = this.image.naturalWidth;
                     const ih = this.image.naturalHeight;
                     
-                    // 计算 Cover 缩放比
                     const r = Math.max(dw / iw, dh / ih);
                     const sw = dw / r;
                     const sh = dh / r;
@@ -313,16 +347,14 @@
                 this.image = image;
                 this.scale = 1;
                 
-                // 动态计算目标放大倍数：最大放大8倍，且高度不超过屏幕的 70%
                 const maxScale = (canvas.height * 0.7) / this.h;
                 this.targetScale = Math.min(8, maxScale); 
                 
                 this.opacity = 1;
                 this.targetX = canvas.width / 2; 
-                this.targetY = canvas.height * 0.3; // 向上提10%（从 0.4 调整为 0.3）
-                this.lifeFrames = 0; // 新增帧数计时器
+                this.targetY = canvas.height * 0.3;
+                this.lifeFrames = 0;
                 
-                // 根据照片初始位置决定旋转方向：左侧顺时针(正)，右侧逆时针(负)
                 this.rotationSpeed = (this.x < canvas.width / 2) ? 0.001 : -0.001;
             }
 
@@ -332,12 +364,11 @@
                 this.scale += (this.targetScale - this.scale) * 0.05;
                 
                 this.lifeFrames++;
-                // 延迟约1秒（60帧）后才开始虚化
                 if (this.lifeFrames > 60) {
-                    this.opacity -= 0.004; // 衰减速度减半，停留时间延长一倍
+                    this.opacity -= 0.004;
                 }
                 
-                this.rotation += this.rotationSpeed; // 应用动态旋转方向
+                this.rotation += this.rotationSpeed;
             }
 
             draw() {
@@ -357,7 +388,6 @@
                 ctx.fillStyle = '#111';
                 ctx.fillRect(-this.w/2 + p, -this.h/2 + p, this.w - p*2, this.h - p*4);
                 
-                // 仅当图片成功加载时，绘制真实的随机图片（按比例缩放，居中裁剪，不拉伸变形）
                 if (this.image && this.image.complete && this.image.naturalHeight !== 0) {
                     const dx = -this.w/2 + p;
                     const dy = -this.h/2 + p;
@@ -367,7 +397,6 @@
                     const iw = this.image.naturalWidth;
                     const ih = this.image.naturalHeight;
                     
-                    // 计算 Cover 缩放比
                     const r = Math.max(dw / iw, dh / ih);
                     const sw = dw / r;
                     const sh = dh / r;
@@ -415,7 +444,6 @@
             ctx.lineTo(winX + winW, winY+winH);
             ctx.fill();
 
-            // 绘制4条隐约的轨道背景底纹
             ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
             if (CONFIG.trackXs.length === 4) {
                 CONFIG.trackXs.forEach(tx => {
@@ -459,7 +487,6 @@
                 particles.forEach(p => p.draw());
                 for(let i = 0; i < 4; i++) drawAnimatedLighter(i);
                 
-                // 添加全局暗色遮罩，让暂停或开始时背景和照片整体暗淡，凸显居中的 UI 弹窗
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
@@ -467,13 +494,38 @@
                 return;
             }
 
-            // 照片掉落间隔增加，2拍下来一张
-            const interval = (60000 / CONFIG.bpm) * 2;
+            // 根据当前模式决定照片生成的间隔（观赏模式两拍一个，节奏模式一拍解析一个token）
+            const interval = playMode === 'OBSERVE' 
+                ? (60000 / CONFIG.bpm) * 2 
+                : (60000 / CONFIG.bpm);
+
             if (time - lastNoteTime > interval) {
-                const trackIndex = Math.floor(Math.random() * 4); // 随机分配到 4 条轨道
-                notes.push(new Note(trackIndex));
+                
+                if (playMode === 'OBSERVE') {
+                    // 观赏模式：随机单轨下落
+                    const trackIndex = Math.floor(Math.random() * 4);
+                    notes.push(new Note(trackIndex));
+                    playBeatSound();
+                } 
+                else if (playMode === 'RHYTHM') {
+                    // 节奏模式：根据谱面字符串解析下落
+                    const token = mapTokens[currentMapIndex];
+                    if (token !== '') { // 如果不是空拍
+                        // 解析该拍包含的所有轨道 (支持双押等)
+                        for (let i = 0; i < token.length; i++) {
+                            const trackNum = parseInt(token[i]);
+                            // 确保输入是1到4的数字 (1对应D轨, 4对应K轨)
+                            if (trackNum >= 1 && trackNum <= 4) {
+                                notes.push(new Note(trackNum - 1));
+                            }
+                        }
+                        playBeatSound();
+                    }
+                    // 推进到下一拍，到达末尾循环
+                    currentMapIndex = (currentMapIndex + 1) % mapTokens.length;
+                }
+                
                 lastNoteTime = time;
-                playBeatSound();
             }
 
             for (let i = notes.length - 1; i >= 0; i--) {
@@ -482,13 +534,11 @@
                 if (!notes[i].active) notes.splice(i, 1);
             }
 
-            // 倒序更新状态并清理过期照片
             for (let i = floatingPhotos.length - 1; i >= 0; i--) {
                 floatingPhotos[i].update();
                 if (floatingPhotos[i].opacity <= 0) floatingPhotos.splice(i, 1);
             }
             
-            // 正序绘制悬浮照片，确保最新点燃的照片（在数组末尾）最后绘制，从而叠在最顶层
             for (let i = 0; i < floatingPhotos.length; i++) {
                 floatingPhotos[i].draw();
             }
@@ -541,13 +591,12 @@
                 state.angle = Math.max(state.angle - 0.15, 0);
             }
 
-            // 创建金属渐变质感 (打火机机身)
             const bodyGrad = ctx.createLinearGradient(-22, 0, 22, 0);
-            bodyGrad.addColorStop(0, '#2a2b30');   // 左侧暗缘
-            bodyGrad.addColorStop(0.2, '#9ba0a8'); // 左侧高光 (反射房间微光)
-            bodyGrad.addColorStop(0.5, '#4a4d54'); // 中间基础金属灰
-            bodyGrad.addColorStop(0.8, '#70747c'); // 右侧次级反光
-            bodyGrad.addColorStop(1, '#1a1b1f');   // 右侧暗缘
+            bodyGrad.addColorStop(0, '#2a2b30');   
+            bodyGrad.addColorStop(0.2, '#9ba0a8'); 
+            bodyGrad.addColorStop(0.5, '#4a4d54'); 
+            bodyGrad.addColorStop(0.8, '#70747c'); 
+            bodyGrad.addColorStop(1, '#1a1b1f');   
 
             ctx.fillStyle = bodyGrad;
             ctx.fillRect(-22, -50, 44, 90);
@@ -555,14 +604,13 @@
             ctx.lineWidth = 1.5;
             ctx.strokeRect(-22, -50, 44, 90);
 
-            // 打火机盖子
             ctx.save();
             ctx.translate(-22, -50);
             ctx.rotate(-state.angle);
             
             const capGrad = ctx.createLinearGradient(0, 0, 44, 0);
             capGrad.addColorStop(0, '#2a2b30');
-            capGrad.addColorStop(0.2, '#a5aab5'); // 盖子的高光稍微亮一点
+            capGrad.addColorStop(0.2, '#a5aab5'); 
             capGrad.addColorStop(0.5, '#4a4d54');
             capGrad.addColorStop(0.8, '#828791');
             capGrad.addColorStop(1, '#1a1b1f');
@@ -572,10 +620,9 @@
             ctx.strokeRect(0, -22, 44, 22);
             ctx.restore();
 
-            // 打火机内部点火喷嘴机械结构
             const mechGrad = ctx.createLinearGradient(-8, 0, 8, 0);
             mechGrad.addColorStop(0, '#111');
-            mechGrad.addColorStop(0.5, '#666'); // 中间的金属反光
+            mechGrad.addColorStop(0.5, '#666'); 
             mechGrad.addColorStop(1, '#111');
             ctx.fillStyle = mechGrad;
             ctx.fillRect(-8, -62, 16, 12);
@@ -708,14 +755,23 @@
             }
         }, {passive: false});
 
-        startBtn.addEventListener('click', () => {
+        function startGame(mode) {
+            playMode = mode;
+            modeDisplay.innerText = mode === 'OBSERVE' ? '观赏模式' : '节奏模式';
+            modeDisplay.style.color = mode === 'OBSERVE' ? '#a8a29e' : '#b7791f';
+            
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             gameState = 'PLAYING';
             startScreen.classList.add('hidden');
             scoreBoard.classList.remove('hidden');
+            
             lastNoteTime = performance.now();
+            currentMapIndex = 0;
             bgMusic.play().catch(err => console.log("Music play blocked:", err));
-        });
+        }
+
+        startObserveBtn.addEventListener('click', () => startGame('OBSERVE'));
+        startRhythmBtn.addEventListener('click', () => startGame('RHYTHM'));
 
         pauseBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -724,6 +780,32 @@
 
         resumeBtn.addEventListener('click', () => {
             togglePause();
+        });
+
+        quitBtn.addEventListener('click', () => {
+            // 充置游戏状态
+            gameState = 'START';
+            score = 0;
+            scoreVal.innerText = score;
+            notes = [];
+            particles = [];
+            floatingPhotos = [];
+            currentMapIndex = 0;
+            
+            // 充置打火机状态
+            lighters.forEach(l => {
+                l.flameTime = 0;
+                l.angle = 0;
+            });
+
+            // 停止并重置音乐
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+
+            // 切换 UI
+            pauseScreen.classList.add('hidden');
+            scoreBoard.classList.add('hidden');
+            startScreen.classList.remove('hidden');
         });
 
         requestAnimationFrame(gameLoop);
