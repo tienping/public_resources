@@ -458,6 +458,11 @@
                 floatingPhotos.forEach(f => f.draw());
                 particles.forEach(p => p.draw());
                 for(let i = 0; i < 4; i++) drawAnimatedLighter(i);
+                
+                // 添加全局暗色遮罩，让暂停或开始时背景和照片整体暗淡，凸显居中的 UI 弹窗
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
                 requestAnimationFrame(gameLoop);
                 return;
             }
