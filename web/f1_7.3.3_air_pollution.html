@@ -102,6 +102,12 @@
             <button id="start-outro-btn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-12 py-6 bg-blue-500 hover:bg-blue-400 text-white font-extrabold rounded-full text-4xl transition hover:scale-110 shadow-[0_0_30px_rgba(59,130,246,0.7)] border-4 border-blue-600 hidden">Play Video</button>
         </div>
 
+        <!-- Edu Video Screen -->
+        <div id="edu-video-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-[65] interactive hidden">
+            <video id="edu-video" class="w-full h-full object-contain" src="https://tienping.github.io/public_resources/video/why_air_pollution.mp4" controls playsinline></video>
+            <button id="close-edu-video-btn" class="absolute bottom-8 right-8 px-6 py-3 bg-gray-800 bg-opacity-70 hover:bg-gray-700 text-white font-bold rounded-full text-xl transition border border-gray-500 backdrop-blur-sm shadow-xl">Close Video ✖</button>
+        </div>
+
         <!-- Pause Screen -->
         <div id="pause-screen" class="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-[45] text-white hidden interactive backdrop-blur-sm">
             <h1 class="text-6xl font-black mb-8 drop-shadow-2xl text-yellow-400 tracking-widest">PAUSED</h1>
@@ -112,12 +118,14 @@
         <div id="start-screen" class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 text-white p-6 interactive backdrop-blur-sm">
             <h1 class="text-5xl font-extrabold mb-4 text-green-400 text-center drop-shadow-lg">Air Pollution Defender</h1>
             <p class="text-lg mb-6 text-left max-w-2xl bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-gray-600 shadow-xl leading-relaxed">
-                Communicate about air pollutants and the causes (Learning Standard 7.3.2)<br><br>
+                <span class="font-bold underline">Communicate about air pollutants and the causes (Learning Standard 7.3.2)</span> <a href="#" id="learn-more-link" class="text-blue-400 hover:text-blue-300 underline font-bold transition">📖 Learn more about Air Pollution</a><br><br>
+                Air pollution is caused by harmful substances like smoke, dust, and gases released into the air from vehicles, factories, and open burning. It can harm humans, animals, and the environment.<br>
+                <br>
                 🚜 <b>Loggers</b> destroy our natural air filters, tress. Drag to 🗑️!<br>
                 👨‍🌾 <b>Irresponsible Farmers</b> use excessive fertiliser and pesticide. Drag to 🗑️!<br>
-                🚗 <b>Vehicles</b> release toxic carbon monoxide and smoke. Drag to 🗑️!)<br><br>
+                🚗 <b>Vehicles</b> release toxic carbon monoxide and smoke. Drag to 🗑️!)<br>
                 🔥 <b>Forest Fires</b> spread, filling the air with soot and dust. <br>
-                Use the 🧯 extinguisher to put them out.<br><br>
+                Use the 🧯 extinguisher to put them out.<br>
                 🌲 <b>Trees</b> clean the air by absorbing gases. Plant them from the Nursery.<br><br>
                 Keep the pollution bar low to stay ALIVE!
             </p>
@@ -205,6 +213,11 @@
         const outroVideo = document.getElementById('outro-video');
         const skipOutroBtn = document.getElementById('skip-outro-btn');
         const startOutroBtn = document.getElementById('start-outro-btn');
+        
+        const eduVideoScreen = document.getElementById('edu-video-screen');
+        const eduVideo = document.getElementById('edu-video');
+        const closeEduVideoBtn = document.getElementById('close-edu-video-btn');
+        const learnMoreLink = document.getElementById('learn-more-link');
         
         const showScoresBtn = document.getElementById('show-scores-btn');
         
@@ -1084,6 +1097,23 @@
         startOutroBtn.addEventListener('click', () => {
             outroVideo.play().catch(e => console.warn("Play blocked by browser:", e));
         });
+
+        // Educational Video Logic
+        learnMoreLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            eduVideoScreen.classList.remove('hidden');
+            eduVideo.currentTime = 0;
+            // Safe to autoplay here because it is a direct result of a user click
+            eduVideo.play().catch(e => console.warn("Play blocked by browser:", e));
+        });
+
+        function closeEduVideo() {
+            eduVideo.pause();
+            eduVideoScreen.classList.add('hidden');
+        }
+
+        closeEduVideoBtn.addEventListener('click', closeEduVideo);
+        eduVideo.addEventListener('ended', closeEduVideo);
 
         function togglePause() {
             if (!isPlaying) return;
