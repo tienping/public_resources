@@ -90,9 +90,16 @@
 
         <!-- Intro Video Screen -->
         <div id="video-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-[60] interactive">
-            <video id="intro-video" class="w-full h-full object-contain" src="https://tienping.github.io/public_resources/video/why_air_pollution.mp4" controls playsinline></video>
+            <video id="intro-video" class="w-full h-full object-contain" src="https://tienping.github.io/public_resources/video/air_pollution_defender.mp4" controls playsinline></video>
             <button id="skip-video-btn" class="absolute bottom-8 right-8 px-6 py-3 bg-gray-800 bg-opacity-70 hover:bg-gray-700 text-white font-bold rounded-full text-xl transition border border-gray-500 backdrop-blur-sm shadow-xl">Skip Video ⏭️</button>
             <button id="start-video-btn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-12 py-6 bg-green-500 hover:bg-green-400 text-black font-extrabold rounded-full text-4xl transition hover:scale-110 shadow-[0_0_30px_rgba(74,222,128,0.7)] border-4 border-green-600">Start</button>
+        </div>
+
+        <!-- Outro Video Screen -->
+        <div id="outro-video-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-[60] interactive hidden">
+            <video id="outro-video" class="w-full h-full object-contain" src="https://tienping.github.io/public_resources/video/air_pollution_breakdown.mp4" controls playsinline></video>
+            <button id="skip-outro-btn" class="absolute bottom-8 right-8 px-6 py-3 bg-gray-800 bg-opacity-70 hover:bg-gray-700 text-white font-bold rounded-full text-xl transition border border-gray-500 backdrop-blur-sm shadow-xl">Skip Video ⏭️</button>
+            <button id="start-outro-btn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-12 py-6 bg-blue-500 hover:bg-blue-400 text-white font-extrabold rounded-full text-4xl transition hover:scale-110 shadow-[0_0_30px_rgba(59,130,246,0.7)] border-4 border-blue-600 hidden">Play Video</button>
         </div>
 
         <!-- Pause Screen -->
@@ -104,13 +111,15 @@
         <!-- Start Screen -->
         <div id="start-screen" class="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 text-white p-6 interactive backdrop-blur-sm">
             <h1 class="text-5xl font-extrabold mb-4 text-green-400 text-center drop-shadow-lg">Air Pollution Defender</h1>
-            <p class="text-lg mb-6 text-center max-w-2xl bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-gray-600 shadow-xl leading-relaxed">
-                Learn to control air pollution! (Standard 7.3.3)<br><br>
-                🌲 <b>Trees</b> reduce pollution. Plant them from the Nursery (top left).<br>
-                🚜 <b>Loggers</b> & 👨‍🌾 <b>Farmers</b> harm nature. Drag them to the 🗑️ Rubbish Bin!<br>
-                🔥 <b>Forest Fires</b> spread. Drag the 🧯 Extinguisher to put them out.<br>
-                🚗 <b>Vehicles</b> emit smoke. Drag them to the bin too!<br>
-                <br>Keep the pollution bar empty to survive!
+            <p class="text-lg mb-6 text-left max-w-2xl bg-gray-900 bg-opacity-80 p-6 rounded-xl border border-gray-600 shadow-xl leading-relaxed">
+                Communicate about air pollutants and the causes (Learning Standard 7.3.2)<br><br>
+                🚜 <b>Loggers</b> destroy our natural air filters, tress. Drag to 🗑️!<br>
+                👨‍🌾 <b>Irresponsible Farmers</b> use excessive fertiliser and pesticide. Drag to 🗑️!<br>
+                🚗 <b>Vehicles</b> release toxic carbon monoxide and smoke. Drag to 🗑️!)<br><br>
+                🔥 <b>Forest Fires</b> spread, filling the air with soot and dust. <br>
+                Use the 🧯 extinguisher to put them out.<br><br>
+                🌲 <b>Trees</b> clean the air by absorbing gases. Plant them from the Nursery.<br><br>
+                Keep the pollution bar low to stay ALIVE!
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 <button id="start-btn" class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(74,222,128,0.7)]">Start Mission</button>
@@ -185,11 +194,18 @@
         const startScreen = document.getElementById('start-screen');
         const gameOverScreen = document.getElementById('game-over-screen');
         const videoScreen = document.getElementById('video-screen');
+        const outroVideoScreen = document.getElementById('outro-video-screen');
         const pauseScreen = document.getElementById('pause-screen');
+        
         const introVideo = document.getElementById('intro-video');
         const skipVideoBtn = document.getElementById('skip-video-btn');
         const startVideoBtn = document.getElementById('start-video-btn');
         const replayVideoBtn = document.getElementById('replay-video-btn');
+        
+        const outroVideo = document.getElementById('outro-video');
+        const skipOutroBtn = document.getElementById('skip-outro-btn');
+        const startOutroBtn = document.getElementById('start-outro-btn');
+        
         const showScoresBtn = document.getElementById('show-scores-btn');
         
         const startBtn = document.getElementById('start-btn');
@@ -613,6 +629,7 @@
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
             pauseScreen.classList.add('hidden');
+            outroVideoScreen.classList.add('hidden');
             
             isPlaying = true;
             isPaused = false;
@@ -855,21 +872,7 @@
             
             // Win/Loss Condition
             if (pollutionLevel >= GAME_CONFIG.MAX_POLLUTION) {
-                isPlaying = false;
-                birdSound.pause(); // Ensure audio stops on Game Over
-                coughSound.pause();
-                warningSound.pause();
-                fireSound.pause();
-                
-                // Reset Score Submission UI
-                playerNameInput.value = '';
-                playerNameInput.disabled = false;
-                submitScoreBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
-                submitScoreBtn.disabled = false;
-                submitScoreStatus.classList.add('hidden');
-                
-                document.getElementById('final-score').innerText = score;
-                gameOverScreen.classList.remove('hidden');
+                handleGameOver();
             } else {
                 gameLoopId = requestAnimationFrame(gameLoop);
             }
@@ -992,8 +995,44 @@
         window.addEventListener('touchstart', handleDown, {passive: false});
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleUp);
+
+        // Core Game Over Logic
+        function handleGameOver() {
+            isPlaying = false;
+            isPaused = false;
+            draggedItem = null;
+            
+            pauseScreen.classList.add('hidden');
+            
+            birdSound.pause();
+            coughSound.pause();
+            warningSound.pause();
+            fireSound.pause();
+            
+            // Reset Score Submission UI
+            playerNameInput.value = '';
+            playerNameInput.disabled = false;
+            submitScoreBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+            submitScoreBtn.disabled = false;
+            submitScoreStatus.classList.add('hidden');
+            
+            // Display score inside GameOver modal (which is currently hidden)
+            document.getElementById('final-score').innerText = score;
+            
+            // Show Outro Video First
+            outroVideoScreen.classList.remove('hidden');
+            outroVideo.currentTime = 0;
+            
+            let playPromise = outroVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.warn("Autoplay blocked by browser:", e);
+                    startOutroBtn.classList.remove('hidden');
+                });
+            }
+        }
         
-        // Video Intro Logic
+        // Intro Video Logic
         function closeVideo() {
             introVideo.pause();
             videoScreen.classList.add('hidden');
@@ -1007,7 +1046,9 @@
         });
         
         introVideo.addEventListener('pause', () => {
-            startVideoBtn.classList.remove('hidden');
+            if(!introVideo.ended && !videoScreen.classList.contains('hidden')) {
+                startVideoBtn.classList.remove('hidden');
+            }
         });
 
         startVideoBtn.addEventListener('click', () => {
@@ -1018,6 +1059,30 @@
             videoScreen.classList.remove('hidden');
             introVideo.currentTime = 0;
             startVideoBtn.classList.remove('hidden');
+        });
+
+        // Outro Video Logic
+        function closeOutroVideo() {
+            outroVideo.pause();
+            outroVideoScreen.classList.add('hidden');
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        skipOutroBtn.addEventListener('click', closeOutroVideo);
+        outroVideo.addEventListener('ended', closeOutroVideo);
+
+        outroVideo.addEventListener('play', () => {
+            startOutroBtn.classList.add('hidden');
+        });
+        
+        outroVideo.addEventListener('pause', () => {
+            if(!outroVideo.ended && !outroVideoScreen.classList.contains('hidden')) {
+                startOutroBtn.classList.remove('hidden');
+            }
+        });
+
+        startOutroBtn.addEventListener('click', () => {
+            outroVideo.play().catch(e => console.warn("Play blocked by browser:", e));
         });
 
         function togglePause() {
@@ -1040,27 +1105,7 @@
 
         quitBtn.addEventListener('click', () => {
             if (!isPlaying) return;
-            isPlaying = false;
-            isPaused = false;
-            draggedItem = null;
-            
-            pauseScreen.classList.add('hidden');
-            
-            birdSound.pause();
-            coughSound.pause();
-            warningSound.pause();
-            fireSound.pause();
-            
-            // Reset Score Submission UI
-            playerNameInput.value = '';
-            playerNameInput.disabled = false;
-            submitScoreBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
-            submitScoreBtn.disabled = false;
-            submitScoreStatus.classList.add('hidden');
-            
-            // Show Game Over screen to display score instead of jumping to start
-            document.getElementById('final-score').innerText = score;
-            gameOverScreen.classList.remove('hidden');
+            handleGameOver();
         });
 
         homeBtn.addEventListener('click', () => {
