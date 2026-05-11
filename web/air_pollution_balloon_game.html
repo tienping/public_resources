@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smog Buster</title>
+    <style>
+        /* CSS Reset & Basic Setup */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none; /* Prevent text selection during gameplay */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Game Container Setup */
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 4/3; /* Maintain a consistent playable area */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: #87CEEB; /* Sky blue background fallback */
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Canvas */
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* UI Overlays (Start & Game Over Screens) */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(44, 62, 80, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: #f1c40f;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .instructions {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            background: rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .instructions span {
+            display: inline-block;
+            margin: 0 5px;
+            font-size: 1.5rem;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #final-score {
+            font-size: 4rem;
+            color: #2ecc71;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        #pauseBtn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: #34495e;
+            display: none; /* Hidden initially */
+            z-index: 5;
+        }
+
+        #pauseBtn:hover {
+            background-color: #2c3e50;
+        }
+
+        #audioControls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(52, 73, 94, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            z-index: 5;
+        }
+
+        #muteBtn {
+            background: none;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-size: 1.5rem;
+            min-width: auto;
+            margin: 0;
+            transform: none;
+        }
+
+        #muteBtn:hover {
+            transform: scale(1.1);
+            background: none;
+        }
+
+        #volumeSlider {
+            width: 80px;
+            cursor: pointer;
+            accent-color: #f1c40f;
+        }
+
+        #countdownText {
+            font-size: 8rem;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- The Main Game Canvas -->
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen active">
+            <h1>Smog Buster</h1>
+            <div class="instructions">
+                <p>Help clean the atmosphere!</p>
+                <p>Shoot (click) the <strong>Air Pollution</strong> balloons to score <strong>+10 points</strong>.<br>
+                   <span style="font-size: 1rem; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; margin-top: 5px;">e.g., Factory smoke, Haze, Bad odour</span>
+                </p>
+                <p style="margin-top: 15px;">Avoid the <strong>Eco-Friendly</strong> balloons! Popping them deducts <strong>-10 points</strong>.<br>
+                   <span style="font-size: 1rem; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; margin-top: 5px;">e.g., Bicycles, Solar panels, Recycling</span>
+                </p>
+                <p style="margin-top: 15px; color: #f1c40f; font-weight: bold;">You have 40 seconds. Get ready for FRENZY MODE!</p>
+            </div>
+            <button id="startBtn">Start Game</button>
+        </div>
+
+        <!-- Countdown Screen -->
+        <div id="countdownScreen" class="screen">
+            <h1 id="countdownText">3</h1>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="pauseScreen" class="screen">
+            <h2>Paused</h2>
+            <button id="resumeBtn">Resume</button>
+        </div>
+
+        <!-- Pause Button -->
+        <button id="pauseBtn">⏸ Pause</button>
+
+        <!-- Audio Controls -->
+        <div id="audioControls">
+            <button id="muteBtn" title="Mute/Unmute">🔊</button>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen">
+            <h2>Time's Up!</h2>
+            <p>Your Final Score:</p>
+            <div id="final-score">0</div>
+            <button id="restartBtn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME CONFIGURATION & VARIABLES ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Elements
+        const startScreen = document.getElementById('startScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const countdownScreen = document.getElementById('countdownScreen');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const countdownText = document.getElementById('countdownText');
+        const finalScoreEl = document.getElementById('final-score');
+
+        // Game Settings & Assets
+        const TOTAL_GAME_TIME = 40; // in seconds
+        const TARGET_FPS = 60;
+        
+        // Target Categories
+        const POLLUTION_ITEMS = [
+            'Factory smoke', 'Industrial activities', 'Haze', 'Open burning and forest fires',
+            'Dust', 'Construction and quarry activities', 'Cigarette smoke', 'Burning tobacco',
+            'Poisonous gases', 'Vehicle and factory emissions', 'Bad odour', 'Garbage and waste disposal',
+            'Vehicle smoke', 'Burning petrol and diesel', 'Chemical pollution', 'Aerosols and pesticides'
+        ];
+        const ECO_ITEMS = [
+            'Bicycles', 'Planting trees', 'Solar panels', 'Wind turbines',
+            'Electric vehicles', 'Recycling', 'Public transport', 'Composting',
+            'Walking', 'Carpooling', 'Green energy', 'Conserving water'
+        ];
+        
+        // Pastel colors for balloons so emojis remain readable
+        const BALLOON_COLORS = ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#E8BAFF', '#FFBAE8'];
+
+        // Game State Variables
+        let isPlaying = false;
+        let isPaused = false;
+        let score = 0;
+        let timeLeft = TOTAL_GAME_TIME;
+        let balloons = [];
+        let floatingTexts = []; // To show +10 / -10 when clicking
+        let particles = []; // To show explosion particles
+        
+        // Timer/Loop tracking
+        let lastTime = 0;
+        let nextSpawnTime = 0;
+        let gameTimerInterval;
+        let frenzyLevel = 0;
+        let frenzyTextTimer = 0; // Controls the "FRENZY MODE!" flash duration
+
+        // --- AUDIO SYSTEM ---
+        let audioCtx;
+        let masterGainNode;
+        let isMuted = false;
+        const bgMusic = new Audio('https://tienping.github.io/public_resources/audio/Game-Music-Fun-Modern-Path.mp3');
+        bgMusic.loop = true;
+        bgMusic.volume = 0.5; // Matches the slider's default value
+
+        function initAudio() {
+            // Initialize AudioContext on first user interaction (browser policy)
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a master gain node to control overall sound effects volume
+                masterGainNode = audioCtx.createGain();
+                masterGainNode.connect(audioCtx.destination);
+                masterGainNode.gain.value = isMuted ? 0 : volumeSlider.value;
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playPopSound() {
+            if (!audioCtx || !masterGainNode) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.connect(gainNode);
+            gainNode.connect(masterGainNode); // Connect to master instead of destination
+            
+            // Rapid pitch drop for a "pop" sound
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            
+            // Volume fade out
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playBombSound() {
+            if (!audioCtx || !masterGainNode) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+
+            // A square wave through a lowpass filter creates a good rumbly explosion
+            osc.type = 'square';
+            
+            osc.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(masterGainNode); // Connect to master instead of destination
+            
+            // Filter sweep (creates the 'boom' resonance drop)
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+
+            // Pitch drop for the heavy thud
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.5);
+            
+            // Volume fade out
+            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // --- CLASSES ---
+
+        class Balloon {
+            constructor() {
+                this.radius = 45 + Math.random() * 20; // 45 to 65 (larger to fit text)
+                // Spawn randomly along the X axis, fully inside the canvas bounds
+                this.x = this.radius + Math.random() * (canvas.width - this.radius * 2);
+                this.y = canvas.height + this.radius + 20; // Start slightly below screen
+                
+                // Base speed is around 100-200 pixels per second. 
+                // We add some speed variation to make it interesting.
+                this.speed = 100 + Math.random() * 100; 
+                this.wobbleSpeed = 0.001 + Math.random() * 0.002;
+                this.wobbleAmount = 5 + Math.random() * 10;
+                this.wobbleOffset = Math.random() * Math.PI * 2; // Random start phase
+
+                this.color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+                
+                // Determine if this is a target or a decoy
+                this.isPollution = Math.random() > 0.4; // 60% chance to be a target
+                if (this.isPollution) {
+                    this.text = POLLUTION_ITEMS[Math.floor(Math.random() * POLLUTION_ITEMS.length)];
+                } else {
+                    this.text = ECO_ITEMS[Math.floor(Math.random() * ECO_ITEMS.length)];
+                }
+            }
+
+            update(dt, totalTime) {
+                // Move upward
+                this.y -= this.speed * dt;
+                // Add a sine wave wobble for realistic balloon movement
+                this.currentX = this.x + Math.sin(totalTime * this.wobbleSpeed + this.wobbleOffset) * this.wobbleAmount;
+            }
+
+            draw(ctx) {
+                let drawX = this.currentX || this.x;
+
+                // Draw the string
+                ctx.beginPath();
+                ctx.moveTo(drawX, this.y + this.radius);
+                ctx.quadraticCurveTo(drawX - 10, this.y + this.radius + 20, drawX + 5, this.y + this.radius + 50);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw the Balloon body (Ellipse)
+                ctx.beginPath();
+                ctx.ellipse(drawX, this.y, this.radius, this.radius * 1.15, 0, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                
+                // Balloon highlight (makes it look 3D)
+                ctx.beginPath();
+                ctx.ellipse(drawX - this.radius*0.3, this.y - this.radius*0.4, this.radius*0.2, this.radius*0.4, Math.PI/4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fill();
+
+                // Draw the knot at the bottom
+                ctx.beginPath();
+                ctx.moveTo(drawX - 5, this.y + this.radius * 1.15);
+                ctx.lineTo(drawX + 5, this.y + this.radius * 1.15);
+                ctx.lineTo(drawX, this.y + this.radius * 1.15 + 8);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // Draw the Text in the center
+                ctx.font = `bold 12px Arial`;
+                ctx.fillStyle = '#2c3e50'; // Dark text for readability on pastel backgrounds
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Word wrap logic so long phrases fit inside the balloon
+                let words = this.text.split(' ');
+                let line = '';
+                let lines = [];
+                let maxWidth = this.radius * 1.6; // Max width based on balloon size
+                let lineHeight = 14;
+
+                for(let n = 0; n < words.length; n++) {
+                    let testLine = line + words[n] + ' ';
+                    let metrics = ctx.measureText(testLine);
+                    let testWidth = metrics.width;
+                    if (testWidth > maxWidth && n > 0) {
+                        lines.push(line.trim());
+                        line = words[n] + ' ';
+                    } else {
+                        line = testLine;
+                    }
+                }
+                lines.push(line.trim());
+
+                // Center the text block vertically
+                let startY = this.y - ((lines.length - 1) * lineHeight) / 2;
+                for(let i = 0; i < lines.length; i++) {
+                    ctx.fillText(lines[i], drawX, startY + (i * lineHeight));
+                }
+            }
+            
+            // Check if a point (x,y) is inside this balloon
+            isClicked(clickX, clickY) {
+                let drawX = this.currentX || this.x;
+                // Simple distance calculation (treating as a circle for hit detection)
+                const dist = Math.hypot(clickX - drawX, clickY - this.y);
+                return dist <= this.radius * 1.15; // Slightly larger hit box for the ellipse
+            }
+        }
+
+        // Handles the "+10" / "-10" text that floats up when a balloon is popped
+        class FloatingText {
+            constructor(x, y, text, color) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.life = 1.0; // Alpha
+            }
+
+            update(dt) {
+                this.y -= 50 * dt; // Float up
+                this.life -= 1.5 * dt; // Fade out quickly
+            }
+
+            draw(ctx) {
+                if (this.life <= 0) return;
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life;
+                ctx.textAlign = 'center';
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.globalAlpha = 1.0; // Reset
+                
+                // Add a tiny outline for readability
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 1;
+                ctx.globalAlpha = this.life;
+                ctx.strokeText(this.text, this.x, this.y);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        // Handles the particle explosion when a balloon is popped
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                
+                // Explode outwards in a random direction
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 200 + 50;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                
+                this.radius = Math.random() * 4 + 2;
+                this.life = 1.0;
+                this.decay = Math.random() * 1.5 + 1.5; // Fade out rate
+            }
+
+            update(dt) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.vy += 400 * dt; // Add some gravity so particles fall
+                this.life -= this.decay * dt;
+            }
+
+            draw(ctx) {
+                if (this.life <= 0) return;
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        // --- CORE GAME LOGIC ---
+
+        function init() {
+            startBtn.addEventListener('click', startCountdown);
+            restartBtn.addEventListener('click', startCountdown);
+            pauseBtn.addEventListener('click', togglePause);
+            resumeBtn.addEventListener('click', togglePause);
+            
+            // Audio Control Listeners
+            muteBtn.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('input', handleVolumeChange);
+            
+            // Handle player shooting (clicking)
+            // Listen on the container or window and map coordinates
+            canvas.addEventListener('mousedown', handleShoot);
+            canvas.addEventListener('touchstart', handleShoot, {passive: false}); // Mobile support
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            muteBtn.textContent = isMuted ? '🔇' : '🔊';
+            bgMusic.muted = isMuted;
+            
+            if (masterGainNode) {
+                masterGainNode.gain.value = isMuted ? 0 : volumeSlider.value;
+            }
+        }
+
+        function handleVolumeChange(e) {
+            const vol = parseFloat(e.target.value);
+            bgMusic.volume = vol;
+            
+            if (masterGainNode && !isMuted) {
+                masterGainNode.gain.value = vol;
+            }
+
+            // Auto mute/unmute based on slider value
+            if (vol === 0 && !isMuted) {
+                isMuted = true;
+                muteBtn.textContent = '🔇';
+                bgMusic.muted = true;
+            } else if (vol > 0 && isMuted) {
+                isMuted = false;
+                muteBtn.textContent = '🔊';
+                bgMusic.muted = false;
+                if (masterGainNode) {
+                    masterGainNode.gain.value = vol;
+                }
+            }
+        }
+
+        function startCountdown() {
+            initAudio(); // Initialize audio on first user gesture
+            
+            // Unlock audio playback during the direct user gesture to prevent browser blocking
+            bgMusic.play().then(() => {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+            }).catch(e => console.warn("Audio unlock failed", e));
+            
+            startScreen.classList.remove('active');
+            gameOverScreen.classList.remove('active');
+            countdownScreen.classList.add('active');
+            pauseBtn.style.display = 'none';
+
+            let count = 3;
+            countdownText.textContent = count;
+
+            let countInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownText.textContent = count;
+                } else if (count === 0) {
+                    countdownText.textContent = "GO!";
+                } else {
+                    clearInterval(countInterval);
+                    countdownScreen.classList.remove('active');
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function togglePause() {
+            if (!isPlaying) return;
+            
+            isPaused = !isPaused;
+
+            if (isPaused) {
+                pauseScreen.classList.add('active');
+                pauseBtn.style.display = 'none';
+                bgMusic.pause();
+            } else {
+                pauseScreen.classList.remove('active');
+                pauseBtn.style.display = 'block';
+                bgMusic.play();
+                
+                // Restart loop
+                lastTime = performance.now();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function startGame() {
+            // Reset state
+            score = 0;
+            timeLeft = TOTAL_GAME_TIME;
+            balloons = [];
+            floatingTexts = [];
+            particles = [];
+            frenzyLevel = 0;
+            frenzyTextTimer = 0;
+            isPlaying = true;
+            isPaused = false;
+            nextSpawnTime = performance.now(); // Immediate first spawn
+            
+            pauseBtn.style.display = 'block';
+            
+            // Start background music
+            bgMusic.currentTime = 0;
+            bgMusic.play().catch(e => console.warn("Music play failed:", e));
+
+            // Manage Time Countdown
+            clearInterval(gameTimerInterval);
+            gameTimerInterval = setInterval(() => {
+                if (isPlaying && !isPaused) {
+                    timeLeft--;
+                    checkFrenzyTriggers();
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
+                }
+            }, 1000);
+
+            // Start loop
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            isPlaying = false;
+            isPaused = false;
+            pauseBtn.style.display = 'none';
+            clearInterval(gameTimerInterval);
+            bgMusic.pause();
+            
+            // Update UI
+            finalScoreEl.textContent = score;
+            // Color code the final score based on performance
+            if(score < 0) finalScoreEl.style.color = '#e74c3c';
+            else if(score > 500) finalScoreEl.style.color = '#f1c40f';
+            else finalScoreEl.style.color = '#2ecc71';
+
+            gameOverScreen.classList.add('active');
+        }
+
+        // Determines specific spawn intervals based on current time left
+        function calculateNextSpawnDelay() {
+            let timeElapsed = TOTAL_GAME_TIME - timeLeft;
+            let min, max;
+            
+            if (timeElapsed < 10) {
+                // Normal Mode (0s to 10s elapsed)
+                min = 500;
+                max = 1500;
+            } else if (timeElapsed < 15) {
+                // Frenzy Level 1 (10s to 15s elapsed)
+                min = 250;
+                max = 750;
+            } else if (timeElapsed < 30) {
+                // Frenzy Level 2 (15s to 30s elapsed)
+                min = 125;
+                max = 375;
+            } else {
+                // Frenzy Level 3 (30s to 40s elapsed)
+                min = 62.5;
+                max = 187.5;
+            }
+            return min + Math.random() * (max - min);
+        }
+
+        // Set visual flags when crossing frenzy thresholds
+        function checkFrenzyTriggers() {
+            let timeElapsed = TOTAL_GAME_TIME - timeLeft;
+            
+            if (timeElapsed === 10 && frenzyLevel === 0) {
+                triggerFrenzy(1);
+            } else if (timeElapsed === 15 && frenzyLevel === 1) {
+                triggerFrenzy(2);
+            } else if (timeElapsed === 30 && frenzyLevel === 2) {
+                triggerFrenzy(3);
+            }
+        }
+
+        function triggerFrenzy(level) {
+            frenzyLevel = level;
+            frenzyTextTimer = 2.0; // Show text for 2 seconds
+        }
+
+        // Process Clicks / Touches
+        function handleShoot(e) {
+            if (!isPlaying || isPaused) return;
+            e.preventDefault(); // Prevent double firing on touch
+
+            // Normalize coordinate mapping
+            const rect = canvas.getBoundingClientRect();
+            
+            // Determine client X/Y whether it's a mouse or touch event
+            let clientX, clientY;
+            if(e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const clickX = (clientX - rect.left) * scaleX;
+            const clickY = (clientY - rect.top) * scaleY;
+
+            // Iterate backwards to hit the topmost balloon first if they overlap
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                let b = balloons[i];
+                if (b.isClicked(clickX, clickY)) {
+                    
+                    // Handle logic based on balloon type
+                    if (b.isPollution) {
+                        score += 10;
+                        playPopSound();
+                        floatingTexts.push(new FloatingText(b.currentX || b.x, b.y, "+10", "#000000"));
+                        
+                        // Create standard explosion particles matching the balloon's color
+                        for (let p = 0; p < 20; p++) {
+                            particles.push(new Particle(b.currentX || b.x, b.y, b.color));
+                        }
+                    } else {
+                        score -= 10;
+                        playBombSound();
+                        floatingTexts.push(new FloatingText(b.currentX || b.x, b.y, "-10", "#e74c3c"));
+                        
+                        // Create bomb explosion particles (Fire and Smoke colors)
+                        const fireColors = ['#ff0000', '#ff7f00', '#ffff00', '#333333', '#111111'];
+                        for (let p = 0; p < 40; p++) { // Double the particles for a bigger boom
+                            let color = fireColors[Math.floor(Math.random() * fireColors.length)];
+                            let fireParticle = new Particle(b.currentX || b.x, b.y, color);
+                            // Make them fly faster and larger to look like a blast
+                            fireParticle.vx *= 1.8;
+                            fireParticle.vy *= 1.8;
+                            fireParticle.radius *= 1.5; 
+                            particles.push(fireParticle);
+                        }
+                    }
+
+                    // Remove the clicked balloon
+                    balloons.splice(i, 1);
+                    break; // Only pop one balloon per click
+                }
+            }
+        }
+
+        // --- RENDER & GAME LOOP ---
+
+        function drawHUD() {
+            // Score
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Score: ${score}`, 20, 40);
+
+            // Time
+            ctx.textAlign = 'right';
+            let timeColor = timeLeft <= 10 ? '#e74c3c' : 'white'; // Red text last 10s
+            ctx.fillStyle = timeColor;
+            ctx.fillText(`Time: ${timeLeft}s`, canvas.width - 20, 40);
+
+            // Frenzy Notification
+            if (frenzyTextTimer > 0) {
+                // Pulse effect
+                const scale = 1 + Math.sin(performance.now() * 0.01) * 0.1;
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.scale(scale, scale);
+                ctx.fillStyle = '#f1c40f';
+                ctx.font = 'bold 60px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Determine text based on frenzy level
+                let frenzyText = frenzyLevel > 1 ? `FRENZY MODE X${frenzyLevel}!` : `FRENZY MODE!`;
+                
+                // Add stroke for contrast
+                ctx.strokeStyle = '#c0392b';
+                ctx.lineWidth = 5;
+                ctx.strokeText(frenzyText, 0, 0);
+                ctx.fillText(frenzyText, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function gameLoop(currentTime) {
+            if (!isPlaying || isPaused) return;
+
+            // Delta time calculation (in seconds)
+            let dt = (currentTime - lastTime) / 1000;
+            if (dt > 0.5) dt = 1/60; // Prevent huge jumps if tab was inactive or unpaused
+            lastTime = currentTime;
+
+            // Update Frenzy Timer
+            if (frenzyTextTimer > 0) {
+                frenzyTextTimer -= dt;
+            }
+
+            // --- SPAWNING LOGIC ---
+            if (currentTime >= nextSpawnTime) {
+                balloons.push(new Balloon());
+                nextSpawnTime = currentTime + calculateNextSpawnDelay();
+            }
+
+            // Clear canvas using transparency to let the CSS background show or repaint
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw logic
+            // Use backwards loop for safe removal during iteration
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                let b = balloons[i];
+                b.update(dt, currentTime);
+                b.draw(ctx);
+
+                // Despawn if it goes off the top
+                if (b.y + b.radius * 2 < 0) {
+                    balloons.splice(i, 1);
+                }
+            }
+
+            // Update & Draw Floating Texts
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                let ft = floatingTexts[i];
+                ft.update(dt);
+                ft.draw(ctx);
+                if (ft.life <= 0) {
+                    floatingTexts.splice(i, 1);
+                }
+            }
+
+            // Update & Draw Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update(dt);
+                p.draw(ctx);
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            drawHUD();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize events when script loads
+        init();
+
+    </script>
+</body>
+</html>
