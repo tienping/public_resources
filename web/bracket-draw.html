@@ -1,0 +1,494 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Dices, Trophy, Users, RefreshCw, ChevronRight } from 'lucide-react';
+
+export default function App() {
+  const [inputs, setInputs] = useState([{ id: Date.now(), name: '', count: 1 }]);
+  const [rounds, setRounds] = useState([]); // 2D Array tracking the entire bracket tree
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [spinValue, setSpinValue] = useState("");
+  const [activeSpinIndex, setActiveSpinIndex] = useState(-1);
+  const [hasGenerated, setHasGenerated] = useState(false);
+  const [bracketSize, setBracketSize] = useState(0);
+
+  // --- FISHER-YATES SHUFFLE ---
+  // A mathematically true random shuffle for arrays
+  const shuffleArray = (array) => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+  };
+
+  // --- BRACKET BRANCH SHUFFLE ---
+  // Randomly swaps halves of the bracket to randomize visual positions.
+  // This perfectly maintains the strict seed spacing for BYEs and identical teams,
+  // but prevents "Seed 1" from always appearing in the top-left slot.
+  const shuffleBracketBranches = (layout) => {
+    if (layout.length <= 2) {
+      if (layout.length === 2 && Math.random() > 0.5) {
+        return [layout[1], layout[0]]; // Swap Top/Bottom in a match
+      }
+      return layout;
+    }
+    const half = layout.length / 2;
+    const left = shuffleBracketBranches(layout.slice(0, half));
+    const right = shuffleBracketBranches(layout.slice(half));
+    // 50% chance to swap entire bracket halves
+    return Math.random() > 0.5 ? [...left, ...right] : [...right, ...left];
+  };
+
+  // --- STANDARD SEEDING ALGORITHM ---
+  const getStandardSeeding = (numTeams) => {
+    let roundsCount = Math.log2(numTeams);
+    let bracket = [1];
+    for (let i = 0; i < roundsCount; i++) {
+      let nextBracket = [];
+      let sum = Math.pow(2, i + 1) + 1;
+      for (let j = 0; j < bracket.length; j++) {
+        nextBracket.push(bracket[j]);
+        nextBracket.push(sum - bracket[j]);
+      }
+      bracket = nextBracket;
+    }
+    return bracket;
+  };
+
+  // --- BRACKET GENERATION LOGIC ---
+  const handleGenerate = () => {
+    if (isSpinning) return;
+
+    // 1. Parse inputs
+    let flatTeams = [];
+    let groupId = 0;
+    
+    inputs.forEach(input => {
+      const cleanName = input.name.trim();
+      if (!cleanName) return;
+      groupId++;
+      
+      if (input.count === 1) {
+        flatTeams.push({ name: cleanName, group: groupId });
+      } else {
+        for (let i = 0; i < input.count; i++) {
+          const prefix = String.fromCharCode(65 + i); 
+          flatTeams.push({ name: `${prefix} - ${cleanName}`, group: groupId });
+        }
+      }
+    });
+
+    if (flatTeams.length < 2) {
+      alert("Please enter at least 2 teams to generate a bracket.");
+      return;
+    }
+
+    // 2. Determine Nearest Power of 2 (2, 4, 8, 16...)
+    let N = 2;
+    while (N < flatTeams.length) N *= 2;
+    setBracketSize(N);
+
+    // 3. Separate identical base teams
+    let groups = {};
+    flatTeams.forEach(t => {
+      if (!groups[t.group]) groups[t.group] = [];
+      groups[t.group].push(t);
+    });
+
+    // Shuffle items within groups, then shuffle groups themselves
+    let groupArrays = Object.values(groups).map(arr => shuffleArray(arr));
+    groupArrays = shuffleArray(groupArrays); 
+    
+    // Sort by length so largest groups get maximum separation
+    groupArrays.sort((a, b) => b.length - a.length);
+
+    let interleavedTeams = [];
+    let maxLen = groupArrays[0].length;
+    for (let i = 0; i < maxLen; i++) {
+      for (let arr of groupArrays) {
+        if (i < arr.length) interleavedTeams.push(arr[i]);
+      }
+    }
+
+    // 4. Assign seeds & Byes
+    let seedAssignments = {};
+    interleavedTeams.forEach((team, index) => { seedAssignments[index + 1] = team; });
+    for (let i = interleavedTeams.length + 1; i <= N; i++) {
+      seedAssignments[i] = { name: "BYE", isBye: true };
+    }
+
+    // 5. Final Layout mapping
+    let physicalSeeds = getStandardSeeding(N);
+    let finalLayout = physicalSeeds.map(seed => seedAssignments[seed]);
+
+    // Randomize the physical positions while keeping the seed distances!
+    finalLayout = shuffleBracketBranches(finalLayout);
+
+    // 6. Initialize Empty Bracket Tree
+    let initialRounds = [];
+    let numRounds = Math.log2(N);
+    
+    for(let r = 0; r <= numRounds; r++) {
+      let round = [];
+      if (r === numRounds) {
+        round.push({ t1: null }); // Champion slot
+      } else {
+        let numMatches = Math.pow(2, numRounds - r - 1);
+        for(let m = 0; m < numMatches; m++) {
+          round.push({ t1: null, t2: null });
+        }
+      }
+      initialRounds.push(round);
+    }
+
+    // Pre-fill BYEs into Round 0
+    for(let i = 0; i < finalLayout.length; i++) {
+      if(finalLayout[i].isBye) {
+        let mIdx = Math.floor(i / 2);
+        if(i % 2 === 0) initialRounds[0][mIdx].t1 = finalLayout[i];
+        else initialRounds[0][mIdx].t2 = finalLayout[i];
+      }
+    }
+
+    setRounds(initialRounds);
+    startSpinning(finalLayout, interleavedTeams);
+  };
+
+  // --- ANIMATION LOGIC ---
+  const startSpinning = async (layout, rawTeams) => {
+    setHasGenerated(true);
+    setIsSpinning(true);
+    setSpinValue("PREPARING BRACKET...");
+    
+    let pool = [...rawTeams];
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Spin for each position in Round 1
+    for (let i = 0; i < layout.length; i++) {
+      if (layout[i].isBye) continue;
+
+      setActiveSpinIndex(i);
+      const isLarge = rawTeams.length > 16;
+      const iterations = isLarge ? 4 : 8;
+      const spinInterval = isLarge ? 25 : 40;
+
+      for (let s = 0; s < iterations; s++) {
+        let randomTeam = pool[Math.floor(Math.random() * pool.length)];
+        setSpinValue(randomTeam.name);
+        await new Promise(r => setTimeout(r, spinInterval));
+      }
+
+      setSpinValue(layout[i].name);
+      await new Promise(r => setTimeout(r, isLarge ? 150 : 300));
+
+      // Update state slot
+      setRounds(prev => {
+        const next = [...prev];
+        next[0] = [...next[0]];
+        const mIdx = Math.floor(i / 2);
+        next[0][mIdx] = { ...next[0][mIdx] };
+        
+        if (i % 2 === 0) next[0][mIdx].t1 = layout[i];
+        else next[0][mIdx].t2 = layout[i];
+        
+        return next;
+      });
+
+      pool = pool.filter(t => t.name !== layout[i].name);
+    }
+
+    // Auto-advance BYEs
+    setRounds(prev => {
+      let finalTree = JSON.parse(JSON.stringify(prev)); // Deep copy to ensure safe propagation
+      
+      finalTree[0].forEach((match, mIdx) => {
+        const nextMatchIndex = Math.floor(mIdx / 2);
+        const isTopSlot = mIdx % 2 === 0;
+
+        if (match.t1?.isBye && match.t2 && !match.t2.isBye) {
+          if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t2;
+          else finalTree[1][nextMatchIndex].t2 = match.t2;
+        } else if (match.t2?.isBye && match.t1 && !match.t1.isBye) {
+          if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t1;
+          else finalTree[1][nextMatchIndex].t2 = match.t1;
+        }
+      });
+      return finalTree;
+    });
+
+    setIsSpinning(false);
+    setActiveSpinIndex(-1);
+    setSpinValue("DRAW COMPLETE!");
+  };
+
+  // --- MANUAL ADVANCEMENT ---
+  const handleAdvance = (rIdx, mIdx, team) => {
+    if (isSpinning || !team || team.isBye) return;
+    if (rIdx >= rounds.length - 1) return; // Cannot advance past champion
+
+    setRounds(prev => {
+      const nextTree = JSON.parse(JSON.stringify(prev));
+      const nextRIdx = rIdx + 1;
+      
+      if (nextRIdx === nextTree.length - 1) {
+        // Champion round only has 1 slot (t1)
+        nextTree[nextRIdx][0].t1 = team;
+      } else {
+        const nextMIdx = Math.floor(mIdx / 2);
+        const isTopSlot = mIdx % 2 === 0;
+        
+        if (isTopSlot) nextTree[nextRIdx][nextMIdx].t1 = team;
+        else nextTree[nextRIdx][nextMIdx].t2 = team;
+      }
+      return nextTree;
+    });
+  };
+
+  // --- HELPER TO DETERMINE STYLING ---
+  const getTeamStatus = (team, rIdx, mIdx) => {
+    if (!team) return 'empty';
+    if (team.isBye) return 'bye';
+    if (rIdx >= rounds.length - 1) return 'champion'; 
+
+    const nextRound = rounds[rIdx + 1];
+    const nextMatchIndex = Math.floor(mIdx / 2);
+    const isTopSlot = mIdx % 2 === 0;
+    
+    let advancedTeam = null;
+    if (rIdx + 1 === rounds.length - 1) {
+       advancedTeam = nextRound[0].t1;
+    } else {
+       advancedTeam = isTopSlot ? nextRound[nextMatchIndex].t1 : nextRound[nextMatchIndex].t2;
+    }
+
+    if (!advancedTeam) return 'pending';
+    if (advancedTeam.name === team.name) return 'winner';
+    return 'loser';
+  };
+
+  // --- INPUT HANDLERS ---
+  const addInput = () => setInputs([...inputs, { id: Date.now(), name: '', count: 1 }]);
+  const removeInput = (id) => { if (inputs.length > 1) setInputs(inputs.filter(inp => inp.id !== id)); };
+  const updateInput = (id, field, value) => setInputs(inputs.map(inp => inp.id === id ? { ...inp, [field]: value } : inp));
+  const resetBracket = () => { setHasGenerated(false); setRounds([]); setSpinValue(""); };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans p-4 md:p-8 flex flex-col xl:flex-row gap-8">
+      
+      {/* LEFT PANEL: CONFIGURATION */}
+      <div className="w-full xl:w-[380px] shrink-0 flex flex-col gap-6">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center gap-3 mb-6">
+            <Trophy className="text-yellow-500 w-8 h-8" />
+            <h1 className="text-2xl font-bold text-white tracking-tight">Bracket Generator</h1>
+          </div>
+
+          <div className="flex flex-col gap-3 max-h-[40vh] xl:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+            {inputs.map((inp) => (
+              <div key={inp.id} className="flex gap-2 items-center group">
+                <div className="flex-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Users className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <input
+                    type="text"
+                    disabled={isSpinning}
+                    placeholder="Enter team or name..."
+                    value={inp.name}
+                    onChange={(e) => updateInput(inp.id, 'name', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent block pl-10 p-2.5 transition-colors disabled:opacity-50"
+                  />
+                </div>
+                
+                <select
+                  disabled={isSpinning}
+                  value={inp.count}
+                  onChange={(e) => updateInput(inp.id, 'count', parseInt(e.target.value))}
+                  className="bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-2 focus:ring-indigo-500 block p-2.5 outline-none cursor-pointer disabled:opacity-50"
+                  title="Number of variants (A~Z)"
+                >
+                  {Array.from({ length: 26 }, (_, i) => i + 1).map(num => (
+                    <option key={num} value={num}>{num}</option>
+                  ))}
+                </select>
+
+                <button
+                  disabled={isSpinning || inputs.length === 1}
+                  onClick={() => removeInput(inp.id)}
+                  className="p-2.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            disabled={isSpinning}
+            onClick={addInput}
+            className="mt-4 w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg transition-colors border border-slate-700 border-dashed disabled:opacity-50"
+          >
+            <Plus className="w-4 h-4" /> Add Team Row
+          </button>
+        </div>
+
+        <button
+          onClick={hasGenerated && !isSpinning ? resetBracket : handleGenerate}
+          disabled={isSpinning}
+          className={`w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all ${
+            hasGenerated && !isSpinning
+              ? 'bg-slate-800 hover:bg-slate-700 text-white'
+              : 'bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-indigo-500/25'
+          } disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
+          {hasGenerated && !isSpinning ? (
+            <><RefreshCw className="w-6 h-6" /> Reset Bracket</>
+          ) : (
+            <><Dices className="w-6 h-6" /> Generate Draw</>
+          )}
+        </button>
+      </div>
+
+      {/* RIGHT PANEL: VISUALIZATION */}
+      <div className="w-full flex-1 flex flex-col gap-6 min-w-0">
+        
+        {/* BANNER */}
+        <div className={`bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 ${hasGenerated ? 'p-4 min-h-[100px]' : 'p-6 min-h-[200px]'}`}>
+          {hasGenerated ? (
+            <div className="flex items-center gap-4">
+              {isSpinning && <Dices className="w-8 h-8 text-indigo-400 animate-spin" />}
+              <div>
+                <p className="text-slate-400 font-semibold tracking-widest text-xs mb-1 text-center">
+                  {isSpinning ? 'SPINNING ROUND 1' : 'TOURNAMENT ACTIVE - CLICK WINNERS TO ADVANCE'}
+                </p>
+                <h2 className={`text-2xl md:text-3xl font-black text-center transition-all duration-100 ${
+                  isSpinning ? 'text-yellow-400 scale-105' : 'text-indigo-400'
+                }`}>
+                  {spinValue}
+                </h2>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center text-slate-500">
+              <Dices className="w-16 h-16 mx-auto mb-4 opacity-20" />
+              <p className="text-lg">Add your teams and hit Generate to build the tree.</p>
+            </div>
+          )}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50" />
+        </div>
+
+        {/* BRACKET TREE */}
+        {hasGenerated && (
+          <div className="bg-slate-900/50 border border-slate-800/50 rounded-2xl p-6 flex-1 overflow-x-auto custom-scrollbar relative">
+            <div className="flex flex-row gap-12 min-h-[500px] h-full items-stretch pb-8">
+              
+              {rounds.map((round, rIdx) => {
+                const isChampionRound = rIdx === rounds.length - 1;
+                
+                return (
+                  <div key={rIdx} className="flex flex-col justify-around min-w-[220px] relative">
+                    {/* Round Header */}
+                    <div className="absolute -top-4 left-0 right-0 text-center font-bold text-slate-500 tracking-wider text-sm uppercase">
+                      {isChampionRound ? 'Champion' : `Round ${rIdx + 1}`}
+                    </div>
+
+                    {isChampionRound ? (
+                      // Champion Display
+                      <div className="bg-gradient-to-b from-yellow-500/20 to-yellow-500/5 border-2 border-yellow-500/50 rounded-2xl p-6 text-center shadow-[0_0_30px_rgba(234,179,8,0.1)]">
+                        <Trophy className="mx-auto text-yellow-500 w-12 h-12 mb-3 drop-shadow-md" />
+                        <div className="text-xs text-yellow-500/80 uppercase tracking-widest font-bold mb-1">Tournament Winner</div>
+                        <div className="font-black text-yellow-400 text-2xl break-words">
+                          {round[0].t1 ? round[0].t1.name : 'TBD'}
+                        </div>
+                      </div>
+                    ) : (
+                      // Standard Matches
+                      round.map((match, mIdx) => {
+                        const statusT1 = getTeamStatus(match.t1, rIdx, mIdx);
+                        const statusT2 = getTeamStatus(match.t2, rIdx, mIdx);
+                        const isT1ActiveSpin = isSpinning && rIdx === 0 && activeSpinIndex === mIdx * 2;
+                        const isT2ActiveSpin = isSpinning && rIdx === 0 && activeSpinIndex === mIdx * 2 + 1;
+
+                        return (
+                          <div key={mIdx} className="relative flex items-center my-2">
+                            <div className="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-lg w-full flex flex-col z-10">
+                              <TeamSlot 
+                                team={match.t1} 
+                                status={statusT1} 
+                                isSpinningActive={isT1ActiveSpin}
+                                onClick={() => handleAdvance(rIdx, mIdx, match.t1)} 
+                              />
+                              <div className="h-px bg-slate-700 w-full relative">
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800 text-[9px] text-slate-500 font-bold px-2 rounded-full border border-slate-700">VS</div>
+                              </div>
+                              <TeamSlot 
+                                team={match.t2} 
+                                status={statusT2} 
+                                isSpinningActive={isT2ActiveSpin}
+                                onClick={() => handleAdvance(rIdx, mIdx, match.t2)} 
+                              />
+                            </div>
+                            
+                            {/* Visual Connector Line to next round */}
+                            <div className="absolute -right-6 w-6 h-px bg-slate-700 -z-0" />
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Sub-component for individual team slots
+function TeamSlot({ team, status, isSpinningActive, onClick }) {
+  let styles = "bg-slate-800 text-slate-300"; // Pending / Normal
+  let interactionStyles = "hover:bg-slate-700 cursor-pointer";
+
+  if (isSpinningActive) {
+    styles = "bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] z-20 font-bold border border-indigo-400";
+    interactionStyles = "cursor-default";
+  } else if (status === 'empty') {
+    styles = "bg-slate-900/50 text-slate-600 border border-transparent";
+    interactionStyles = "cursor-default";
+  } else if (status === 'bye') {
+    styles = "bg-slate-900/50 text-slate-500 italic border border-transparent";
+    interactionStyles = "cursor-default";
+  } else if (status === 'winner' || status === 'champion') {
+    styles = "bg-indigo-600 text-white font-bold border border-indigo-500 shadow-md";
+    interactionStyles = "cursor-default";
+  } else if (status === 'loser') {
+    styles = "bg-slate-900 text-slate-600 opacity-60 border border-transparent";
+    interactionStyles = "hover:opacity-100 hover:bg-slate-800 cursor-pointer"; // allow reversing decision
+  } else if (status === 'pending') {
+    styles = "bg-slate-800 text-slate-200 font-medium border border-transparent";
+  }
+
+  return (
+    <div 
+      onClick={status !== 'bye' && status !== 'empty' && !isSpinningActive ? onClick : undefined}
+      className={`px-4 py-3 text-sm transition-all duration-300 relative select-none flex items-center justify-between ${styles} ${interactionStyles}`}
+    >
+      <span className="truncate pr-2">
+        {team ? team.name : (isSpinningActive ? 'Rolling...' : 'TBD')}
+      </span>
+      
+      {/* Visual Indicator for Winner */}
+      {status === 'winner' && <ChevronRight className="w-4 h-4 opacity-50" />}
+      
+      {/* Highlight glow when actively spinning */}
+      {isSpinningActive && (
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
+        </span>
+      )}
+    </div>
+  );
+}
