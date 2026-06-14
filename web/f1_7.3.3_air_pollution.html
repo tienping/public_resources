@@ -35,7 +35,7 @@
     <div id="game-container" class="relative w-screen h-screen overflow-hidden">
         <canvas id="gameCanvas"></canvas>
         
-        <div class="ui-layer flex flex-col justify-between p-4">
+        <div class="ui-layer flex flex-col justify-between p-4 z-20">
             <!-- Top UI: Extinguisher, Nursery, and Stats -->
             <div class="flex justify-between items-start">
                 <div class="flex flex-col gap-4">
@@ -82,14 +82,17 @@
             
             <!-- Bottom UI: Rubbish Bin -->
             <div class="flex justify-end pb-4 pr-4">
-                <div id="rubbish-bin" class="interactive bg-gray-800 border-4 border-gray-600 rounded-2xl p-4 w-28 h-28 flex items-center justify-center shadow-2xl opacity-90 transition transform hover:scale-110">
+                <div id="rubbish-bin" class="interactive bg-gray-800 border-4 border-gray-600 rounded-2xl p-4 w-28 h-28 flex items-center justify-center shadow-2xl opacity-90 transition transform hover:scale-110 relative z-20">
                     <span class="text-6xl pointer-events-none">🗑️</span>
                 </div>
             </div>
         </div>
 
+        <!-- NEW: Overlay Canvas for Dragged Items -->
+        <canvas id="overlayCanvas" class="absolute inset-0 pointer-events-none z-[30]"></canvas>
+
         <!-- Intro Video Screen -->
-        <div id="video-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-[60] interactive">
+        <div id="video-screen" class="absolute inset-0 bg-black flex flex-col items-center justify-center z-[60] interactive hidden">
             <video id="intro-video" class="w-full h-full object-contain" src="https://tienping.github.io/public_resources/video/air_pollution_defender.mp4" controls playsinline></video>
             <button id="skip-video-btn" class="absolute bottom-8 right-8 px-6 py-3 bg-gray-800 bg-opacity-70 hover:bg-gray-700 text-white font-bold rounded-full text-xl transition border border-gray-500 backdrop-blur-sm shadow-xl">Skip Video ⏭️</button>
             <button id="start-video-btn" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-12 py-6 bg-green-500 hover:bg-green-400 text-black font-extrabold rounded-full text-4xl transition hover:scale-110 shadow-[0_0_30px_rgba(74,222,128,0.7)] border-4 border-green-600">Start</button>
@@ -111,7 +114,11 @@
         <!-- Pause Screen -->
         <div id="pause-screen" class="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-[45] text-white hidden interactive backdrop-blur-sm">
             <h1 class="text-6xl font-black mb-8 drop-shadow-2xl text-yellow-400 tracking-widest">PAUSED</h1>
-            <button id="resume-btn" class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(74,222,128,0.7)]">▶️ Resume</button>
+            <div class="flex flex-col gap-6 items-center">
+                <button id="resume-btn" class="px-8 py-4 bg-green-500 hover:bg-green-400 text-black font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(74,222,128,0.7)] w-64">▶️ Resume</button>
+                <button id="mute-btn" class="px-8 py-4 bg-gray-500 hover:bg-gray-400 text-white font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(107,114,128,0.7)] w-64">🔇 Mute</button>
+                <button id="pause-home-btn" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-full text-2xl transition transform hover:scale-110 shadow-[0_0_20px_rgba(37,99,235,0.7)] w-64">🏠 Home</button>
+            </div>
         </div>
 
         <!-- Start Screen -->
@@ -123,7 +130,7 @@
                 <br>
                 🚜 <b>Loggers</b> destroy our natural air filters, tress. Drag to 🗑️!<br>
                 👨‍🌾 <b>Irresponsible Farmers</b> use excessive fertiliser and pesticide. Drag to 🗑️!<br>
-                🚗 <b>Vehicles</b> release toxic carbon monoxide and smoke. Drag to 🗑️!)<br>
+                🚗 <b>Vehicles</b> release toxic carbon monoxide and smoke. Drag to 🗑️!<br>
                 🔥 <b>Forest Fires</b> spread, filling the air with soot and dust. <br>
                 Use the 🧯 extinguisher to put them out.<br>
                 🌲 <b>Trees</b> clean the air by absorbing gases. Plant them from the Nursery.<br><br>
@@ -183,6 +190,8 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const overCtx = overlayCanvas.getContext('2d');
         
         // Audio Assets
         const plantSound = new Audio('https://tienping.github.io/public_resources/audio/chime_sound.mp3');
@@ -224,6 +233,8 @@
         const startBtn = document.getElementById('start-btn');
         const restartBtn = document.getElementById('restart-btn');
         const homeBtn = document.getElementById('home-btn');
+        const pauseHomeBtn = document.getElementById('pause-home-btn');
+        const muteBtn = document.getElementById('mute-btn');
         const feedbackBtn = document.getElementById('feedback-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const resumeBtn = document.getElementById('resume-btn');
@@ -298,6 +309,8 @@
             height = window.innerHeight;
             canvas.width = width;
             canvas.height = height;
+            overlayCanvas.width = width;
+            overlayCanvas.height = height;
             
             // Recalculate hitboxes for interactive UI
             extRect = document.getElementById('extinguisher-base').getBoundingClientRect();
@@ -316,6 +329,12 @@
         let level = 1;
         let levelTimer = 0;
         let pollutionLevel = 0;
+        let isMuted = false;
+        
+        let tutorials = { plant: false, fire: false, vehicle: false, logger: false, farmer: false };
+        let tutorialActive = false;
+        let tutorialType = null;
+        let highlightedEntity = null;
         
         // Entity Arrays
         let trees = [];
@@ -562,15 +581,15 @@
             draw() {
                 ctx.save();
                 
-                // Pesticide aura
-                if (this.type === 'farmer' && this.actionTimer < 0.5) {
+                // Pesticide aura (Forced on during its tutorial)
+                if (this.type === 'farmer' && (this.actionTimer < 0.5 || (typeof tutorialActive !== 'undefined' && tutorialActive && highlightedEntity === this))) {
                     ctx.fillStyle = 'rgba(168, 85, 247, 0.5)';
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, 40, 0, Math.PI*2);
                     ctx.fill();
                 }
-                // Vehicle smoke aura
-                if (this.type === 'vehicle' && this.actionTimer > 0) {
+                // Vehicle smoke aura (Forced on during its tutorial)
+                if (this.type === 'vehicle' && (this.actionTimer > 0 || (typeof tutorialActive !== 'undefined' && tutorialActive && highlightedEntity === this))) {
                     ctx.fillStyle = 'rgba(107, 114, 128, 0.6)';
                     ctx.beginPath();
                     ctx.arc(this.x - (this.direction * 30), this.y, 30, 0, Math.PI*2);
@@ -608,6 +627,11 @@
             enemies = [];
             floatingTexts = [];
             draggedItem = null;
+            
+            tutorials = { plant: false, fire: false, vehicle: false, logger: false, farmer: false };
+            tutorialActive = false;
+            tutorialType = null;
+            highlightedEntity = null;
             
             nurseryTrees = GAME_CONFIG.NURSERY_MAX;
             nurseryTimer = 0;
@@ -700,66 +724,92 @@
         function gameLoop(timestamp) {
             if (!isPlaying) return;
             
-            if (isPaused) {
-                lastTime = timestamp; // Prevent large dt spike when unpaused
-                gameLoopId = requestAnimationFrame(gameLoop);
-                return;
-            }
-            
             let dt = (timestamp - lastTime) / 1000;
             lastTime = timestamp;
             
             // Critical Fix: Prevent huge time jumps if user switches browser tabs
             if (dt > 0.1) dt = 0.1; 
             
-            // Level up
-            levelTimer += dt;
-            if (levelTimer >= GAME_CONFIG.LEVEL_UP_TIME) {
-                level++;
-                levelTimer -= GAME_CONFIG.LEVEL_UP_TIME; // Keep the remainder
-                addFloatingText("LEVEL UP! Faster Spawns!", width/2, height/2, "purple");
-            }
+            let anyFire = false;
 
-            // Update Nursery
-            if (nurseryTrees < GAME_CONFIG.NURSERY_MAX) {
-                nurseryTimer += dt;
-                if (nurseryTimer >= GAME_CONFIG.NURSERY_RESTOCK_TIME) {
-                    nurseryTrees++;
+            if (!isPaused) {
+                // Level up
+                levelTimer += dt;
+                if (levelTimer >= GAME_CONFIG.LEVEL_UP_TIME) {
+                    level++;
+                    levelTimer -= GAME_CONFIG.LEVEL_UP_TIME; // Keep the remainder
+                    addFloatingText("LEVEL UP! Faster Spawns!", width/2, height/2, "purple");
+                }
+
+                // Update Nursery
+                if (nurseryTrees < GAME_CONFIG.NURSERY_MAX) {
+                    nurseryTimer += dt;
+                    if (nurseryTimer >= GAME_CONFIG.NURSERY_RESTOCK_TIME) {
+                        nurseryTrees++;
+                        nurseryTimer = 0;
+                    }
+                } else {
                     nurseryTimer = 0;
                 }
-            } else {
-                nurseryTimer = 0;
-            }
-            
-            updateSpawns(dt);
-            
-            let anyFire = false;
-            
-            // Update Trees
-            for (let i = trees.length - 1; i >= 0; i--) {
-                trees[i].update(dt);
-                if (trees[i].isBurning) anyFire = true;
                 
-                if (trees[i].burnTimer <= 0) {
-                    trees.splice(i, 1);
-                    pollutionLevel += GAME_CONFIG.FIRE_PENALTY; // Penalty
-                    addFloatingText("Destroyed!", trees[i]?.x || width/2, trees[i]?.y || height/2, "red");
-                }
-            }
-            
-            // Update Enemies (Ignore the one currently being dragged)
-            for (let i = enemies.length - 1; i >= 0; i--) {
-                let isDragged = draggedItem && draggedItem.type === 'enemy' && draggedItem.index === i;
-                if (!isDragged) {
-                    enemies[i].update(dt);
-                }
-                if (enemies[i].markedForDeletion) {
-                    enemies.splice(i, 1);
-                    // Re-align the dragged index if an array shift happens
-                    if (draggedItem && draggedItem.type === 'enemy') {
-                        if (draggedItem.index > i) draggedItem.index--;
-                        else if (draggedItem.index === i) draggedItem = null;
+                updateSpawns(dt);
+                
+                // Check for tutorial trigger
+                if (!tutorialActive) {
+                    let plantEnt = !tutorials.plant ? { x: width/2, y: height/2 } : null; // Virtual entity for plant tutorial
+                    let vehicleEnt = !tutorials.vehicle ? enemies.find(e => e.type === 'vehicle' && e.x > 50 && e.x < width - 50) : null;
+                    let fireEnt = !tutorials.fire ? trees.find(t => t.isBurning) : null;
+                    let loggerEnt = !tutorials.logger ? enemies.find(e => e.type === 'logger' && e.x > 10 && e.x < width - 50) : null;
+                    let farmerEnt = !tutorials.farmer ? enemies.find(e => e.type === 'farmer') : null;
+
+                    if (plantEnt) {
+                        tutorialActive = true; tutorialType = 'plant'; highlightedEntity = plantEnt; isPaused = true;
+                    } else if (vehicleEnt) {
+                        tutorialActive = true; tutorialType = 'vehicle'; highlightedEntity = vehicleEnt; isPaused = true;
+                    } else if (fireEnt) {
+                        tutorialActive = true; tutorialType = 'fire'; highlightedEntity = fireEnt; isPaused = true;
+                    } else if (loggerEnt) {
+                        tutorialActive = true; tutorialType = 'logger'; highlightedEntity = loggerEnt; isPaused = true;
+                    } else if (farmerEnt) {
+                        tutorialActive = true; tutorialType = 'farmer'; highlightedEntity = farmerEnt; isPaused = true;
                     }
+
+                    if (tutorialActive) {
+                        birdSound.pause(); coughSound.pause(); warningSound.pause(); fireSound.pause();
+                    }
+                }
+                
+                // Update Trees
+                for (let i = trees.length - 1; i >= 0; i--) {
+                    trees[i].update(dt);
+                    if (trees[i].isBurning) anyFire = true;
+                    
+                    if (trees[i].burnTimer <= 0) {
+                        trees.splice(i, 1);
+                        pollutionLevel += GAME_CONFIG.FIRE_PENALTY; // Penalty
+                        addFloatingText("Destroyed!", trees[i]?.x || width/2, trees[i]?.y || height/2, "red");
+                    }
+                }
+                
+                // Update Enemies (Ignore the one currently being dragged)
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    let isDragged = draggedItem && draggedItem.type === 'enemy' && draggedItem.index === i;
+                    if (!isDragged) {
+                        enemies[i].update(dt);
+                    }
+                    if (enemies[i].markedForDeletion) {
+                        enemies.splice(i, 1);
+                        // Re-align the dragged index if an array shift happens
+                        if (draggedItem && draggedItem.type === 'enemy') {
+                            if (draggedItem.index > i) draggedItem.index--;
+                            else if (draggedItem.index === i) draggedItem = null;
+                        }
+                    }
+                }
+            } else {
+                // If paused, just check fires for accurate visual/audio state
+                for (let i = trees.length - 1; i >= 0; i--) {
+                    if (trees[i].isBurning) anyFire = true;
                 }
             }
             
@@ -778,44 +828,170 @@
                 r.draw();
             }
             
-            // Draw currently dragged item on Top
-            if (draggedItem) {
+            // Draw Tutorial Overlay
+            if (tutorialActive && highlightedEntity) {
                 ctx.save();
-                ctx.font = '60px Arial';
+                
+                // Create a dark overlay over the whole screen
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, width, height);
+                
+                // Cut out a circle for the highlighted entity or UI tool
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                if (tutorialType === 'fire') {
+                    ctx.arc(highlightedEntity.x, highlightedEntity.y, 60, 0, Math.PI * 2);
+                } else if (tutorialType === 'plant') {
+                    let nursCenterX = nurseryRect.left + nurseryRect.width / 2;
+                    let nursCenterY = nurseryRect.top + nurseryRect.height / 2;
+                    ctx.arc(nursCenterX, nursCenterY, 60, 0, Math.PI * 2);
+                } else {
+                    ctx.arc(highlightedEntity.x, highlightedEntity.y, 70, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                
+                // Cut out a circle for the destination UI or area
+                ctx.beginPath();
+                if (tutorialType === 'fire') {
+                    let extCenterX = extRect.left + extRect.width / 2;
+                    let extCenterY = extRect.top + extRect.height / 2;
+                    ctx.arc(extCenterX, extCenterY, 60, 0, Math.PI * 2);
+                } else if (tutorialType === 'plant') {
+                    ctx.arc(width/2, height*0.75, 100, 0, Math.PI * 2); // Highlight grass area
+                } else {
+                    let binCenterX = binRect.left + binRect.width / 2;
+                    let binCenterY = binRect.top + binRect.height / 2;
+                    ctx.arc(binCenterX, binCenterY, 80, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                
+                // Reset composite operation to draw on top of the dark overlay
+                ctx.globalCompositeOperation = 'source-over';
+                
+                // Draw rings around the cutouts
+                ctx.strokeStyle = '#facc15'; // yellow-400
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                if (tutorialType === 'fire') {
+                    ctx.arc(highlightedEntity.x, highlightedEntity.y, 60, 0, Math.PI * 2);
+                } else if (tutorialType === 'plant') {
+                    let nursCenterX = nurseryRect.left + nurseryRect.width / 2;
+                    let nursCenterY = nurseryRect.top + nurseryRect.height / 2;
+                    ctx.arc(nursCenterX, nursCenterY, 60, 0, Math.PI * 2);
+                } else {
+                    ctx.arc(highlightedEntity.x, highlightedEntity.y, 70, 0, Math.PI * 2);
+                }
+                ctx.stroke();
+                
+                ctx.beginPath();
+                if (tutorialType === 'fire') {
+                    let extCenterX = extRect.left + extRect.width / 2;
+                    let extCenterY = extRect.top + extRect.height / 2;
+                    ctx.arc(extCenterX, extCenterY, 60, 0, Math.PI * 2);
+                } else if (tutorialType === 'plant') {
+                    ctx.arc(width/2, height*0.75, 100, 0, Math.PI * 2);
+                } else {
+                    let binCenterX = binRect.left + binRect.width / 2;
+                    let binCenterY = binRect.top + binRect.height / 2;
+                    ctx.arc(binCenterX, binCenterY, 80, 0, Math.PI * 2);
+                }
+                ctx.stroke();
+
+                // Draw tutorial text
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 36px Inter, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 15;
-                ctx.shadowOffsetY = 15;
+                ctx.shadowColor = 'black';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                
+                // Calculate text position avoiding the cutouts
+                let textY = height / 2;
+                if (tutorialType !== 'plant' && Math.abs(textY - highlightedEntity.y) < 100) {
+                     textY = highlightedEntity.y - 150;
+                     if (textY < 50) textY = highlightedEntity.y + 150; 
+                }
+                
+                if (tutorialType === 'plant') {
+                    ctx.fillText("PLANT A TREE!", width / 2, textY - 40);
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillText("Drag a tree from the Nursery to the grass to clean the air.", width / 2, textY);
+                } else if (tutorialType === 'fire') {
+                    ctx.fillText("DRAG EXTINGUISHER TO THE FIRE!", width / 2, textY);
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillText("Fires spread and destroy trees. Put them out!", width / 2, textY + 40);
+                } else if (tutorialType === 'vehicle') {
+                    ctx.fillText("DRAG THE VEHICLE TO THE BIN!", width / 2, textY);
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillText("Vehicles release toxic smoke. Dispose of them quickly!", width / 2, textY + 40);
+                } else if (tutorialType === 'logger') {
+                    ctx.fillText("DRAG THE LOGGER TO THE BIN!", width / 2, textY);
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillText("Loggers destroy our natural air filters. Stop them!", width / 2, textY + 40);
+                } else if (tutorialType === 'farmer') {
+                    ctx.fillText("DRAG THE FARMER TO THE BIN!", width / 2, textY);
+                    ctx.font = 'bold 24px Inter, sans-serif';
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillText("Irresponsible farming releases toxic chemicals!", width / 2, textY + 40);
+                }
+                
+                ctx.restore();
+                
+                // Only draw the entity inside the cutout hole if we aren't currently dragging it
+                let isDraggingHighlight = draggedItem && draggedItem.type === 'enemy' && enemies[draggedItem.index] === highlightedEntity;
+                if (!isDraggingHighlight && typeof highlightedEntity.draw === 'function') {
+                    highlightedEntity.draw();
+                }
+            }
+            
+            // Draw currently dragged item on Top (Using Overlay Canvas)
+            overCtx.clearRect(0, 0, width, height);
+            if (draggedItem) {
+                overCtx.save();
+                overCtx.font = '60px Arial';
+                overCtx.textAlign = 'center';
+                overCtx.textBaseline = 'middle';
+                overCtx.shadowColor = 'rgba(0,0,0,0.5)';
+                overCtx.shadowBlur = 15;
+                overCtx.shadowOffsetY = 15;
                 
                 if (draggedItem.type === 'extinguisher') {
-                    ctx.fillText('🧯', dragPos.x, dragPos.y);
+                    overCtx.fillText('🧯', dragPos.x, dragPos.y);
                     // Draw Area of Effect (Expanded to 100px radius)
-                    ctx.beginPath();
-                    ctx.arc(dragPos.x, dragPos.y, 100, 0, Math.PI*2);
-                    ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
-                    ctx.fill();
-                    ctx.strokeStyle = '#3b82f6';
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
+                    overCtx.beginPath();
+                    overCtx.arc(dragPos.x, dragPos.y, 100, 0, Math.PI*2);
+                    overCtx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+                    overCtx.fill();
+                    overCtx.strokeStyle = '#3b82f6';
+                    overCtx.lineWidth = 3;
+                    overCtx.stroke();
                 } else if (draggedItem.type === 'tree') {
-                    ctx.fillText('🌲', dragPos.x, dragPos.y);
+                    overCtx.fillText('🌲', dragPos.x, dragPos.y);
                 } else if (draggedItem.type === 'enemy') {
                     let e = enemies[draggedItem.index];
                     let icon = e.type === 'logger' ? '🚜' : e.type === 'farmer' ? '👨‍🌾' : e.icon;
-                    if (e.type === 'vehicle' && e.direction === 1) { ctx.scale(-1, 1); ctx.fillText(icon, -dragPos.x, dragPos.y); } 
-                    else { ctx.fillText(icon, dragPos.x, dragPos.y); }
+                    if (e.type === 'vehicle' && e.direction === 1) { overCtx.scale(-1, 1); overCtx.fillText(icon, -dragPos.x, dragPos.y); } 
+                    else { overCtx.fillText(icon, dragPos.x, dragPos.y); }
                 }
-                ctx.restore();
+                overCtx.restore();
             }
             
             // Draw UI Floating Texts
             ctx.save();
             for (let i = floatingTexts.length - 1; i >= 0; i--) {
                 let ft = floatingTexts[i];
-                ft.y -= 40 * dt;
-                ft.timer -= dt;
-                ft.alpha = ft.timer;
+                
+                // Only float upwards if game is unpaused
+                if (!isPaused) {
+                    ft.y -= 40 * dt;
+                    ft.timer -= dt;
+                    ft.alpha = ft.timer;
+                }
                 
                 if (ft.alpha <= 0) {
                     floatingTexts.splice(i, 1);
@@ -832,49 +1008,51 @@
             }
             ctx.restore();
             
-            // Update Background Audio Volume based on Pollution
-            let pollutionPct = pollutionLevel / GAME_CONFIG.MAX_POLLUTION;
-            if (pollutionPct < 0.60) {
-                if (birdSound.paused) birdSound.play().catch(e => {}); // Resume if it was stopped
-                
-                if (pollutionPct <= 0.59) {
-                    // Map 0% pollution to 1.0 volume, and 59% pollution to 0.1 volume
-                    birdSound.volume = Math.max(0.1, 1.0 - (pollutionPct / 0.59) * 0.9);
+            if (!isPaused) {
+                // Update Background Audio Volume based on Pollution
+                let pollutionPct = pollutionLevel / GAME_CONFIG.MAX_POLLUTION;
+                if (pollutionPct < 0.60) {
+                    if (birdSound.paused) birdSound.play().catch(e => {}); // Resume if it was stopped
+                    
+                    if (pollutionPct <= 0.59) {
+                        // Map 0% pollution to 1.0 volume, and 59% pollution to 0.1 volume
+                        birdSound.volume = Math.max(0.1, 1.0 - (pollutionPct / 0.59) * 0.9);
+                    } else {
+                        // Keep at 10% volume between 59% and 60%
+                        birdSound.volume = 0.1;
+                    }
                 } else {
-                    // Keep at 10% volume between 59% and 60%
-                    birdSound.volume = 0.1;
+                    if (!birdSound.paused) birdSound.pause(); // Stop above 60%
                 }
-            } else {
-                if (!birdSound.paused) birdSound.pause(); // Stop above 60%
+                
+                // Coughing Sound Logic
+                if (pollutionPct >= 0.50) {
+                    if (coughSound.paused) coughSound.play().catch(e => {});
+                    // Calculate volume: 50% pollution = 10% volume, 100% pollution = 100% volume
+                    let targetVol = 0.10 + (pollutionPct - 0.50) * 1.8;
+                    coughSound.volume = Math.min(1.0, Math.max(0.1, targetVol));
+                } else {
+                    if (!coughSound.paused) coughSound.pause();
+                }
+                
+                // Warning Sound Logic (80% to 100%)
+                if (pollutionPct >= 0.80) {
+                    warningSound.volume = 0.5; // Restore volume from the 0.0 startup trick
+                    if (warningSound.paused) warningSound.play().catch(e => {});
+                } else {
+                    if (!warningSound.paused) warningSound.pause();
+                }
+                
+                // Fire Burning Sound Logic
+                if (anyFire) {
+                    fireSound.volume = 0.7; // Restore volume from the 0.0 startup trick
+                    if (fireSound.paused) fireSound.play().catch(e => {});
+                } else {
+                    if (!fireSound.paused) fireSound.pause();
+                }
             }
             
-            // Coughing Sound Logic
-            if (pollutionPct >= 0.50) {
-                if (coughSound.paused) coughSound.play().catch(e => {});
-                // Calculate volume: 50% pollution = 10% volume, 100% pollution = 100% volume
-                let targetVol = 0.10 + (pollutionPct - 0.50) * 1.8;
-                coughSound.volume = Math.min(1.0, Math.max(0.1, targetVol));
-            } else {
-                if (!coughSound.paused) coughSound.pause();
-            }
-            
-            // Warning Sound Logic (80% to 100%)
-            if (pollutionPct >= 0.80) {
-                warningSound.volume = 0.5; // Restore volume from the 0.0 startup trick
-                if (warningSound.paused) warningSound.play().catch(e => {});
-            } else {
-                if (!warningSound.paused) warningSound.pause();
-            }
-            
-            // Fire Burning Sound Logic
-            if (anyFire) {
-                fireSound.volume = 0.7; // Restore volume from the 0.0 startup trick
-                if (fireSound.paused) fireSound.play().catch(e => {});
-            } else {
-                if (!fireSound.paused) fireSound.pause();
-            }
-            
-            // Update UI DOM Elements
+            // Always Update UI DOM Elements so they reflect tutorial actions
             scoreDisplay.innerText = score;
             levelDisplay.innerText = level;
             levelTimerDisplay.innerText = Math.max(0, Math.ceil(GAME_CONFIG.LEVEL_UP_TIME - levelTimer));
@@ -903,6 +1081,8 @@
         
         function handleDown(e) {
             if (!isPlaying || isPaused || e.target.tagName === 'BUTTON') return;
+            if (tutorialActive) return; // Prevent picking up new items if tutorial is active (unless handled later)
+            
             let pos = getPointerPos(e);
             dragPos = pos;
             
@@ -929,8 +1109,34 @@
             }
         }
         
+        // Special Down handler to allow picking up the tutorial vehicle while paused
+        function handleTutorialDown(e) {
+             if (!tutorialActive || !highlightedEntity) return;
+             let pos = getPointerPos(e);
+             dragPos = pos;
+             
+             if (tutorialType === 'fire') {
+                 if (isInsideRect(pos.x, pos.y, extRect)) {
+                     draggedItem = { type: 'extinguisher' };
+                     document.getElementById('extinguisher-base').style.opacity = '0.3';
+                 }
+             } else if (tutorialType === 'plant') {
+                 if (isInsideRect(pos.x, pos.y, nurseryRect) && nurseryTrees > 0) {
+                     draggedItem = { type: 'tree' };
+                     nurseryTrees--;
+                 }
+             } else {
+                 if (dist(pos.x, pos.y, highlightedEntity.x, highlightedEntity.y) < highlightedEntity.size) {
+                      let idx = enemies.indexOf(highlightedEntity);
+                      if (idx !== -1) {
+                          draggedItem = { type: 'enemy', index: idx };
+                      }
+                 }
+             }
+        }
+        
         function handleMove(e) {
-            if (!draggedItem || !isPlaying || isPaused) return;
+            if (!draggedItem || (!isPlaying && !tutorialActive)) return;
             e.preventDefault(); 
             dragPos = getPointerPos(e);
             
@@ -945,7 +1151,8 @@
         }
         
         function handleUp(e) {
-            if (!draggedItem || !isPlaying || isPaused) return;
+            if (!draggedItem || !isPlaying) return;
+            if (isPaused && !tutorialActive) return;
             
             if (draggedItem.type === 'extinguisher') {
                 document.getElementById('extinguisher-base').style.opacity = '1';
@@ -957,9 +1164,23 @@
                         score += GAME_CONFIG.EXTINGUISH_SCORE;
                         extinguished = true;
                         addFloatingText("+" + GAME_CONFIG.EXTINGUISH_SCORE, t.x, t.y, "blue");
+                        
+                        // Resume game if fire tutorial was completed
+                        if (tutorialActive && tutorialType === 'fire' && t === highlightedEntity) {
+                            tutorials.fire = true;
+                            tutorialActive = false;
+                            highlightedEntity = null;
+                            isPaused = false;
+                            lastTime = performance.now();
+                        }
                     }
                 }
                 if (extinguished) pollutionLevel = Math.max(0, pollutionLevel - GAME_CONFIG.EXTINGUISH_REDUCTION);
+                
+                // Prevent progressing if missed during tutorial
+                if (tutorialActive && tutorialType === 'fire' && highlightedEntity) {
+                    addFloatingText("Drag it to the fire!", width/2, height/2, "red");
+                }
                 
             } else if (draggedItem.type === 'tree') {
                 let tx = dragPos.x;
@@ -979,10 +1200,24 @@
                     // Play the chime sound
                     const soundClone = plantSound.cloneNode();
                     soundClone.volume = 0.3;
+                    soundClone.muted = isMuted; // Respect mute state
                     soundClone.play().catch(e => console.warn("Audio blocked by browser:", e));
+                    
+                    // Resume game if plant tutorial was completed
+                    if (tutorialActive && tutorialType === 'plant') {
+                        tutorials.plant = true;
+                        tutorialActive = false;
+                        highlightedEntity = null;
+                        isPaused = false;
+                        lastTime = performance.now();
+                    }
                 } else {
                     nurseryTrees++; // Refund tree
                     addFloatingText("Invalid Spot!", tx, ty, "red");
+                    
+                    if (tutorialActive && tutorialType === 'plant') {
+                         addFloatingText("Drag it to the clear grass!", width/2, height/2, "red");
+                    }
                 }
                 
             } else if (draggedItem.type === 'enemy') {
@@ -990,10 +1225,24 @@
                 
                 if (isInsideRect(dragPos.x, dragPos.y, binRect)) {
                     let eType = enemies[draggedItem.index].type;
+                    let isTutorialEnemy = tutorialActive && enemies[draggedItem.index] === highlightedEntity;
+                    
                     enemies.splice(draggedItem.index, 1); // Trash it!
                     let pts = eType === 'logger' ? GAME_CONFIG.LOGGER_TRASH_SCORE : eType === 'farmer' ? GAME_CONFIG.FARMER_TRASH_SCORE : GAME_CONFIG.VEHICLE_TRASH_SCORE;
                     score += pts;
                     addFloatingText("+" + pts, binRect.left + 50, binRect.top - 20, "white");
+                    
+                    // Resume game if tutorial was completed
+                    if (isTutorialEnemy) {
+                        tutorials[eType] = true;
+                        tutorialActive = false;
+                        highlightedEntity = null;
+                        isPaused = false;
+                        lastTime = performance.now(); // Reset time to prevent huge delta
+                    }
+                } else if (tutorialActive) {
+                     // If user dropped it outside the bin during tutorial, snap it back
+                     addFloatingText("Drag it to the bin!", highlightedEntity.x, highlightedEntity.y - 40, "red");
                 }
             }
             
@@ -1001,19 +1250,20 @@
         }
         
         // Window events ensure smooth dragging off the canvas
-        window.addEventListener('mousedown', handleDown);
+        window.addEventListener('mousedown', (e) => { handleDown(e); handleTutorialDown(e); });
         window.addEventListener('mousemove', handleMove, {passive: false});
         window.addEventListener('mouseup', handleUp);
         
-        window.addEventListener('touchstart', handleDown, {passive: false});
+        window.addEventListener('touchstart', (e) => { handleDown(e); handleTutorialDown(e); }, {passive: false});
         window.addEventListener('touchmove', handleMove, {passive: false});
         window.addEventListener('touchend', handleUp);
 
         // Core Game Over Logic
-        function handleGameOver() {
+        function handleGameOver(skipVideo = false) {
             isPlaying = false;
             isPaused = false;
             draggedItem = null;
+            overCtx.clearRect(0, 0, width, height);
             
             pauseScreen.classList.add('hidden');
             
@@ -1032,16 +1282,20 @@
             // Display score inside GameOver modal (which is currently hidden)
             document.getElementById('final-score').innerText = score;
             
-            // Show Outro Video First
-            outroVideoScreen.classList.remove('hidden');
-            outroVideo.currentTime = 0;
-            
-            let playPromise = outroVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(e => {
-                    console.warn("Autoplay blocked by browser:", e);
-                    startOutroBtn.classList.remove('hidden');
-                });
+            if (skipVideo) {
+                gameOverScreen.classList.remove('hidden');
+            } else {
+                // Show Outro Video First
+                outroVideoScreen.classList.remove('hidden');
+                outroVideo.currentTime = 0;
+                
+                let playPromise = outroVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => {
+                        console.warn("Autoplay blocked by browser:", e);
+                        startOutroBtn.classList.remove('hidden');
+                    });
+                }
             }
         }
         
@@ -1116,7 +1370,7 @@
         eduVideo.addEventListener('ended', closeEduVideo);
 
         function togglePause() {
-            if (!isPlaying) return;
+            if (!isPlaying || tutorialActive) return;
             isPaused = !isPaused;
             if (isPaused) {
                 pauseScreen.classList.remove('hidden');
@@ -1133,9 +1387,50 @@
         pauseBtn.addEventListener('click', togglePause);
         resumeBtn.addEventListener('click', togglePause);
 
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            plantSound.muted = isMuted;
+            birdSound.muted = isMuted;
+            coughSound.muted = isMuted;
+            warningSound.muted = isMuted;
+            fireSound.muted = isMuted;
+
+            if (isMuted) {
+                muteBtn.innerHTML = '🔊 Unmute';
+                muteBtn.classList.replace('bg-gray-500', 'bg-red-500');
+                muteBtn.classList.replace('hover:bg-gray-400', 'hover:bg-red-400');
+                muteBtn.classList.replace('shadow-[0_0_20px_rgba(107,114,128,0.7)]', 'shadow-[0_0_20px_rgba(239,68,68,0.7)]');
+            } else {
+                muteBtn.innerHTML = '🔇 Mute';
+                muteBtn.classList.replace('bg-red-500', 'bg-gray-500');
+                muteBtn.classList.replace('hover:bg-red-400', 'hover:bg-gray-400');
+                muteBtn.classList.replace('shadow-[0_0_20px_rgba(239,68,68,0.7)]', 'shadow-[0_0_20px_rgba(107,114,128,0.7)]');
+            }
+        });
+
+        pauseHomeBtn.addEventListener('click', () => {
+            if (!isPlaying) return;
+            isPlaying = false;
+            isPaused = false;
+            draggedItem = null;
+            
+            pauseScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            
+            birdSound.pause();
+            coughSound.pause();
+            warningSound.pause();
+            fireSound.pause();
+            
+            // Clear the board visually
+            ctx.clearRect(0, 0, width, height);
+            overCtx.clearRect(0, 0, width, height);
+            drawMap();
+        });
+
         quitBtn.addEventListener('click', () => {
             if (!isPlaying) return;
-            handleGameOver();
+            handleGameOver(true);
         });
 
         homeBtn.addEventListener('click', () => {
@@ -1144,6 +1439,7 @@
             
             // Clear the board visually
             ctx.clearRect(0, 0, width, height);
+            overCtx.clearRect(0, 0, width, height);
             drawMap();
         });
 
