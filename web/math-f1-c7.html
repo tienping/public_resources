@@ -363,50 +363,28 @@
                 </div>
 
                 <!-- TYPE 3: MISSION 4 CARTESIAN SAFEZONE REALTIME GAME -->
-                <div id="panel-cartesian" class="hidden flex flex-col lg:flex-row gap-6 items-center">
+                <div id="panel-cartesian" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                     
-                    <!-- Cartesian Canvas Area -->
-                    <div class="bg-slate-950 border-2 border-indigo-900/40 p-4 rounded-2xl relative select-none shadow-2xl">
-                        <!-- Canvas -->
-                        <canvas id="cartesian-canvas" width="400" height="400" class="bg-slate-950 rounded-xl max-w-full h-auto"></canvas>
+                    <!-- Left Column: Controls, Readouts, and Instructions -->
+                    <div class="lg:col-span-5 flex flex-col justify-between space-y-4">
                         
-                        <!-- Top Real-time Countdown Timer Bar Overlay -->
-                        <div class="absolute top-6 left-6 right-6">
-                            <div class="flex justify-between items-center text-xs text-amber-300 font-extrabold mb-1 bg-slate-950/80 px-2 py-1 rounded">
-                                <span class="uppercase tracking-wider">ACTIVE SAFEZONE COUNTDOWN</span>
-                                <span id="lbl-countdown-timer">10.0s</span>
-                            </div>
-                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
-                                <div id="bar-countdown-timer" class="bg-gradient-to-r from-amber-400 to-rose-500 h-full transition-all duration-75" style="width: 100%"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Cartesian controls panel (D-pad & stats) -->
-                    <div class="flex-grow w-full flex flex-col justify-between space-y-4">
-                        
-                        <!-- Real-time Mascot Coordinates Tracker -->
-                        <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-2xl flex flex-col space-y-4">
-                            <div class="text-center bg-slate-950/50 rounded-xl py-3 border border-rose-500/30 shadow-inner">
-                                <span class="text-[10px] text-rose-400 block uppercase font-extrabold tracking-widest mb-1">
-                                    <i class="fa-solid fa-triangle-exclamation"></i> Target Safezone Equation
-                                </span>
-                                <span id="lbl-safezone-hint" class="text-3xl md:text-4xl font-black text-rose-500 drop-shadow-md">Evaluating...</span>
-                            </div>
-                            <div class="flex justify-around items-center">
-                                <div class="text-center w-1/2 border-r border-slate-800/80">
-                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Your X Pos</span>
-                                    <span id="lbl-mascot-x" class="text-2xl font-black text-emerald-400">0</span>
+                        <!-- Telemetry Stats & Coordinate tracker -->
+                        <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-2xl flex flex-col space-y-3">
+                            <span class="text-[10px] text-indigo-400 font-extrabold uppercase tracking-widest">Mascot Telemetry / 坐标雷达</span>
+                            <div class="flex justify-around items-center bg-slate-950/60 p-3 rounded-xl border border-slate-800/50">
+                                <div class="text-center w-1/2 border-r border-slate-800">
+                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">X Coordinate</span>
+                                    <span id="lbl-mascot-x" class="text-3xl font-black text-emerald-400">0</span>
                                 </div>
                                 <div class="text-center w-1/2">
-                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Your Y Pos</span>
-                                    <span id="lbl-mascot-y" class="text-2xl font-black text-emerald-400">0</span>
+                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Y Coordinate</span>
+                                    <span id="lbl-mascot-y" class="text-3xl font-black text-emerald-400">0</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Dynamic Interactive True/False Safe Zone visual toggle switch -->
-                        <div class="bg-slate-900/50 border border-slate-800/80 p-3 rounded-2xl flex justify-between items-center px-5 shadow-sm">
+                        <div class="bg-slate-900/50 border border-slate-800/80 p-3.5 rounded-2xl flex justify-between items-center px-5 shadow-sm">
                             <div class="flex items-center space-x-2">
                                 <i class="fa-solid fa-eye text-emerald-400 animate-pulse"></i>
                                 <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">Show Safe Zone / 显示安全区</span>
@@ -416,11 +394,15 @@
                             </button>
                         </div>
 
-                        <!-- Touch Navigation D-Pad for trackpad/laptops -->
-                        <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl flex flex-col items-center">
-                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-3">Controls (W,A,S,D / On-Screen)</span>
+                        <!-- D-Pad and Movement Cues visual at the bottom -->
+                        <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl flex flex-col items-center justify-center">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-4 flex items-center space-x-1.5">
+                                <i class="fa-solid fa-keyboard"></i>
+                                <span>Movement Controls</span>
+                            </span>
                             
-                            <div class="grid grid-cols-3 gap-2 w-48">
+                            <!-- Touch Navigation D-Pad -->
+                            <div class="grid grid-cols-3 gap-2 w-44">
                                 <div></div>
                                 <button onclick="moveMascot(0, 1)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
                                     <i class="fa-solid fa-chevron-up"></i>
@@ -430,9 +412,9 @@
                                 <button onclick="moveMascot(-1, 0)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
                                     <i class="fa-solid fa-chevron-left"></i>
                                 </button>
-                                <button class="h-12 bg-slate-900/30 rounded-xl text-slate-600 font-black flex items-center justify-center border border-slate-800/80 cursor-default" disabled>
-                                    <i class="fa-solid fa-gamepad"></i>
-                                </button>
+                                <div class="h-12 bg-slate-950/40 rounded-xl text-indigo-400 flex items-center justify-center border border-slate-800/80 cursor-default">
+                                    <i class="fa-solid fa-gamepad text-indigo-400"></i>
+                                </div>
                                 <button onclick="moveMascot(1, 0)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </button>
@@ -442,6 +424,61 @@
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </button>
                                 <div></div>
+                            </div>
+
+                            <!-- Keyboard instructions visual keys at the bottom -->
+                            <div class="mt-4 flex flex-wrap justify-center gap-2 text-slate-500 text-[10px] uppercase font-bold tracking-wider">
+                                <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 flex items-center gap-1"><kbd class="text-slate-300 font-mono">W</kbd> or <i class="fa-solid fa-arrow-up"></i></span>
+                                <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 flex items-center gap-1"><kbd class="text-slate-300 font-mono">S</kbd> or <i class="fa-solid fa-arrow-down"></i></span>
+                                <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 flex items-center gap-1"><kbd class="text-slate-300 font-mono">A</kbd> or <i class="fa-solid fa-arrow-left"></i></span>
+                                <span class="bg-slate-950 px-2 py-1 rounded border border-slate-800 flex items-center gap-1"><kbd class="text-slate-300 font-mono">D</kbd> or <i class="fa-solid fa-arrow-right"></i></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Big Obvious Cartesian Plane + Question Box Above -->
+                    <div class="lg:col-span-7 flex flex-col space-y-4">
+                        
+                        <!-- Target Equation Box directly ABOVE the canvas -->
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 bg-rose-500/10 border border-rose-500/30 text-[10px] font-extrabold text-rose-400 rounded uppercase tracking-wider">
+                                    <i class="fa-solid fa-shield-halved mr-1"></i> Objective / 任务目标
+                                </span>
+                                <span class="text-xs font-bold text-slate-400">Mission 4 of 4</span>
+                            </div>
+                            <!-- Giant, Beautiful Target Inequality Equation -->
+                            <div class="bg-slate-950 border border-rose-500/40 rounded-xl py-4 px-6 text-center shadow-inner glow-button relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-r from-rose-500/5 via-transparent to-rose-500/5"></div>
+                                <span class="text-xs text-rose-400 font-extrabold uppercase tracking-widest block mb-1">
+                                    <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Safe Zone Equation / 安全区不等式
+                                </span>
+                                <span id="lbl-safezone-hint" class="text-4xl md:text-5xl font-black text-rose-500 tracking-wider font-mono">Evaluating...</span>
+                            </div>
+                        </div>
+
+                        <!-- Big Obvious Cartesian Grid Frame -->
+                        <div class="bg-slate-950 border-2 border-indigo-900/60 p-5 rounded-2xl relative select-none shadow-2xl flex flex-col justify-center items-center">
+                            
+                            <!-- Canvas Scaled to beautiful responsive box -->
+                            <div class="w-full max-w-[450px] aspect-square relative">
+                                <canvas id="cartesian-canvas" width="450" height="450" class="bg-slate-950 rounded-xl w-full h-full border border-indigo-950"></canvas>
+                            </div>
+                            
+                            <!-- Top Real-time Countdown Timer Bar Overlay -->
+                            <div class="w-full max-w-[450px] mt-4">
+                                <div class="flex justify-between items-center text-xs text-amber-300 font-extrabold mb-1 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
+                                    <span class="uppercase tracking-wider flex items-center space-x-1.5">
+                                        <i class="fa-solid fa-stopwatch animate-spin text-amber-400" style="animation-duration: 3s"></i>
+                                        <span>Active Safezone Countdown</span>
+                                    </span>
+                                    <span id="lbl-countdown-timer" class="text-sm font-black bg-slate-950 px-2 py-0.5 rounded border border-slate-800">10.0s</span>
+                                </div>
+                                <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                                    <div id="bar-countdown-timer" class="bg-gradient-to-r from-amber-400 to-rose-500 h-full rounded-full transition-all duration-75" style="width: 100%"></div>
+                                endX
+                                </div>
                             </div>
                         </div>
 
@@ -830,7 +867,7 @@
                     targetAngle: 270, // North
                     boundary: 1,
                     evaluator: (x, y) => y >= 1,
-                    safeDesc: "y ≥ 1 (Top / 上方)"
+                    safeDesc: "y ≥ 1"
                 },
                 {
                     type: "safezone",
@@ -841,7 +878,7 @@
                     targetAngle: 0, // East
                     boundary: 0,
                     evaluator: (x, y) => x >= 0,
-                    safeDesc: "x ≥ 0 (Right / 右侧)"
+                    safeDesc: "x ≥ 0"
                 },
                 {
                     type: "safezone",
@@ -852,7 +889,7 @@
                     targetAngle: 90, // South
                     boundary: -1,
                     evaluator: (x, y) => y <= -1,
-                    safeDesc: "y ≤ -1 (Bottom / 下方)"
+                    safeDesc: "y ≤ -1"
                 },
                 {
                     type: "safezone",
@@ -863,7 +900,7 @@
                     targetAngle: 180, // West
                     boundary: -2,
                     evaluator: (x, y) => x <= -2,
-                    safeDesc: "x ≤ -2 (Left / 左侧)"
+                    safeDesc: "x ≤ -2"
                 },
                 {
                     type: "safezone",
@@ -874,7 +911,7 @@
                     targetAngle: 270, // North
                     boundary: 0,
                     evaluator: (x, y) => y > 0,
-                    safeDesc: "y > 0 (Top / 上方)"
+                    safeDesc: "y > 0"
                 },
                 {
                     type: "safezone",
@@ -885,7 +922,7 @@
                     targetAngle: 0, // East
                     boundary: 1,
                     evaluator: (x, y) => x > 1,
-                    safeDesc: "x > 1 (Right / 右侧)"
+                    safeDesc: "x > 1"
                 },
                 {
                     type: "safezone",
@@ -896,7 +933,7 @@
                     targetAngle: 90, // South
                     boundary: 0,
                     evaluator: (x, y) => y <= 0,
-                    safeDesc: "y ≤ 0 (Bottom / 下方)"
+                    safeDesc: "y ≤ 0"
                 },
                 {
                     type: "safezone",
@@ -907,7 +944,7 @@
                     targetAngle: 180, // West
                     boundary: 1,
                     evaluator: (x, y) => x <= 1,
-                    safeDesc: "x ≤ 1 (Left / 左侧)"
+                    safeDesc: "x ≤ 1"
                 }
             ]
         };
@@ -1011,6 +1048,7 @@
                 document.getElementById("panel-cartesian").classList.remove("hidden");
                 document.getElementById("panel-mcq").classList.add("hidden");
                 document.getElementById("panel-numberline").classList.add("hidden");
+                document.getElementById("question-text-area").classList.add("hidden"); // Hide global quest description
                 
                 // Initialize canvas variables
                 canvas = document.getElementById("cartesian-canvas");
@@ -1024,10 +1062,16 @@
                 m4Transition.startAngle = 270;
                 m4Transition.endAngle = 270;
                 
+                // Trim dynamic sudden-death questions if restarting
+                if (QUEST_DATABASE[4].length > 10) {
+                    QUEST_DATABASE[4].length = 10;
+                }
+                
                 renderMilestoneGems();
             } else {
                 document.getElementById("m4-milestone-panel").classList.add("hidden");
                 document.getElementById("panel-cartesian").classList.add("hidden");
+                document.getElementById("question-text-area").classList.remove("hidden"); // Show global quest description
             }
 
             loadQuestion();
@@ -1036,9 +1080,8 @@
         function renderMilestoneGems() {
             const container = document.getElementById("milestones-gems-container");
             container.innerHTML = "";
-            const questions = QUEST_DATABASE[4];
             
-            for (let i = 0; i < questions.length; i++) {
+            for (let i = 0; i < 10; i++) {
                 const gem = document.createElement("div");
                 gem.id = `gem-milestone-${i}`;
                 gem.className = "milestone-gem w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-500";
@@ -1049,7 +1092,24 @@
         }
 
         function updateMilestoneGemsUI() {
-            for (let i = 0; i < QUEST_DATABASE[4].length; i++) {
+            const container = document.getElementById("milestones-gems-container");
+            
+            // Switch to Sudden Death UI if past question 10
+            if (gameState.currentMission === 4 && gameState.currentQuestionIdx >= 10) {
+                let sdRound = gameState.currentQuestionIdx - 9;
+                let alertText = `🔥 SUDDEN DEATH: ROUND ${sdRound}`;
+                
+                if (sdRound > 10) {
+                    alertText = `💀 BLIND MODE: ROUND ${sdRound} (NO HINTS)`;
+                } else if (sdRound > 5) {
+                    alertText = `⚠️ HARDCORE: ROUND ${sdRound} (LINE ONLY)`;
+                }
+                
+                container.innerHTML = `<span class="px-4 py-1.5 rounded-lg bg-rose-500 text-white font-black text-sm animate-pulse shadow-lg shadow-rose-500/50">${alertText}</span>`;
+                return;
+            }
+
+            for (let i = 0; i < 10; i++) {
                 const gem = document.getElementById(`gem-milestone-${i}`);
                 if (!gem) continue;
                 if (i < gameState.currentQuestionIdx) {
@@ -1084,10 +1144,12 @@
             document.getElementById("gameplay-progress-bar").style.width = `${progressPct}%`;
 
             // Display question texts (Trilingual)
-            document.getElementById("topic-badge").innerText = currentQ.topic;
-            document.getElementById("main-question-text").innerText = currentQ.questionEN;
-            document.getElementById("chinese-translation-text").innerHTML = `<span class="text-xs bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5 rounded mr-1.5">中文</span>` + currentQ.questionZH;
-            document.getElementById("malay-translation-text").innerText = `KSSM Rujukan: ` + currentQ.questionBM;
+            if (gameState.currentMission !== 4) {
+                document.getElementById("topic-badge").innerText = currentQ.topic;
+                document.getElementById("main-question-text").innerText = currentQ.questionEN;
+                document.getElementById("chinese-translation-text").innerHTML = `<span class="text-xs bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5 rounded mr-1.5">中文</span>` + currentQ.questionZH;
+                document.getElementById("malay-translation-text").innerText = `KSSM Rujukan: ` + currentQ.questionBM;
+            }
 
             // Trigger Specific UI Panel layouts
             if (currentQ.type === "mcq") {
@@ -1304,6 +1366,45 @@
         }
 
         // --- MISSION 4 CARTESIAN SAFEZONE REALTIME LOGIC ---
+        function generateRandomM4Question() {
+            const axes = ['x', 'y'];
+            const signs = ['>', '<', '>=', '<='];
+            
+            const axis = axes[Math.floor(Math.random() * axes.length)];
+            const sign = signs[Math.floor(Math.random() * signs.length)];
+            const boundary = Math.floor(Math.random() * 7) - 3; // Random boundary from -3 to 3
+            
+            let targetAngle = 0;
+            if (axis === 'x') {
+                if (sign.includes('>')) targetAngle = 0; // East
+                else targetAngle = 180; // West
+            } else {
+                if (sign.includes('>')) targetAngle = 270; // North
+                else targetAngle = 90; // South
+            }
+            
+            let signStr = sign.replace('>=', '≥').replace('<=', '≤');
+            let equation = `${axis} ${signStr} ${boundary}`;
+            
+            return {
+                type: "safezone",
+                topic: "Sudden Death! / 极限生存模式",
+                questionEN: `Survive! Move your mascot to the safe zone: ${equation}`,
+                questionZH: `极限生存！移动至安全区：${equation}`,
+                questionBM: `Bertahan! Gerakkan maskot ke zon selamat: ${equation}`,
+                targetAngle: targetAngle,
+                boundary: boundary,
+                evaluator: (x, y) => {
+                    let val = axis === 'x' ? x : y;
+                    if (sign === '>') return val > boundary;
+                    if (sign === '<') return val < boundary;
+                    if (sign === '>=') return val >= boundary;
+                    if (sign === '<=') return val <= boundary;
+                },
+                safeDesc: equation
+            };
+        }
+
         function startCartesianArenaRound(questionObj) {
             if (animFrameId) {
                 cancelAnimationFrame(animFrameId);
@@ -1320,7 +1421,9 @@
             m4Transition.endAngle = m4Transition.startAngle + diff;
             
             // Sync Hint Labels
-            document.getElementById("lbl-safezone-hint").innerText = questionObj.safeDesc;
+            document.querySelectorAll("#lbl-safezone-hint").forEach(el => {
+                el.innerText = questionObj.safeDesc;
+            });
             updateMascotDisplay();
 
             // Set up real-time timer
@@ -1354,11 +1457,11 @@
             
             // Update color based on urgency
             if (barPct < 30) {
-                timerBar.className = "bg-rose-500 h-full transition-all duration-75";
+                timerBar.className = "bg-rose-500 h-full rounded-full transition-all duration-75";
             } else if (barPct < 60) {
-                timerBar.className = "bg-amber-500 h-full transition-all duration-75";
+                timerBar.className = "bg-amber-500 h-full rounded-full transition-all duration-75";
             } else {
-                timerBar.className = "bg-emerald-500 h-full transition-all duration-75";
+                timerBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-75";
             }
 
             // Rotate the safe zone starting at exactly 2 seconds remaining (t-2), and finishing at 1 second remaining
@@ -1387,19 +1490,22 @@
             ctx.fillStyle = "#020617";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            const center = canvas.width / 2; // 225
+            const gridScale = 50;           // Grid coordinate units of 50px
+
             // 2. Draw Grid coordinate helper lines
             ctx.lineWidth = 1;
             ctx.strokeStyle = "#1e293b";
             for (let i = -4; i <= 4; i++) {
                 // Vertical grid helper
-                let xPos = 200 + (i * 45);
+                let xPos = center + (i * gridScale);
                 ctx.beginPath();
                 ctx.moveTo(xPos, 0);
                 ctx.lineTo(xPos, canvas.height);
                 ctx.stroke();
 
                 // Horizontal grid helper
-                let yPos = 200 - (i * 45);
+                let yPos = center - (i * gridScale);
                 ctx.beginPath();
                 ctx.moveTo(0, yPos);
                 ctx.lineTo(canvas.width, yPos);
@@ -1411,84 +1517,110 @@
             ctx.strokeStyle = "#475569";
             // X-Axis
             ctx.beginPath();
-            ctx.moveTo(10, 200);
-            ctx.lineTo(390, 200);
+            ctx.moveTo(15, center);
+            ctx.lineTo(canvas.width - 15, center);
             ctx.stroke();
             // Y-Axis
             ctx.beginPath();
-            ctx.moveTo(200, 10);
-            ctx.lineTo(200, 390);
+            ctx.moveTo(center, 15);
+            ctx.lineTo(center, canvas.height - 15);
             ctx.stroke();
 
             // Axis labels & arrows
             ctx.fillStyle = "#94a3b8";
-            ctx.font = "bold 11px sans-serif";
-            ctx.fillText("x", 385, 195);
-            ctx.fillText("y", 205, 15);
+            ctx.font = "bold 12px sans-serif";
+            ctx.fillText("x", canvas.width - 15, center - 6);
+            ctx.fillText("y", center + 8, 20);
 
             // 4. Draw tick numbers along axes
             ctx.fillStyle = "#475569";
-            ctx.font = "9px sans-serif";
+            ctx.font = "bold 10px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
             for (let i = -4; i <= 4; i++) {
                 if (i === 0) continue;
-                let xPos = 200 + (i * 45);
-                let yPos = 200 - (i * 45);
+                let xPos = center + (i * gridScale);
+                let yPos = center - (i * gridScale);
 
                 // Tick marks
-                ctx.fillRect(xPos - 1, 197, 2, 6);
-                ctx.fillRect(197, yPos - 1, 6, 2);
+                ctx.fillRect(xPos - 1, center - 3, 2, 7);
+                ctx.fillRect(center - 3, yPos - 1, 7, 2);
 
                 // Number labels
-                ctx.fillText(i, xPos - 3, 215);
-                ctx.fillText(i, 183, yPos + 3);
+                ctx.fillText(i, xPos, center + 14);
+                ctx.fillText(i, center - 14, yPos);
             }
 
             // 5. Draw the Dynamic Clockwise rotating Safe Zone overlay!
             // Visually show the green safe zone depending on the interactive toggle switch! (True/False setting)
-            if (showCartesianHint) {
-                ctx.save();
-                ctx.translate(200, 200);
-                ctx.rotate(m4Transition.currentAngle * Math.PI / 180);
+            // In Sudden Death, rules change: Round 6+ = No Fill, Round 11+ = No Line
+            let sdRound = gameState.currentQuestionIdx - 9;
+            let shouldDrawFill = showCartesianHint && (sdRound <= 5);
+            let shouldDrawLine = showCartesianHint && (sdRound <= 10);
 
-                // Safe Zone colored block
-                ctx.fillStyle = "rgba(16, 185, 129, 0.20)";
-                ctx.strokeStyle = "rgba(16, 185, 129, 0.7)";
-                ctx.lineWidth = 3;
+            if (shouldDrawFill || shouldDrawLine) {
+                ctx.save();
+                ctx.translate(center, center);
+                ctx.rotate(m4Transition.currentAngle * Math.PI / 180);
 
                 // Scaling offset coordinates based on boundary
                 const currentQ = QUEST_DATABASE[4][gameState.currentQuestionIdx];
-                let boundaryOffset = (currentQ ? currentQ.boundary : 0) * 45;
+                let boundaryOffset = (currentQ ? currentQ.boundary : 0) * gridScale;
 
-                ctx.beginPath();
-                // We draw a large rectangle covering the active half-plane
-                ctx.rect(boundaryOffset, -400, 800, 800);
-                ctx.fill();
+                if (shouldDrawFill) {
+                    // Safe Zone colored block
+                    ctx.fillStyle = "rgba(16, 185, 129, 0.20)";
+                    ctx.beginPath();
+                    // We draw a large rectangle covering the active half-plane
+                    ctx.rect(boundaryOffset, -canvas.width * 2, canvas.width * 4, canvas.height * 4);
+                    ctx.fill();
+                }
 
-                // Safezone partition boundary line
-                ctx.beginPath();
-                ctx.moveTo(boundaryOffset, -400);
-                ctx.lineTo(boundaryOffset, 400);
-                ctx.stroke();
+                if (shouldDrawLine) {
+                    // Safezone partition boundary line
+                    ctx.strokeStyle = "rgba(16, 185, 129, 0.7)";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(boundaryOffset, -canvas.height * 2);
+                    ctx.lineTo(boundaryOffset, canvas.height * 2);
+                    ctx.stroke();
+                }
+                
                 ctx.restore();
             }
 
             // 6. Draw Mascot Player
             // Mapping Mascot grid coordinates to Canvas coordinates
-            let canvasMascotX = 200 + (m4Mascot.x * 45);
-            let canvasMascotY = 200 - (m4Mascot.y * 45); // Cartesian Y goes up, canvas goes down
+            let canvasMascotX = center + (m4Mascot.x * gridScale);
+            let canvasMascotY = center - (m4Mascot.y * gridScale); // Cartesian Y goes up, canvas goes down
 
             // Mascot Outer Radar Pulse Glow
             ctx.beginPath();
-            ctx.arc(canvasMascotX, canvasMascotY, 14, 0, 2 * Math.PI);
-            ctx.fillStyle = "rgba(99, 102, 241, 0.3)";
+            ctx.arc(canvasMascotX, canvasMascotY, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = "rgba(99, 102, 241, 0.35)";
             ctx.fill();
 
             // Draw Mascot character emoji
             ctx.fillStyle = "#ffffff";
-            ctx.font = "20px sans-serif";
+            ctx.font = "22px sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText("🧙‍♂️", canvasMascotX, canvasMascotY);
+        }
+
+        // --- TOGGLE CARTESIAN HINT REPRESENTATION (GREEN ZONE) ---
+        function toggleCartesianHint() {
+            showCartesianHint = !showCartesianHint;
+            const btn = document.getElementById("btn-toggle-hint");
+            
+            if (showCartesianHint) {
+                btn.innerText = "TRUE / 开启";
+                btn.className = "px-5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
+            } else {
+                btn.innerText = "FALSE / 关闭";
+                btn.className = "px-5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
+            }
+            drawCartesianArena();
         }
 
         function moveMascot(dx, dy) {
@@ -1515,31 +1647,21 @@
                 try { sfx.playSuccess(); } catch(e) {}
                 
                 // Reduce base countdown timer by 1 second for successfully solved questions
-                m4Timer.maxTime = Math.max(3, m4Timer.maxTime - 1); 
+                m4Timer.maxTime = Math.max(2, m4Timer.maxTime - 1); // Floor at 2 seconds for Sudden Death
                 
-                showFeedback(true, "Safe & Sound! / 安全抵挡！", `Excellent navigation! You've successfully landed in the safe coordinates representing: ${currentQ.safeDesc}.<br><span class="text-amber-300 font-bold text-xs">Note: Next round's countdown has been shortened to ${m4Timer.maxTime}s! Faster!</span>`);
+                showFeedback(true, "Safe & Sound! / 安全抵达！", `Excellent navigation! You've successfully landed in the safe coordinates representing: ${currentQ.safeDesc}.<br><span class="text-amber-300 font-bold text-xs">Note: Next round's countdown has been shortened to ${m4Timer.maxTime}s! Faster!</span>`);
             } else {
-                gameState.lives = Math.max(0, gameState.lives - 1);
+                if (gameState.currentQuestionIdx >= 10) {
+                    // Sudden death logic: 1 mistake after round 10 means instant game over!
+                    gameState.lives = 0;
+                } else {
+                    gameState.lives = Math.max(0, gameState.lives - 1);
+                }
                 try { sfx.playFailure(); } catch(e) {}
                 
                 showFeedback(false, "Caught in Hazard! / 置身危险区域！", `Oops! Your coordinates (${m4Mascot.x}, ${m4Mascot.y}) did not satisfy the safe zone inequality: ${currentQ.safeDesc}. Make sure you relocate before the timer finishes!`);
             }
             updateDashboardUI();
-        }
-
-        // --- TOGGLE CARTESIAN HINT REPRESENTATION (GREEN ZONE) ---
-        function toggleCartesianHint() {
-            showCartesianHint = !showCartesianHint;
-            const btn = document.getElementById("btn-toggle-hint");
-            
-            if (showCartesianHint) {
-                btn.innerText = "TRUE / 开启";
-                btn.className = "px-5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
-            } else {
-                btn.innerText = "FALSE / 关闭";
-                btn.className = "px-5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
-            }
-            drawCartesianArena();
         }
 
         // --- KEY LISTENER ATTACHMENT FOR WASD CONTROLS ---
@@ -1635,8 +1757,25 @@
                 
                 if (gameState.lives <= 0) {
                     actBtn.className = "w-full py-4 rounded-xl font-bold text-white transition-all bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-600/20";
-                    actBtn.innerText = "Try Game Again / 重新开始挑战";
-                    actBtn.onclick = () => returnToMainOnFail();
+                    
+                    if (gameState.currentMission === 4 && gameState.completedMissions.has(4)) {
+                        if (gameState.completedMissions.size >= 4) {
+                            actBtn.innerText = "Finish & Claim Victory / 查看最终成绩";
+                            actBtn.onclick = () => {
+                                if (feedbackTimer) { clearInterval(feedbackTimer); feedbackTimer = null; }
+                                goToVictoryScreen();
+                            };
+                        } else {
+                            actBtn.innerText = "Mission Passed! Return to Menu / 返回主菜单";
+                            actBtn.onclick = () => {
+                                if (feedbackTimer) { clearInterval(feedbackTimer); feedbackTimer = null; }
+                                abandonMission();
+                            };
+                        }
+                    } else {
+                        actBtn.innerText = "Try Game Again / 重新开始挑战";
+                        actBtn.onclick = () => returnToMainOnFail();
+                    }
                 } else {
                     actBtn.className = "w-full py-4 rounded-xl font-bold text-white transition-all bg-slate-800 hover:bg-slate-700 border border-slate-700";
                     actBtn.innerText = "Retry / 重新作答";
@@ -1658,7 +1797,18 @@
 
             const questions = QUEST_DATABASE[gameState.currentMission];
             
-            if (gameState.currentQuestionIdx + 1 < questions.length) {
+            if (gameState.currentMission === 4) {
+                // If they finished the baseline 10 questions, mark the mission as successfully completed!
+                if (gameState.currentQuestionIdx === 9) {
+                    gameState.completedMissions.add(4);
+                }
+                // Generate next procedural question if needed
+                if (gameState.currentQuestionIdx + 1 >= questions.length) {
+                    QUEST_DATABASE[4].push(generateRandomM4Question());
+                }
+                gameState.currentQuestionIdx++;
+                loadQuestion();
+            } else if (gameState.currentQuestionIdx + 1 < questions.length) {
                 gameState.currentQuestionIdx++;
                 loadQuestion();
             } else {
