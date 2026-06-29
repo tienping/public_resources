@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inequality Quest: Guardian of the Number Line</title>
+    <!-- Tailwind CSS for high fidelity modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&family=Noto+Sans+SC:wght=400;500;700;900&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans SC', sans-serif;
+            background: radial-gradient(circle at top, #1e1b4b, #0f172a);
+        }
+        .glow-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.8);
+            transform: translateY(-2px);
+        }
+        .milestone-gem {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-indigo-900/50 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-indigo-500 to-purple-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-compass-drafting text-xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-indigo-200 via-purple-200 to-pink-300 bg-clip-text text-transparent">INEQUALITY QUEST</h1>
+                    <p class="text-xs text-indigo-300 font-semibold tracking-wider uppercase">Misi Ketaksamaan Linear • 线性不等式任务</p>
+                </div>
+            </div>
+            
+            <!-- Dynamic Stats Bar -->
+            <div id="game-stats" class="hidden flex items-center space-x-6">
+                <!-- Score Indicator -->
+                <div class="bg-slate-800/80 border border-slate-700/50 px-4 py-2 rounded-xl flex items-center space-x-2.5">
+                    <i class="fa-solid fa-star text-amber-400 animate-pulse"></i>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase leading-none">Score / 得分</div>
+                        <div id="player-score" class="text-base font-extrabold text-amber-300">0</div>
+                    </div>
+                </div>
+                <!-- Health Indicator -->
+                <div class="bg-slate-800/80 border border-slate-700/50 px-4 py-2 rounded-xl flex items-center space-x-2.5">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase leading-none">Lives / 生命</div>
+                        <div id="player-lives" class="text-base font-extrabold text-rose-400">❤️❤️❤️</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Button -->
+            <button onclick="toggleHelpModal()" class="text-slate-400 hover:text-white transition bg-slate-800/50 hover:bg-slate-800 p-2.5 rounded-lg border border-slate-700/30">
+                <i class="fa-solid fa-circle-info text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Game Window -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex-grow flex flex-col justify-center">
+        
+        <!-- ================= WELCOME SCREEN ================= -->
+        <section id="screen-welcome" class="bg-slate-900/60 border border-slate-800/80 p-8 md:p-12 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden my-6">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+
+            <div class="text-center space-y-6 relative z-10">
+                <span class="px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-xs font-bold text-indigo-300 uppercase tracking-widest">
+                    Interactive Math Pilot • 数学互动课
+                </span>
+                <h2 class="text-4xl md:text-5xl font-black tracking-tight leading-none text-white">
+                    Unlock the Secrets of <br>
+                    <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Linear Inequalities</span>
+                </h2>
+                <h3 class="text-xl font-bold text-indigo-200">解开线性不等式的奥秘</h3>
+                <p class="text-slate-300 max-w-xl mx-auto text-base">
+                    Welcome, young Math wizard! Learn how to solve real-world problems, build graphs, and solve algebra equations using inequalities.
+                    <br><span class="text-slate-400 text-sm mt-2 block">欢迎，年轻的数学勇士！通过解开现实谜题、绘制数轴并解决不等式方程来拯救数学维度。</span>
+                </p>
+
+                <!-- Language Selection Tip -->
+                <div class="bg-slate-800/40 border border-slate-700/30 p-4 rounded-xl max-w-md mx-auto text-xs text-slate-300 flex items-center space-x-3 text-left">
+                    <i class="fa-solid fa-language text-3xl text-indigo-400"></i>
+                    <div>
+                        <p class="font-bold">Trilingual Support (EN / 华语 / BM)</p>
+                        <p class="text-slate-400">Questions are displayed in English with Mandarin and Bahasa Melayu translations to help you learn easier!</p>
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button onclick="startGame()" class="glow-button px-10 py-5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl font-bold text-lg text-white tracking-wide flex items-center space-x-3 mx-auto">
+                        <span>Enter the Dimension (开始探索)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MISSION SELECTOR ================= -->
+        <section id="screen-mission-select" class="hidden space-y-8 my-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl font-extrabold text-white">Choose Your Mission / 选择任务</h2>
+                <p class="text-slate-400">Complete all four stages to master Chapter 7. 完成四个关卡以掌握第七章。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Mission 1 Card -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/50 transition duration-300 group relative">
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition duration-300">
+                            <i class="fa-solid fa-tag"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-md text-white">Mission 1: The Decoder</h3>
+                            <p class="text-[10px] text-indigo-300 font-bold mb-1">关卡 1：不等式翻译员</p>
+                            <p class="text-xs text-slate-400">Translate real-life signs and limits into symbolic inequalities.</p>
+                        </div>
+                    </div>
+                    <button onclick="startMission(1)" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-blue-600 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Start Mission 1 / 开始</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+
+                <!-- Mission 2 Card -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/50 transition duration-300 group relative">
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition duration-300">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-md text-white">Mission 2: Line Builder</h3>
+                            <p class="text-[10px] text-indigo-300 font-bold mb-1">关卡 2：数轴绘制专家</p>
+                            <p class="text-xs text-slate-400">Draw arrows and toggle open/solid boundary circles on the number line.</p>
+                        </div>
+                    </div>
+                    <button id="btn-mission-2" onclick="startMission(2)" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-purple-600 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Start Mission 2 / 开始</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+
+                <!-- Mission 3 Card -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-pink-500/50 transition duration-300 group relative">
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-400 group-hover:bg-pink-500 group-hover:text-white transition duration-300">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-md text-white">Mission 3: Sign Flippers</h3>
+                            <p class="text-[10px] text-indigo-300 font-bold mb-1">关卡 3：不等号大反转</p>
+                            <p class="text-xs text-slate-400">Master algebraic steps! Beware of negative signs that flip inequality symbols.</p>
+                        </div>
+                    </div>
+                    <button id="btn-mission-3" onclick="startMission(3)" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-pink-600 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Start Mission 3 / 开始</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+
+                <!-- Mission 4 Card -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-emerald-500/50 transition duration-300 group relative">
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition duration-300">
+                            <i class="fa-solid fa-crosshairs"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-md text-white">Mission 4: Safe Zone</h3>
+                            <p class="text-[10px] text-indigo-300 font-bold mb-1">关卡 4：避难安全区</p>
+                            <p class="text-xs text-slate-400">Control a mascot in Cartesian coordinate plane and run into the rotating safe area!</p>
+                        </div>
+                    </div>
+                    <button id="btn-mission-4" onclick="startMission(4)" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-emerald-600 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Start Mission 4 / 开始</span>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Teacher Helper / Instruction Note -->
+            <div class="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl">
+                <h4 class="text-sm font-bold text-slate-300 mb-2 flex items-center space-x-2">
+                    <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
+                    <span>Teacher's Note / 教师指南:</span>
+                </h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    This interactive tool helps students learn step-by-step. Let students use the top-right Info button (<i class="fa-solid fa-circle-info"></i>) to read rules of empty/solid circles and negative numbers anytime they get stuck.
+                    <br><span class="text-indigo-300/80">提示：本系统包含完整的中文辅助说明，关卡 4 训练学生结合笛卡尔直角坐标系（Cartesian Coordinates）快速做出不等式区间位置的判断！你可以选择开启/关闭绿色安全区提示作为不同难度的挑战！</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- ================= PLAY ZONE: MAIN INTERFACE ================= -->
+        <section id="screen-gameplay" class="hidden flex flex-col space-y-6 my-6">
+            
+            <!-- Progress & Stage Info -->
+            <div class="flex justify-between items-center bg-slate-900/50 border border-slate-800 px-5 py-3 rounded-2xl">
+                <div>
+                    <span id="gameplay-mission-title" class="text-xs font-bold uppercase text-indigo-400">Mission 1</span>
+                    <h3 id="gameplay-question-num" class="text-lg font-bold text-white">Question 1 of 4</h3>
+                </div>
+                <div class="w-1/3 bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                    <div id="gameplay-progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-300" style="width: 25%"></div>
+                </div>
+            </div>
+
+            <!-- Game Quest Sandbox -->
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 md:p-8 backdrop-blur-xl relative shadow-xl">
+                
+                <!-- Feedback Overlay Dialog -->
+                <div id="feedback-overlay" class="hidden absolute inset-0 z-30 rounded-3xl backdrop-blur-md flex flex-col items-center justify-center p-6 text-center transition-all duration-300">
+                    <div id="feedback-card" class="bg-slate-950/95 border-2 p-8 rounded-2xl max-w-md w-full shadow-2xl transform scale-95 transition-transform">
+                        <div id="feedback-icon" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4"></div>
+                        <h4 id="feedback-title" class="text-2xl font-black mb-2 text-white">Perfect!</h4>
+                        <p id="feedback-desc" class="text-slate-300 text-sm mb-6"></p>
+                        <div id="feedback-buttons-container" class="flex flex-col gap-2 w-full">
+                            <button id="feedback-action-btn" class="w-full py-4 rounded-xl font-bold text-white transition-all duration-300 shadow-lg"></button>
+                            <button id="feedback-pause-btn" class="hidden w-full py-2.5 rounded-xl font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-slate-700 text-xs flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-pause"></i>
+                                <span>Pause Auto-Advance / 暂停自动跳转</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= MISSION 4 EXCLUSIVE MILESTONES ================= -->
+                <div id="m4-milestone-panel" class="hidden bg-slate-950/40 border border-slate-800/60 p-4 rounded-2xl mb-6 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <span class="text-xs font-extrabold text-emerald-400 tracking-wider uppercase flex items-center space-x-1.5">
+                        <i class="fa-solid fa-flag-checkered animate-bounce"></i>
+                        <span>Milestone Progress (通关进度):</span>
+                    </span>
+                    <div class="flex space-x-2" id="milestones-gems-container">
+                        <!-- 8 Gems indicators will dynamically spawn here -->
+                    </div>
+                </div>
+
+                <!-- QUESTION DISPLAY AREA -->
+                <div id="question-text-area" class="space-y-4 mb-8 border-b border-slate-800 pb-6">
+                    <!-- Dynamic badge indicating difficulty/topic -->
+                    <span id="topic-badge" class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md text-xs font-semibold text-indigo-300">
+                        Topic Tag
+                    </span>
+                    
+                    <!-- English Question -->
+                    <h4 id="main-question-text" class="text-xl md:text-2xl font-extrabold text-white leading-snug">
+                        Question description will load dynamically...
+                    </h4>
+                    
+                    <!-- Chinese Question -->
+                    <p id="chinese-translation-text" class="text-base font-semibold text-amber-300/95 leading-relaxed bg-amber-500/5 px-4 py-2.5 rounded-xl border border-amber-500/10">
+                        中文翻译载入中...
+                    </p>
+
+                    <!-- Malay Question (KSSM reference) -->
+                    <p id="malay-translation-text" class="text-xs italic text-slate-400 font-medium pl-1">
+                        Terjemahan Bahasa Melayu...
+                    </p>
+                </div>
+
+                <!-- ================= CORE INTERACTION PANELS ================= -->
+
+                <!-- TYPE 1: MULTIPLE CHOICE (Mission 1 & Mission 3) -->
+                <div id="panel-mcq" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- MCQ options are rendered here dynamically -->
+                </div>
+
+                <!-- TYPE 2: INTERACTIVE NUMBER LINE CONSTRUCTOR (Mission 2) -->
+                <div id="panel-numberline" class="hidden space-y-8">
+                    
+                    <!-- SVG Interactive Number Line -->
+                    <div class="bg-slate-950/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-center items-center select-none">
+                        
+                        <!-- Value selector status -->
+                        <div class="text-sm font-semibold mb-4 text-indigo-200">
+                            Selected Boundary Point / 选中端点: <span id="lbl-boundary" class="text-xl font-black text-amber-300">0</span>
+                        </div>
+
+                        <!-- SVG Graphic Canvas -->
+                        <div class="w-full overflow-x-auto">
+                            <svg id="svg-canvas" width="600" height="150" class="mx-auto min-w-[500px]">
+                                <!-- Main Number Line Axis -->
+                                <line x1="50" y1="90" x2="550" y2="90" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+                                <!-- Left arrow line -->
+                                <path d="M 50 90 L 60 83 M 50 90 L 60 97" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+                                <!-- Right arrow line -->
+                                <path d="M 550 90 L 540 83 M 550 90 L 540 97" stroke="#475569" stroke-width="4" stroke-linecap="round" />
+
+                                <!-- Ticks and Labels dynamically generated -->
+                                <g id="svg-ticks"></g>
+
+                                <!-- The interactive user-constructed inequality graph -->
+                                <g id="user-graph">
+                                    <!-- Dynamic line constructed by the player -->
+                                    <line id="user-line" x1="300" y1="50" x2="300" y2="50" stroke="#6366f1" stroke-width="5" stroke-dasharray="2" class="hidden" />
+                                    <!-- Dynamic arrow head pointing left or right -->
+                                    <path id="user-arrow" d="" fill="none" stroke="#6366f1" stroke-width="5" stroke-linecap="round" class="hidden" />
+                                    <!-- Dynamic node circle representing open or closed -->
+                                    <circle id="user-node" cx="300" cy="50" r="10" fill="#0f172a" stroke="#6366f1" stroke-width="4" class="hidden" />
+                                </g>
+                            </svg>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2"><i class="fa-solid fa-mouse-pointer mr-1"></i> Click any number above to set the anchor point. (点击下方数字来放置端点)</p>
+                    </div>
+
+                    <!-- Construction Controls Panel -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Circle Style Selector -->
+                        <div class="bg-slate-800/40 border border-slate-700/30 p-5 rounded-2xl space-y-3">
+                            <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider">Circle Style / 圆圈类型 (Jenis Titik)</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="setCircleStyle('open')" id="btn-circle-open" class="py-3 px-4 rounded-xl border-2 border-indigo-500/20 hover:border-indigo-500 bg-slate-900/50 flex flex-col items-center justify-center transition">
+                                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 bg-transparent mb-1"></div>
+                                    <span class="text-sm font-bold text-white">Open / 空心 (○)</span>
+                                    <span class="text-[10px] text-slate-400">Strictly (<, >) 不含等号</span>
+                                </button>
+                                <button onclick="setCircleStyle('solid')" id="btn-circle-solid" class="py-3 px-4 rounded-xl border-2 border-indigo-500/20 hover:border-indigo-500 bg-slate-900/50 flex flex-col items-center justify-center transition">
+                                    <div class="w-6 h-6 rounded-full bg-slate-300 mb-1"></div>
+                                    <span class="text-sm font-bold text-white">Solid / 实心 (●)</span>
+                                    <span class="text-[10px] text-slate-400">Equal allowed (≤, ≥) 包含等号</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Arrow Direction Selector -->
+                        <div class="bg-slate-800/40 border border-slate-700/30 p-5 rounded-2xl space-y-3">
+                            <label class="block text-xs font-bold text-indigo-300 uppercase tracking-wider">Arrow Direction / 箭头方向 (Arah)</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="setDirection('left')" id="btn-dir-left" class="py-3 px-4 rounded-xl border-2 border-indigo-500/20 hover:border-indigo-500 bg-slate-900/50 flex flex-col items-center justify-center transition">
+                                    <i class="fa-solid fa-arrow-left text-lg mb-1 text-slate-300"></i>
+                                    <span class="text-sm font-bold text-white">Left / 向左 (←)</span>
+                                    <span class="text-[10px] text-slate-400">Less than (<, ≤) 较小值</span>
+                                </button>
+                                <button onclick="setDirection('right')" id="btn-dir-right" class="py-3 px-4 rounded-xl border-2 border-indigo-500/20 hover:border-indigo-500 bg-slate-900/50 flex flex-col items-center justify-center transition">
+                                    <i class="fa-solid fa-arrow-right text-lg mb-1 text-slate-300"></i>
+                                    <span class="text-sm font-bold text-white">Right / 向右 (→)</span>
+                                    <span class="text-[10px] text-slate-400">Greater than (>, ≥) 较大值</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Interactive Graph Button -->
+                    <div class="flex justify-center pt-4">
+                        <button onclick="checkNumberlineAnswer()" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl font-bold text-white hover:opacity-90 shadow-lg shadow-emerald-500/20 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Verify Graph / 确认解答 (Sahkan)</span>
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- TYPE 3: MISSION 4 CARTESIAN SAFEZONE REALTIME GAME -->
+                <div id="panel-cartesian" class="hidden flex flex-col lg:flex-row gap-6 items-center">
+                    
+                    <!-- Cartesian Canvas Area -->
+                    <div class="bg-slate-950 border-2 border-indigo-900/40 p-4 rounded-2xl relative select-none shadow-2xl">
+                        <!-- Canvas -->
+                        <canvas id="cartesian-canvas" width="400" height="400" class="bg-slate-950 rounded-xl max-w-full h-auto"></canvas>
+                        
+                        <!-- Top Real-time Countdown Timer Bar Overlay -->
+                        <div class="absolute top-6 left-6 right-6">
+                            <div class="flex justify-between items-center text-xs text-amber-300 font-extrabold mb-1 bg-slate-950/80 px-2 py-1 rounded">
+                                <span class="uppercase tracking-wider">ACTIVE SAFEZONE COUNTDOWN</span>
+                                <span id="lbl-countdown-timer">10.0s</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                                <div id="bar-countdown-timer" class="bg-gradient-to-r from-amber-400 to-rose-500 h-full transition-all duration-75" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cartesian controls panel (D-pad & stats) -->
+                    <div class="flex-grow w-full flex flex-col justify-between space-y-4">
+                        
+                        <!-- Real-time Mascot Coordinates Tracker -->
+                        <div class="bg-slate-900/50 border border-slate-800/80 p-4 rounded-2xl flex flex-col space-y-4">
+                            <div class="text-center bg-slate-950/50 rounded-xl py-3 border border-rose-500/30 shadow-inner">
+                                <span class="text-[10px] text-rose-400 block uppercase font-extrabold tracking-widest mb-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Target Safezone Equation
+                                </span>
+                                <span id="lbl-safezone-hint" class="text-3xl md:text-4xl font-black text-rose-500 drop-shadow-md">Evaluating...</span>
+                            </div>
+                            <div class="flex justify-around items-center">
+                                <div class="text-center w-1/2 border-r border-slate-800/80">
+                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Your X Pos</span>
+                                    <span id="lbl-mascot-x" class="text-2xl font-black text-emerald-400">0</span>
+                                </div>
+                                <div class="text-center w-1/2">
+                                    <span class="text-[10px] text-slate-500 block uppercase font-bold">Your Y Pos</span>
+                                    <span id="lbl-mascot-y" class="text-2xl font-black text-emerald-400">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Interactive True/False Safe Zone visual toggle switch -->
+                        <div class="bg-slate-900/50 border border-slate-800/80 p-3 rounded-2xl flex justify-between items-center px-5 shadow-sm">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-eye text-emerald-400 animate-pulse"></i>
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wide">Show Safe Zone / 显示安全区</span>
+                            </div>
+                            <button onclick="toggleCartesianHint()" id="btn-toggle-hint" class="px-5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md">
+                                TRUE / 开启
+                            </button>
+                        </div>
+
+                        <!-- Touch Navigation D-Pad for trackpad/laptops -->
+                        <div class="bg-slate-900/40 border border-slate-800/60 p-5 rounded-2xl flex flex-col items-center">
+                            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-3">Controls (W,A,S,D / On-Screen)</span>
+                            
+                            <div class="grid grid-cols-3 gap-2 w-48">
+                                <div></div>
+                                <button onclick="moveMascot(0, 1)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
+                                    <i class="fa-solid fa-chevron-up"></i>
+                                </button>
+                                <div></div>
+
+                                <button onclick="moveMascot(-1, 0)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
+                                    <i class="fa-solid fa-chevron-left"></i>
+                                </button>
+                                <button class="h-12 bg-slate-900/30 rounded-xl text-slate-600 font-black flex items-center justify-center border border-slate-800/80 cursor-default" disabled>
+                                    <i class="fa-solid fa-gamepad"></i>
+                                </button>
+                                <button onclick="moveMascot(1, 0)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+
+                                <div></div>
+                                <button onclick="moveMascot(0, -1)" class="h-12 bg-slate-800 hover:bg-indigo-600 rounded-xl text-white font-black flex items-center justify-center transition border border-slate-700/50 hover:scale-105 active:scale-95 shadow-md">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                                <div></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Secondary Controller Panel -->
+            <div class="flex justify-between items-center">
+                <button onclick="abandonMission()" class="px-5 py-2.5 bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:text-rose-400 rounded-xl font-bold text-xs text-slate-400 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-arrow-left-long"></i>
+                    <span>Quit Mission / 退出 (Kembali)</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= CONGRATULATIONS / END SCREEN ================= -->
+        <section id="screen-victory" class="hidden bg-slate-900/60 border border-slate-800/80 p-8 md:p-12 rounded-3xl backdrop-blur-xl shadow-2xl relative overflow-hidden my-6 text-center space-y-8">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl"></div>
+
+            <div class="space-y-4">
+                <div class="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-full mx-auto flex items-center justify-center text-4xl text-emerald-400 animate-bounce">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black text-white">All Missions Accomplished!</h2>
+                <p class="text-md text-emerald-300 font-extrabold uppercase tracking-widest">恭喜！你成功完成了所有关卡！</p>
+                <p class="text-slate-300 max-w-md mx-auto text-sm">
+                    Amazing work! You've successfully navigated the coordinates, decoded expressions, and mastered the sign-flip rules of linear inequalities.
+                    <br><span class="text-slate-400 text-xs mt-1 block">太棒了！你已经成功跨越数轴重重障碍，征服了不等号的“负数乘除反转律”并完美占领了坐标避难区！</span>
+                </p>
+            </div>
+
+            <!-- Score Stats Recap Grid -->
+            <div class="grid grid-cols-2 gap-4 max-w-xs mx-auto">
+                <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+                    <div class="text-xs text-slate-400 font-bold uppercase">Final Score / 总得分</div>
+                    <div id="recap-score" class="text-2xl font-black text-amber-300">0</div>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
+                    <div class="text-xs text-slate-400 font-bold uppercase">Rank / 荣誉段位</div>
+                    <div id="recap-rank" class="text-md font-extrabold text-indigo-300 flex items-center justify-center h-8">Elite Cadet</div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex flex-col sm:flex-row justify-center items-center gap-3">
+                <button onclick="goToMissionSelect()" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> Play Again / 重新开始
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer with helpful developer/syllabus indicators -->
+    <footer class="border-t border-slate-900/60 bg-slate-950/80 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+            <p>© 2026 Mathematics Form 1 Pilot Program • Chapter 7 Linear Inequalities</p>
+            <div class="flex space-x-4">
+                <span>KSSM Syllabus Aligned</span>
+                <span>•</span>
+                <span>Interactive Learning Engine</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= DYNAMIC CONCEPT REFERENCE MODAL ================= -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto p-6 md:p-8 space-y-6 shadow-2xl relative">
+            <button onclick="toggleHelpModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="space-y-2">
+                <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-book-open text-indigo-400"></i>
+                    <span>Quick Handbook / 核心数学规则指南</span>
+                </h3>
+                <p class="text-xs text-slate-400">Quickly study how symbols represent points on the line.</p>
+            </div>
+
+            <div class="space-y-4 text-sm text-slate-300">
+                <!-- Symbols Table -->
+                <div class="bg-slate-950/60 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <h4 class="font-extrabold text-xs uppercase tracking-wider text-indigo-300">Symbol Meanings / 符号与其对应画法</h4>
+                    <div class="grid grid-cols-2 gap-4 text-xs">
+                        <div class="space-y-1">
+                            <p class="font-bold text-white">&gt; (More Than / 多于)</p>
+                            <p class="text-slate-400">Circle: <strong class="text-blue-300">Open 空心 (○)</strong></p>
+                            <p class="text-slate-400">Arrow: <strong class="text-blue-300">Right 向右 (→)</strong></p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="font-bold text-white">&lt; (Less Than / 少于)</p>
+                            <p class="text-slate-400">Circle: <strong class="text-blue-300">Open 空心 (○)</strong></p>
+                            <p class="text-slate-400">Arrow: <strong class="text-blue-300">Left 向左 (←)</strong></p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="font-bold text-white">&ge; (At least / 至少)</p>
+                            <p class="text-slate-400">Circle: <strong class="text-indigo-300">Solid 实心 (●)</strong></p>
+                            <p class="text-slate-400">Arrow: <strong class="text-indigo-300">Right 向右 (→)</strong></p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="font-bold text-white">&le; (At most / 最多)</p>
+                            <p class="text-slate-400">Circle: <strong class="text-indigo-300">Solid 实心 (●)</strong></p>
+                            <p class="text-slate-400">Arrow: <strong class="text-indigo-300">Left 向左 (←)</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mission 4 Guide -->
+                <div class="bg-emerald-950/40 border border-emerald-900/50 rounded-xl p-4 space-y-2">
+                    <h4 class="font-extrabold text-xs uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>Mission 4 Guide / 关卡 4 直角坐标避难指南</span>
+                    </h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Control your mascot (🧙‍♂️) around the $x$ and $y$ Cartesian plane using `WASD` or Arrow Keys. Move into the designated inequality zone before the timer runs out!
+                        <br><span class="text-emerald-300/80">注意：每次答对后，总倒计时就会自动缩短 1 秒！请在倒计时最后一秒结束静止前进入正确区域！</span>
+                    </p>
+                </div>
+
+                <!-- The Golden Flip Rule -->
+                <div class="bg-indigo-950/40 border border-indigo-900/50 rounded-xl p-4 space-y-2">
+                    <h4 class="font-extrabold text-xs uppercase tracking-wider text-pink-300 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>The Negative Flip Rule (负数大反转律)</span>
+                    </h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Whenever you <strong>multiply</strong> or <strong>divide</strong> an inequality by a <strong>negative number</strong>, you MUST <strong>reverse/flip</strong> the inequality sign!
+                    </p>
+                    <p class="text-[11px] text-amber-300 italic leading-relaxed">
+                        注意：当对不等式两边进行 <strong>“乘”</strong> 或 <strong>“除”</strong> 以一个 <strong>负数</strong> 时，不等号的方向必须 <strong>彻底反转</strong>！
+                    </p>
+                    <div class="bg-slate-950/80 p-2 rounded text-[11px] font-mono text-center text-amber-200">
+                        -2x < 6 &nbsp;&nbsp;&rarr;&nbsp;&nbsp; Divide by -2 &nbsp;&nbsp;&rarr;&nbsp;&nbsp; x > -3
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="toggleHelpModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-sm transition">
+                Got it / 我懂了，继续比赛！
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= GAME ENGINE SCRIPT ================= -->
+    <script>
+        // Web Audio Synthesizer with secure fail-safe fallback
+        class SoundEffects {
+            constructor() {
+                this.ctx = null;
+                this.disabled = false;
+            }
+            init() {
+                if (!this.ctx && !this.disabled) {
+                    try {
+                        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContextClass) {
+                            this.ctx = new AudioContextClass();
+                        } else {
+                            this.disabled = true;
+                        }
+                    } catch (e) {
+                        console.warn("AudioContext creation blocked or unsupported in this sandbox. Sound effects disabled.", e);
+                        this.disabled = true;
+                    }
+                }
+            }
+            playSuccess() {
+                this.init();
+                if (!this.ctx || this.disabled) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(1046.50, this.ctx.currentTime + 0.15); // C6
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                } catch(e) {
+                    console.warn("Error playing sound:", e);
+                }
+            }
+            playFailure() {
+                this.init();
+                if (!this.ctx || this.disabled) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220.00, this.ctx.currentTime); // A3
+                    osc.frequency.linearRampToValueAtTime(110.00, this.ctx.currentTime + 0.25); // A2
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.3);
+                } catch(e) {
+                    console.warn("Error playing sound:", e);
+                }
+            }
+            playComplete() {
+                this.init();
+                if (!this.ctx || this.disabled) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C, E, G, C arpeggio
+                    notes.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.1));
+                        gain.gain.setValueAtTime(0.1, now + (idx * 0.1));
+                        gain.gain.linearRampToValueAtTime(0.01, now + (idx * 0.1) + 0.4);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + (idx * 0.1));
+                        osc.stop(now + (idx * 0.1) + 0.4);
+                    });
+                } catch(e) {
+                    console.warn("Error playing sound:", e);
+                }
+            }
+        }
+
+        const sfx = new SoundEffects();
+
+        // Database of Questions mapped to KSSM Form 1 Chapter 7 syllabus (Bilingual/Trilingual)
+        const QUEST_DATABASE = {
+            1: [ // MISSION 1: The Decoder
+                {
+                    type: "mcq",
+                    topic: "Real-world translation / 现实情境翻译",
+                    questionEN: "A lorry carrying cement has a weight limit (w) of at most 12 tonnes to cross the bridge safely. Which inequality represents this scenario?",
+                    questionZH: "一辆载水泥的罗里安全过桥的最大载重量为 12 吨。用 w 表示重量，以下哪一个不等式代表这种情况？",
+                    questionBM: "Sebuah lori simen mempunyai had berat (w) selebih-lebihnya 12 tan untuk merentasi jambatan dengan selamat. Ketaksamaan manakah mewakili situasi ini?",
+                    options: [
+                        { text: "w < 12", explanation: "Almost! But 'at most 12' (最多12吨) means exactly 12 is also allowed. (接近了！但是“最多12”也代表包含12。)" },
+                        { text: "w ≤ 12", explanation: "Correct! 'At most' (最多 / selebih-lebihnya) means less than or equal to. (正确！“最多”代表小于或等于。)", isCorrect: true },
+                        { text: "w > 12", explanation: "Incorrect! That means the lorry must be strictly heavier than 12. (不正确！这意味着重量必须大于12吨。)" },
+                        { text: "w ≥ 12", explanation: "Incorrect! 'At most' sets 12 as the maximum limit, not the minimum. (不正确！“最多”代表上限是12，而不是下限。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "Real-world translation / 现实情境翻译",
+                    questionEN: "To enter the roller coaster, you must have a height (h) of at least 140 cm. Which inequality matches?",
+                    questionZH: "乘坐过山车者的身高必须至少达到 140 厘米。用 h 表示身高，以下哪一个不等式符合条件？",
+                    questionBM: "Untuk menaiki roller coaster, ketinggian (h) anda mestilah sekurang-kurangnya 140 cm. Ketaksamaan manakah yang betul?",
+                    options: [
+                        { text: "h > 140", explanation: "Almost! 'At least' (至少) includes exactly 140 cm. (接近了！“至少”也包括刚好140厘米。)" },
+                        { text: "h < 140", explanation: "No! That would mean you must be shorter than 140 cm. (错误！那代表身高必须矮于140厘米。)" },
+                        { text: "h ≥ 140", explanation: "Perfect! 'At least' (至少 / sekurang-kurangnya) translates to greater than or equal to. (完全正确！“至少”代表大于或等于。)", isCorrect: true },
+                        { text: "h ≤ 140", explanation: "Incorrect. That means 140 is the maximum allowable height. (错误。那代表上限是140。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "Real-world translation / 现实情境翻译",
+                    questionEN: "The speed limit (s) along a construction zone is strictly less than 50 km/h. Which inequality matches?",
+                    questionZH: "施工区域的限制时速必须严格小于 50 公里/小时。用 s 表示时速，以下哪一个不等式符合？",
+                    questionBM: "Had kelajuan (s) di kawasan pembinaan adalah kurang daripada 50 km/j secara mutlak. Ketaksamaan manakah yang betul?",
+                    options: [
+                        { text: "s < 50", explanation: "Correct! 'Less than' (严格小于 / kurang daripada) translates directly to strictly less than symbol. (正确！“小于”代表不含等号的小于。)", isCorrect: true },
+                        { text: "s ≤ 50", explanation: "Close, but 'strictly less than' means exactly 50 is not allowed. (接近，但“严格小于”代表不包含50。)" },
+                        { text: "s > 50", explanation: "Incorrect! That encourages speeding! (错误！这将变成鼓励超速了！)" },
+                        { text: "s ≥ 50", explanation: "Incorrect. That means driving faster than 50. (错误。那代表行车时速等于或高于50。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "Real-world translation / 现实情境翻译",
+                    questionEN: "To pass the school math challenge, a student needs scores (s) of more than 40 marks. Choose the correct statement.",
+                    questionZH: "若要通过学校数学挑战赛，学生的分数必须多于 40 分。用 s 表示分数，选择正确的不等式。",
+                    questionBM: "Untuk lulus cabaran matematik sekolah, murid memerlukan markah (s) lebih daripada 40. Pilih pernyataan yang betul.",
+                    options: [
+                        { text: "s < 40", explanation: "Incorrect. That would mean failing marks! (错误。这代表分数在40分以下。)" },
+                        { text: "s > 40", explanation: "Correct! 'More than' (多于 / lebih daripada) represents strictly greater than. (正确！“多于”代表大于号。)", isCorrect: true },
+                        { text: "s ≥ 40", explanation: "No. If a student gets exactly 40, they wouldn't pass because it must be 'more' than 40. (不对。如果拿刚好40分是不通过的，因为必须是“多于”40分。)" },
+                        { text: "s ≤ 40", explanation: "Incorrect. This represents marks of 40 or below. (错误。这代表分数在40分或以下。)" }
+                    ]
+                }
+            ],
+            2: [ // MISSION 2: The Number Line Builder
+                {
+                    type: "numberline",
+                    topic: "Graphing / 数轴绘图",
+                    questionEN: "Plot the inequality graph representing: x > 2",
+                    questionZH: "在数轴上绘制出代表以下不等式的图像：x > 2",
+                    questionBM: "Bina graf ketaksamaan yang mewakili: x > 2",
+                    target: { boundary: 2, circle: "open", dir: "right" }
+                },
+                {
+                    type: "numberline",
+                    topic: "Graphing / 数轴绘图",
+                    questionEN: "Plot the inequality graph representing: x ≤ -1",
+                    questionZH: "在数轴上绘制出代表以下不等式的图像：x ≤ -1",
+                    questionBM: "Bina graf ketaksamaan yang mewakili: x ≤ -1",
+                    target: { boundary: -1, circle: "solid", dir: "left" }
+                },
+                {
+                    type: "numberline",
+                    topic: "Graphing / 数轴绘图",
+                    questionEN: "Plot the inequality graph representing: x ≥ 0",
+                    questionZH: "在数轴上绘制出代表以下不等式的图像：x ≥ 0",
+                    questionBM: "Bina graf ketaksamaan yang mewakili: x ≥ 0",
+                    target: { boundary: 0, circle: "solid", dir: "right" }
+                },
+                {
+                    type: "numberline",
+                    topic: "Graphing / 数轴绘图",
+                    questionEN: "Plot the inequality graph representing: x < -3",
+                    questionZH: "在数轴上绘制出代表以下不等式的图像：x < -3",
+                    questionBM: "Bina graf ketaksamaan yang mewakili: x < -3",
+                    target: { boundary: -3, circle: "open", dir: "left" }
+                }
+            ],
+            3: [ // MISSION 3: Sign Flippers (Algebraic operations)
+                {
+                    type: "mcq",
+                    topic: "Solving Algebra / 求解代数不等式",
+                    questionEN: "Solve the inequality: x + 4 > 10. What is the value of x?",
+                    questionZH: "求解一元一次不等式：x + 4 > 10。x 的取值范围是多少？",
+                    questionBM: "Selesaikan ketaksamaan: x + 4 > 10. Apakah nilai bagi x?",
+                    options: [
+                        { text: "x > 14", explanation: "Incorrect. Did you add 4 instead of subtracting? (错误。你是不是把 +4 移到右边变成加法了？)" },
+                        { text: "x < 6", explanation: "Incorrect. The symbol direction should not change. (错误。不等号方向在加减法中无需改变。)" },
+                        { text: "x > 6", explanation: "Correct! x + 4 > 10 gives x > 10 - 4 which simplifies to x > 6. (正确！移项得 x > 10 - 4，故得 x > 6。)", isCorrect: true },
+                        { text: "x ≥ 6", explanation: "Almost, but the original equation had a strictly greater than symbol. (接近，但是原题目是没有等号的哦。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "Solving Algebra / 求解代数不等式",
+                    questionEN: "Solve the inequality: 3x ≤ 15. What is the value of x?",
+                    questionZH: "求解一元一次不等式：3x ≤ 15。x 的取值范围是多少？",
+                    questionBM: "Selesaikan ketaksamaan: 3x ≤ 15. Apakah nilai bagi x?",
+                    options: [
+                        { text: "x ≤ 5", explanation: "Spot on! Divide both sides by positive 3, the symbol stays the same. (正确！两边除以正数3，不等号方向不变。)", isCorrect: true },
+                        { text: "x ≥ 5", explanation: "Incorrect! Dividing by a positive number does NOT flip the sign. (错误！只有除以负数时不等号才需要反转。)" },
+                        { text: "x ≤ 12", explanation: "No, did you subtract 3 instead of dividing? (错误。你是不是用减法而不是除法？)" },
+                        { text: "x < 5", explanation: "Watch the symbol! It must remain a 'less than or equal' style. (注意符号！原式带有等号，简化的结果也必须有等号。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "The Negative Flip Rule / 负数大反转律",
+                    questionEN: "Solve: -2x < 8. Watch out! Remember the NEGATIVE DIVISION rule!",
+                    questionZH: "求解不等式：-2x < 8。注意！记住“两边同除以负数”时不等号方向需要反转的规则！",
+                    questionBM: "Selesaikan: -2x < 8. Hati-hati! Ingat undang-undang pembahagian NEGATIF!",
+                    options: [
+                        { text: "x < -4", explanation: "Incorrect! When you divide by negative -2, you MUST flip the symbol. (错误！当除以负数 -2 时，不等号方向必须反转！)" },
+                        { text: "x > -4", explanation: "Genius! Dividing by negative 2 flips '<' to '>'. (-2x < 8 -> x > 8 / -2 -> x > -4). (聪明！除以负数使小于号反转为大于号！)", isCorrect: true },
+                        { text: "x > 4", explanation: "Check your positive/negative division! 8 divided by -2 is -4. (注意正负号！8 除以 -2 应该是 -4。)" },
+                        { text: "x < 4", explanation: "Both the sign direction and the calculation are incorrect. (不等号方向与正负号计算皆有误。)" }
+                    ]
+                },
+                {
+                    type: "mcq",
+                    topic: "The Negative Flip Rule / 负数大反转律",
+                    questionEN: "Solve: -x/3 ≥ 2. What happens to the fraction and symbol?",
+                    questionZH: "求解不等式：-x/3 ≥ 2。分数和不等号方向会发生什么改变？",
+                    questionBM: "Selesaikan: -x/3 ≥ 2. Apakah yang berlaku kepada pecahan dan simbol?",
+                    options: [
+                        { text: "x ≥ -6", explanation: "Incorrect! You multiplied by negative 3, so you must flip the symbol. (错误！两边同乘以负数 -3，不等号方向需要反转。)" },
+                        { text: "x ≤ -6", explanation: "Brilliant! Multiplying by -3 to isolate x forces '≥' to flip to '≤'. (真棒！两边同乘以负数 -3 时，“大等于”反转为“小等于”。)", isCorrect: true },
+                        { text: "x ≤ 6", explanation: "Check your sign! Positive 2 multiplied by negative 3 is -6. (注意符号！正 2 乘以负 3 应该得到负 6。)" },
+                        { text: "x < -6", explanation: "Almost, but the original equation allowed equality (≥ becomes ≤). (接近，但原式含有等号，必须保留等号。)" }
+                    ]
+                }
+            ],
+            4: [ // MISSION 4: Safe Zone Cartesian Game
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: y ≥ 1",
+                    questionZH: "将你的角色移动至安全区：y ≥ 1",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: y ≥ 1",
+                    targetAngle: 270, // North
+                    boundary: 1,
+                    evaluator: (x, y) => y >= 1,
+                    safeDesc: "y ≥ 1 (Top / 上方)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: x ≥ 0",
+                    questionZH: "将你的角色移动至安全区：x ≥ 0",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: x ≥ 0",
+                    targetAngle: 0, // East
+                    boundary: 0,
+                    evaluator: (x, y) => x >= 0,
+                    safeDesc: "x ≥ 0 (Right / 右侧)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: y ≤ -1",
+                    questionZH: "将你的角色移动至安全区：y ≤ -1",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: y ≤ -1",
+                    targetAngle: 90, // South
+                    boundary: -1,
+                    evaluator: (x, y) => y <= -1,
+                    safeDesc: "y ≤ -1 (Bottom / 下方)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: x ≤ -2",
+                    questionZH: "将你的角色移动至安全区：x ≤ -2",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: x ≤ -2",
+                    targetAngle: 180, // West
+                    boundary: -2,
+                    evaluator: (x, y) => x <= -2,
+                    safeDesc: "x ≤ -2 (Left / 左侧)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: y > 0",
+                    questionZH: "将你的角色移动至安全区：y > 0",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: y > 0",
+                    targetAngle: 270, // North
+                    boundary: 0,
+                    evaluator: (x, y) => y > 0,
+                    safeDesc: "y > 0 (Top / 上方)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: x > 1",
+                    questionZH: "将你的角色移动至安全区：x > 1",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: x > 1",
+                    targetAngle: 0, // East
+                    boundary: 1,
+                    evaluator: (x, y) => x > 1,
+                    safeDesc: "x > 1 (Right / 右侧)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: y ≤ 0",
+                    questionZH: "将你的角色移动至安全区：y ≤ 0",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: y ≤ 0",
+                    targetAngle: 90, // South
+                    boundary: 0,
+                    evaluator: (x, y) => y <= 0,
+                    safeDesc: "y ≤ 0 (Bottom / 下方)"
+                },
+                {
+                    type: "safezone",
+                    topic: "Cartesian Safe Zone / 直角坐标安全区",
+                    questionEN: "Move your mascot to the safe zone: x ≤ 1",
+                    questionZH: "将你的角色移动至安全区：x ≤ 1",
+                    questionBM: "Gerakkan maskot anda ke zon selamat: x ≤ 1",
+                    targetAngle: 180, // West
+                    boundary: 1,
+                    evaluator: (x, y) => x <= 1,
+                    safeDesc: "x ≤ 1 (Left / 左侧)"
+                }
+            ]
+        };
+
+        // Core Game Engine State
+        let gameState = {
+            currentMission: 1,
+            currentQuestionIdx: 0,
+            score: 0,
+            lives: 3,
+            completedMissions: new Set()
+        };
+
+        // Numberline plotting variables
+        let plotState = {
+            boundary: 0,
+            circle: "open",
+            dir: "right"
+        };
+
+        // Mission 4 Cartesian Arena Variables
+        let m4Mascot = { x: 0, y: 0 };
+        let m4Timer = {
+            maxTime: 10,       // Starts at 10 seconds, reduces by 1 per success
+            elapsed: 0,
+            active: false,
+            startTime: null
+        };
+        let m4Transition = {
+            startAngle: 270,
+            endAngle: 270,
+            currentAngle: 270
+        };
+        let animFrameId = null;
+
+        // Toggle state for Cartesian Hint representation (Green Zone Overlay)
+        let showCartesianHint = true;
+
+        // Feedback auto-advance timer handle
+        let feedbackTimer = null;
+
+        // Canvas context caching
+        let canvas = null;
+        let ctx = null;
+
+        // Launch Game Initially
+        function startGame() {
+            try {
+                sfx.init();
+            } catch(e) {
+                console.warn("Sound init failed quietly:", e);
+            }
+            document.getElementById("screen-welcome").classList.add("hidden");
+            document.getElementById("screen-mission-select").classList.remove("hidden");
+            document.getElementById("game-stats").classList.remove("hidden");
+            resetGameSession();
+        }
+
+        function resetGameSession() {
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.completedMissions.clear();
+            m4Timer.maxTime = 10; // reset countdown base
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+            updateDashboardUI();
+        }
+
+        function updateDashboardUI() {
+            document.getElementById("player-score").innerText = gameState.score;
+            document.getElementById("player-lives").innerText = "❤️".repeat(gameState.lives);
+            
+            // Check completed stages to highlight buttons
+            const m2Btn = document.getElementById("btn-mission-2");
+            const m3Btn = document.getElementById("btn-mission-3");
+            const m4Btn = document.getElementById("btn-mission-4");
+
+            if (gameState.completedMissions.has(1)) {
+                m2Btn.classList.add("bg-indigo-600/30", "border-indigo-500/40");
+            }
+            if (gameState.completedMissions.has(2)) {
+                m3Btn.classList.add("bg-purple-600/30", "border-purple-500/40");
+            }
+            if (gameState.completedMissions.has(3)) {
+                m4Btn.classList.add("bg-emerald-600/30", "border-emerald-500/40");
+            }
+        }
+
+        function startMission(missionNum) {
+            gameState.currentMission = missionNum;
+            gameState.currentQuestionIdx = 0;
+            
+            document.getElementById("screen-mission-select").classList.add("hidden");
+            document.getElementById("screen-gameplay").classList.remove("hidden");
+            
+            // Hide or show Mission 4 exclusive elements
+            if (missionNum === 4) {
+                document.getElementById("m4-milestone-panel").classList.remove("hidden");
+                document.getElementById("panel-cartesian").classList.remove("hidden");
+                document.getElementById("panel-mcq").classList.add("hidden");
+                document.getElementById("panel-numberline").classList.add("hidden");
+                
+                // Initialize canvas variables
+                canvas = document.getElementById("cartesian-canvas");
+                ctx = canvas.getContext("2d");
+                
+                // Reset mascot to center coordinate
+                m4Mascot.x = 0;
+                m4Mascot.y = 0;
+                m4Timer.maxTime = 10; // start fresh
+                m4Transition.currentAngle = 270;
+                m4Transition.startAngle = 270;
+                m4Transition.endAngle = 270;
+                
+                renderMilestoneGems();
+            } else {
+                document.getElementById("m4-milestone-panel").classList.add("hidden");
+                document.getElementById("panel-cartesian").classList.add("hidden");
+            }
+
+            loadQuestion();
+        }
+
+        function renderMilestoneGems() {
+            const container = document.getElementById("milestones-gems-container");
+            container.innerHTML = "";
+            const questions = QUEST_DATABASE[4];
+            
+            for (let i = 0; i < questions.length; i++) {
+                const gem = document.createElement("div");
+                gem.id = `gem-milestone-${i}`;
+                gem.className = "milestone-gem w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-500";
+                gem.innerText = i + 1;
+                container.appendChild(gem);
+            }
+            updateMilestoneGemsUI();
+        }
+
+        function updateMilestoneGemsUI() {
+            for (let i = 0; i < QUEST_DATABASE[4].length; i++) {
+                const gem = document.getElementById(`gem-milestone-${i}`);
+                if (!gem) continue;
+                if (i < gameState.currentQuestionIdx) {
+                    gem.className = "milestone-gem w-7 h-7 rounded-lg bg-emerald-500 border border-emerald-400 text-white flex items-center justify-center text-xs font-bold shadow-lg shadow-emerald-500/30 animate-pulse";
+                    gem.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                } else if (i === gameState.currentQuestionIdx) {
+                    gem.className = "milestone-gem w-7 h-7 rounded-lg bg-amber-500 border border-amber-400 text-slate-950 flex items-center justify-center text-xs font-black shadow-lg shadow-amber-500/40 scale-110";
+                    gem.innerText = i + 1;
+                } else {
+                    gem.className = "milestone-gem w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold";
+                    gem.innerText = i + 1;
+                }
+            }
+        }
+
+        function loadQuestion() {
+            // Close any left-over overlays and timers
+            document.getElementById("feedback-overlay").classList.add("hidden");
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+
+            const questions = QUEST_DATABASE[gameState.currentMission];
+            const currentQ = questions[gameState.currentQuestionIdx];
+
+            // Setup general progress elements
+            document.getElementById("gameplay-mission-title").innerText = `Mission ${gameState.currentMission}: ${getMissionName(gameState.currentMission)}`;
+            document.getElementById("gameplay-question-num").innerText = `Question ${gameState.currentQuestionIdx + 1} of ${questions.length}`;
+            
+            const progressPct = ((gameState.currentQuestionIdx) / questions.length) * 100;
+            document.getElementById("gameplay-progress-bar").style.width = `${progressPct}%`;
+
+            // Display question texts (Trilingual)
+            document.getElementById("topic-badge").innerText = currentQ.topic;
+            document.getElementById("main-question-text").innerText = currentQ.questionEN;
+            document.getElementById("chinese-translation-text").innerHTML = `<span class="text-xs bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5 rounded mr-1.5">中文</span>` + currentQ.questionZH;
+            document.getElementById("malay-translation-text").innerText = `KSSM Rujukan: ` + currentQ.questionBM;
+
+            // Trigger Specific UI Panel layouts
+            if (currentQ.type === "mcq") {
+                document.getElementById("panel-mcq").classList.remove("hidden");
+                document.getElementById("panel-numberline").classList.add("hidden");
+                renderMCQOptions(currentQ.options);
+            } else if (currentQ.type === "numberline") {
+                document.getElementById("panel-mcq").classList.add("hidden");
+                document.getElementById("panel-numberline").classList.remove("hidden");
+                setupInteractiveNumberline(currentQ);
+            } else if (currentQ.type === "safezone") {
+                updateMilestoneGemsUI();
+                startCartesianArenaRound(currentQ);
+            }
+        }
+
+        function getMissionName(num) {
+            switch(num) {
+                case 1: return "The Decoder (关卡 1: 不等式翻译)";
+                case 2: return "Line Builder (关卡 2: 数轴绘制)";
+                case 3: return "Sign Flippers (关卡 3: 负号大反转)";
+                case 4: return "Safe Zone Arena (关卡 4: 避难安全区)";
+                default: return "";
+            }
+        }
+
+        // --- MCQ PANEL LOGIC ---
+        function renderMCQOptions(options) {
+            const panel = document.getElementById("panel-mcq");
+            panel.innerHTML = ""; // Clear existing
+
+            // Shuffle options slightly to prevent rote memory clicking
+            const shuffled = [...options].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(opt => {
+                const btn = document.createElement("button");
+                btn.className = "text-left p-5 rounded-2xl border-2 border-slate-800 bg-slate-900/40 hover:border-indigo-500 hover:bg-slate-800 transition duration-200 group flex items-start space-x-4";
+                btn.onclick = () => submitMCQAnswer(opt);
+
+                btn.innerHTML = `
+                    <div class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition mt-0.5">
+                        <i class="fa-solid fa-check scale-0 group-hover:scale-100 transition"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <span class="text-base font-bold text-white block">${opt.text}</span>
+                    </div>
+                `;
+                panel.appendChild(btn);
+            });
+        }
+
+        function submitMCQAnswer(selectedOption) {
+            if (selectedOption.isCorrect) {
+                gameState.score += 25;
+                try { sfx.playSuccess(); } catch(e) {}
+                showFeedback(true, "Superb! / 太棒了！", selectedOption.explanation || "That is absolutely correct. (回答正确。)");
+            } else {
+                gameState.lives = Math.max(0, gameState.lives - 1);
+                try { sfx.playFailure(); } catch(e) {}
+                showFeedback(false, "Oops! Not quite. / 答错喽！", selectedOption.explanation || "Review the rule book and try again. (阅读说明书后再次尝试。)");
+            }
+            updateDashboardUI();
+        }
+
+        // --- INTERACTIVE NUMBER LINE SYSTEM ---
+        function setupInteractiveNumberline(questionObj) {
+            plotState.boundary = 0;
+            plotState.circle = "open";
+            plotState.dir = "right";
+
+            generateTicksSVG();
+            updateInteractiveGraph();
+            updatePlotButtonsUI();
+        }
+
+        function generateTicksSVG() {
+            const container = document.getElementById("svg-ticks");
+            container.innerHTML = "";
+
+            for (let val = -5; val <= 5; val++) {
+                const xPos = 300 + (val * 45);
+                
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", xPos);
+                line.setAttribute("y1", 82);
+                line.setAttribute("x2", xPos);
+                line.setAttribute("y2", 98);
+                line.setAttribute("stroke", "#475569");
+                line.setAttribute("stroke-width", "3");
+                container.appendChild(line);
+
+                const hitBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                hitBox.setAttribute("x", xPos - 20);
+                hitBox.setAttribute("y", 60);
+                hitBox.setAttribute("width", 40);
+                hitBox.setAttribute("height", 60);
+                hitBox.setAttribute("fill", "transparent");
+                hitBox.setAttribute("class", "cursor-pointer");
+                hitBox.onclick = () => selectBoundaryPoint(val);
+                container.appendChild(hitBox);
+
+                const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txt.setAttribute("x", xPos);
+                txt.setAttribute("y", 125);
+                txt.setAttribute("fill", "#94a3b8");
+                txt.setAttribute("font-size", "13");
+                txt.setAttribute("font-weight", "bold");
+                txt.setAttribute("text-anchor", "middle");
+                txt.textContent = val;
+                container.appendChild(txt);
+            }
+        }
+
+        function selectBoundaryPoint(val) {
+            plotState.boundary = val;
+            document.getElementById("lbl-boundary").innerText = val;
+            updateInteractiveGraph();
+        }
+
+        function setCircleStyle(style) {
+            plotState.circle = style;
+            updatePlotButtonsUI();
+            updateInteractiveGraph();
+        }
+
+        function setDirection(direction) {
+            plotState.dir = direction;
+            updatePlotButtonsUI();
+            updateInteractiveGraph();
+        }
+
+        function updatePlotButtonsUI() {
+            document.getElementById("btn-circle-open").className = "py-3 px-4 rounded-xl border-2 border-indigo-500/20 bg-slate-900/50 flex flex-col items-center justify-center transition hover:border-indigo-400";
+            document.getElementById("btn-circle-solid").className = "py-3 px-4 rounded-xl border-2 border-indigo-500/20 bg-slate-900/50 flex flex-col items-center justify-center transition hover:border-indigo-400";
+            document.getElementById("btn-dir-left").className = "py-3 px-4 rounded-xl border-2 border-indigo-500/20 bg-slate-900/50 flex flex-col items-center justify-center transition hover:border-indigo-400";
+            document.getElementById("btn-dir-right").className = "py-3 px-4 rounded-xl border-2 border-indigo-500/20 bg-slate-900/50 flex flex-col items-center justify-center transition hover:border-indigo-400";
+
+            if (plotState.circle === "open") {
+                document.getElementById("btn-circle-open").className = "py-3 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/20 flex flex-col items-center justify-center transition";
+            } else {
+                document.getElementById("btn-circle-solid").className = "py-3 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/20 flex flex-col items-center justify-center transition";
+            }
+
+            if (plotState.dir === "left") {
+                document.getElementById("btn-dir-left").className = "py-3 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/20 flex flex-col items-center justify-center transition";
+            } else {
+                document.getElementById("btn-dir-right").className = "py-3 px-4 rounded-xl border-2 border-indigo-500 bg-indigo-500/20 flex flex-col items-center justify-center transition";
+            }
+        }
+
+        function updateInteractiveGraph() {
+            const xPos = 300 + (plotState.boundary * 45);
+            
+            const node = document.getElementById("user-node");
+            node.setAttribute("cx", xPos);
+            node.setAttribute("cy", 50);
+            node.setAttribute("fill", plotState.circle === "solid" ? "#818cf8" : "#0f172a");
+            node.classList.remove("hidden");
+
+            const line = document.getElementById("user-line");
+            line.setAttribute("x1", xPos);
+            line.setAttribute("y1", 50);
+            
+            let endX = plotState.dir === "left" ? 50 : 550;
+            line.setAttribute("x2", endX);
+            line.setAttribute("y2", 50);
+            line.classList.remove("hidden");
+
+            const arrow = document.getElementById("user-arrow");
+            let arrowPath = "";
+            if (plotState.dir === "left") {
+                arrowPath = `M 55 45 L 45 50 M 55 55 L 45 50`;
+            } else {
+                arrowPath = `M 545 45 L 555 50 M 545 55 L 555 50`;
+            }
+            arrow.setAttribute("d", arrowPath);
+            arrow.classList.remove("hidden");
+        }
+
+        function checkNumberlineAnswer() {
+            const questions = QUEST_DATABASE[gameState.currentMission];
+            const target = questions[gameState.currentQuestionIdx].target;
+
+            const isCorrect = 
+                plotState.boundary === target.boundary &&
+                plotState.circle === target.circle &&
+                plotState.dir === target.dir;
+
+            if (isCorrect) {
+                gameState.score += 25;
+                try { sfx.playSuccess(); } catch(e) {}
+                showFeedback(true, "Perfect Plot! / 绘制完全正确！", "Your graph matches the target inequality correctly. (你的数轴图像完美符合不等式要求！)");
+            } else {
+                gameState.lives = Math.max(0, gameState.lives - 1);
+                try { sfx.playFailure(); } catch(e) {}
+                
+                let tipsEN = "Review the graph criteria: ";
+                let tipsZH = "请检查绘图细节：";
+                if (plotState.boundary !== target.boundary) {
+                    tipsEN += `The boundary should anchor exactly at ${target.boundary}. `;
+                    tipsZH += `端点数值应该是 ${target.boundary}。`;
+                }
+                if (plotState.circle !== target.circle) {
+                    tipsEN += `Your circle style should be ${target.circle === "open" ? "Open (○)" : "Solid (●)"}. `;
+                    tipsZH += `圆圈类型应该是 ${target.circle === "open" ? "空心 (○)" : "实心 (●)"}。`;
+                }
+                if (plotState.dir !== target.dir) {
+                    tipsEN += `The arrow direction should face ${target.dir === "left" ? "Left (←)" : "Right (→)"}. `;
+                    tipsZH += `箭头方向应该指向 ${target.dir === "left" ? "左侧 (←)" : "右侧 (→)"}。`;
+                }
+                showFeedback(false, "Graph Desynchronized / 图像未对准", tipsZH + "<br><span class='text-xs text-slate-400 mt-1 block'>" + tipsEN + "</span>");
+            }
+            updateDashboardUI();
+        }
+
+        // --- MISSION 4 CARTESIAN SAFEZONE REALTIME LOGIC ---
+        function startCartesianArenaRound(questionObj) {
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+            
+            // Set up rotating angles for the target clockwise motion
+            m4Transition.startAngle = m4Transition.endAngle;
+            
+            // Calculate relative difference to force clockwise rotation
+            let diff = (questionObj.targetAngle - (m4Transition.startAngle % 360) + 360) % 360;
+            if (diff === 0 && questionObj.targetAngle !== (m4Transition.startAngle % 360)) {
+                diff = 360;
+            }
+            m4Transition.endAngle = m4Transition.startAngle + diff;
+            
+            // Sync Hint Labels
+            document.getElementById("lbl-safezone-hint").innerText = questionObj.safeDesc;
+            updateMascotDisplay();
+
+            // Set up real-time timer
+            m4Timer.elapsed = 0;
+            m4Timer.active = true;
+            m4Timer.startTime = Date.now();
+
+            // Trigger animation frame loop
+            runCartesianLoop();
+        }
+
+        function runCartesianLoop() {
+            if (gameState.currentMission !== 4 || !m4Timer.active) return;
+
+            // Calculate exact elapsed seconds
+            const now = Date.now();
+            m4Timer.elapsed = (now - m4Timer.startTime) / 1000;
+            
+            let timeLeft = m4Timer.maxTime - m4Timer.elapsed;
+            if (timeLeft <= 0) {
+                timeLeft = 0;
+                m4Timer.active = false;
+                evaluateMascotInSafezone();
+            }
+
+            // Sync visual Timer bar and Label
+            document.getElementById("lbl-countdown-timer").innerText = `${timeLeft.toFixed(1)}s`;
+            const barPct = (timeLeft / m4Timer.maxTime) * 100;
+            const timerBar = document.getElementById("bar-countdown-timer");
+            timerBar.style.width = `${barPct}%`;
+            
+            // Update color based on urgency
+            if (barPct < 30) {
+                timerBar.className = "bg-rose-500 h-full transition-all duration-75";
+            } else if (barPct < 60) {
+                timerBar.className = "bg-amber-500 h-full transition-all duration-75";
+            } else {
+                timerBar.className = "bg-emerald-500 h-full transition-all duration-75";
+            }
+
+            // Rotate the safe zone starting at exactly 2 seconds remaining (t-2), and finishing at 1 second remaining
+            let interpolationProgress = 0;
+            if (timeLeft <= 1.0) {
+                interpolationProgress = 1;
+            } else if (timeLeft <= 2.0) {
+                interpolationProgress = 2.0 - timeLeft;
+            } else {
+                interpolationProgress = 0;
+            }
+            m4Transition.currentAngle = m4Transition.startAngle + (m4Transition.endAngle - m4Transition.startAngle) * interpolationProgress;
+
+            // Render Cartesian Frame onto Canvas
+            drawCartesianArena();
+
+            if (m4Timer.active) {
+                animFrameId = requestAnimationFrame(runCartesianLoop);
+            }
+        }
+
+        function drawCartesianArena() {
+            if (!canvas || !ctx) return;
+
+            // 1. Clear background
+            ctx.fillStyle = "#020617";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Draw Grid coordinate helper lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#1e293b";
+            for (let i = -4; i <= 4; i++) {
+                // Vertical grid helper
+                let xPos = 200 + (i * 45);
+                ctx.beginPath();
+                ctx.moveTo(xPos, 0);
+                ctx.lineTo(xPos, canvas.height);
+                ctx.stroke();
+
+                // Horizontal grid helper
+                let yPos = 200 - (i * 45);
+                ctx.beginPath();
+                ctx.moveTo(0, yPos);
+                ctx.lineTo(canvas.width, yPos);
+                ctx.stroke();
+            }
+
+            // 3. Draw Axis Lines
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#475569";
+            // X-Axis
+            ctx.beginPath();
+            ctx.moveTo(10, 200);
+            ctx.lineTo(390, 200);
+            ctx.stroke();
+            // Y-Axis
+            ctx.beginPath();
+            ctx.moveTo(200, 10);
+            ctx.lineTo(200, 390);
+            ctx.stroke();
+
+            // Axis labels & arrows
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillText("x", 385, 195);
+            ctx.fillText("y", 205, 15);
+
+            // 4. Draw tick numbers along axes
+            ctx.fillStyle = "#475569";
+            ctx.font = "9px sans-serif";
+            for (let i = -4; i <= 4; i++) {
+                if (i === 0) continue;
+                let xPos = 200 + (i * 45);
+                let yPos = 200 - (i * 45);
+
+                // Tick marks
+                ctx.fillRect(xPos - 1, 197, 2, 6);
+                ctx.fillRect(197, yPos - 1, 6, 2);
+
+                // Number labels
+                ctx.fillText(i, xPos - 3, 215);
+                ctx.fillText(i, 183, yPos + 3);
+            }
+
+            // 5. Draw the Dynamic Clockwise rotating Safe Zone overlay!
+            // Visually show the green safe zone depending on the interactive toggle switch! (True/False setting)
+            if (showCartesianHint) {
+                ctx.save();
+                ctx.translate(200, 200);
+                ctx.rotate(m4Transition.currentAngle * Math.PI / 180);
+
+                // Safe Zone colored block
+                ctx.fillStyle = "rgba(16, 185, 129, 0.20)";
+                ctx.strokeStyle = "rgba(16, 185, 129, 0.7)";
+                ctx.lineWidth = 3;
+
+                // Scaling offset coordinates based on boundary
+                const currentQ = QUEST_DATABASE[4][gameState.currentQuestionIdx];
+                let boundaryOffset = (currentQ ? currentQ.boundary : 0) * 45;
+
+                ctx.beginPath();
+                // We draw a large rectangle covering the active half-plane
+                ctx.rect(boundaryOffset, -400, 800, 800);
+                ctx.fill();
+
+                // Safezone partition boundary line
+                ctx.beginPath();
+                ctx.moveTo(boundaryOffset, -400);
+                ctx.lineTo(boundaryOffset, 400);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 6. Draw Mascot Player
+            // Mapping Mascot grid coordinates to Canvas coordinates
+            let canvasMascotX = 200 + (m4Mascot.x * 45);
+            let canvasMascotY = 200 - (m4Mascot.y * 45); // Cartesian Y goes up, canvas goes down
+
+            // Mascot Outer Radar Pulse Glow
+            ctx.beginPath();
+            ctx.arc(canvasMascotX, canvasMascotY, 14, 0, 2 * Math.PI);
+            ctx.fillStyle = "rgba(99, 102, 241, 0.3)";
+            ctx.fill();
+
+            // Draw Mascot character emoji
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "20px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("🧙‍♂️", canvasMascotX, canvasMascotY);
+        }
+
+        function moveMascot(dx, dy) {
+            if (gameState.currentMission !== 4 || !m4Timer.active) return;
+            
+            // Clamp coordinates to stay within the [-4, +4] Cartesian Grid
+            m4Mascot.x = Math.max(-4, Math.min(4, m4Mascot.x + dx));
+            m4Mascot.y = Math.max(-4, Math.min(4, m4Mascot.y + dy));
+            
+            updateMascotDisplay();
+        }
+
+        function updateMascotDisplay() {
+            document.getElementById("lbl-mascot-x").innerText = m4Mascot.x;
+            document.getElementById("lbl-mascot-y").innerText = m4Mascot.y;
+        }
+
+        function evaluateMascotInSafezone() {
+            const currentQ = QUEST_DATABASE[4][gameState.currentQuestionIdx];
+            const isInsideSafeZone = currentQ.evaluator(m4Mascot.x, m4Mascot.y);
+
+            if (isInsideSafeZone) {
+                gameState.score += 25;
+                try { sfx.playSuccess(); } catch(e) {}
+                
+                // Reduce base countdown timer by 1 second for successfully solved questions
+                m4Timer.maxTime = Math.max(3, m4Timer.maxTime - 1); 
+                
+                showFeedback(true, "Safe & Sound! / 安全抵挡！", `Excellent navigation! You've successfully landed in the safe coordinates representing: ${currentQ.safeDesc}.<br><span class="text-amber-300 font-bold text-xs">Note: Next round's countdown has been shortened to ${m4Timer.maxTime}s! Faster!</span>`);
+            } else {
+                gameState.lives = Math.max(0, gameState.lives - 1);
+                try { sfx.playFailure(); } catch(e) {}
+                
+                showFeedback(false, "Caught in Hazard! / 置身危险区域！", `Oops! Your coordinates (${m4Mascot.x}, ${m4Mascot.y}) did not satisfy the safe zone inequality: ${currentQ.safeDesc}. Make sure you relocate before the timer finishes!`);
+            }
+            updateDashboardUI();
+        }
+
+        // --- TOGGLE CARTESIAN HINT REPRESENTATION (GREEN ZONE) ---
+        function toggleCartesianHint() {
+            showCartesianHint = !showCartesianHint;
+            const btn = document.getElementById("btn-toggle-hint");
+            
+            if (showCartesianHint) {
+                btn.innerText = "TRUE / 开启";
+                btn.className = "px-5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
+            } else {
+                btn.innerText = "FALSE / 关闭";
+                btn.className = "px-5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black transition-all duration-200 shadow-md";
+            }
+            drawCartesianArena();
+        }
+
+        // --- KEY LISTENER ATTACHMENT FOR WASD CONTROLS ---
+        window.addEventListener("keydown", function(e) {
+            if (gameState.currentMission !== 4 || !m4Timer.active) return;
+            
+            const key = e.key.toLowerCase();
+            if (key === "w" || e.key === "ArrowUp") {
+                moveMascot(0, 1);
+                e.preventDefault();
+            } else if (key === "s" || e.key === "ArrowDown") {
+                moveMascot(0, -1);
+                e.preventDefault();
+            } else if (key === "a" || e.key === "ArrowLeft") {
+                moveMascot(-1, 0);
+                e.preventDefault();
+            } else if (key === "d" || e.key === "ArrowRight") {
+                moveMascot(1, 0);
+                e.preventDefault();
+            }
+        });
+
+        // --- FEEDBACK WINDOW CONTROL ---
+        function showFeedback(isCorrect, title, desc) {
+            // Pause countdown activity during feedback
+            m4Timer.active = false;
+            
+            // Clear any lingering feedback auto-advance timers first
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+
+            const overlay = document.getElementById("feedback-overlay");
+            const card = document.getElementById("feedback-card");
+            const icon = document.getElementById("feedback-icon");
+            const titleEl = document.getElementById("feedback-title");
+            const descEl = document.getElementById("feedback-desc");
+            const actBtn = document.getElementById("feedback-action-btn");
+            const pauseBtn = document.getElementById("feedback-pause-btn");
+
+            pauseBtn.classList.add("hidden"); // Default hidden
+
+            // Setup styling depending on correct state
+            if (isCorrect) {
+                card.className = "bg-slate-900 border-2 border-emerald-500/80 p-8 rounded-2xl max-w-md w-full shadow-2xl transition transform scale-100";
+                icon.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-emerald-500/10 text-emerald-400";
+                icon.innerHTML = `<i class="fa-solid fa-award"></i>`;
+                titleEl.className = "text-2xl font-black mb-2 text-emerald-400";
+                
+                actBtn.className = "w-full py-4 rounded-xl font-bold text-white transition-all bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/20";
+                actBtn.innerText = "Continue / 下一题";
+                actBtn.onclick = () => {
+                    if (feedbackTimer) {
+                        clearInterval(feedbackTimer);
+                        feedbackTimer = null;
+                    }
+                    advanceQuest();
+                };
+
+                // AUTO-ADVANCE SETUP EXCLUSIVE TO MISSION 4
+                if (gameState.currentMission === 4) {
+                    pauseBtn.classList.remove("hidden");
+                    let secondsLeft = 2;
+                    actBtn.innerText = `Continue / 下一题 (${secondsLeft}s)`;
+                    
+                    // Pause Button Event Listener
+                    pauseBtn.onclick = () => {
+                        if (feedbackTimer) {
+                            clearInterval(feedbackTimer);
+                            feedbackTimer = null;
+                        }
+                        pauseBtn.classList.add("hidden");
+                        actBtn.innerText = "Continue / 下一题";
+                    };
+
+                    feedbackTimer = setInterval(() => {
+                        secondsLeft--;
+                        if (secondsLeft <= 0) {
+                            clearInterval(feedbackTimer);
+                            feedbackTimer = null;
+                            advanceQuest();
+                        } else {
+                            actBtn.innerText = `Continue / 下一题 (${secondsLeft}s)`;
+                        }
+                    }, 1000);
+                }
+            } else {
+                card.className = "bg-slate-900 border-2 border-rose-500/80 p-8 rounded-2xl max-w-md w-full shadow-2xl transition transform scale-100";
+                icon.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-rose-500/10 text-rose-400";
+                icon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+                titleEl.className = "text-2xl font-black mb-2 text-rose-400";
+                
+                if (gameState.lives <= 0) {
+                    actBtn.className = "w-full py-4 rounded-xl font-bold text-white transition-all bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-600/20";
+                    actBtn.innerText = "Try Game Again / 重新开始挑战";
+                    actBtn.onclick = () => returnToMainOnFail();
+                } else {
+                    actBtn.className = "w-full py-4 rounded-xl font-bold text-white transition-all bg-slate-800 hover:bg-slate-700 border border-slate-700";
+                    actBtn.innerText = "Retry / 重新作答";
+                    actBtn.onclick = () => loadQuestion();
+                }
+            }
+
+            titleEl.innerText = title;
+            descEl.innerHTML = desc;
+            overlay.classList.remove("hidden");
+        }
+
+        function advanceQuest() {
+            // Prevent timer memory leak
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+
+            const questions = QUEST_DATABASE[gameState.currentMission];
+            
+            if (gameState.currentQuestionIdx + 1 < questions.length) {
+                gameState.currentQuestionIdx++;
+                loadQuestion();
+            } else {
+                // Completed the final question of the current mission
+                gameState.completedMissions.add(gameState.currentMission);
+                try { sfx.playComplete(); } catch(e) {}
+
+                // If finished all missions, display victory
+                if (gameState.completedMissions.size >= 4) {
+                    goToVictoryScreen();
+                } else {
+                    // Go back to mission hub with accomplishments saved
+                    document.getElementById("screen-gameplay").classList.add("hidden");
+                    document.getElementById("screen-mission-select").classList.remove("hidden");
+                    updateDashboardUI();
+                }
+            }
+        }
+
+        function returnToMainOnFail() {
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+            document.getElementById("screen-gameplay").classList.add("hidden");
+            document.getElementById("screen-mission-select").classList.remove("hidden");
+            resetGameSession();
+        }
+
+        function abandonMission() {
+            m4Timer.active = false;
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+            document.getElementById("screen-gameplay").classList.add("hidden");
+            document.getElementById("screen-mission-select").classList.remove("hidden");
+            updateDashboardUI();
+        }
+
+        function goToMissionSelect() {
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+            document.getElementById("screen-victory").classList.add("hidden");
+            document.getElementById("screen-mission-select").classList.remove("hidden");
+            resetGameSession();
+        }
+
+        function goToVictoryScreen() {
+            if (feedbackTimer) {
+                clearInterval(feedbackTimer);
+                feedbackTimer = null;
+            }
+            document.getElementById("screen-gameplay").classList.add("hidden");
+            document.getElementById("screen-victory").classList.remove("hidden");
+            document.getElementById("recap-score").innerText = gameState.score;
+            
+            // Assign creative ranking system badge
+            const rankEl = document.getElementById("recap-rank");
+            if (gameState.score >= 500) {
+                rankEl.innerText = "Grandmaster of the Number Line 👑";
+                rankEl.className = "text-md font-extrabold text-amber-300";
+            } else if (gameState.score >= 300) {
+                rankEl.innerText = "Inequality Specialist ⚡";
+                rankEl.className = "text-md font-extrabold text-purple-300";
+            } else {
+                rankEl.innerText = "Guardian Apprentice 🌱";
+                rankEl.className = "text-md font-extrabold text-indigo-300";
+            }
+        }
+
+        // Help Modal Controls
+        function toggleHelpModal() {
+            const modal = document.getElementById("help-modal");
+            modal.classList.toggle("hidden");
+        }
+    </script>
+</body>
+</html>
