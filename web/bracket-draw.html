@@ -30,8 +30,8 @@
     <main class="flex-1 p-4 md:p-8 flex flex-col xl:flex-row gap-8 w-full">
         <!-- LEFT PANEL: CONFIGURATION -->
         <div class="w-full xl:w-[380px] shrink-0 flex flex-col gap-6">
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                <div class="flex items-center gap-3 mb-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-full max-h-[85vh]">
+                <div class="flex items-center gap-3 mb-6 shrink-0">
                     <!-- Trophy Icon -->
                     <svg class="text-yellow-500 w-8 h-8" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
@@ -45,30 +45,53 @@
                     <h1 class="text-2xl font-bold text-white tracking-tight">Bracket Generator</h1>
                 </div>
 
-                <div id="inputs-container" class="flex flex-col gap-3 max-h-[40vh] xl:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div id="inputs-container" class="flex flex-col gap-3 flex-1 overflow-y-auto pr-2 custom-scrollbar min-h-0">
                     <!-- Inputs render here -->
                 </div>
 
-                <button id="btn-add" class="mt-4 w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg transition-colors border border-slate-700 border-dashed disabled:opacity-50">
-                    <!-- Plus Icon -->
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                    Add Team Row
-                </button>
-
-                <div class="flex flex-col gap-1 mt-4 text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="toggle-prevent" onchange="state.preventSameSchool = this.checked" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
-                        <label for="toggle-prevent" class="cursor-pointer select-none font-medium">Prevent same teams meeting in Round 1</label>
+                <div class="shrink-0 pt-4 flex flex-col gap-3">
+                    <div id="team-count-display" class="text-sm text-slate-400 text-center font-bold tracking-wider uppercase border border-slate-700 bg-slate-900 rounded-lg py-2">
+                        Total Teams: 0
                     </div>
-                    <p class="text-xs text-slate-500 pl-6 leading-snug">
-                        Prioritizes the largest schools and assigns them across the bracket, strictly preventing them from meeting in Round 1 (unless they make up &gt;50% of the teams).
-                    </p>
-                </div>
 
-                <button id="btn-io" onclick="openIOModal()" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-sm font-medium rounded-lg transition-colors border border-slate-800 mt-2 disabled:opacity-50">
-                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                    Import / Export Data
-                </button>
+                    <button id="btn-add" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-lg transition-colors border border-slate-700 border-dashed disabled:opacity-50">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                        Add Team Row
+                    </button>
+
+                    <div class="flex flex-col gap-3 text-sm text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        <!-- Mode Select -->
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Tournament Format</label>
+                            <select id="mode-select" onchange="window.setMode(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500">
+                                <option value="knockout">Knockout Bracket</option>
+                                <option value="robin">Round Robin Groups</option>
+                            </select>
+                        </div>
+
+                        <!-- Robin Config (Hidden by default) -->
+                        <div id="robin-config-wrapper" class="hidden">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Number of Groups (per round)</label>
+                            <input type="text" id="robin-sizes" value="4, 2" onchange="state.robinSizesStr = this.value" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. 4, 2" />
+                            <p class="text-[10px] text-slate-500 mt-1">Comma-separated numbers (e.g. 4, 2 means 4 groups in R1, 2 groups in R2).</p>
+                        </div>
+
+                        <div class="h-px bg-slate-800 w-full my-1"></div>
+
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="toggle-prevent" onchange="state.preventSameSchool = this.checked" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                            <label for="toggle-prevent" class="cursor-pointer select-none font-medium">Prevent same teams in R1</label>
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-snug">
+                            Prioritizes spreading large schools across bracket branches or groups.
+                        </p>
+                    </div>
+
+                    <button id="btn-io" onclick="openIOModal()" class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 text-sm font-medium rounded-lg transition-colors border border-slate-800 disabled:opacity-50">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                        Import / Export Data
+                    </button>
+                </div>
             </div>
 
             <button id="btn-generate" class="w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
@@ -95,7 +118,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer id="copyrightFooter" onclick="handleCopyrightClick()" class="cursor-pointer select-none py-4 text-center text-slate-400 text-xs font-medium tracking-widest uppercase hover:text-slate-600 transition-colors w-full">
+    <footer id="copyrightFooter" onclick="handleCopyrightClick()" class="cursor-pointer select-none py-4 text-center text-slate-400 text-xs font-medium tracking-widest uppercase hover:text-slate-600 transition-colors w-full shrink-0">
         © TienPing @ 2026
     </footer>
 
@@ -174,8 +197,12 @@
 
         // --- State Management ---
         let state = {
+            mode: 'knockout', // 'knockout' | 'robin'
+            robinSizesStr: "4, 2",
             inputs: [{ id: Date.now(), name: '', count: 1 }],
             rounds: [],
+            robinData: [],
+            slottingSequence: [],
             isSpinning: false,
             spinMessage: "",
             spinValue: "",
@@ -196,16 +223,27 @@
         const ioModalElement = document.getElementById('io-modal');
         const ioTextarea = document.getElementById('io-textarea');
         const togglePrevent = document.getElementById('toggle-prevent');
+        const modeSelect = document.getElementById('mode-select');
+        const robinConfigWrapper = document.getElementById('robin-config-wrapper');
+
+        window.setMode = (mode) => {
+            state.mode = mode;
+            robinConfigWrapper.classList.toggle('hidden', mode !== 'robin');
+            updateUI();
+        };
 
         // --- UI Rendering ---
 
         function renderInputs() {
             inputsContainer.innerHTML = '';
+            let totalTeams = 0;
+
             state.inputs.forEach((inp) => {
+                if (inp.name.trim()) totalTeams += inp.count;
+
                 const row = document.createElement('div');
-                row.className = 'flex gap-2 items-center group';
+                row.className = 'flex gap-2 items-center group shrink-0';
                 
-                // Select options html
                 let optionsHtml = '';
                 for(let i=1; i<=26; i++) {
                     optionsHtml += `<option value="${i}" ${inp.count === i ? 'selected' : ''}>${i}</option>`;
@@ -244,6 +282,7 @@
                 inputsContainer.appendChild(row);
             });
             
+            document.getElementById('team-count-display').innerText = `Total Teams: ${totalTeams}`;
             btnAdd.disabled = state.isSpinning;
         }
 
@@ -251,6 +290,8 @@
             btnGenerate.disabled = state.isSpinning;
             btnIO.disabled = state.isSpinning;
             togglePrevent.disabled = state.isSpinning;
+            modeSelect.disabled = state.isSpinning;
+            document.getElementById('robin-sizes').disabled = state.isSpinning;
             
             if (state.hasGenerated && !state.isSpinning) {
                 btnGenerate.className = "w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-50 disabled:cursor-not-allowed";
@@ -267,7 +308,7 @@
             if (state.hasGenerated) {
                 bannerContainer.className = "bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 p-4 min-h-[100px]";
                 bannerContainer.innerHTML = `
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 z-10 relative">
                         ${state.isSpinning ? ICONS.dicesSpinning : ''}
                         <div>
                             <p class="text-slate-400 font-semibold tracking-widest text-xs mb-1 text-center">
@@ -283,7 +324,7 @@
             } else {
                 bannerContainer.className = "bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-500 p-6 min-h-[200px]";
                 bannerContainer.innerHTML = `
-                    <div class="text-center text-slate-500">
+                    <div class="text-center text-slate-500 z-10 relative">
                         ${ICONS.dicesBig}
                         <p class="text-lg">Add your teams and hit Generate to build the tree.</p>
                     </div>
@@ -292,7 +333,7 @@
             }
         }
 
-        function getTeamStatus(team, rIdx, mIdx) {
+        function getTeamStatusKnockout(team, rIdx, mIdx) {
             if (!team) return 'empty';
             if (team.isBye) return 'bye';
             if (rIdx >= state.rounds.length - 1) return 'champion'; 
@@ -309,10 +350,25 @@
             }
 
             if (!advancedTeam) return 'pending';
-            // Use unique ID to track advancement accurately if available
             if (team.uid !== undefined && advancedTeam.uid === team.uid) return 'winner';
             if (team.uid === undefined && advancedTeam.name === team.name) return 'winner';
             return 'loser';
+        }
+
+        function getTeamStatusRobin(team, rIdx) {
+            if (!team) return 'empty';
+            if (team.isBye) return 'bye';
+            if (rIdx >= state.robinData.length - 1) return 'pending'; // Last round configured
+
+            const nextRound = state.robinData[rIdx + 1];
+            let advanced = false;
+            for (let g of nextRound) {
+                if (g.slots.some(t => t && t.uid === team.uid)) {
+                    advanced = true;
+                    break;
+                }
+            }
+            return advanced ? 'winner' : 'pending';
         }
 
         function renderBracket() {
@@ -323,14 +379,16 @@
             }
             bracketWrapper.classList.remove('hidden');
 
+            if (state.mode === 'knockout') renderKnockoutBracket();
+            else renderRobinBracket();
+        }
+
+        function renderKnockoutBracket() {
             let html = '';
-            
             state.rounds.forEach((round, rIdx) => {
                 const isChampionRound = rIdx === state.rounds.length - 1;
-                
                 html += `<div class="flex flex-col justify-around min-w-[220px] relative">`;
                 
-                // Header
                 html += `<div class="absolute -top-4 left-0 right-0 text-center font-bold text-slate-500 tracking-wider text-sm uppercase">
                             ${isChampionRound ? 'Champion' : `Round ${rIdx + 1}`}
                          </div>`;
@@ -346,12 +404,11 @@
                     `;
                 } else {
                     round.forEach((match, mIdx) => {
-                        const statusT1 = getTeamStatus(match.t1, rIdx, mIdx);
-                        const statusT2 = getTeamStatus(match.t2, rIdx, mIdx);
+                        const statusT1 = getTeamStatusKnockout(match.t1, rIdx, mIdx);
+                        const statusT2 = getTeamStatusKnockout(match.t2, rIdx, mIdx);
                         const isT1ActiveSpin = state.isSpinning && rIdx === 0 && state.activeSpinIndex === mIdx * 2;
                         const isT2ActiveSpin = state.isSpinning && rIdx === 0 && state.activeSpinIndex === mIdx * 2 + 1;
 
-                        // Check if both teams are present, not BYEs, and have the exact same school name
                         const hasClash = match.t1 && match.t2 && !match.t1.isBye && !match.t2.isBye && match.t1.schoolName === match.t2.schoolName;
 
                         html += `
@@ -370,14 +427,62 @@
                 }
                 html += `</div>`;
             });
-            
             bracketContainer.innerHTML = html;
         }
 
-        function renderTeamSlot(team, status, isSpinningActive, rIdx, mIdx, slotId, hasClash = false) {
+        function renderRobinBracket() {
+            let html = '';
+            state.robinData.forEach((round, rIdx) => {
+                html += `<div class="flex flex-col gap-4 min-w-[260px] relative">`;
+                html += `<div class="text-center font-bold text-slate-500 tracking-wider text-sm uppercase mb-2 flex items-center justify-center gap-2">
+                            Round ${rIdx + 1} 
+                            <span class="bg-slate-800/80 text-slate-400 text-[10px] px-2 py-0.5 rounded-full font-semibold border border-slate-700/50">
+                                ${round.length} Group${round.length > 1 ? 's' : ''}
+                            </span>
+                         </div>`;
+
+                round.forEach((group, gIdx) => {
+                    // Pre-calculate clashes in the group
+                    const schoolCounts = {};
+                    group.slots.forEach(t => {
+                        if (t && !t.isBye) {
+                            schoolCounts[t.schoolName] = (schoolCounts[t.schoolName] || 0) + 1;
+                        }
+                    });
+
+                    html += `<div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 shadow-lg flex flex-col z-10">`;
+                    html += `<div class="bg-slate-900/80 px-3 py-2 text-xs text-indigo-300 font-bold border-b border-slate-700 text-center uppercase tracking-widest">${group.name}</div>`;
+                    html += `<div class="flex flex-col divide-y divide-slate-700/50 min-h-[44px]">`;
+
+                    if (group.slots.length === 0) {
+                        html += `<div class="px-4 py-3 text-sm text-slate-600 italic text-center">TBD</div>`;
+                    } else {
+                        group.slots.forEach((team, sIdx) => {
+                            const status = getTeamStatusRobin(team, rIdx);
+                            const isActiveSpin = state.isSpinning && state.activeSpinIndex === `${rIdx}-${gIdx}-${sIdx}`;
+                            const hasClash = team && !team.isBye && schoolCounts[team.schoolName] > 1;
+
+                            html += renderTeamSlot(team, status, isActiveSpin, rIdx, gIdx, sIdx, hasClash);
+                        });
+                    }
+
+                    html += `</div></div>`;
+                });
+                html += `</div>`;
+            });
+            bracketContainer.innerHTML = html;
+        }
+
+        function renderTeamSlot(team, status, isSpinningActive, rIdx, gIdx, slotId, hasClash = false) {
             let styles = "bg-slate-800 text-slate-300"; 
             let interactionStyles = "hover:bg-slate-700 cursor-pointer";
-            let onClickAttr = `onclick="handleAdvance(${rIdx}, ${mIdx}, '${slotId}')"`;
+            
+            let onClickAttr = "";
+            if (state.mode === 'knockout') {
+                onClickAttr = `onclick="handleAdvanceKnockout(${rIdx}, ${gIdx}, '${slotId}')"`;
+            } else {
+                onClickAttr = `onclick="handleAdvanceRobin(${rIdx}, ${gIdx}, ${slotId})"`;
+            }
 
             if (isSpinningActive) {
                 styles = "bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] z-20 font-bold border border-indigo-400";
@@ -475,7 +580,6 @@
         
         window.updateInput = (id, field, value) => {
             state.inputs = state.inputs.map(inp => inp.id === id ? { ...inp, [field]: value } : inp);
-            // We intentionally don't call updateUI() here to prevent focus loss while typing
         };
 
         window.removeInput = (id) => {
@@ -488,8 +592,6 @@
         btnAdd.onclick = () => {
             state.inputs.push({ id: Date.now(), name: '', count: 1 });
             updateUI();
-            
-            // Scroll to bottom
             setTimeout(() => {
                 inputsContainer.scrollTop = inputsContainer.scrollHeight;
             }, 10);
@@ -536,7 +638,6 @@
                         });
                     }
                 } else {
-                    // Fallback
                     newInputs.push({
                         id: idCounter++,
                         name: trimmedLine,
@@ -557,6 +658,7 @@
         window.resetBracket = () => {
             state.hasGenerated = false;
             state.rounds = [];
+            state.robinData = [];
             state.spinValue = "";
             updateUI();
         };
@@ -568,7 +670,7 @@
 
             let flatTeams = [];
             let groupId = 0;
-            let teamUid = 0; // Unique ID to track identical names correctly
+            let teamUid = 0; 
             
             state.inputs.forEach(input => {
                 const cleanName = input.name.trim();
@@ -586,10 +688,20 @@
             });
 
             if (flatTeams.length < 2) {
-                alert("Please enter at least 2 teams to generate a bracket.");
+                alert("Please enter at least 2 teams to generate.");
                 return;
             }
 
+            state.slottingSequence = [];
+
+            if (state.mode === 'knockout') {
+                generateKnockout(flatTeams);
+            } else {
+                generateRobin(flatTeams);
+            }
+        };
+
+        function generateKnockout(flatTeams) {
             let N = 2;
             while (N < flatTeams.length) N *= 2;
             state.bracketSize = N;
@@ -604,14 +716,12 @@
             let groupArrays = Object.values(groups).map(arr => shuffleArray(arr));
             let seedAssignments = {};
             
-            // Assign BYEs to bottom seeds
             let numByes = N - flatTeams.length;
             for (let i = 0; i < numByes; i++) {
                 seedAssignments[N - i] = { name: "BYE", isBye: true, schoolName: "BYE" };
             }
 
             if (state.preventSameSchool) {
-                // Shuffle groups of the same size, then sort by size
                 groupArrays = shuffleArray(groupArrays);
                 groupArrays.sort((a, b) => b.length - a.length);
 
@@ -621,36 +731,29 @@
 
                 let availableSeeds = [];
                 for (let i = 1; i <= flatTeams.length; i++) availableSeeds.push(i);
-
                 const getOpponentSeed = (seed, totalN) => totalN - seed + 1;
 
                 orderedTeams.forEach(team => {
                     let assigned = false;
-                    
                     for (let i = 0; i < availableSeeds.length; i++) {
                         let candidateSeed = availableSeeds[i];
                         let opponentSeed = getOpponentSeed(candidateSeed, N);
                         let opponent = seedAssignments[opponentSeed];
                         
-                        // Check if putting this team here creates a Round 1 clash
                         if (opponent && opponent.schoolName === team.schoolName && !opponent.isBye) {
-                            continue; // Clash detected, try next available seed
+                            continue; 
                         }
-
                         seedAssignments[candidateSeed] = team;
                         availableSeeds.splice(i, 1);
                         assigned = true;
                         break;
                     }
-
-                    // If NO seed avoids a clash (e.g. school > 50%), fallback to the first available
                     if (!assigned) {
                         let fallbackSeed = availableSeeds.shift();
                         seedAssignments[fallbackSeed] = team;
                     }
                 });
             } else {
-                // Completely random shuffle
                 for (let arr of groupArrays) {
                     orderedTeams.push(...arr);
                 }
@@ -690,10 +793,112 @@
             }
 
             state.rounds = initialRounds;
-            startSpinning(finalLayout, orderedTeams);
-        };
 
-        const startSpinning = async (layout, rawTeams) => {
+            if (state.preventSameSchool) {
+                for (let i = 0; i < orderedTeams.length; i++) {
+                    const targetIndex = finalLayout.findIndex(t => t && !t.isBye && t.uid === orderedTeams[i].uid);
+                    if (targetIndex !== -1) {
+                        state.slottingSequence.push({ team: orderedTeams[i], targetIndex: targetIndex });
+                    }
+                }
+            } else {
+                for (let i = 0; i < finalLayout.length; i++) {
+                    if (finalLayout[i] && !finalLayout[i].isBye) {
+                        state.slottingSequence.push({ team: finalLayout[i], targetIndex: i });
+                    }
+                }
+            }
+            
+            startSpinning(orderedTeams);
+        }
+
+        function generateRobin(flatTeams) {
+            let numGroupsPerRound = state.robinSizesStr.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s > 0);
+            if (numGroupsPerRound.length === 0) numGroupsPerRound = [2]; // Default to 2 groups
+
+            const N = flatTeams.length;
+            const r1NumGroups = numGroupsPerRound[0];
+
+            let robinRounds = [];
+            
+            // Distribute N teams into r1NumGroups evenly
+            let baseSize = Math.floor(N / r1NumGroups);
+            let extra = N % r1NumGroups;
+            
+            // Init R1
+            let r1Groups = [];
+            for (let i = 0; i < r1NumGroups; i++) {
+                let groupSize = baseSize + (i < extra ? 1 : 0);
+                r1Groups.push({
+                    id: `r0-g${i}`,
+                    name: `Group ${String.fromCharCode(65 + i)}`,
+                    slots: Array(groupSize).fill(null)
+                });
+            }
+            robinRounds.push(r1Groups);
+
+            // Init empty subsequent rounds
+            for (let i = 1; i < numGroupsPerRound.length; i++) {
+                let rGroups = [];
+                for (let g = 0; g < numGroupsPerRound[i]; g++) {
+                    rGroups.push({
+                        id: `r${i}-g${g}`,
+                        name: `Group ${String.fromCharCode(65 + g)}`,
+                        slots: [] // Start empty, expand as teams advance
+                    });
+                }
+                robinRounds.push(rGroups);
+            }
+
+            if (state.preventSameSchool) {
+                let groups = {};
+                flatTeams.forEach(t => {
+                    if (!groups[t.group]) groups[t.group] = [];
+                    groups[t.group].push(t);
+                });
+                let groupArrays = Object.values(groups).map(arr => shuffleArray(arr));
+                groupArrays = shuffleArray(groupArrays);
+                groupArrays.sort((a, b) => b.length - a.length);
+                let orderedTeams = groupArrays.flat();
+
+                // Deal like cards across groups to maximize separation
+                let currentGroup = 0;
+                orderedTeams.forEach(team => {
+                    let placed = false;
+                    let attempt = 0;
+                    while (!placed && attempt < r1NumGroups) {
+                        let g = r1Groups[currentGroup];
+                        let slotIdx = g.slots.indexOf(null);
+                        if (slotIdx !== -1) {
+                            g.slots[slotIdx] = 'reserved'; // mark temporarily
+                            state.slottingSequence.push({ team: team, rIdx: 0, gIdx: currentGroup, sIdx: slotIdx });
+                            placed = true;
+                        }
+                        currentGroup = (currentGroup + 1) % r1NumGroups;
+                        attempt++;
+                    }
+                });
+                
+                // Clear reserves before animation
+                r1Groups.forEach(g => g.slots.fill(null));
+            } else {
+                let shuffled = shuffleArray(flatTeams);
+                let teamIdx = 0;
+                for (let g = 0; g < r1NumGroups; g++) {
+                    for (let s = 0; s < r1Groups[g].slots.length; s++) {
+                        if (teamIdx < shuffled.length) {
+                            state.slottingSequence.push({ team: shuffled[teamIdx], rIdx: 0, gIdx: g, sIdx: s });
+                            teamIdx++;
+                        }
+                    }
+                }
+            }
+
+            state.robinData = robinRounds;
+            startSpinning(flatTeams);
+        }
+
+        const startSpinning = async (rawTeams) => {
             state.hasGenerated = true;
             state.isSpinning = true;
             state.spinMessage = "PREPARING BRACKET...";
@@ -703,35 +908,20 @@
             let pool = [...rawTeams];
             await new Promise(r => setTimeout(r, 1000));
 
-            // Determine the visual slotting order based on the user's setting
-            let slottingSequence = [];
-            if (state.preventSameSchool) {
-                // Animate slotting in the exact order the algorithm prioritized them
-                for (let i = 0; i < rawTeams.length; i++) {
-                    const targetIndex = layout.findIndex(t => t && !t.isBye && t.uid === rawTeams[i].uid);
-                    if (targetIndex !== -1) {
-                        slottingSequence.push({ team: rawTeams[i], targetIndex: targetIndex });
-                    }
-                }
-            } else {
-                // Standard sequential slotting (top to bottom, 1 by 1)
-                for (let i = 0; i < layout.length; i++) {
-                    if (layout[i] && !layout[i].isBye) {
-                        slottingSequence.push({ team: layout[i], targetIndex: i });
-                    }
-                }
-            }
+            for (let i = 0; i < state.slottingSequence.length; i++) {
+                const step = state.slottingSequence[i];
+                const teamToSlot = step.team;
 
-            for (let i = 0; i < slottingSequence.length; i++) {
-                const teamToSlot = slottingSequence[i].team;
-                const targetIndex = slottingSequence[i].targetIndex;
-
-                state.activeSpinIndex = targetIndex;
+                if (state.mode === 'knockout') {
+                    state.activeSpinIndex = step.targetIndex;
+                } else {
+                    state.activeSpinIndex = `${step.rIdx}-${step.gIdx}-${step.sIdx}`;
+                }
+                
                 const isLarge = rawTeams.length > 16;
                 const iterations = isLarge ? 4 : 8;
                 const spinInterval = isLarge ? 25 : 40;
 
-                // Create a pool of just THIS school's remaining teams if prevention is on
                 const activePool = state.preventSameSchool 
                     ? pool.filter(t => t.group === teamToSlot.group) 
                     : pool;
@@ -745,47 +935,51 @@
 
                 for (let s = 0; s < iterations; s++) {
                     let randomTeam = activePool[Math.floor(Math.random() * activePool.length)];
-                    if(!randomTeam) randomTeam = pool[Math.floor(Math.random() * pool.length)]; // Safety fallback
+                    if(!randomTeam) randomTeam = pool[Math.floor(Math.random() * pool.length)];
                     state.spinValue = randomTeam.name;
-                    updateUI(); // Quick re-render for spinning text/glow
+                    updateUI();
                     await new Promise(r => setTimeout(r, spinInterval));
                 }
 
                 state.spinValue = teamToSlot.name;
                 await new Promise(r => setTimeout(r, isLarge ? 150 : 300));
 
-                // Assign team to layout
-                const mIdx = Math.floor(targetIndex / 2);
-                if (targetIndex % 2 === 0) state.rounds[0][mIdx].t1 = teamToSlot;
-                else state.rounds[0][mIdx].t2 = teamToSlot;
+                if (state.mode === 'knockout') {
+                    const mIdx = Math.floor(step.targetIndex / 2);
+                    if (step.targetIndex % 2 === 0) state.rounds[0][mIdx].t1 = teamToSlot;
+                    else state.rounds[0][mIdx].t2 = teamToSlot;
+                } else {
+                    state.robinData[step.rIdx][step.gIdx].slots[step.sIdx] = teamToSlot;
+                }
 
                 pool = pool.filter(t => t.uid !== teamToSlot.uid);
                 updateUI();
             }
 
-            // Auto-advance BYEs (using Deep Copy logic)
-            let finalTree = JSON.parse(JSON.stringify(state.rounds));
-            finalTree[0].forEach((match, mIdx) => {
-                const nextMatchIndex = Math.floor(mIdx / 2);
-                const isTopSlot = mIdx % 2 === 0;
+            if (state.mode === 'knockout') {
+                let finalTree = JSON.parse(JSON.stringify(state.rounds));
+                finalTree[0].forEach((match, mIdx) => {
+                    const nextMatchIndex = Math.floor(mIdx / 2);
+                    const isTopSlot = mIdx % 2 === 0;
 
-                if (match.t1?.isBye && match.t2 && !match.t2.isBye) {
-                    if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t2;
-                    else finalTree[1][nextMatchIndex].t2 = match.t2;
-                } else if (match.t2?.isBye && match.t1 && !match.t1.isBye) {
-                    if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t1;
-                    else finalTree[1][nextMatchIndex].t2 = match.t1;
-                }
-            });
-            
-            state.rounds = finalTree;
+                    if (match.t1?.isBye && match.t2 && !match.t2.isBye) {
+                        if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t2;
+                        else finalTree[1][nextMatchIndex].t2 = match.t2;
+                    } else if (match.t2?.isBye && match.t1 && !match.t1.isBye) {
+                        if (isTopSlot) finalTree[1][nextMatchIndex].t1 = match.t1;
+                        else finalTree[1][nextMatchIndex].t2 = match.t1;
+                    }
+                });
+                state.rounds = finalTree;
+            }
+
             state.isSpinning = false;
             state.activeSpinIndex = -1;
             state.spinValue = "DRAW COMPLETE!";
             updateUI();
         };
 
-        window.handleAdvance = (rIdx, mIdx, slotId) => {
+        window.handleAdvanceKnockout = (rIdx, mIdx, slotId) => {
             if (state.isSpinning) return;
             const team = state.rounds[rIdx][mIdx][slotId];
             if (!team || team.isBye) return;
@@ -805,6 +999,46 @@
             }
             
             state.rounds = nextTree;
+            updateUI();
+        };
+
+        window.handleAdvanceRobin = (rIdx, gIdx, sIdx) => {
+            if (state.isSpinning) return;
+            const team = state.robinData[rIdx][gIdx].slots[sIdx];
+            if (!team || team.isBye) return;
+
+            let numGroupsPerRound = state.robinSizesStr.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s > 0);
+            let nextRIdx = rIdx + 1;
+            if (nextRIdx >= numGroupsPerRound.length) return; 
+
+            let nextTree = JSON.parse(JSON.stringify(state.robinData));
+
+            let foundInNext = false;
+            for (let g = 0; g < nextTree[nextRIdx].length; g++) {
+                let idx = nextTree[nextRIdx][g].slots.findIndex(t => t && t.uid === team.uid);
+                if (idx !== -1) {
+                    nextTree[nextRIdx][g].slots.splice(idx, 1); // Undo advance
+                    foundInNext = true;
+                    break;
+                }
+            }
+
+            if (!foundInNext) {
+                // Find group with fewest teams to maintain even distribution
+                let minSize = Infinity;
+                let targetGroup = null;
+                for(let g of nextTree[nextRIdx]) {
+                    if (g.slots.length < minSize) {
+                        minSize = g.slots.length;
+                        targetGroup = g;
+                    }
+                }
+                if (targetGroup) {
+                    targetGroup.slots.push(team);
+                }
+            }
+
+            state.robinData = nextTree;
             updateUI();
         };
 
