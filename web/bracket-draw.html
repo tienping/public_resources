@@ -64,22 +64,22 @@
                         <div>
                             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Tournament Format</label>
                             <select id="mode-select" onchange="window.setMode(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500">
+                                <option value="robin" selected>Round Robin Groups</option>
                                 <option value="knockout">Knockout Bracket</option>
-                                <option value="robin">Round Robin Groups</option>
                             </select>
                         </div>
 
-                        <!-- Robin Config (Hidden by default) -->
-                        <div id="robin-config-wrapper" class="hidden">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Number of Groups (per round)</label>
-                            <input type="text" id="robin-sizes" value="4, 2" onchange="state.robinSizesStr = this.value" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. 4, 2" />
-                            <p class="text-[10px] text-slate-500 mt-1">Comma-separated numbers (e.g. 4, 2 means 4 groups in R1, 2 groups in R2).</p>
+                        <!-- Robin Config -->
+                        <div id="robin-config-wrapper" class="">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Number of Groups</label>
+                            <input type="number" id="robin-sizes" value="4" onchange="state.robinSizesStr = String(this.value)" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. 4" min="1" />
+                            <p class="text-[10px] text-slate-500 mt-1">Number of groups to divide the teams into for Round 1.</p>
                         </div>
 
                         <div class="h-px bg-slate-800 w-full my-1"></div>
 
                         <div class="flex items-center gap-2">
-                            <input type="checkbox" id="toggle-prevent" onchange="state.preventSameSchool = this.checked" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                            <input type="checkbox" id="toggle-prevent" checked onchange="state.preventSameSchool = this.checked" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
                             <label for="toggle-prevent" class="cursor-pointer select-none font-medium">Prevent same teams in R1</label>
                         </div>
                         <p class="text-[10px] text-slate-500 leading-snug">
@@ -190,6 +190,7 @@
             dices: `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01M10 14h.01M15 6h.01M18 9h.01"/></svg>`,
             dicesBig: `<svg class="w-16 h-16 mx-auto mb-4 opacity-20" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01M10 14h.01M15 6h.01M18 9h.01"/></svg>`,
             dicesSpinning: `<svg class="w-8 h-8 text-indigo-400 animate-spin" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="2" y="10" rx="2" ry="2"/><path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"/><path d="M6 18h.01M10 14h.01M15 6h.01M18 9h.01"/></svg>`,
+            stop: `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>`,
             refresh: `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
             chevron: `<svg class="w-4 h-4 opacity-50" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`,
             trophy: `<svg class="mx-auto text-yellow-500 w-12 h-12 mb-3 drop-shadow-md" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 1.1-.9 2-2 2H4"></path><path d="M14 14.66V17c0 1.1.9 2 2 2h8"></path><path d="M8 22H16"></path><path d="M15.5 4h-7a4.5 4.5 0 0 0-4.5 4.5v1.2a5.3 5.3 0 0 0 5.3 5.3h3.4a5.3 5.3 0 0 0 5.3-5.3V8.5A4.5 4.5 0 0 0 15.5 4z"></path></svg>`
@@ -197,19 +198,20 @@
 
         // --- State Management ---
         let state = {
-            mode: 'knockout', // 'knockout' | 'robin'
-            robinSizesStr: "4, 2",
+            mode: 'robin', // 'knockout' | 'robin'
+            robinSizesStr: "4",
             inputs: [{ id: Date.now(), name: '', count: 1 }],
             rounds: [],
             robinData: [],
             slottingSequence: [],
             isSpinning: false,
+            isStopping: false,
             spinMessage: "",
             spinValue: "",
             activeSpinIndex: -1,
             hasGenerated: false,
             bracketSize: 0,
-            preventSameSchool: false
+            preventSameSchool: true
         };
 
         // DOM Elements
@@ -287,17 +289,26 @@
         }
 
         function renderControls() {
-            btnGenerate.disabled = state.isSpinning;
             btnIO.disabled = state.isSpinning;
             togglePrevent.disabled = state.isSpinning;
             modeSelect.disabled = state.isSpinning;
             document.getElementById('robin-sizes').disabled = state.isSpinning;
             
-            if (state.hasGenerated && !state.isSpinning) {
+            if (state.isSpinning) {
+                btnGenerate.disabled = state.isStopping;
+                btnGenerate.className = "w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all bg-red-600 hover:bg-red-500 text-white hover:shadow-red-500/25 disabled:opacity-50 disabled:cursor-not-allowed";
+                btnGenerate.innerHTML = `${ICONS.stop} Stop Slotting`;
+                btnGenerate.onclick = () => {
+                    state.isStopping = true;
+                    updateUI();
+                };
+            } else if (state.hasGenerated) {
+                btnGenerate.disabled = false;
                 btnGenerate.className = "w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all bg-slate-800 hover:bg-slate-700 text-white disabled:opacity-50 disabled:cursor-not-allowed";
                 btnGenerate.innerHTML = `${ICONS.refresh} Reset Bracket`;
                 btnGenerate.onclick = resetBracket;
             } else {
+                btnGenerate.disabled = false;
                 btnGenerate.className = "w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg shadow-lg transition-all bg-indigo-600 hover:bg-indigo-500 text-white hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed";
                 btnGenerate.innerHTML = `${ICONS.dices} Generate Draw`;
                 btnGenerate.onclick = handleGenerate;
@@ -660,6 +671,7 @@
             state.rounds = [];
             state.robinData = [];
             state.spinValue = "";
+            state.isStopping = false;
             updateUI();
         };
 
@@ -813,11 +825,10 @@
         }
 
         function generateRobin(flatTeams) {
-            let numGroupsPerRound = state.robinSizesStr.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s > 0);
-            if (numGroupsPerRound.length === 0) numGroupsPerRound = [2]; // Default to 2 groups
+            let r1NumGroups = parseInt(state.robinSizesStr);
+            if (isNaN(r1NumGroups) || r1NumGroups < 1) r1NumGroups = 2; // Default to 2 groups
 
             const N = flatTeams.length;
-            const r1NumGroups = numGroupsPerRound[0];
 
             let robinRounds = [];
             
@@ -836,19 +847,6 @@
                 });
             }
             robinRounds.push(r1Groups);
-
-            // Init empty subsequent rounds
-            for (let i = 1; i < numGroupsPerRound.length; i++) {
-                let rGroups = [];
-                for (let g = 0; g < numGroupsPerRound[i]; g++) {
-                    rGroups.push({
-                        id: `r${i}-g${g}`,
-                        name: `Group ${String.fromCharCode(65 + g)}`,
-                        slots: [] // Start empty, expand as teams advance
-                    });
-                }
-                robinRounds.push(rGroups);
-            }
 
             if (state.preventSameSchool) {
                 let groups = {};
@@ -901,12 +899,13 @@
         const startSpinning = async (rawTeams) => {
             state.hasGenerated = true;
             state.isSpinning = true;
+            state.isStopping = false;
             state.spinMessage = "PREPARING BRACKET...";
             state.spinValue = "INITIALIZING...";
             updateUI();
             
             let pool = [...rawTeams];
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 500));
 
             for (let i = 0; i < state.slottingSequence.length; i++) {
                 const step = state.slottingSequence[i];
@@ -919,18 +918,20 @@
                 }
                 
                 const isLarge = rawTeams.length > 16;
-                const iterations = isLarge ? 4 : 8;
-                const spinInterval = isLarge ? 25 : 40;
+                const iterations = state.isStopping ? 0 : (isLarge ? 4 : 8);
+                const spinInterval = state.isStopping ? 0 : (isLarge ? 25 : 40);
 
                 const activePool = state.preventSameSchool 
                     ? pool.filter(t => t.group === teamToSlot.group) 
                     : pool;
 
-                if (state.preventSameSchool) {
-                    const remaining = activePool.length;
-                    state.spinMessage = `SLOTTING: ${teamToSlot.schoolName.toUpperCase()} (${remaining} LEFT)`;
-                } else {
-                    state.spinMessage = `SPINNING FOR NEXT SLOT...`;
+                if (!state.isStopping) {
+                    if (state.preventSameSchool) {
+                        const remaining = activePool.length;
+                        state.spinMessage = `SLOTTING: ${teamToSlot.schoolName.toUpperCase()} (${remaining} LEFT)`;
+                    } else {
+                        state.spinMessage = `SPINNING FOR NEXT SLOT...`;
+                    }
                 }
 
                 for (let s = 0; s < iterations; s++) {
@@ -942,7 +943,9 @@
                 }
 
                 state.spinValue = teamToSlot.name;
-                await new Promise(r => setTimeout(r, isLarge ? 150 : 300));
+                if (!state.isStopping) {
+                    await new Promise(r => setTimeout(r, isLarge ? 150 : 300));
+                }
 
                 if (state.mode === 'knockout') {
                     const mIdx = Math.floor(step.targetIndex / 2);
@@ -953,7 +956,7 @@
                 }
 
                 pool = pool.filter(t => t.uid !== teamToSlot.uid);
-                updateUI();
+                if (!state.isStopping) updateUI();
             }
 
             if (state.mode === 'knockout') {
@@ -974,8 +977,10 @@
             }
 
             state.isSpinning = false;
+            state.isStopping = false;
             state.activeSpinIndex = -1;
-            state.spinValue = "DRAW COMPLETE!";
+            state.spinMessage = "DRAW COMPLETE!";
+            state.spinValue = "ALL TEAMS SLOTTED";
             updateUI();
         };
 
@@ -1007,34 +1012,67 @@
             const team = state.robinData[rIdx][gIdx].slots[sIdx];
             if (!team || team.isBye) return;
 
-            let numGroupsPerRound = state.robinSizesStr.split(',').map(s => parseInt(s.trim())).filter(s => !isNaN(s) && s > 0);
             let nextRIdx = rIdx + 1;
-            if (nextRIdx >= numGroupsPerRound.length) return; 
-
             let nextTree = JSON.parse(JSON.stringify(state.robinData));
+
+            // Ensure next round exists in state dynamically
+            if (!nextTree[nextRIdx]) {
+                nextTree.push([]);
+            }
 
             let foundInNext = false;
             for (let g = 0; g < nextTree[nextRIdx].length; g++) {
                 let idx = nextTree[nextRIdx][g].slots.findIndex(t => t && t.uid === team.uid);
                 if (idx !== -1) {
                     nextTree[nextRIdx][g].slots.splice(idx, 1); // Undo advance
+                    
+                    // Clean up empty groups in subsequent rounds automatically
+                    if (nextTree[nextRIdx][g].slots.length === 0) {
+                        nextTree[nextRIdx].splice(g, 1);
+                        // Re-letter remaining groups
+                        nextTree[nextRIdx].forEach((grp, i) => {
+                            grp.name = `Group ${String.fromCharCode(65 + i)}`;
+                            grp.id = `r${nextRIdx}-g${i}`;
+                        });
+                    }
+                    
+                    // If the entire round is empty and it's the last round, remove it
+                    if (nextTree[nextRIdx].length === 0 && nextRIdx === nextTree.length - 1) {
+                        nextTree.pop();
+                    }
+                    
                     foundInNext = true;
                     break;
                 }
             }
 
             if (!foundInNext) {
-                // Find group with fewest teams to maintain even distribution
-                let minSize = Infinity;
+                // Find group with fewest teams, max 4 teams per group (to maintain distribution dynamically)
+                let maxGroupSize = 4;
                 let targetGroup = null;
-                for(let g of nextTree[nextRIdx]) {
-                    if (g.slots.length < minSize) {
-                        minSize = g.slots.length;
-                        targetGroup = g;
+                
+                if (nextTree[nextRIdx].length > 0) {
+                    let minSize = Infinity;
+                    for(let g of nextTree[nextRIdx]) {
+                        if (g.slots.length < minSize) {
+                            minSize = g.slots.length;
+                            targetGroup = g;
+                        }
+                    }
+                    if (minSize >= maxGroupSize) {
+                        targetGroup = null; // Create new group if all current groups have 4 teams
                     }
                 }
+                
                 if (targetGroup) {
                     targetGroup.slots.push(team);
+                } else {
+                    let newGroup = {
+                        id: `r${nextRIdx}-g${nextTree[nextRIdx].length}`,
+                        name: `Group ${String.fromCharCode(65 + nextTree[nextRIdx].length)}`,
+                        slots: [team]
+                    };
+                    nextTree[nextRIdx].push(newGroup);
                 }
             }
 
