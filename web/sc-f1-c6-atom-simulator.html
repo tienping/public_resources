@@ -1,500 +1,614 @@
-import React, { useState } from 'react';
-import { Plus, Minus, Info, Atom, AlertCircle, Thermometer, Sparkles, Flame, HelpCircle } from 'lucide-react';
-
-// Element data for the first 20 elements with expanded properties for Form 1 curriculum
-const ELEMENTS = [
-  { 
-    z: 1, symbol: 'H', name: 'Hydrogen', group: '1', period: '1', 
-    classification: 'Non-metal', state: 'Gas', mp: -259.16, bp: -252.87,
-    characteristics: 'The lightest element in the universe. Colorless, odorless, and highly flammable.',
-    uses: 'Used as rocket fuel and to make water (when combined with oxygen).'
-  },
-  { 
-    z: 2, symbol: 'He', name: 'Helium', group: '18', period: '1', 
-    classification: 'Non-metal', state: 'Gas', mp: -272.2, bp: -268.93,
-    characteristics: 'An inert (totally unreactive) noble gas. Much lighter than air, does not burn.',
-    uses: 'Used in party balloons and weather balloons.'
-  },
-  { 
-    z: 3, symbol: 'Li', name: 'Lithium', group: '1', period: '2', 
-    classification: 'Metal', state: 'Solid', mp: 180.5, bp: 1342,
-    characteristics: 'An extremely soft, silvery-white alkali metal. So light that it floats on water.',
-    uses: 'Used in rechargeable batteries for smartphones, laptops, and electric vehicles.'
-  },
-  { 
-    z: 4, symbol: 'Be', name: 'Beryllium', group: '2', period: '2', 
-    classification: 'Metal', state: 'Solid', mp: 1287, bp: 2470,
-    characteristics: 'A strong, lightweight, steel-grey alkaline earth metal with a very high melting point.',
-    uses: 'Used in spacecraft parts, military missiles, and X-ray tube windows.'
-  },
-  { 
-    z: 5, symbol: 'B', name: 'Boron', group: '13', period: '2', 
-    classification: 'Semi-metal', state: 'Solid', mp: 2076, bp: 3927,
-    characteristics: 'A tough metalloid that is very hard and highly heat-resistant.',
-    uses: 'Used to make heat-proof borosilicate glass (like Pyrex chemistry beakers).'
-  },
-  { 
-    z: 6, symbol: 'C', name: 'Carbon', group: '14', period: '2', 
-    classification: 'Non-metal', state: 'Solid', mp: 3550, bp: 4827, // Sublimes
-    characteristics: 'Can exist as soft black graphite (conducts electricity!) or super-hard diamond.',
-    uses: 'Graphite is used as pencil lead; diamond is used for jewelry and cutting tools.'
-  },
-  { 
-    z: 7, symbol: 'N', name: 'Nitrogen', group: '15', period: '2', 
-    classification: 'Non-metal', state: 'Gas', mp: -210, bp: -195.79,
-    characteristics: 'A colorless, odorless gas. It makes up about 78% of the Earth\'s atmosphere.',
-    uses: 'Liquid nitrogen is used as a super-cold coolant; also used to make plant fertilizers.'
-  },
-  { 
-    z: 8, symbol: 'O', name: 'Oxygen', group: '16', period: '2', 
-    classification: 'Non-metal', state: 'Gas', mp: -218.79, bp: -182.96,
-    characteristics: 'Essential for the respiration of almost all living organisms. Supports burning (combustion).',
-    uses: 'Used in medical oxygen tanks and combined with hydrogen as rocket propellant.'
-  },
-  { 
-    z: 9, symbol: 'F', name: 'Fluorine', group: '17', period: '2', 
-    classification: 'Non-metal', state: 'Gas', mp: -219.67, bp: -188.11,
-    characteristics: 'A pale-yellow, highly toxic halogen gas. It is the most reactive of all chemical elements.',
-    uses: 'Fluoride compounds are added to toothpaste to prevent tooth decay.'
-  },
-  { 
-    z: 10, symbol: 'Ne', name: 'Neon', group: '18', period: '2', 
-    classification: 'Non-metal', state: 'Gas', mp: -248.59, bp: -246.08,
-    characteristics: 'A colorless, inactive noble gas. Glows with a bright orange-red light when electrified.',
-    uses: 'Used widely in neon advertising signs and high-voltage indicators.'
-  },
-  { 
-    z: 11, symbol: 'Na', name: 'Sodium', group: '1', period: '3', 
-    classification: 'Metal', state: 'Solid', mp: 97.79, bp: 883,
-    characteristics: 'A highly reactive, soft alkali metal. It reacts violently with water and must be stored in oil.',
-    uses: 'Combined with chlorine to make common table salt (Sodium Chloride).'
-  },
-  { 
-    z: 12, symbol: 'Mg', name: 'Magnesium', group: '2', period: '3', 
-    classification: 'Metal', state: 'Solid', mp: 650, bp: 1090,
-    characteristics: 'A silvery-white, lightweight metal. It burns in air with an intense, blinding white light.',
-    uses: 'Used in fireworks, flares, and lightweight alloy rims for sports cars.'
-  },
-  { 
-    z: 13, symbol: 'Al', name: 'Aluminum', group: '13', period: '3', 
-    classification: 'Metal', state: 'Solid', mp: 660.32, bp: 2519,
-    characteristics: 'A lightweight, silvery metal that does not rust easily and conducts heat very well.',
-    uses: 'Used to make soda cans, kitchen foil, and airplane bodies.'
-  },
-  { 
-    z: 14, symbol: 'Si', name: 'Silicon', group: '14', period: '3', 
-    classification: 'Semi-metal', state: 'Solid', mp: 1414, bp: 3265,
-    characteristics: 'A shiny metalloid that is a semiconductor (conducts electricity under certain conditions).',
-    uses: 'The main component of computer microchips, solar panels, and glass.'
-  },
-  { 
-    z: 15, symbol: 'P', name: 'Phosphorus', group: '15', period: '3', 
-    classification: 'Non-metal', state: 'Solid', mp: 44.15, bp: 280.5,
-    characteristics: 'Exists as reactive red phosphorus or highly dangerous, glowing white phosphorus.',
-    uses: 'Red phosphorus is used on the friction strips of safety matchboxes.'
-  },
-  { 
-    z: 16, symbol: 'S', name: 'Sulfur', group: '16', period: '3', 
-    classification: 'Non-metal', state: 'Solid', mp: 115.21, bp: 444.6,
-    characteristics: 'A bright yellow, brittle solid. It produces a pungent, choking smell when burned.',
-    uses: 'Used in gunpowder, vulcanizing rubber (making tires tough), and matches.'
-  },
-  { 
-    z: 17, symbol: 'Cl', name: 'Chlorine', group: '17', period: '3', 
-    classification: 'Non-metal', state: 'Gas', mp: -101.5, bp: -34.04,
-    characteristics: 'A greenish-yellow, heavy, toxic halogen gas with a strong, irritating smell.',
-    uses: 'Used to disinfect water in swimming pools and in household bleach.'
-  },
-  { 
-    z: 18, symbol: 'Ar', name: 'Argon', group: '18', period: '3', 
-    classification: 'Non-metal', state: 'Gas', mp: -189.34, bp: -185.85,
-    characteristics: 'An inert, colorless noble gas. It protects hot metal filaments from burning up.',
-    uses: 'Filled inside double-glazed windows and old incandescent light bulbs.'
-  },
-  { 
-    z: 19, symbol: 'K', name: 'Potassium', group: '1', period: '4', 
-    classification: 'Metal', state: 'Solid', mp: 63.5, bp: 759,
-    characteristics: 'A super-soft, silvery alkali metal. It reacts instantly and explosively with water.',
-    uses: 'An essential nutrient found in bananas; widely used in agricultural fertilizers.'
-  },
-  { 
-    z: 20, symbol: 'Ca', name: 'Calcium', group: '2', period: '4', 
-    classification: 'Metal', state: 'Solid', mp: 842, bp: 1484,
-    characteristics: 'A moderately reactive alkaline earth metal. Dull grey, but silvery when freshly cut.',
-    uses: 'Crucial for healthy bones and teeth; used to make cement and concrete.'
-  }
-];
-
-export default function App() {
-  const [protons, setProtons] = useState(6); // Default to Carbon
-  const [inputValue, setInputValue] = useState("6");
-
-  // Calculate electron arrangement based on 2.8.8.2 rule
-  const getElectronArrangement = (num) => {
-    let e = num;
-    const shells = [];
-    if (e > 0) {
-      let s1 = Math.min(e, 2);
-      shells.push(s1);
-      e -= s1;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Atom Simulator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    if (e > 0) {
-      let s2 = Math.min(e, 8);
-      shells.push(s2);
-      e -= s2;
+    @keyframes spin-clockwise {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-    if (e > 0) {
-      let s3 = Math.min(e, 8);
-      shells.push(s3);
-      e -= s3;
+    @keyframes spin-counter-clockwise {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
     }
-    if (e > 0) {
-      let s4 = Math.min(e, 2);
-      shells.push(s4);
-      e -= s4;
+    .animate-spin-cw {
+      transform-origin: 200px 200px;
+      animation: spin-clockwise var(--speed, 15s) linear infinite;
     }
-    return shells;
-  };
-
-  const currentElement = ELEMENTS[protons - 1] || ELEMENTS[0];
-  const arrangement = getElectronArrangement(protons);
-  const valenceElectrons = arrangement[arrangement.length - 1] || 0;
-  const numShells = arrangement.length;
-
-  // Handles input validation
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-    const val = parseInt(e.target.value, 10);
-    if (!isNaN(val) && val >= 1 && val <= 20) {
-      setProtons(val);
+    .animate-spin-ccw {
+      transform-origin: 200px 200px;
+      animation: spin-counter-clockwise var(--speed, 15s) linear infinite;
     }
-  };
-
-  const handleBlur = () => {
-    let val = parseInt(inputValue, 10);
-    if (isNaN(val) || val < 1) val = 1;
-    if (val > 20) val = 20;
-    setProtons(val);
-    setInputValue(val.toString());
-  };
-
-  const increment = () => {
-    if (protons < 20) {
-      setProtons(protons + 1);
-      setInputValue((protons + 1).toString());
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
     }
-  };
-
-  const decrement = () => {
-    if (protons > 1) {
-      setProtons(protons - 1);
-      setInputValue((protons - 1).toString());
+    input[type=number] {
+      -moz-appearance: textfield;
     }
-  };
+  </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 p-4 md:p-8 selection:bg-cyan-500 selection:text-white">
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <!-- Header -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="bg-cyan-500/20 p-3 rounded-xl">
+          <svg class="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 3a9 9 0 0 0-9 9c0 2.5 1 4.7 2.6 6.4L12 12V3z"></path>
+            <path d="M21 12a9 9 0 0 0-9-9v9h9z"></path>
+            <path d="M12 21a9 9 0 0 0 9-9h-9v9z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Interactive Atom Simulator</h1>
+          <p class="text-slate-400 text-sm md:text-base">Designed for Form 1 General Science classes.</p>
+        </div>
+      </div>
+      <div class="text-xs text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700 max-w-xs self-start md:self-auto">
+        💡 <strong>Syllabus Tip:</strong> This covers elements 1 to 20. Beyond calcium, the electron shell configuration becomes more complex!
+      </div>
+    </header>
 
-  // Helper colors for Metal/Semi-metal/Non-metal classifications
-  const getClassificationColor = (classification) => {
-    switch (classification) {
-      case 'Metal':
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
-      case 'Semi-metal':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
-      case 'Non-metal':
-      default:
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 md:p-8 font-sans selection:bg-cyan-500 selection:text-white">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left Column: Atom Visualizer -->
+      <div class="lg:col-span-7 bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
         
-        {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800 p-6 rounded-2xl shadow-xl border border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="bg-cyan-500/20 p-3 rounded-xl">
-              <Atom className="w-8 h-8 text-cyan-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Interactive Atom Simulator</h1>
-              <p className="text-slate-400 text-sm md:text-base">Designed for Form 1 General Science classes.</p>
-            </div>
+        <!-- Top-Left Element Summary Badge -->
+        <div class="absolute top-4 left-4 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-700 flex items-center gap-2 backdrop-blur-sm z-10">
+          <span id="badge-symbol" class="text-4xl font-black text-cyan-400">C</span>
+          <div class="flex flex-col leading-tight">
+            <span id="badge-name" class="text-sm font-bold text-slate-300">Carbon</span>
+            <span id="badge-z" class="text-xs text-slate-500">Atomic Number: 6</span>
           </div>
-          <div className="text-xs text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700 max-w-xs self-start md:self-auto">
-            💡 <strong>Syllabus Tip:</strong> This covers elements 1 to 20. Beyond calcium, the electron shell configuration becomes more complex!
+        </div>
+
+        <!-- Classification Badge on Model -->
+        <div class="absolute top-4 right-4 z-10">
+          <span id="classification-badge" class="px-3 py-1 text-xs font-semibold rounded-full border bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+            Non-metal
+          </span>
+        </div>
+
+        <!-- SVG Atom Model -->
+        <div class="relative w-full max-w-[420px] aspect-square flex items-center justify-center mt-8 lg:mt-0">
+          <svg viewBox="0 0 400 400" class="w-full h-full overflow-visible">
+            <defs>
+              <radialGradient id="nucleusGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ef4444" stop-opacity="1" />
+                <stop offset="100%" stop-color="#991b1b" stop-opacity="1" />
+              </radialGradient>
+              <filter id="electronGlow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Orbit Shells and Electrons will be injected here dynamically -->
+            <g id="orbits-container"></g>
+
+            <!-- Nucleus (Drawn on top of orbits) -->
+            <circle cx="200" cy="200" r="26" fill="url(#nucleusGlow)" class="shadow-2xl" />
+            <text id="nucleus-text" x="200" y="205" text-anchor="middle" fill="white" font-size="13" font-weight="bold" class="select-none pointer-events-none">
+              6p⁺
+            </text>
+          </svg>
+        </div>
+        
+        <!-- Visual Guide Legend -->
+        <div class="flex gap-4 text-xs text-slate-400 mt-4 bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/50">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 bg-red-500 rounded-full inline-block border border-red-400"></span>
+            <span>Protons (Nucleus)</span>
           </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left Column: Atom Visualizer */}
-          <div className="lg:col-span-7 bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
-            
-            {/* Top-Left Element Summary Badge */}
-            <div className="absolute top-4 left-4 bg-slate-900/80 px-4 py-2 rounded-lg border border-slate-700 flex items-center gap-2 backdrop-blur-sm z-10">
-              <span className="text-4xl font-black text-cyan-400">{currentElement.symbol}</span>
-              <div className="flex flex-col leading-tight">
-                <span className="text-sm font-bold text-slate-300">{currentElement.name}</span>
-                <span className="text-xs text-slate-500">Atomic Number: {currentElement.z}</span>
-              </div>
-            </div>
-
-            {/* Classification Badge on Model */}
-            <div className="absolute top-4 right-4 z-10">
-              <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getClassificationColor(currentElement.classification)}`}>
-                {currentElement.classification}
-              </span>
-            </div>
-
-            {/* SVG Atom Model */}
-            <div className="relative w-full max-w-[420px] aspect-square flex items-center justify-center mt-8 lg:mt-0">
-              <svg viewBox="0 0 400 400" className="w-full h-full overflow-visible">
-                <defs>
-                  <radialGradient id="nucleusGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#ef4444" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#991b1b" stopOpacity="1" />
-                  </radialGradient>
-                  <filter id="electronGlow">
-                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-
-                {/* Nucleus */}
-                <circle cx="200" cy="200" r="26" fill="url(#nucleusGlow)" className="shadow-2xl" />
-                <text x="200" y="205" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" className="select-none pointer-events-none">
-                  {protons}p⁺
-                </text>
-
-                {/* Shells and Electrons */}
-                {arrangement.map((numElectrons, shellIndex) => {
-                  const radius = 60 + (shellIndex * 42); // Distance between shells
-                  const speed = 12 + (shellIndex * 8);   // Speed differences
-                  const direction = shellIndex % 2 === 0 ? 1 : -1; // Rotating directions
-                  
-                  return (
-                    <g key={`shell-${shellIndex}`}>
-                      {/* Orbit Track */}
-                      <circle 
-                        cx="200" cy="200" r={radius} 
-                        fill="none" stroke="#334155" strokeWidth="2" strokeDasharray="4 4"
-                      />
-                      
-                      {/* Spinning Electron Group */}
-                      <g style={{
-                        transformOrigin: '200px 200px',
-                        animation: `spin ${speed}s linear infinite ${direction === 1 ? 'normal' : 'reverse'}`
-                      }}>
-                        {Array.from({ length: numElectrons }).map((_, eIndex) => {
-                          const angle = (eIndex / numElectrons) * (2 * Math.PI);
-                          const cx = 200 + radius * Math.cos(angle);
-                          const cy = 200 + radius * Math.sin(angle);
-                          
-                          // Highlight valence electrons in different color (Cyan) vs Inner (White/Grey)
-                          const isValence = shellIndex === arrangement.length - 1;
-                          
-                          return (
-                            <circle 
-                              key={`e-${shellIndex}-${eIndex}`}
-                              cx={cx} cy={cy} r="6.5" 
-                              fill={isValence ? "#22d3ee" : "#94a3b8"} 
-                              filter="url(#electronGlow)"
-                            />
-                          );
-                        })}
-                      </g>
-                    </g>
-                  );
-                })}
-              </svg>
-            </div>
-            
-            {/* Visual Guide Legend */}
-            <div className="flex gap-4 text-xs text-slate-400 mt-4 bg-slate-900/40 p-2.5 rounded-lg border border-slate-700/50">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 bg-red-500 rounded-full inline-block border border-red-400"></span>
-                <span>Protons (Nucleus)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 bg-cyan-400 rounded-full inline-block"></span>
-                <span>Valence Electron (Outermost)</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 bg-slate-400 rounded-full inline-block"></span>
-                <span>Inner Shell Electron</span>
-              </div>
-            </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 bg-cyan-400 rounded-full inline-block"></span>
+            <span>Valence Electron (Outermost)</span>
           </div>
-
-          {/* Right Column: Controls and Info */}
-          <div className="lg:col-span-5 space-y-6">
-            
-            {/* Controls */}
-            <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-amber-400" />
-                Change Atom (1 - 20)
-              </h2>
-              
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-700">
-                  <span className="text-slate-300 font-medium">Protons (p⁺)</span>
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={decrement}
-                      disabled={protons <= 1}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      title="Decrease Protons"
-                    >
-                      <Minus className="w-5 h-5" />
-                    </button>
-                    
-                    <input 
-                      type="number" 
-                      value={inputValue}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      min="1" max="20"
-                      className="w-16 h-10 bg-slate-950 text-center text-xl font-bold text-cyan-400 rounded-lg border border-slate-700 focus:outline-none focus:border-cyan-500"
-                    />
-                    
-                    <button 
-                      onClick={increment}
-                      disabled={protons >= 20}
-                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      title="Increase Protons"
-                    >
-                      <Plus className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-slate-900 rounded-xl border border-slate-700 flex flex-col">
-                    <span className="text-xs text-slate-400">Total Electrons (e⁻)</span>
-                    <span className="text-xl font-bold text-cyan-400">{protons}</span>
-                  </div>
-                  <div className="p-3 bg-slate-900 rounded-xl border border-slate-700 flex flex-col">
-                    <span className="text-xs text-slate-400">Neutral State</span>
-                    <span className="text-sm font-semibold text-slate-300 mt-1">Protons = Electrons</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* NEW Element Properties (Classification & Thermal States) */}
-            <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-teal-400" />
-                Physical Properties
-              </h2>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700 flex flex-col justify-center items-center text-center">
-                  <div className="bg-slate-800 p-2 rounded-full mb-2">
-                    <Thermometer className="w-5 h-5 text-red-400" />
-                  </div>
-                  <span className="text-xs text-slate-400">Melting Point</span>
-                  <span className="text-lg font-bold text-white mt-1">
-                    {currentElement.mp} °C
-                  </span>
-                </div>
-
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700 flex flex-col justify-center items-center text-center">
-                  <div className="bg-slate-800 p-2 rounded-full mb-2">
-                    <Flame className="w-5 h-5 text-amber-500" />
-                  </div>
-                  <span className="text-xs text-slate-400">Boiling Point</span>
-                  <span className="text-lg font-bold text-white mt-1">
-                    {currentElement.bp} °C
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 p-3 bg-slate-900/50 rounded-xl border border-slate-700 flex justify-between items-center text-sm">
-                <span className="text-slate-400">Room Temp State (25°C):</span>
-                <span className="font-bold text-teal-300">{currentElement.state}</span>
-              </div>
-            </div>
-
-            {/* Characteristics and Uses */}
-            <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
-              <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-yellow-400" />
-                Key Facts & Uses
-              </h2>
-              <div className="space-y-3.5">
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                  <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Characteristic</h3>
-                  <p className="text-sm text-slate-200 leading-relaxed">{currentElement.characteristics}</p>
-                </div>
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                  <h3 className="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Common Uses</h3>
-                  <p className="text-sm text-slate-200 leading-relaxed">{currentElement.uses}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Group & Period Mapping (Original Educational Info) */}
-            <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5 text-cyan-400" />
-                Bohr Rules & Layout Mapping
-              </h2>
-
-              <div className="space-y-4">
-                
-                {/* Electron Arrangement */}
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
-                  <p className="text-sm text-slate-400 mb-1">Electron Arrangement (Bohr Configuration)</p>
-                  <p className="text-xl font-bold tracking-widest text-white">
-                    {arrangement.join('.')}
-                  </p>
-                </div>
-
-                {/* Period Mapping */}
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700 border-l-4 border-l-purple-500">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-300 font-medium">Period {currentElement.period}</span>
-                    <span className="bg-purple-500/20 text-purple-400 text-xs px-2 py-1 rounded font-bold">{numShells} Shell{numShells > 1 ? 's' : ''}</span>
-                  </div>
-                  <p className="text-sm text-slate-400 mt-2">
-                    Because this atom has <strong>{numShells}</strong> occupied electron shell{numShells > 1 ? 's' : ''}, it is located in <strong>Period {currentElement.period}</strong>.
-                  </p>
-                </div>
-
-                {/* Group Mapping */}
-                <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-700 border-l-4 border-l-cyan-500">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-slate-300 font-medium">Group {currentElement.group}</span>
-                    <span className="bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded font-bold">{valenceElectrons} Valence e⁻</span>
-                  </div>
-                  <p className="text-sm text-slate-400 mt-2">
-                    {protons === 2 ? (
-                      <span>Helium is a special case! It has a full outer shell of 2 electrons, making it very stable, so it's placed with the Noble Gases in <strong>Group 18</strong>.</span>
-                    ) : (
-                      <span>Because its outermost shell (valence shell) has <strong>{valenceElectrons}</strong> electron{valenceElectrons > 1 ? 's' : ''}, it belongs to <strong>Group {currentElement.group}</strong>.</span>
-                    )}
-                  </p>
-                </div>
-
-              </div>
-            </div>
-
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 bg-slate-400 rounded-full inline-block"></span>
+            <span>Inner Shell Electron</span>
           </div>
         </div>
       </div>
 
-      {/* Global CSS for Animations */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}} />
+      <!-- Right Column: Controls and Info -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Controls -->
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <!-- AlertCircle Icon -->
+            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Change Atom (1 - 20)
+          </h2>
+          
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center justify-between p-4 bg-slate-900 rounded-xl border border-slate-700">
+              <span class="text-slate-300 font-medium">Protons (p⁺)</span>
+              <div class="flex items-center gap-3">
+                <button 
+                  id="btn-decrement"
+                  class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Decrease Protons"
+                >
+                  <!-- Minus Icon -->
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+                
+                <input 
+                  id="proton-input"
+                  type="number" 
+                  value="6"
+                  min="1" max="20"
+                  class="w-16 h-10 bg-slate-950 text-center text-xl font-bold text-cyan-400 rounded-lg border border-slate-700 focus:outline-none focus:border-cyan-500"
+                />
+                
+                <button 
+                  id="btn-increment"
+                  class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title="Increase Protons"
+                >
+                  <!-- Plus Icon -->
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 flex flex-col">
+                <span class="text-xs text-slate-400">Total Electrons (e⁻)</span>
+                <span id="total-electrons" class="text-xl font-bold text-cyan-400">6</span>
+              </div>
+              <div class="p-3 bg-slate-900 rounded-xl border border-slate-700 flex flex-col">
+                <span class="text-xs text-slate-400">Neutral State</span>
+                <span class="text-sm font-semibold text-slate-300 mt-1">Protons = Electrons</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Element Properties (Classification & Thermal States) -->
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <!-- HelpCircle Icon -->
+            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            Physical Properties
+          </h2>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700 flex flex-col justify-center items-center text-center">
+              <div class="bg-slate-800 p-2 rounded-full mb-2">
+                <!-- Thermometer Icon -->
+                <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                </svg>
+              </div>
+              <span class="text-xs text-slate-400">Melting Point</span>
+              <span id="melting-point" class="text-lg font-bold text-white mt-1">3550 °C</span>
+            </div>
+
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700 flex flex-col justify-center items-center text-center">
+              <div class="bg-slate-800 p-2 rounded-full mb-2">
+                <!-- Flame Icon -->
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+                </svg>
+              </div>
+              <span class="text-xs text-slate-400">Boiling Point</span>
+              <span id="boiling-point" class="text-lg font-bold text-white mt-1">4827 °C</span>
+            </div>
+          </div>
+
+          <div class="mt-4 p-3 bg-slate-900/50 rounded-xl border border-slate-700 flex justify-between items-center text-sm">
+            <span class="text-slate-400">Room Temp State (25°C):</span>
+            <span id="room-state" class="font-bold text-teal-300 font-semibold">Solid</span>
+          </div>
+        </div>
+
+        <!-- Characteristics and Uses -->
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
+          <h2 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <!-- Sparkles Icon -->
+            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707M12 5a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z"></path>
+            </svg>
+            Key Facts & Uses
+          </h2>
+          <div class="space-y-3.5">
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+              <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Characteristic</h3>
+              <p id="characteristic-desc" class="text-sm text-slate-200 leading-relaxed"></p>
+            </div>
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+              <h3 class="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-1">Common Uses</h3>
+              <p id="common-uses-desc" class="text-sm text-slate-200 leading-relaxed"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group & Period Mapping -->
+        <div class="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <!-- Info Icon -->
+            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Bohr Rules & Layout Mapping
+          </h2>
+
+          <div class="space-y-4">
+            
+            <!-- Electron Arrangement -->
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+              <p class="text-sm text-slate-400 mb-1">Electron Arrangement (Bohr Configuration)</p>
+              <p id="electron-config-text" class="text-xl font-bold tracking-widest text-white">2.4</p>
+            </div>
+
+            <!-- Period Mapping -->
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700 border-l-4 border-l-purple-500">
+              <div class="flex justify-between items-center mb-1">
+                <span id="period-badge-title" class="text-slate-300 font-medium">Period 2</span>
+                <span id="period-shells-badge" class="bg-purple-500/20 text-purple-400 text-xs px-2 py-1 rounded font-bold">2 Shells</span>
+              </div>
+              <p id="period-desc-text" class="text-sm text-slate-400 mt-2">
+                Because this atom has <strong>2</strong> occupied electron shells, it is located in <strong>Period 2</strong>.
+              </p>
+            </div>
+
+            <!-- Group Mapping -->
+            <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-700 border-l-4 border-l-cyan-500">
+              <div class="flex justify-between items-center mb-1">
+                <span id="group-badge-title" class="text-slate-300 font-medium">Group 14</span>
+                <span id="group-valence-badge" class="bg-cyan-500/20 text-cyan-400 text-xs px-2 py-1 rounded font-bold">4 Valence e⁻</span>
+              </div>
+              <p id="group-desc-text" class="text-sm text-slate-400 mt-2">
+                Because its outermost shell (valence shell) has <strong>4</strong> electrons, it belongs to <strong>Group 14</strong>.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
     </div>
-  );
-}
+  </div>
+
+  <script>
+    // Elements data array
+    const ELEMENTS = [
+      { 
+        z: 1, symbol: 'H', name: 'Hydrogen', group: '1', period: '1', 
+        classification: 'Non-metal', state: 'Gas', mp: -259.16, bp: -252.87,
+        characteristics: 'The lightest element in the universe. Colorless, odorless, and highly flammable.',
+        uses: 'Used as rocket fuel and to make water (when combined with oxygen).'
+      },
+      { 
+        z: 2, symbol: 'He', name: 'Helium', group: '18', period: '1', 
+        classification: 'Non-metal', state: 'Gas', mp: -272.2, bp: -268.93,
+        characteristics: 'An inert (totally unreactive) noble gas. Much lighter than air, does not burn.',
+        uses: 'Used in party balloons and weather balloons.'
+      },
+      { 
+        z: 3, symbol: 'Li', name: 'Lithium', group: '1', period: '2', 
+        classification: 'Metal', state: 'Solid', mp: 180.5, bp: 1342,
+        characteristics: 'An extremely soft, silvery-white alkali metal. So light that it floats on water.',
+        uses: 'Used in rechargeable batteries for smartphones, laptops, and electric vehicles.'
+      },
+      { 
+        z: 4, symbol: 'Be', name: 'Beryllium', group: '2', period: '2', 
+        classification: 'Metal', state: 'Solid', mp: 1287, bp: 2470,
+        characteristics: 'A strong, lightweight, steel-grey alkaline earth metal with a very high melting point.',
+        uses: 'Used in spacecraft parts, military missiles, and X-ray tube windows.'
+      },
+      { 
+        z: 5, symbol: 'B', name: 'Boron', group: '13', period: '2', 
+        classification: 'Semi-metal', state: 'Solid', mp: 2076, bp: 3927,
+        characteristics: 'A tough metalloid that is very hard and highly heat-resistant.',
+        uses: 'Used to make heat-proof borosilicate glass (like Pyrex chemistry beakers).'
+      },
+      { 
+        z: 6, symbol: 'C', name: 'Carbon', group: '14', period: '2', 
+        classification: 'Non-metal', state: 'Solid', mp: 3550, bp: 4827,
+        characteristics: 'Can exist as soft black graphite (conducts electricity!) or super-hard diamond.',
+        uses: 'Graphite is used as pencil lead; diamond is used for jewelry and cutting tools.'
+      },
+      { 
+        z: 7, symbol: 'N', name: 'Nitrogen', group: '15', period: '2', 
+        classification: 'Non-metal', state: 'Gas', mp: -210, bp: -195.79,
+        characteristics: 'A colorless, odorless gas. It makes up about 78% of the Earth\'s atmosphere.',
+        uses: 'Liquid nitrogen is used as a super-cold coolant; also used to make plant fertilizers.'
+      },
+      { 
+        z: 8, symbol: 'O', name: 'Oxygen', group: '16', period: '2', 
+        classification: 'Non-metal', state: 'Gas', mp: -218.79, bp: -182.96,
+        characteristics: 'Essential for the respiration of almost all living organisms. Supports burning (combustion).',
+        uses: 'Used in medical oxygen tanks and combined with hydrogen as rocket propellant.'
+      },
+      { 
+        z: 9, symbol: 'F', name: 'Fluorine', group: '17', period: '2', 
+        classification: 'Non-metal', state: 'Gas', mp: -219.67, bp: -188.11,
+        characteristics: 'A pale-yellow, highly toxic halogen gas. It is the most reactive of all chemical elements.',
+        uses: 'Fluoride compounds are added to toothpaste to prevent tooth decay.'
+      },
+      { 
+        z: 10, symbol: 'Ne', name: 'Neon', group: '18', period: '2', 
+        classification: 'Non-metal', state: 'Gas', mp: -248.59, bp: -246.08,
+        characteristics: 'A colorless, inactive noble gas. Glows with a bright orange-red light when electrified.',
+        uses: 'Used widely in neon advertising signs and high-voltage indicators.'
+      },
+      { 
+        z: 11, symbol: 'Na', name: 'Sodium', group: '1', period: '3', 
+        classification: 'Metal', state: 'Solid', mp: 97.79, bp: 883,
+        characteristics: 'A highly reactive, soft alkali metal. It reacts violently with water and must be stored in oil.',
+        uses: 'Combined with chlorine to make common table salt (Sodium Chloride).'
+      },
+      { 
+        z: 12, symbol: 'Mg', name: 'Magnesium', group: '2', period: '3', 
+        classification: 'Metal', state: 'Solid', mp: 650, bp: 1090,
+        characteristics: 'A silvery-white, lightweight metal. It burns in air with an intense, blinding white light.',
+        uses: 'Used in fireworks, flares, and lightweight alloy rims for sports cars.'
+      },
+      { 
+        z: 13, symbol: 'Al', name: 'Aluminum', group: '13', period: '3', 
+        classification: 'Metal', state: 'Solid', mp: 660.32, bp: 2519,
+        characteristics: 'A lightweight, silvery metal that does not rust easily and conducts heat very well.',
+        uses: 'Used to make soda cans, kitchen foil, and airplane bodies.'
+      },
+      { 
+        z: 14, symbol: 'Si', name: 'Silicon', group: '14', period: '3', 
+        classification: 'Semi-metal', state: 'Solid', mp: 1414, bp: 3265,
+        characteristics: 'A shiny metalloid that is a semiconductor (conducts electricity under certain conditions).',
+        uses: 'The main component of computer microchips, solar panels, and glass.'
+      },
+      { 
+        z: 15, symbol: 'P', name: 'Phosphorus', group: '15', period: '3', 
+        classification: 'Non-metal', state: 'Solid', mp: 44.15, bp: 280.5,
+        characteristics: 'Exists as reactive red phosphorus or highly dangerous, glowing white phosphorus.',
+        uses: 'Red phosphorus is used on the friction strips of safety matchboxes.'
+      },
+      { 
+        z: 16, symbol: 'S', name: 'Sulfur', group: '16', period: '3', 
+        classification: 'Non-metal', state: 'Solid', mp: 115.21, bp: 444.6,
+        characteristics: 'A bright yellow, brittle solid. It produces a pungent, choking smell when burned.',
+        uses: 'Used in gunpowder, vulcanizing rubber (making tires tough), and matches.'
+      },
+      { 
+        z: 17, symbol: 'Cl', name: 'Chlorine', group: '17', period: '3', 
+        classification: 'Non-metal', state: 'Gas', mp: -101.5, bp: -34.04,
+        characteristics: 'A greenish-yellow, heavy, toxic halogen gas with a strong, irritating smell.',
+        uses: 'Used to disinfect water in swimming pools and in household bleach.'
+      },
+      { 
+        z: 18, symbol: 'Ar', name: 'Argon', group: '18', period: '3', 
+        classification: 'Non-metal', state: 'Gas', mp: -189.34, bp: -185.85,
+        characteristics: 'An inert, colorless noble gas. It protects hot metal filaments from burning up.',
+        uses: 'Filled inside double-glazed windows and old incandescent light bulbs.'
+      },
+      { 
+        z: 19, symbol: 'K', name: 'Potassium', group: '1', period: '4', 
+        classification: 'Metal', state: 'Solid', mp: 63.5, bp: 759,
+        characteristics: 'A super-soft, silvery alkali metal. It reacts instantly and explosively with water.',
+        uses: 'An essential nutrient found in bananas; widely used in agricultural fertilizers.'
+      },
+      { 
+        z: 20, symbol: 'Ca', name: 'Calcium', group: '2', period: '4', 
+        classification: 'Metal', state: 'Solid', mp: 842, bp: 1484,
+        characteristics: 'A moderately reactive alkaline earth metal. Dull grey, but silvery when freshly cut.',
+        uses: 'Crucial for healthy bones and teeth; used to make cement and concrete.'
+      }
+    ];
+
+    // State Variables
+    let protons = 6;
+
+    // DOM Element selections
+    const badgeSymbol = document.getElementById('badge-symbol');
+    const badgeName = document.getElementById('badge-name');
+    const badgeZ = document.getElementById('badge-z');
+    const classificationBadge = document.getElementById('classification-badge');
+    const nucleusText = document.getElementById('nucleus-text');
+    const orbitsContainer = document.getElementById('orbits-container');
+    const btnDecrement = document.getElementById('btn-decrement');
+    const btnIncrement = document.getElementById('btn-increment');
+    const protonInput = document.getElementById('proton-input');
+    const totalElectrons = document.getElementById('total-electrons');
+    const meltingPoint = document.getElementById('melting-point');
+    const boilingPoint = document.getElementById('boiling-point');
+    const roomState = document.getElementById('room-state');
+    const characteristicDesc = document.getElementById('characteristic-desc');
+    const commonUsesDesc = document.getElementById('common-uses-desc');
+    const electronConfigText = document.getElementById('electron-config-text');
+    const periodBadgeTitle = document.getElementById('period-badge-title');
+    const periodShellsBadge = document.getElementById('period-shells-badge');
+    const periodDescText = document.getElementById('period-desc-text');
+    const groupBadgeTitle = document.getElementById('group-badge-title');
+    const groupValenceBadge = document.getElementById('group-valence-badge');
+    const groupDescText = document.getElementById('group-desc-text');
+
+    // Calculate electron arrangement based on 2.8.8.2 rule
+    function getElectronArrangement(num) {
+      let e = num;
+      const shells = [];
+      if (e > 0) {
+        let s1 = Math.min(e, 2);
+        shells.push(s1);
+        e -= s1;
+      }
+      if (e > 0) {
+        let s2 = Math.min(e, 8);
+        shells.push(s2);
+        e -= s2;
+      }
+      if (e > 0) {
+        let s3 = Math.min(e, 8);
+        shells.push(s3);
+        e -= s3;
+      }
+      if (e > 0) {
+        let s4 = Math.min(e, 2);
+        shells.push(s4);
+        e -= s4;
+      }
+      return shells;
+    }
+
+    // Helper colors for classifications
+    function getClassificationClass(classification) {
+      switch (classification) {
+        case 'Metal':
+          return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        case 'Semi-metal':
+          return 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        case 'Non-metal':
+        default:
+          return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+      }
+    }
+
+    // Render function to update the DOM
+    function render() {
+      const currentElement = ELEMENTS[protons - 1] || ELEMENTS[0];
+      const arrangement = getElectronArrangement(protons);
+      const valenceElectrons = arrangement[arrangement.length - 1] || 0;
+      const numShells = arrangement.length;
+
+      // Update Badges & Texts
+      badgeSymbol.textContent = currentElement.symbol;
+      badgeName.textContent = currentElement.name;
+      badgeZ.textContent = `Atomic Number: ${currentElement.z}`;
+      nucleusText.textContent = `${protons}p⁺`;
+      totalElectrons.textContent = protons;
+      protonInput.value = protons;
+
+      // Update classification badge with proper styles
+      classificationBadge.textContent = currentElement.classification;
+      classificationBadge.className = `px-3 py-1 text-xs font-semibold rounded-full border ${getClassificationClass(currentElement.classification)}`;
+
+      // Update physical properties & info
+      meltingPoint.textContent = `${currentElement.mp} °C`;
+      boilingPoint.textContent = `${currentElement.bp} °C`;
+      roomState.textContent = currentElement.state;
+      characteristicDesc.textContent = currentElement.characteristics;
+      commonUsesDesc.textContent = currentElement.uses;
+
+      // Update Educational Rules Panel
+      electronConfigText.textContent = arrangement.join('.');
+      
+      periodBadgeTitle.textContent = `Period ${currentElement.period}`;
+      periodShellsBadge.textContent = `${numShells} Shell${numShells > 1 ? 's' : ''}`;
+      periodDescText.innerHTML = `Because this atom has <strong>${numShells}</strong> occupied electron shell${numShells > 1 ? 's' : ''}, it is located in <strong>Period ${currentElement.period}</strong>.`;
+
+      groupBadgeTitle.textContent = `Group ${currentElement.group}`;
+      groupValenceBadge.textContent = `${valenceElectrons} Valence e⁻`;
+      
+      if (protons === 2) {
+        groupDescText.innerHTML = `Helium is a special case! It has a full outer shell of 2 electrons, making it very stable, so it's placed with the Noble Gases in <strong>Group 18</strong>.`;
+      } else {
+        groupDescText.innerHTML = `Because its outermost shell (valence shell) has <strong>${valenceElectrons}</strong> electron${valenceElectrons > 1 ? 's' : ''}, it belongs to <strong>Group ${currentElement.group}</strong>.`;
+      }
+
+      // Handle button disabled states
+      btnDecrement.disabled = protons <= 1;
+      btnIncrement.disabled = protons >= 20;
+
+      // Render Orbits & Spinning Electrons in SVG
+      let orbitsMarkup = '';
+      arrangement.forEach((numElectrons, shellIndex) => {
+        const radius = 60 + (shellIndex * 42);
+        const speed = 12 + (shellIndex * 8);
+        const isClockwise = shellIndex % 2 === 0;
+        const animationClass = isClockwise ? 'animate-spin-cw' : 'animate-spin-ccw';
+
+        // Orbit circle
+        orbitsMarkup += `<circle cx="200" cy="200" r="${radius}" fill="none" stroke="#334155" stroke-width="2" stroke-dasharray="4 4" />`;
+
+        // Electrons group
+        orbitsMarkup += `<g class="${animationClass}" style="--speed: ${speed}s">`;
+        
+        for (let eIndex = 0; eIndex < numElectrons; eIndex++) {
+          const angle = (eIndex / numElectrons) * (2 * Math.PI);
+          const cx = 200 + radius * Math.cos(angle);
+          const cy = 200 + radius * Math.sin(angle);
+          const isValence = shellIndex === arrangement.length - 1;
+          const electronColor = isValence ? '#22d3ee' : '#94a3b8';
+
+          orbitsMarkup += `<circle cx="${cx}" cy="${cy}" r="6.5" fill="${electronColor}" filter="url(#electronGlow)" />`;
+        }
+        orbitsMarkup += `</g>`;
+      });
+
+      orbitsContainer.innerHTML = orbitsMarkup;
+    }
+
+    // Event Listeners
+    btnDecrement.addEventListener('click', () => {
+      if (protons > 1) {
+        protons--;
+        render();
+      }
+    });
+
+    btnIncrement.addEventListener('click', () => {
+      if (protons < 20) {
+        protons++;
+        render();
+      }
+    });
+
+    protonInput.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (!isNaN(val) && val >= 1 && val <= 20) {
+        protons = val;
+        render();
+      }
+    });
+
+    protonInput.addEventListener('blur', (e) => {
+      let val = parseInt(e.target.value, 10);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 20) val = 20;
+      protons = val;
+      render();
+    });
+
+    // Initial Render
+    render();
+  </script>
+</body>
+</html>
