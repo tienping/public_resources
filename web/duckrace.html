@@ -246,11 +246,13 @@ Isi 4 & Kesimpulan</textarea>
         let globalVolume = 0.2;     // Default to 20%
         let preMuteVolume = 0.2;    // Keeps track of previous level before muting
         
+        let lastAudioPlayTime = 0;  // Guard to space out simultaneous hardware mix requests
+        
         // WEB AUDIO SYSTEM VARIABLES (Optimized for robust 70+ racer continuity)
-        let audioCtx = null;
+        let audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // Create immediately (starts suspended)
         let quackBuffer = null;
         let snailBuffer = null;
-        let arrayBuffers = { duck: null, snail: null };
+        let preloadPromises = { duck: null, snail: null };
         let activeQuacks = 0; // Tracks currently playing quack sounds
 
         let clickTimes = [];
@@ -342,17 +344,21 @@ Isi 4 & Kesimpulan</textarea>
         const qacAudioUrl = 'https://tienping.github.io/public_resources/audio/quak.mp3';
         const snlAudioUrl = 'https://tienping.github.io/public_resources/audio/snail.mp3';
 
-        // Async prefetch binary sound assets immediately so they are cached in memory
-        async function prefetchSounds() {
-            try {
-                const resQuack = await fetch(qacAudioUrl);
-                arrayBuffers.duck = await resQuack.arrayBuffer();
-                
-                const resSnail = await fetch(snlAudioUrl);
-                arrayBuffers.snail = await resSnail.arrayBuffer();
-            } catch (e) {
-                console.warn("Failed to prefetch sounds during initial load. Loading on play fallback enabled.", e);
-            }
+        // PRE-LOAD & DECODE SOUNDS IMMEDIATELY ON PAGE LOAD
+        function prefetchSounds() {
+            if (!audioCtx) return; // Guard for unsupported browsers
+            
+            preloadPromises.duck = fetch(qacAudioUrl)
+                .then(res => res.arrayBuffer())
+                .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+                .then(decoded => { quackBuffer = decoded; return decoded; })
+                .catch(e => console.warn("Failed to preload duck sound.", e));
+
+            preloadPromises.snail = fetch(snlAudioUrl)
+                .then(res => res.arrayBuffer())
+                .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+                .then(decoded => { snailBuffer = decoded; return decoded; })
+                .catch(e => console.warn("Failed to preload snail sound.", e));
         }
         prefetchSounds();
 
@@ -360,49 +366,23 @@ Isi 4 & Kesimpulan</textarea>
         async function initAudioContext() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                prefetchSounds(); // Try again if it failed earlier
             }
             if (audioCtx.state === 'suspended') {
                 await audioCtx.resume();
             }
-            // Trigger pre-decoding of cached assets
-            await getDecodedBuffer('duck');
-            await getDecodedBuffer('snail');
+            // Ensure sounds are fully decoded before we proceed
+            if (!quackBuffer && preloadPromises.duck) await preloadPromises.duck;
+            if (!snailBuffer && preloadPromises.snail) await preloadPromises.snail;
         }
 
-        // Decodes binary arrays dynamically when the context unlocks
+        // Return the ready buffer
         async function getDecodedBuffer(type) {
-            if (!audioCtx) return null;
             if (type === 'duck') {
-                if (quackBuffer) return quackBuffer;
-                if (arrayBuffers.duck) {
-                    try {
-                        const copy = arrayBuffers.duck.slice(0); // Slice avoids consuming the main array
-                        quackBuffer = await audioCtx.decodeAudioData(copy);
-                        return quackBuffer;
-                    } catch (e) {
-                        console.error("Decoding quack error: ", e);
-                    }
-                }
-                // Fallback fetch
-                const res = await fetch(qacAudioUrl);
-                const arrayBuf = await res.arrayBuffer();
-                quackBuffer = await audioCtx.decodeAudioData(arrayBuf);
+                if (!quackBuffer && preloadPromises.duck) await preloadPromises.duck;
                 return quackBuffer;
             } else {
-                if (snailBuffer) return snailBuffer;
-                if (arrayBuffers.snail) {
-                    try {
-                        const copy = arrayBuffers.snail.slice(0);
-                        snailBuffer = await audioCtx.decodeAudioData(copy);
-                        return snailBuffer;
-                    } catch (e) {
-                        console.error("Decoding snail error: ", e);
-                    }
-                }
-                // Fallback fetch
-                const res = await fetch(snlAudioUrl);
-                const arrayBuf = await res.arrayBuffer();
-                snailBuffer = await audioCtx.decodeAudioData(arrayBuf);
+                if (!snailBuffer && preloadPromises.snail) await preloadPromises.snail;
                 return snailBuffer;
             }
         }
@@ -877,6 +857,16 @@ Isi 4 & Kesimpulan</textarea>
                 else c.clearRect(0, 0, canvas.width, canvas.height);
             }
             drawConfetti();
+        }
+
+        // Auto-mute default for mobile devices to prevent sudden loud sounds
+        // Removed innerWidth check so desktop previews don't accidentally auto-mute
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobileDevice) {
+            isMuted = true;
+            globalVolume = 0;
+            document.getElementById('volumeSlider').value = 0;
+            document.getElementById('volumeIcon').textContent = '🔇';
         }
 
         updateCounts();
