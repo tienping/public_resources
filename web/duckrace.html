@@ -93,6 +93,12 @@
         </div>
     </div>
 
+    <!-- Floating QRGEN QR Code (Bottom Right) -->
+    <div class="fixed bottom-6 right-6 z-[100] hidden md:flex flex-col items-center bg-white/95 backdrop-blur-sm p-3 rounded-2xl shadow-lg border border-slate-200 w-32 transition-all duration-300 hover:scale-[2] origin-bottom-right hover:border-sky-200 cursor-pointer">
+        <img src="https://tienping.github.io/public_resources/images/qrgen-qr.png" alt="QRGEN App" class="w-28 h-28 rounded-lg" onerror="this.style.display='none'">
+        <span class="text-[10px] font-black text-slate-500 mt-2 text-center tracking-wider uppercase">QRGen App</span>
+    </div>
+
     <div class="max-w-3xl mx-auto w-full flex-grow">
         <!-- Header -->
         <header class="text-center mb-10">
@@ -240,6 +246,13 @@ Isi 4 & Kesimpulan</textarea>
         let globalVolume = 0.2;     // Default to 20%
         let preMuteVolume = 0.2;    // Keeps track of previous level before muting
         
+        // WEB AUDIO SYSTEM VARIABLES (Optimized for robust 70+ racer continuity)
+        let audioCtx = null;
+        let quackBuffer = null;
+        let snailBuffer = null;
+        let arrayBuffers = { duck: null, snail: null };
+        let activeQuacks = 0; // Tracks currently playing quack sounds
+
         let clickTimes = [];
         function handleCopyrightClick() {
             const now = Date.now();
@@ -329,15 +342,70 @@ Isi 4 & Kesimpulan</textarea>
         const qacAudioUrl = 'https://tienping.github.io/public_resources/audio/quak.mp3';
         const snlAudioUrl = 'https://tienping.github.io/public_resources/audio/snail.mp3';
 
-        // THE FIX: A large pre-allocated pool allows overlapping chaos without creating new memory!
-        const QUACK_POOL_SIZE = 15;
-        const SNAIL_POOL_SIZE = 5;
-        
-        const quackPool = Array.from({ length: QUACK_POOL_SIZE }, () => new Audio(qacAudioUrl));
-        const snailPool = Array.from({ length: SNAIL_POOL_SIZE }, () => new Audio(snlAudioUrl));
-        
-        let quackIdx = 0;
-        let snailIdx = 0;
+        // Async prefetch binary sound assets immediately so they are cached in memory
+        async function prefetchSounds() {
+            try {
+                const resQuack = await fetch(qacAudioUrl);
+                arrayBuffers.duck = await resQuack.arrayBuffer();
+                
+                const resSnail = await fetch(snlAudioUrl);
+                arrayBuffers.snail = await resSnail.arrayBuffer();
+            } catch (e) {
+                console.warn("Failed to prefetch sounds during initial load. Loading on play fallback enabled.", e);
+            }
+        }
+        prefetchSounds();
+
+        // Initialize AudioContext under user gestures
+        async function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+            // Trigger pre-decoding of cached assets
+            await getDecodedBuffer('duck');
+            await getDecodedBuffer('snail');
+        }
+
+        // Decodes binary arrays dynamically when the context unlocks
+        async function getDecodedBuffer(type) {
+            if (!audioCtx) return null;
+            if (type === 'duck') {
+                if (quackBuffer) return quackBuffer;
+                if (arrayBuffers.duck) {
+                    try {
+                        const copy = arrayBuffers.duck.slice(0); // Slice avoids consuming the main array
+                        quackBuffer = await audioCtx.decodeAudioData(copy);
+                        return quackBuffer;
+                    } catch (e) {
+                        console.error("Decoding quack error: ", e);
+                    }
+                }
+                // Fallback fetch
+                const res = await fetch(qacAudioUrl);
+                const arrayBuf = await res.arrayBuffer();
+                quackBuffer = await audioCtx.decodeAudioData(arrayBuf);
+                return quackBuffer;
+            } else {
+                if (snailBuffer) return snailBuffer;
+                if (arrayBuffers.snail) {
+                    try {
+                        const copy = arrayBuffers.snail.slice(0);
+                        snailBuffer = await audioCtx.decodeAudioData(copy);
+                        return snailBuffer;
+                    } catch (e) {
+                        console.error("Decoding snail error: ", e);
+                    }
+                }
+                // Fallback fetch
+                const res = await fetch(snlAudioUrl);
+                const arrayBuf = await res.arrayBuffer();
+                snailBuffer = await audioCtx.decodeAudioData(arrayBuf);
+                return snailBuffer;
+            }
+        }
 
         const SPLASH_PALETTE = [
             { normal: 'rgba(255, 255, 255, 0.8)', boost: 'rgba(251, 191, 36, 0.9)' },
@@ -366,7 +434,7 @@ Isi 4 & Kesimpulan</textarea>
         const FINISH_LINE_PADDING = 80;
         const TOP_PADDING = 30;
 
-        function toggleMute() {
+        async function toggleMute() {
             isMuted = !isMuted;
             const slider = document.getElementById('volumeSlider');
             if (isMuted) {
@@ -377,10 +445,11 @@ Isi 4 & Kesimpulan</textarea>
                 globalVolume = preMuteVolume;
                 slider.value = globalVolume;
                 volumeIcon.textContent = globalVolume < 0.4 ? '🔈' : '🔊';
+                await initAudioContext();
             }
         }
 
-        function updateVolume(val) {
+        async function updateVolume(val) {
             globalVolume = parseFloat(val);
             if (globalVolume === 0) {
                 isMuted = true;
@@ -389,34 +458,58 @@ Isi 4 & Kesimpulan</textarea>
                 isMuted = false;
                 volumeIcon.textContent = globalVolume < 0.4 ? '🔈' : '🔊';
                 preMuteVolume = globalVolume;
+                await initAudioContext();
             }
         }
 
-        function playSound(type) {
+        async function playSound(type) {
             if (isMuted) return;
 
+            // Check if there are already 15 quacks actively playing
+            if (type === 'duck' && activeQuacks >= 15) {
+                return;
+            }
+
+            // Ensure our Web Audio context is initialized and active
+            if (!audioCtx) {
+                await initAudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
             try {
-                if (type === 'duck') {
-                    const audio = quackPool[quackIdx];
-                    quackIdx = (quackIdx + 1) % QUACK_POOL_SIZE;
-                    
-                    // Add "Soul" matched with user-controlled volume adjustment
-                    audio.volume = (0.15 + Math.random() * 0.25) * globalVolume; 
-                    if (audio.playbackRate) {
-                        audio.playbackRate = 0.85 + Math.random() * 0.4; // Pitch shifting!
-                    }
-                    
-                    audio.currentTime = 0;
-                    audio.play().catch(() => {});
-                } else {
-                    const audio = snailPool[snailIdx];
-                    snailIdx = (snailIdx + 1) % SNAIL_POOL_SIZE;
-                    audio.volume = 0.3 * globalVolume;
-                    audio.currentTime = 0;
-                    audio.play().catch(() => {});
+                const buffer = await getDecodedBuffer(type);
+                if (!buffer) return;
+
+                // Create clean, garbage-collected audio source node
+                const source = audioCtx.createBufferSource();
+                source.buffer = buffer;
+
+                const gainNode = audioCtx.createGain();
+                const volumeMultiplier = (type === 'duck') ? (0.15 + Math.random() * 0.25) : 0.3;
+                gainNode.gain.value = volumeMultiplier * globalVolume;
+
+                // Infinite polyphonic pitch shifting with native mixing threads
+                if (type === 'duck' && source.playbackRate) {
+                    source.playbackRate.value = 0.85 + Math.random() * 0.4;
                 }
+
+                source.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                // Track active quack count accurately
+                if (type === 'duck') {
+                    activeQuacks++;
+                    source.onended = () => {
+                        activeQuacks--;
+                        if (activeQuacks < 0) activeQuacks = 0; // Sanity check
+                    };
+                }
+
+                source.start(0);
             } catch (e) {
-                // Fail silently if iOS blocks the media playback
+                // Fail silently
             }
         }
 
@@ -485,7 +578,9 @@ Isi 4 & Kesimpulan</textarea>
                 this.isBoosted = false;
                 this.rank = 0;
                 this.colorTheme = SPLASH_PALETTE[laneIndex % SPLASH_PALETTE.length];
-                this.nextSoundTime = Math.random() * 1000 + 500;
+                
+                // Warm up delay set to much sooner (200ms - 600ms)
+                this.nextSoundTime = Math.random() * 400 + 200;
             }
 
             setRandomSpeed(isLast = false) {
@@ -504,12 +599,13 @@ Isi 4 & Kesimpulan</textarea>
                 if (this.nextSoundTime <= 0) {
                     playSound(isSnailMode ? 'snail' : 'duck');
                     
-                    // Add back the chaos: 30% chance a duck does a "double quack" burst!
-                    if (Math.random() > 0.7 && !isSnailMode) {
-                        setTimeout(() => playSound('duck'), 150 + Math.random() * 100);
+                    // Increased probability of a double-quack burst to 40% and tightened timing
+                    if (Math.random() > 0.6 && !isSnailMode) {
+                        setTimeout(() => playSound('duck'), 100 + Math.random() * 80);
                     }
                     
-                    this.nextSoundTime = Math.random() * (isSnailMode ? 1000 : 600) + (isSnailMode ? 1600 : 1000);
+                    // HIGH FREQUENCY QUACKS: Interval reduced down to 300ms - 700ms (was 1.0s - 1.6s)
+                    this.nextSoundTime = Math.random() * (isSnailMode ? 1000 : 400) + (isSnailMode ? 1600 : 300);
                 }
                 const currentSplashColor = this.isBoosted ? this.colorTheme.boost : this.colorTheme.normal;
                 if (isSnailMode) {
@@ -580,7 +676,10 @@ Isi 4 & Kesimpulan</textarea>
         let lastFrameTime = 0;
 
         // Start Race preparation
-        function prepareRace() {
+        async function prepareRace() {
+            // Warm up Web Audio context upon clicking the Start Button
+            await initAudioContext();
+
             const names = getList(namesInput.value);
             const rawTasks = getList(tasksInput.value);
             
