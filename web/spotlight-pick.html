@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Spotlight System</title>
+
+<style>
+body{
+    margin:0;
+    background:#050b18;
+    color:#00eaff;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container{
+    width:100%;
+    max-width:800px;
+    border:3px solid #00d5ff;
+    border-radius:20px;
+    padding:30px;
+    text-align:center;
+    box-shadow:0 0 25px #00c8ff;
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Hadkan tinggi maksimum untuk skrin */
+}
+
+h1{
+    margin-top:0;
+    color:white;
+    font-size: 2rem;
+}
+
+#status{
+    margin:20px 0;
+    font-size:22px;
+    color:#00ffff;
+}
+
+/* Kawasan Senarai Hasil */
+#results-list {
+    overflow-y: auto; /* Boleh skrol jika terlalu panjang */
+    max-height: 50vh;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background: rgba(0, 234, 255, 0.05); /* Latar belakang nipis membezakan kawasan senarai */
+    border: 1px solid rgba(0, 213, 255, 0.2);
+}
+
+#results-list:empty {
+    display: none; /* Sembunyikan jika kosong */
+}
+
+/* Gaya kad untuk setiap kumpulan yang terpilih */
+.team-card {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #0099ff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    text-align: left;
+}
+
+.team-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.team-name {
+    font-size:clamp(20px, 4vw, 35px);
+    color:gold;
+    font-weight:bold;
+    text-shadow:0 0 15px gold;
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+.scanning-item {
+    font-size:clamp(24px, 5vw, 40px);
+    color:gold;
+    font-weight:bold;
+    text-shadow:0 0 15px gold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    margin-bottom: 15px;
+}
+
+/* Kumpulan butang tindakan */
+.action-btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+    margin: 0;
+    border-radius: 8px;
+    text-shadow: none;
+    font-weight: normal;
+}
+
+.btn-bersedia { background: #f39c12; }
+.btn-bersedia:hover { background: #e67e22; }
+
+.btn-maju { background: #27ae60; }
+.btn-maju:hover { background: #2ecc71; }
+
+.btn-done { background: #c0392b; }
+.btn-done:hover { background: #e74c3c; }
+
+.btn-undo { background: #7f8c8d; }
+.btn-undo:hover { background: #95a5a6; }
+
+/* Gaya untuk nama yang sudah selesai */
+.done-text {
+    text-decoration: line-through;
+    color: #555 !important;
+    text-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+.main-controls {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.main-controls button {
+    padding:15px 25px;
+    font-size:18px;
+    cursor:pointer;
+    margin:10px;
+    background:#0099ff;
+    color:white;
+    border:none;
+    border-radius:10px;
+    transition: background 0.3s;
+}
+
+.main-controls button:hover{
+    background:#00bbff;
+}
+
+/* Teks Penghargaan */
+.credits {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(0, 234, 255, 0.6);
+    font-style: italic;
+}
+
+/* Butang Edit Atas Kanan */
+.top-edit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(142, 68, 173, 0.2);
+    color: white;
+    border: 2px solid #8e44ad;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(142, 68, 173, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+.top-edit-btn:hover {
+    background: #8e44ad;
+    transform: scale(1.1);
+}
+
+/* Custom Alert Box - Base */
+#msg-box {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #0a192f;
+    padding: 25px;
+    border-radius: 15px;
+    z-index: 200;
+    width: 80%;
+    max-width: 400px;
+}
+
+#msg-box button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* Error State (Merah) */
+.msg-error {
+    border: 2px solid #ff4d4d;
+    color: #ffb3b3;
+    box-shadow: 0 0 30px rgba(255, 77, 77, 0.4);
+}
+.msg-error button { background: #ff4d4d; }
+.msg-error button:hover { background: #ff6666; }
+
+/* Success State (Hijau) */
+.msg-success {
+    border: 2px solid #2ecc71;
+    color: #a9dfbf;
+    box-shadow: 0 0 30px rgba(46, 204, 113, 0.4);
+}
+.msg-success button { background: #27ae60; }
+.msg-success button:hover { background: #2ecc71; }
+
+/* Popup Modal untuk Edit Kumpulan */
+#edit-modal {
+    display: none; /* Flex bila dibuka */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: #0a192f;
+    border: 2px solid #00d5ff;
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 0 30px rgba(0, 213, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content h2 {
+    color: white;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.modal-content p {
+    color: #00eaff;
+    font-size: 14px;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#groups-textarea {
+    width: 100%;
+    height: 350px;
+    background: #050b18;
+    color: #00eaff;
+    border: 1px solid #0099ff;
+    border-radius: 8px;
+    padding: 15px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    resize: vertical;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+#groups-textarea:focus {
+    outline: none;
+    border-color: #00d5ff;
+    box-shadow: 0 0 10px rgba(0, 213, 255, 0.5);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.modal-actions button {
+    padding: 10px 25px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    color: white;
+}
+
+.btn-save { background: #27ae60; }
+.btn-save:hover { background: #2ecc71; }
+.btn-cancel { background: #7f8c8d; }
+.btn-cancel:hover { background: #95a5a6; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    
+    <!-- Butang Edit di Penjuru Atas Kanan -->
+    <button class="top-edit-btn" onclick="openEditModal()" title="Edit Kumpulan">✏️</button>
+
+    <!-- Kotak mesej tersuai menggantikan native alert -->
+    <div id="msg-box" class="msg-error">
+        <div id="msg-text">Kumpulan tidak mencukupi untuk 2 pembentang.</div>
+        <button onclick="document.getElementById('msg-box').style.display='none'">OK</button>
+    </div>
+
+    <!-- Modal Edit Kumpulan -->
+    <div id="edit-modal">
+        <div class="modal-content">
+            <h2>📝 Edit Senarai Kumpulan</h2>
+            <p>Masukkan setiap kumpulan pada baris baharu (Enter).</p>
+            <textarea id="groups-textarea" wrap="off"></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">Batal</button>
+                <button class="btn-save" onclick="saveGroups()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <h1>🤖 AI SPOTLIGHT SYSTEM</h1>
+
+    <div id="status">Sedia untuk Imbasan...</div>
+
+    <!-- Senarai kumpulan yang telah dipilih -->
+    <div id="results-list"></div>
+
+    <!-- Kawasan imbasan (hanya untuk animasi) -->
+    <div id="scanning-area">
+        <div class="scanning-item" id="waiting-text">Menunggu...</div>
+    </div>
+
+    <div class="main-controls">
+        <button onclick="startScan()">SCAN</button>
+        <button onclick="resetList()">RESET</button>
+    </div>
+
+    <!-- Teks Penghargaan diletakkan di sini -->
+    <div class="credits">Credited to Cg. Ade Ling</div>
+
+</div>
+
+<script>
+
+const defaultGroups = [
+"SMK Kumpulan 1", "SMK Kumpulan 2", "SMK Kumpulan 3", "SMK Kumpulan 4", "SMK Kumpulan 5", "SMK Kumpulan 6", "SMK Kumpulan 7", "SMK Kumpulan 8", "SMK Kumpulan 9", "SMK Kumpulan 10", "SMK Kumpulan 11",
+"SJKC Kumpulan 1", "SJKC Kumpulan 2", "SJKC Kumpulan 3", "SJKC Kumpulan 4", "SJKC Kumpulan 5", "SJKC Kumpulan 6", "SJKC Kumpulan 7", "SJKC Kumpulan 8", "SJKC Kumpulan 9", "SJKC Kumpulan 10", "SJKC Kumpulan 11", "SJKC Kumpulan 12", "SJKC Kumpulan 13", "SJKC Kumpulan 14", "SJKC Kumpulan 15", "SJKC Kumpulan 16", "SJKC Kumpulan 17", "SJKC Kumpulan 18", "SJKC Kumpulan 19", "SJKC Kumpulan 20", "SJKC Kumpulan 21", "SJKC Kumpulan 22", "SJKC Kumpulan 23", "SJKC Kumpulan 24",
+"SK Kumpulan 1", "SK Kumpulan 2", "SK Kumpulan 3", "SK Kumpulan 4", "SK Kumpulan 5", "SK Kumpulan 6", "SK Kumpulan 7", "SK Kumpulan 8", "SK Kumpulan 9", "SK Kumpulan 10", "SK Kumpulan 11", "SK Kumpulan 12", "SK Kumpulan 13", "SK Kumpulan 14", "SK Kumpulan 15", "SK Kumpulan 16", "SK Kumpulan 17", "SK Kumpulan 18", "SK Kumpulan 19", "SK Kumpulan 20", "SK Kumpulan 21", "SK Kumpulan 22"
+];
+
+let groups = [];
+let used = [];
+
+// Muatkan senarai dari LocalStorage jika ada
+function loadGroups() {
+    const saved = localStorage.getItem('aiSpotlightGroups');
+    if (saved) {
+        try {
+            groups = JSON.parse(saved);
+        } catch (e) {
+            groups = [...defaultGroups];
+        }
+    } else {
+        groups = [...defaultGroups];
+    }
+}
+// Jalankan loadGroups semasa aplikasi mula-mula dibuka
+loadGroups();
+
+// -- Fungsi Modal Edit Kumpulan -- //
+function openEditModal() {
+    let textarea = document.getElementById('groups-textarea');
+    textarea.value = groups.join('\n');
+    document.getElementById('edit-modal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('edit-modal').style.display = 'none';
+}
+
+function saveGroups() {
+    let text = document.getElementById('groups-textarea').value;
+    
+    // Pisahkan baris, buang ruang kosong pada tepi, dan abaikan baris yang kosong
+    let newGroups = text.split('\n').map(g => g.trim()).filter(g => g !== "");
+    
+    if (newGroups.length < 2) {
+        document.getElementById("msg-box").className = "msg-error";
+        document.getElementById("msg-text").innerText = "Sila masukkan sekurang-kurangnya 2 kumpulan yang sah.";
+        document.getElementById("msg-box").style.display = "block";
+        return;
+    }
+    
+    // Simpan ke pembolehubah dan localstorage
+    groups = newGroups;
+    localStorage.setItem('aiSpotlightGroups', JSON.stringify(groups));
+    
+    closeEditModal();
+    resetList(); // Tetapkan semula senarai kerana kumpulan telah berubah
+    
+    // Tunjuk mesej berjaya (pilihan)
+    document.getElementById("msg-box").className = "msg-success";
+    document.getElementById("msg-text").innerText = "Senarai kumpulan telah berjaya disimpan!";
+    document.getElementById("msg-box").style.display = "block";
+}
+
+// Fungsi pembantu untuk membaca teks
+function speakText(text) {
+    // Hentikan sebarang suara yang sedang dimainkan
+    window.speechSynthesis.cancel();
+    
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "ms-MY";
+    window.speechSynthesis.speak(speech);
+}
+
+// Fungsi pembantu untuk menandakan/membatalkan selesai
+function toggleDone(elementId, btn) {
+    let nameElement = document.getElementById(elementId);
+    let btnGroup = btn.parentElement;
+    let bersediaBtn = btnGroup.querySelector('.btn-bersedia');
+    let majuBtn = btnGroup.querySelector('.btn-maju');
+    
+    if (nameElement.classList.contains('done-text')) {
+        // Buka Balik (Undo)
+        nameElement.classList.remove('done-text');
+        btn.innerHTML = 'Selesai';
+        btn.classList.remove('btn-undo');
+        btn.classList.add('btn-done');
+        
+        // Papar semula butang lain
+        if (bersediaBtn) bersediaBtn.style.display = '';
+        if (majuBtn) majuBtn.style.display = '';
+    } else {
+        // Tandakan Selesai
+        nameElement.classList.add('done-text');
+        btn.innerHTML = 'Buka Balik';
+        btn.classList.remove('btn-done');
+        btn.classList.add('btn-undo');
+        
+        // Sembunyikan butang lain
+        if (bersediaBtn) bersediaBtn.style.display = 'none';
+        if (majuBtn) majuBtn.style.display = 'none';
+    }
+}
+
+// Fungsi untuk membina kad HTML kumpulan
+function createTeamCardHTML(teamName, index) {
+    let teamId = `team-${index}`;
+    return `
+        <div class="team-card" id="card-${teamId}">
+            <span id="${teamId}" class="team-name">${teamName}</span>
+            <div class="action-btn-group">
+                <button class="action-btn btn-bersedia" onclick="speakText('${teamName} sila bersedia')">Bersedia</button>
+                <button class="action-btn btn-maju" onclick="speakText('${teamName} sila maju ke hadapan untuk pembentangan')">Maju ke Hadapan</button>
+                <button class="action-btn btn-done" onclick="toggleDone('${teamId}', this)">Selesai</button>
+            </div>
+        </div>
+    `;
+}
+
+function startScan(){
+
+    let available = groups.filter(g => !used.includes(g));
+    let isFirstScan = (used.length === 0);
+
+    // Validasi kumpulan yang tinggal
+    if (isFirstScan && available.length < 2) {
+        document.getElementById("msg-box").className = "msg-error";
+        document.getElementById("msg-text").innerText = "Kumpulan tidak mencukupi untuk memulakan 2 pembentang.";
+        document.getElementById("msg-box").style.display = "block";
+        return;
+    } else if (!isFirstScan && available.length < 1) {
+        document.getElementById("msg-box").className = "msg-error";
+        document.getElementById("msg-text").innerText = "Semua kumpulan telah selesai dipanggil.";
+        document.getElementById("msg-box").style.display = "block";
+        return;
+    }
+
+    let status = document.getElementById("status");
+    let resultsList = document.getElementById("results-list");
+    let scanningArea = document.getElementById("scanning-area");
+
+    status.innerHTML = "🔍 AI Sedang Mengimbas Pembentang Seterusnya...";
+
+    // Sediakan elemen animasi imbasan bergantung kepada giliran (2 kumpulan atau 1 kumpulan)
+    if (isFirstScan) {
+        scanningArea.innerHTML = `
+            <div class="scanning-item" id="scan-slot-1">Mengimbas...</div>
+            <div class="scanning-item" id="scan-slot-2">Mengimbas...</div>
+        `;
+    } else {
+        scanningArea.innerHTML = `
+            <div class="scanning-item" id="scan-slot-1">Mengimbas...</div>
+        `;
+    }
+
+    let count = 0;
+    let scanSlot1 = document.getElementById("scan-slot-1");
+    let scanSlot2 = document.getElementById("scan-slot-2"); // Mungkin null jika bukan imbasan pertama
+
+    let scan = setInterval(()=>{
+
+        let randomTeam = () => available[Math.floor(Math.random() * available.length)];
+
+        // Tunjukkan animasi menukar nama
+        if (scanSlot1) scanSlot1.innerHTML = randomTeam();
+        if (scanSlot2) scanSlot2.innerHTML = randomTeam();
+
+        count++;
+
+        if(count > 20){
+
+            clearInterval(scan);
+
+            let first, second;
+            let appendedHTML = "";
+
+            if (isFirstScan) {
+                // Imbasan pertama: Pilih 2 kumpulan
+                first = randomTeam();
+                do {
+                    second = randomTeam();
+                } while(second === first && available.length > 1);
+                
+                used.push(first, second);
+                
+                // Jana HTML untuk ditambahkan ke bawah senarai
+                appendedHTML += createTeamCardHTML(first, used.length - 1);
+                appendedHTML += createTeamCardHTML(second, used.length);
+
+            } else {
+                // Imbasan seterusnya: pilih 1 kumpulan sahaja
+                first = randomTeam();
+                used.push(first);
+                
+                // Jana HTML untuk ditambahkan ke bawah senarai
+                appendedHTML += createTeamCardHTML(first, used.length);
+            }
+
+            status.innerHTML = "🎯 PEMBENTANG SETERUSNYA DIPILIH";
+
+            // Tambah hasil ke bahagian bawah senarai yang sedia ada
+            resultsList.insertAdjacentHTML('beforeend', appendedHTML);
+            
+            // Kosongkan semula kawasan animasi (kembali ke state asal)
+            scanningArea.innerHTML = "";
+
+            // Auto-skrol ke bahagian paling bawah senarai supaya kumpulan baru nampak
+            resultsList.scrollTop = resultsList.scrollHeight;
+
+            // Pengumuman suara
+            if (isFirstScan) {
+                speakText(first + " dan " + second + " sila bersedia untuk pembentangan.");
+            } else {
+                speakText(first + " sila bersedia.");
+            }
+        }
+
+    }, 100);
+
+}
+
+function resetList(){
+    used = [];
+    document.getElementById("results-list").innerHTML = "";
+    document.getElementById("scanning-area").innerHTML = `<div class="scanning-item" id="waiting-text">Menunggu...</div>`;
+    document.getElementById("status").innerHTML = "Sedia untuk Imbasan...";
+}
+
+</script>
+
+</body>
+</html>
