@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuiz Drag & Drop - Pendidikan Moral</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4; /* Soft green background */
+        }
+        
+        .draggable {
+            cursor: grab;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+        .draggable.dragging {
+            opacity: 0.5;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .slot {
+            min-height: 60px;
+            border: 2px dashed #94a3b8;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        .slot.drag-over {
+            background-color: #e2e8f0;
+            border-color: #3b82f6;
+            border-style: solid;
+        }
+        
+        .bank {
+            min-height: 200px;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: #ffffff;
+        }
+        .bank.drag-over {
+            background-color: #f8fafc;
+        }
+
+        /* Status colors */
+        .correct-slot {
+            border-color: #22c55e !important;
+            border-style: solid !important;
+            background-color: #dcfce7 !important;
+        }
+        .wrong-slot {
+            border-color: #ef4444 !important;
+            border-style: solid !important;
+            background-color: #fee2e2 !important;
+        }
+
+        /* Modal animation */
+        #resultModal {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-700 mb-2">Kuiz Pendidikan Moral T3</h1>
+            <p class="mt-4 text-slate-600 bg-white p-4 rounded-lg shadow-sm inline-block border border-slate-200">
+                <strong>Arahan:</strong> Tarik dan lepaskan jawapan ke dalam kotak kosong mengikut urutan yang betul.<br>
+                Urutan <b>Fakta (F)</b> dan <b>Huraian (H)</b> adalah sangat penting! Anda boleh menukar (swap) kedudukan jawapan.
+            </p>
+        </header>
+
+        <!-- Bahagian Navigasi Tab -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button id="btn-tab-u7" onclick="switchTab('u7')" class="px-6 py-3 rounded-lg font-bold shadow-md transition bg-teal-600 text-white">Unit 7: Perkhidmatan Awam</button>
+            <button id="btn-tab-u8" onclick="switchTab('u8')" class="px-6 py-3 rounded-lg font-bold shadow-md transition bg-slate-200 text-slate-700 hover:bg-slate-300">Unit 8: Bumi Hijau</button>
+        </div>
+
+        <!-- CONTAINER UNIT 7 -->
+        <div id="u7-container" class="flex flex-col lg:flex-row gap-8">
+            <div class="w-full lg:w-3/5 space-y-6">
+                <h2 class="text-xl text-teal-600 font-bold mb-2 border-b-2 border-teal-200 pb-2">Unit 7: Kualiti Perkhidmatan Awam Pemangkin Pembangunan Negara</h2>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-teal-500">
+                    <p class="font-bold text-lg mb-4">1a. Nyatakan dua cara anda membuat aduan atau menyuarakan pendapat tentang perkhidmatan awam. <span class="text-teal-600">[2 markah]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O3"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500">
+                    <p class="font-bold text-lg mb-4">1b. Terangkan dua kebaikan sekiranya perkhidmatan awam di negara kita berkualiti tinggi. <span class="text-blue-600">[4 markah: 2F+2H]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O2"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O5"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O9"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O8"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-purple-500">
+                    <p class="font-bold text-lg mb-4">1c. Huraikan dua cara anggota masyarakat boleh menunjukkan penghargaan kepada perkhidmatan awam. <span class="text-purple-600">[4 markah: 2F+2H]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O10"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O4"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O6"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="O7"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/5">
+                <div class="sticky top-6">
+                    <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Pilihan Jawapan (Unit 7)
+                    </h3>
+                    <div id="answerBank7" class="bank flex flex-col gap-3 shadow-inner bg-slate-100"></div>
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="checkAnswers()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition active:scale-95 text-lg">Semak Jawapan</button>
+                        <button onclick="resetGame()" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition active:scale-95">Semula</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTAINER UNIT 8 (Tersembunyi pada asalnya) -->
+        <div id="u8-container" class="flex flex-col lg:flex-row gap-8 hidden">
+            <div class="w-full lg:w-3/5 space-y-6">
+                <h2 class="text-xl text-green-600 font-bold mb-2 border-b-2 border-green-200 pb-2">Unit 8: Bumi Hijau Bumi Kita (Amalan Konsep 5R)</h2>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-green-500">
+                    <p class="font-bold text-lg mb-4">2a. Nyatakan dua contoh amalan bumi hijau yang boleh anda lakukan di rumah. <span class="text-green-600">[2 markah]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O1"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-indigo-500">
+                    <p class="font-bold text-lg mb-4">2b. Terangkan dua kepentingan sekiranya kita mengamalkan program bumi hijau. <span class="text-indigo-600">[4 markah: 2F+2H]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O3"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O4"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O5"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O6"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-orange-500">
+                    <p class="font-bold text-lg mb-4">2c. Ramalkan akibat buruk sekiranya amalan pelestarian alam sekitar ini diabaikan. <span class="text-orange-600">[4 markah: 4F+1H]</span></p>
+                    <div class="space-y-3 pl-4 border-l-2 border-slate-200">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">F1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O7"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H1</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O8"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O9"></div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-slate-400 w-6">H2</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O10"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F3</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O11"></div>
+                        </div>
+                        <div class="flex items-center gap-3 mt-4">
+                            <span class="font-bold text-slate-400 w-6">F4</span>
+                            <div class="slot w-full bg-slate-50" data-expected="U8_O12"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/5">
+                <div class="sticky top-6">
+                    <h3 class="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Pilihan Jawapan (Unit 8)
+                    </h3>
+                    <div id="answerBank8" class="bank flex flex-col gap-3 shadow-inner bg-slate-100"></div>
+                    <div class="mt-6 flex gap-4">
+                        <button onclick="checkAnswers()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition active:scale-95 text-lg">Semak Jawapan</button>
+                        <button onclick="resetGame()" class="bg-slate-500 hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transform transition active:scale-95">Semula</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Keputusan -->
+    <div id="resultModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="modal-content bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-95 transition-transform duration-300 text-center">
+            <div id="modalIcon" class="mx-auto w-20 h-20 mb-4 flex items-center justify-center rounded-full"></div>
+            <h3 id="modalTitle" class="text-2xl font-bold mb-2"></h3>
+            <p id="modalScore" class="text-xl font-medium text-slate-600 mb-6"></p>
+            <p id="modalMessage" class="text-slate-500 mb-8"></p>
+            <button onclick="closeModal()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition">Tutup & Teruskan</button>
+        </div>
+    </div>
+
+    <script>
+        const optionsData7 = [
+            { id: 'O1', text: 'Selain itu, saya membuat aduan secara bersemuka semasa Hari Bertemu Pelanggan.' },
+            { id: 'O2', text: 'Ekonomi negara kita meningkat.' },
+            { id: 'O3', text: 'Saya membuat aduan melalui sistem dalam talian iaitu e-mel rasmi perkhidmatan awam.' },
+            { id: 'O4', text: 'Hal ini kerana masyarakat tidak dikenakan hukuman.' },
+            { id: 'O5', text: 'Hal ini dikatakan demikian kerana pelancong asing suka melancong di negara kita.' },
+            { id: 'O6', text: 'Selain itu, masyarakat menyertai dan menyokong kempen tentang kepentingan perkhidmatan awam.' },
+            { id: 'O7', text: 'Hal ini dikatakan demikian dengan masyarakat berkongsi maklumat kempen di media sosial.' },
+            { id: 'O8', text: 'Hal ini dikatakan demikian kerana negara kita akan dipandang tinggi oleh negara lain.' },
+            { id: 'O9', text: 'Selain itu, Imej negara kita terjamin.' },
+            { id: 'O10', text: 'Masyarakat mematuhi peraturan dan undang-undang yang ditetapkan oleh perkhidmatan awam.' }
+        ];
+
+        const optionsData8 = [
+            { id: 'U8_O1', text: 'Saya mengitar semula tin aluminium dan kertas A4 yang sudah dipakai.' },
+            { id: 'U8_O2', text: 'Selain itu, saya menanam tumbuhan di sekeliling halaman rumah saya.' },
+            { id: 'U8_O3', text: 'Imej kita terjamin.' },
+            { id: 'U8_O4', text: 'Hal ini dikatakan demikian kerana kita akan dipandang tinggi oleh orang lain.' },
+            { id: 'U8_O5', text: 'Selain itu, hidup kita akan bahagia.' },
+            { id: 'U8_O6', text: 'Hal ini dikatakan demikian kerana masalah pencemaran di kawasan kita dapat dikurangkan.' },
+            { id: 'U8_O7', text: 'Imej masyarakat terjejas.' },
+            { id: 'U8_O8', text: 'Hal ini dikatakan demikian kerja masyarakat akan dipandang rendah oleh masyarakat.' },
+            { id: 'U8_O9', text: 'Selain itu, kepupusan flora dan fauna di kawasan masyarakat tersebut.' },
+            { id: 'U8_O10', text: 'Hal ini dikatakan demikian kerana generasi yang akan datang tidak dapat menikmati kepelbagaian flora dan fauna.' },
+            { id: 'U8_O11', text: 'Seterusnya, kesihatan masyarakat akan terjejas.' },
+            { id: 'U8_O12', text: 'Akhir sekali, pencemaran alam sekitar di sekeliling masyarakat akan meningkat.' }
+        ];
+
+        let draggedItem = null;
+        let activeTab = 'u7'; // Default tab
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            
+            // Sembunyikan semua
+            document.getElementById('u7-container').classList.add('hidden');
+            document.getElementById('u8-container').classList.add('hidden');
+            
+            // Papar yang aktif sahaja
+            document.getElementById(`${tabId}-container`).classList.remove('hidden');
+            
+            // Tukar butang aktif
+            const btnU7 = document.getElementById('btn-tab-u7');
+            const btnU8 = document.getElementById('btn-tab-u8');
+            const activeClass = "px-6 py-3 rounded-lg font-bold shadow-md transition bg-teal-600 text-white";
+            const inactiveClass = "px-6 py-3 rounded-lg font-bold shadow-md transition bg-slate-200 text-slate-700 hover:bg-slate-300";
+            
+            if (tabId === 'u7') {
+                btnU7.className = activeClass;
+                btnU8.className = inactiveClass;
+            } else {
+                btnU8.className = activeClass;
+                btnU7.className = inactiveClass;
+            }
+        }
+
+        function initGame() {
+            // Inisialisasi kedua-dua set
+            initUnit('u7', optionsData7, 'answerBank7');
+            initUnit('u8', optionsData8, 'answerBank8');
+            setupDropZones();
+        }
+
+        function initUnit(unitId, data, bankId) {
+            const bank = document.getElementById(bankId);
+            bank.innerHTML = '';
+            
+            // Kosongkan slot unit
+            document.querySelectorAll(`#${unitId}-container .slot`).forEach(slot => {
+                slot.innerHTML = '';
+                slot.classList.remove('correct-slot', 'wrong-slot');
+            });
+
+            // Rawakkan pilihan jawapan
+            const shuffledOptions = [...data].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = 'draggable bg-white p-3 rounded border border-slate-300 shadow-sm text-sm font-medium hover:border-teal-400 w-full';
+                div.draggable = true;
+                div.dataset.id = opt.id;
+                div.textContent = opt.text;
+                bank.appendChild(div);
+                addDragEvents(div);
+            });
+        }
+
+        function addDragEvents(item) {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                setTimeout(() => this.classList.add('dragging'), 0);
+            });
+
+            item.addEventListener('dragend', function(e) {
+                this.classList.remove('dragging');
+                draggedItem = null;
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            });
+        }
+
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('.slot, .bank');
+
+            dropZones.forEach(zone => {
+                // Hanya tambah listener jika belum ada untuk elak duplikasi
+                if (zone.dataset.hasDropZone === 'true') return;
+                zone.dataset.hasDropZone = 'true';
+
+                zone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', function(e) {
+                    this.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('drag-over');
+
+                    if (!draggedItem) return;
+
+                    this.classList.remove('correct-slot', 'wrong-slot');
+                    if(draggedItem.parentElement && draggedItem.parentElement.classList.contains('slot')){
+                         draggedItem.parentElement.classList.remove('correct-slot', 'wrong-slot');
+                    }
+
+                    if (this.classList.contains('slot')) {
+                        if (this.children.length > 0) {
+                            const existingItem = this.children[0];
+                            const sourceParent = draggedItem.parentNode;
+                            sourceParent.appendChild(existingItem);
+                        }
+                        this.appendChild(draggedItem);
+                    } else if (this.classList.contains('bank')) {
+                        this.appendChild(draggedItem);
+                    }
+                });
+            });
+        }
+
+        function checkAnswers() {
+            // Hanya semak slot dalam tab yang sedang aktif
+            const slots = document.querySelectorAll(`#${activeTab}-container .slot`);
+            let totalSlots = slots.length;
+            let correctCount = 0;
+            let answeredCount = 0;
+
+            slots.forEach(slot => {
+                const expectedId = slot.dataset.expected;
+                slot.classList.remove('correct-slot', 'wrong-slot');
+
+                if (slot.children.length > 0) {
+                    answeredCount++;
+                    const actualId = slot.children[0].dataset.id;
+                    
+                    if (expectedId === actualId) {
+                        slot.classList.add('correct-slot');
+                        correctCount++;
+                    } else {
+                        slot.classList.add('wrong-slot');
+                    }
+                }
+            });
+
+            if (answeredCount < totalSlots) {
+                showModal('Belum Siap!', `Anda baru menjawab ${answeredCount}/${totalSlots}.`, 'Sila isi semua ruang kosong sebelum menyemak jawapan.', 'warning');
+                return;
+            }
+
+            let percentage = (correctCount / totalSlots) * 100;
+            if (percentage === 100) {
+                showModal('Tahniah! Cemerlang', `Markah: ${correctCount}/${totalSlots} (100%)`, 'Susunan Fakta dan Huraian anda sangat tepat!', 'success');
+            } else if (percentage >= 50) {
+                showModal('Usaha Yang Baik!', `Markah: ${correctCount}/${totalSlots} (${percentage.toFixed(0)}%)`, 'Ada beberapa urutan yang salah. Perhatikan Fakta dan Huraian.', 'info');
+            } else {
+                showModal('Cuba Lagi', `Markah: ${correctCount}/${totalSlots} (${percentage.toFixed(0)}%)`, 'Banyak jawapan di ruang yang salah. Sila betulkan urutannya.', 'error');
+            }
+        }
+
+        function showModal(title, score, message, type) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('modalIcon');
+            
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalScore').textContent = score;
+            document.getElementById('modalMessage').textContent = message;
+
+            if (type === 'success') {
+                icon.className = 'mx-auto w-20 h-20 mb-4 flex items-center justify-center rounded-full bg-green-100 text-green-600';
+                icon.innerHTML = '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            } else if (type === 'warning') {
+                icon.className = 'mx-auto w-20 h-20 mb-4 flex items-center justify-center rounded-full bg-yellow-100 text-yellow-600';
+                icon.innerHTML = '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>';
+            } else {
+                icon.className = 'mx-auto w-20 h-20 mb-4 flex items-center justify-center rounded-full bg-red-100 text-red-600';
+                icon.innerHTML = '<svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-95');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('resultModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+        }
+
+        function resetGame() {
+            if (activeTab === 'u7') {
+                initUnit('u7', optionsData7, 'answerBank7');
+            } else {
+                initUnit('u8', optionsData8, 'answerBank8');
+            }
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
