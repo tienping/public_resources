@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBM RBT Tingkatan 1 - Lakaran Piktorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
+        canvas { max-width: 100%; height: auto; display: block; margin: 0 auto; background-color: #ffffff; }
+        .tab-btn.active { background-color: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); }
+        .tab-btn { transition: all 0.2s ease; }
+        .tab-btn:hover:not(.active) { background-color: #e2e8f0; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white py-4 px-6 shadow-md shrink-0 z-10 relative">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-pen-ruler text-blue-400"></i>
+                    Simulasi Lakaran RBT
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">Tingkatan 1 • Bab 4: Lakaran Piktorial (Bentuk Segi Empat)</p>
+            </div>
+            <div class="hidden md:block">
+                <span class="bg-blue-600/30 text-blue-300 px-3 py-1 rounded-full text-xs font-semibold border border-blue-500/30">Bahan Bantu Mengajar Interaktif</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow flex flex-col md:flex-row max-w-7xl mx-auto w-full p-4 gap-6 overflow-hidden">
+        
+        <!-- Canvas Area (Left) -->
+        <div class="flex-grow flex flex-col min-h-0 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+            
+            <!-- Tabs -->
+            <div class="flex overflow-x-auto bg-slate-50 border-b border-slate-200 shrink-0 p-2 gap-2 hide-scrollbar">
+                <button onclick="changeTab('oblik')" id="tab-oblik" class="tab-btn active px-4 py-2 rounded-lg font-semibold text-sm text-slate-600 border border-slate-300 whitespace-nowrap">Oblik</button>
+                <button onclick="changeTab('isometrik')" id="tab-isometrik" class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm text-slate-600 border border-slate-300 whitespace-nowrap">Isometrik</button>
+                <button onclick="changeTab('perspektif1')" id="tab-perspektif1" class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm text-slate-600 border border-slate-300 whitespace-nowrap">Perspektif 1 Titik</button>
+                <button onclick="changeTab('perspektif2')" id="tab-perspektif2" class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm text-slate-600 border border-slate-300 whitespace-nowrap">Perspektif 2 Titik</button>
+                <button onclick="changeTab('perspektif3')" id="tab-perspektif3" class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm text-slate-600 border border-slate-300 whitespace-nowrap">Perspektif 3 Titik</button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="flex-grow relative overflow-hidden flex items-center justify-center p-4 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+                <canvas id="drawCanvas" width="800" height="600" class="rounded shadow-inner border border-slate-200 w-full max-w-3xl"></canvas>
+            </div>
+        </div>
+
+        <!-- Instructions & Controls Panel (Right) -->
+        <div class="w-full md:w-96 shrink-0 flex flex-col gap-4">
+            
+            <!-- Instructions Card -->
+            <div class="glass-panel rounded-xl shadow-sm border border-slate-200 p-6 flex-grow flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-slate-100">
+                    <h2 class="text-xl font-bold text-slate-800" id="mode-title">Lakaran Oblik</h2>
+                    <span class="bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-lg text-sm" id="step-counter">Langkah 1/6</span>
+                </div>
+                
+                <div class="flex-grow overflow-y-auto pr-2">
+                    <p class="text-slate-600 text-lg leading-relaxed mb-6" id="step-description">
+                        Pilih jenis lakaran dan klik butang 'Seterusnya' untuk mulakan simulasi.
+                    </p>
+                    
+                    <!-- Legends / Tips -->
+                    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg mt-auto">
+                        <h4 class="font-semibold text-amber-800 text-sm mb-1"><i class="fa-solid fa-lightbulb mr-1"></i> Petunjuk Visual:</h4>
+                        <ul class="text-xs text-amber-700 space-y-2">
+                            <li class="flex items-center gap-2"><span class="w-4 h-0.5 bg-red-500 inline-block"></span> Garisan merah: Sedang dilukis</li>
+                            <li class="flex items-center gap-2"><span class="w-4 h-0.5 bg-slate-400 inline-block"></span> Garisan kelabu: Garisan binaan/panduan</li>
+                            <li class="flex items-center gap-2"><span class="w-4 h-1 bg-slate-900 inline-block rounded-full"></span> Garisan hitam tebal: Garisan objek (Legap)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="glass-panel rounded-xl shadow-sm border border-slate-200 p-4 grid grid-cols-2 gap-3">
+                <button onclick="prevStep()" id="btn-prev" class="col-span-1 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                </button>
+                <button onclick="nextStep()" id="btn-next" class="col-span-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">
+                    Seterusnya <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button onclick="resetStep()" class="col-span-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-sm mt-1">
+                    <i class="fa-solid fa-rotate-right"></i> Mula Semula
+                </button>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let currentMode = 'oblik';
+        let currentStepIndex = 0;
+
+        // --- MATH HELPERS ---
+        function getIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+            const denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            if (denom === 0) return { x: 0, y: 0 }; 
+            const x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denom;
+            const y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denom;
+            return { x, y };
+        }
+
+        // --- DRAWING HELPERS ---
+        function drawLine(x1, y1, x2, y2, isCurrent = false, isFinal = false, isDashed = false) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            
+            if (isFinal) {
+                ctx.strokeStyle = '#0f172a'; // Black thick
+                ctx.lineWidth = 4;
+            } else if (isCurrent) {
+                ctx.strokeStyle = '#ef4444'; // Red active
+                ctx.lineWidth = 2.5;
+            } else {
+                ctx.strokeStyle = '#94a3b8'; // Slate gray guide
+                ctx.lineWidth = 1.5;
+            }
+
+            if (isDashed && !isFinal) {
+                ctx.setLineDash([5, 5]);
+            } else {
+                ctx.setLineDash([]);
+            }
+
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawPoint(x, y, label = "", isCurrent = false) {
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = isCurrent ? '#ef4444' : '#64748b';
+            ctx.fill();
+            if (label) {
+                ctx.font = "bold 16px Poppins";
+                ctx.fillStyle = isCurrent ? '#ef4444' : '#475569';
+                ctx.fillText(label, x + 8, y - 8);
+            }
+        }
+
+        function drawLabel(x, y, text, color = "#475569") {
+            ctx.font = "italic 16px Poppins";
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        }
+
+        // --- SIMULATION DATA & LOGIC ---
+        const simulations = {
+            oblik: {
+                title: "Lakaran Oblik (Kavalier)",
+                steps: [
+                    {
+                        desc: "Langkah 1: Lakarkan tiga paksi asas. Paksi Mendatar (X), Paksi Menegak (Y), dan Paksi Surut (Z) yang bersudut 45°.",
+                        draw: (curr) => {
+                            // Origin O(250, 450)
+                            drawLine(250, 450, 600, 450, curr); // X
+                            drawLine(250, 450, 250, 150, curr); // Y
+                            drawLine(250, 450, 250 + Math.cos(Math.PI/4)*250, 450 - Math.sin(Math.PI/4)*250, curr); // Z (45deg)
+                            drawLabel(610, 455, "Paksi Mendatar (X)", curr ? "#ef4444" : "#475569");
+                            drawLabel(240, 140, "Paksi Menegak (Y)", curr ? "#ef4444" : "#475569");
+                            drawLabel(430, 260, "Paksi Surut (Z) 45°", curr ? "#ef4444" : "#475569");
+                        }
+                    },
+                    {
+                        desc: "Langkah 2: Tandakan ukuran panjang pada paksi X (Titik A), ukuran tinggi pada paksi Y (Titik B), dan ukuran lebar pada paksi Z (Titik C).",
+                        draw: (curr) => {
+                            drawPoint(450, 450, "A", curr);
+                            drawPoint(250, 280, "B", curr);
+                            let zx = 250 + Math.cos(Math.PI/4)*130;
+                            let zy = 450 - Math.sin(Math.PI/4)*130;
+                            drawPoint(zx, zy, "C", curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 3: Lakarkan garisan menegak dari A dan garisan mendatar dari B untuk membentuk segi empat permukaan hadapan.",
+                        draw: (curr) => {
+                            drawLine(450, 450, 450, 280, curr); // A up
+                            drawLine(250, 280, 450, 280, curr); // B right
+                        }
+                    },
+                    {
+                        desc: "Langkah 4: Dari setiap bucu permukaan hadapan, lakarkan garisan surut bersudut 45° yang selari dengan paksi Z.",
+                        draw: (curr) => {
+                            // Point B (top left)
+                            drawLine(250, 280, 250+91.9, 280-91.9, curr, false, true); 
+                            // Point (top right)
+                            drawLine(450, 280, 450+91.9, 280-91.9, curr, false, true);
+                            // Point A (bottom right)
+                            drawLine(450, 450, 450+91.9, 450-91.9, curr, false, true);
+                        }
+                    },
+                    {
+                        desc: "Langkah 5: Sambungkan hujung garisan-garisan surut tadi dengan garisan menegak dan mendatar untuk membentuk permukaan belakang kotak.",
+                        draw: (curr) => {
+                            let zx = 250+91.9, zy = 450-91.9; // C
+                            let bx = 250+91.9, by = 280-91.9;
+                            let trx = 450+91.9, try_ = 280-91.9;
+                            let brx = 450+91.9, bry = 450-91.9;
+
+                            drawLine(zx, zy, brx, bry, curr); // bottom back
+                            drawLine(brx, bry, trx, try_, curr); // right back
+                            drawLine(trx, try_, bx, by, curr); // top back
+                            drawLine(bx, by, zx, zy, curr); // left back
+                        }
+                    },
+                    {
+                        desc: "Langkah 6: Legapkan (hitamkan) semua garisan objek luar dan binaan sehingga terbentuk sebuah kotak lakaran oblik yang jelas.",
+                        draw: (curr) => {
+                            // Front face
+                            drawLine(250,450, 450,450, false, true);
+                            drawLine(450,450, 450,280, false, true);
+                            drawLine(450,280, 250,280, false, true);
+                            drawLine(250,280, 250,450, false, true);
+                            
+                            // Oblique edges
+                            let zx = 250+91.9, zy = 450-91.9; 
+                            let bx = 250+91.9, by = 280-91.9;
+                            let trx = 450+91.9, try_ = 280-91.9;
+                            let brx = 450+91.9, bry = 450-91.9;
+
+                            drawLine(250,280, bx,by, false, true);
+                            drawLine(450,280, trx,try_, false, true);
+                            drawLine(450,450, brx,bry, false, true);
+
+                            // Back visible edges (top and right)
+                            drawLine(bx,by, trx,try_, false, true);
+                            drawLine(trx,try_, brx,bry, false, true);
+                        }
+                    }
+                ]
+            },
+            isometrik: {
+                title: "Lakaran Isometrik",
+                steps: [
+                    {
+                        desc: "Langkah 1: Bina paksi isometrik (berbentuk Y). Paksi Menegak di tengah, paksi X (30° ke kanan) dan paksi Z (30° ke kiri).",
+                        draw: (curr) => {
+                            // Origin(400, 450)
+                            drawLine(400, 450, 400, 150, curr); // Y up
+                            drawLine(400, 450, 400 + 250*0.866, 450 - 250*0.5, curr); // X right
+                            drawLine(400, 450, 400 - 250*0.866, 450 - 250*0.5, curr); // Z left
+                            drawLabel(400, 140, "Paksi Y", curr ? "#ef4444" : "#475569");
+                            drawLabel(620, 310, "Paksi X (30°)", curr ? "#ef4444" : "#475569");
+                            drawLabel(150, 310, "Paksi Z (30°)", curr ? "#ef4444" : "#475569");
+                            
+                            // Base line for reference
+                            if(curr) {
+                                drawLine(150, 450, 650, 450, true, false, true);
+                            }
+                        }
+                    },
+                    {
+                        desc: "Langkah 2: Tandakan ukuran tinggi pada paksi Y, panjang pada paksi X, dan lebar (kedalaman) pada paksi Z.",
+                        draw: (curr) => {
+                            drawPoint(400, 270, "Tinggi", curr); // H=180
+                            drawPoint(400 + 170*0.866, 450 - 170*0.5, "Panjang", curr); // L=170
+                            drawPoint(400 - 140*0.866, 450 - 140*0.5, "Lebar", curr); // W=140
+                        }
+                    },
+                    {
+                        desc: "Langkah 3: Dari tanda ketinggian, bina garisan bersudut 30° ke kiri (selari dengan Z) dan ke kanan (selari dengan X).",
+                        draw: (curr) => {
+                            let tx = 400, ty = 270;
+                            // Right top line
+                            drawLine(tx, ty, tx + 170*0.866, ty - 170*0.5, curr);
+                            // Left top line
+                            drawLine(tx, ty, tx - 140*0.866, ty - 140*0.5, curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 4: Bina garisan menegak dari tanda panjang (X) dan tanda lebar (Z) ke atas menyilang garisan bumbung untuk melengkapkan dinding kotak.",
+                        draw: (curr) => {
+                            let rx = 400 + 170*0.866, ry = 450 - 170*0.5;
+                            let lx = 400 - 140*0.866, ly = 450 - 140*0.5;
+                            drawLine(rx, ry, rx, ry - 180, curr); // Right vertical
+                            drawLine(lx, ly, lx, ly - 180, curr); // Left vertical
+                        }
+                    },
+                    {
+                        desc: "Langkah 5: Dari bucu dinding atas, silangkan dua garisan bersudut 30° berlawanan arah untuk melengkapkan permukaan atas kotak.",
+                        draw: (curr) => {
+                            let rtx = 400 + 170*0.866, rty = 270 - 170*0.5;
+                            let ltx = 400 - 140*0.866, lty = 270 - 140*0.5;
+                            // from right corner, go left-up
+                            drawLine(rtx, rty, rtx - 140*0.866, rty - 140*0.5, curr);
+                            // from left corner, go right-up
+                            drawLine(ltx, lty, ltx + 170*0.866, lty - 170*0.5, curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 6: Legapkan (hitamkan) garisan luaran objek isometrik ini.",
+                        draw: (curr) => {
+                            let b = {x: 400, y: 450};
+                            let rb = {x: 400 + 170*0.866, y: 450 - 170*0.5};
+                            let lb = {x: 400 - 140*0.866, y: 450 - 140*0.5};
+                            let t = {x: 400, y: 270};
+                            let rt = {x: rb.x, y: rb.y - 180};
+                            let lt = {x: lb.x, y: lb.y - 180};
+                            let topback = {x: rt.x - 140*0.866, y: rt.y - 140*0.5};
+
+                            // Draw thick lines
+                            drawLine(b.x, b.y, rb.x, rb.y, false, true);
+                            drawLine(b.x, b.y, lb.x, lb.y, false, true);
+                            drawLine(b.x, b.y, t.x, t.y, false, true);
+                            drawLine(rb.x, rb.y, rt.x, rt.y, false, true);
+                            drawLine(lb.x, lb.y, lt.x, lt.y, false, true);
+                            drawLine(t.x, t.y, rt.x, rt.y, false, true);
+                            drawLine(t.x, t.y, lt.x, lt.y, false, true);
+                            drawLine(rt.x, rt.y, topback.x, topback.y, false, true);
+                            drawLine(lt.x, lt.y, topback.x, topback.y, false, true);
+                        }
+                    }
+                ]
+            },
+            perspektif1: {
+                title: "Lakaran Perspektif Satu Titik",
+                steps: [
+                    {
+                        desc: "Langkah 1: Bina Garis Bumi (GB) secara mendatar di bahagian bawah.",
+                        draw: (curr) => {
+                            drawLine(100, 500, 700, 500, curr);
+                            drawLabel(100, 490, "Garis Bumi (GB)", curr ? "#ef4444" : "#475569");
+                        }
+                    },
+                    {
+                        desc: "Langkah 2: Bina Garis Ufuk (GU) selari dengan GB. Tentukan satu Titik Lenyap (TL) di atas GU.",
+                        draw: (curr) => {
+                            drawLine(100, 200, 700, 200, curr);
+                            drawLabel(100, 190, "Garis Ufuk (GU)", curr ? "#ef4444" : "#475569");
+                            drawPoint(600, 200, "TL", curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 3: Lukiskan sebuah segi empat tepat mewakili permukaan hadapan kotak di atas Garis Bumi (GB).",
+                        draw: (curr) => {
+                            // Rect from (200, 500) width=180, height=150 -> y(350 to 500)
+                            drawLine(200, 500, 380, 500, curr); // Bot
+                            drawLine(380, 500, 380, 350, curr); // Right
+                            drawLine(380, 350, 200, 350, curr); // Top
+                            drawLine(200, 350, 200, 500, curr); // Left
+                        }
+                    },
+                    {
+                        desc: "Langkah 4: Unjurkan garisan perspektif dari setiap bucu segi empat tersebut menuju tepat ke Titik Lenyap (TL).",
+                        draw: (curr) => {
+                            drawLine(200, 500, 600, 200, curr, false, true);
+                            drawLine(380, 500, 600, 200, curr, false, true);
+                            drawLine(380, 350, 600, 200, curr, false, true);
+                            drawLine(200, 350, 600, 200, curr, false, true);
+                        }
+                    },
+                    {
+                        desc: "Langkah 5: Tentukan ukuran kedalaman (lebar) kotak. Lukiskan garisan menegak dan mendatar di antara garisan unjuran untuk membentuk permukaan belakang.",
+                        draw: (curr) => {
+                            // depth factor 0.4
+                            let x1 = 200 + (600-200)*0.4; // 360
+                            let y1 = 500 + (200-500)*0.4; // 380
+                            let x2 = 380 + (600-380)*0.4; // 468
+                            let y2 = 500 + (200-500)*0.4; // 380
+                            let x3 = 380 + (600-380)*0.4; // 468
+                            let y3 = 350 + (200-350)*0.4; // 290
+                            let x4 = 200 + (600-200)*0.4; // 360
+                            let y4 = 350 + (200-350)*0.4; // 290
+
+                            drawLine(x1, y1, x2, y2, curr); // Bot back
+                            drawLine(x2, y2, x3, y3, curr); // Right back
+                            drawLine(x3, y3, x4, y4, curr); // Top back
+                            drawLine(x4, y4, x1, y1, curr); // Left back
+                        }
+                    },
+                    {
+                        desc: "Langkah 6: Legapkan objek pembinaan sehingga kelihatan lakaran perspektif satu titik yang lengkap.",
+                        draw: (curr) => {
+                            // Front
+                            drawLine(200, 500, 380, 500, false, true); 
+                            drawLine(380, 500, 380, 350, false, true); 
+                            drawLine(380, 350, 200, 350, false, true); 
+                            drawLine(200, 350, 200, 500, false, true); 
+                            
+                            // Edges
+                            let x1 = 360, y1 = 380, x2 = 468, y2 = 380, x3 = 468, y3 = 290, x4 = 360, y4 = 290;
+                            drawLine(200, 350, x4, y4, false, true); // Top Left
+                            drawLine(380, 350, x3, y3, false, true); // Top Right
+                            drawLine(380, 500, x2, y2, false, true); // Bot Right
+                            
+                            // Back visible
+                            drawLine(x4, y4, x3, y3, false, true); // Top back
+                            drawLine(x3, y3, x2, y2, false, true); // Right back
+                        }
+                    }
+                ]
+            },
+            perspektif2: {
+                title: "Lakaran Perspektif Dua Titik",
+                steps: [
+                    {
+                        desc: "Langkah 1: Bina Garis Bumi (GB) secara mendatar di bahagian bawah.",
+                        draw: (curr) => {
+                            drawLine(100, 500, 700, 500, curr);
+                            drawLabel(100, 490, "Garis Bumi (GB)", curr ? "#ef4444" : "#475569");
+                        }
+                    },
+                    {
+                        desc: "Langkah 2: Bina Garis Ufuk (GU) selari dengan GB. Tandakan Titik Lenyap 1 (TL1) di kiri dan Titik Lenyap 2 (TL2) di kanan.",
+                        draw: (curr) => {
+                            drawLine(100, 180, 700, 180, curr);
+                            drawLabel(350, 170, "Garis Ufuk (GU)", curr ? "#ef4444" : "#475569");
+                            drawPoint(120, 180, "TL 1", curr);
+                            drawPoint(680, 180, "TL 2", curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 3: Lukiskan satu garisan menegak pada kedudukan yang dikehendaki di atas GB. Ini mewakili penjuru ketinggian terdekat objek.",
+                        draw: (curr) => {
+                            drawLine(400, 500, 400, 260, curr);
+                            drawPoint(400, 500, "", curr);
+                            drawPoint(400, 260, "", curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 4: Unjurkan garisan perspektif dari atas dan bawah garisan menegak tadi ke TL 1 dan TL 2.",
+                        draw: (curr) => {
+                            drawLine(400, 260, 120, 180, curr, false, true); // Top to TL1
+                            drawLine(400, 500, 120, 180, curr, false, true); // Bot to TL1
+                            drawLine(400, 260, 680, 180, curr, false, true); // Top to TL2
+                            drawLine(400, 500, 680, 180, curr, false, true); // Bot to TL2
+                        }
+                    },
+                    {
+                        desc: "Langkah 5: Tandakan ukuran kepanjangan pada unjuran kiri dan lebar pada unjuran kanan. Tarik garisan menegak ke atas menyilang unjuran atas.",
+                        draw: (curr) => {
+                            // Left width t=0.4
+                            let lx = 400 + (120-400)*0.45; // 274
+                            let lby = 500 + (180-500)*0.45; // 356
+                            let lty = 260 + (180-260)*0.45; // 224
+                            drawLine(lx, lby, lx, lty, curr);
+                            
+                            // Right width t=0.35
+                            let rx = 400 + (680-400)*0.4; // 512
+                            let rby = 500 + (180-500)*0.4; // 372
+                            let rty = 260 + (180-260)*0.4; // 228
+                            drawLine(rx, rby, rx, rty, curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 6: Dari bucu atas penjuru baharu tadi, unjurkan garisan menyilang secara bertentangan (kiri ke TL2, kanan ke TL1) untuk menghasilkan bucu belakang.",
+                        draw: (curr) => {
+                            let lx = 274, lty = 224;
+                            let rx = 512, rty = 228;
+                            drawLine(lx, lty, 680, 180, curr, false, true); // left top to TL2
+                            drawLine(rx, rty, 120, 180, curr, false, true); // right top to TL1
+                        }
+                    },
+                    {
+                        desc: "Langkah 7: Legapkan pembinaan kotak tersebut. Titik persilangan unjuran langkah 6 menghasilkan bumbung kotak.",
+                        draw: (curr) => {
+                            let lx = 274, lty = 224, lby = 356;
+                            let rx = 512, rty = 228, rby = 372;
+                            // intersect of (274,224)->(680,180) and (512,228)->(120,180)
+                            let back = getIntersect(lx, lty, 680, 180, rx, rty, 120, 180);
+
+                            // Front Y
+                            drawLine(400, 500, 400, 260, false, true);
+                            // Bottom left/right
+                            drawLine(400, 500, lx, lby, false, true);
+                            drawLine(400, 500, rx, rby, false, true);
+                            // Side Verticals
+                            drawLine(lx, lby, lx, lty, false, true);
+                            drawLine(rx, rby, rx, rty, false, true);
+                            // Top left/right
+                            drawLine(400, 260, lx, lty, false, true);
+                            drawLine(400, 260, rx, rty, false, true);
+                            // Roof
+                            drawLine(lx, lty, back.x, back.y, false, true);
+                            drawLine(rx, rty, back.x, back.y, false, true);
+                        }
+                    }
+                ]
+            },
+            perspektif3: {
+                title: "Lakaran Perspektif Tiga Titik (Mata Burung)",
+                steps: [
+                    {
+                        desc: "Langkah 1: Bina Garis Ufuk (GU) dan satu garisan menegak panduan di tengah-tengah.",
+                        draw: (curr) => {
+                            drawLine(100, 120, 700, 120, curr);
+                            drawLine(400, 50, 400, 550, curr, false, true);
+                            drawLabel(100, 110, "Garis Ufuk (GU)", curr ? "#ef4444" : "#475569");
+                        }
+                    },
+                    {
+                        desc: "Langkah 2: Tandakan TL 1 dan TL 2 pada GU. Tandakan TL 3 di bahagian paling bawah garisan menegak. Tanda titik ketinggian (Atas dan Bawah objek) pada paksi tegak.",
+                        draw: (curr) => {
+                            drawPoint(150, 120, "TL 1", curr);
+                            drawPoint(650, 120, "TL 2", curr);
+                            drawPoint(400, 550, "TL 3", curr);
+
+                            // Height points
+                            drawPoint(400, 200, "Atas", curr);
+                            drawPoint(400, 360, "Bawah", curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 3: Unjurkan garisan dari kedua-dua titik ketinggian (Atas dan Bawah) tersebut menuju ke Titik Lenyap (TL 1) dan (TL 2).",
+                        draw: (curr) => {
+                            drawLine(400, 200, 150, 120, curr); // Top to TL1
+                            drawLine(400, 200, 650, 120, curr); // Top to TL2
+                            drawLine(400, 360, 150, 120, curr); // Bot to TL1
+                            drawLine(400, 360, 650, 120, curr); // Bot to TL2
+                        }
+                    },
+                    {
+                        desc: "Langkah 4: Tentukan ukuran panjang dan lebar objek di atas garisan unjuran (kiri dan kanan), kemudian unjurkan titik-titik tersebut terus ke bawah menuju TL 3.",
+                        draw: (curr) => {
+                            // Find point on top-left edge
+                            let dx = 150 - 400; // -250
+                            let dy = 120 - 200; // -80
+                            // Let's use x=270
+                            let tL = (270 - 400) / -250; // 130/250 = 0.52
+                            let yL = 200 + tL * dy; // 200 - 41.6 = 158.4
+                            
+                            // Find point on top-right edge
+                            let tR = (520 - 400) / 250; // 120/250 = 0.48
+                            let yR = 200 + tR * (120-200); // 200 - 38.4 = 161.6
+
+                            drawPoint(270, yL, "", curr);
+                            drawPoint(520, yR, "", curr);
+
+                            // Project down to TL3
+                            drawLine(270, yL, 400, 550, curr);
+                            drawLine(520, yR, 400, 550, curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 5: Dari titik bucu baharu, silangkan garisan ke TL 1 dan TL 2 bertentangan untuk menghasilkan permukaan bumbung (kerana dilihat dari atas / Mata Burung).",
+                        draw: (curr) => {
+                            // Points from step 4
+                            let xL = 270, yL = 158.4;
+                            let xR = 520, yR = 161.6;
+
+                            // Left top goes to TL2, Right top goes to TL1
+                            drawLine(xL, yL, 650, 120, curr);
+                            drawLine(xR, yR, 150, 120, curr);
+                        }
+                    },
+                    {
+                        desc: "Langkah 6: Legapkan kotak. Semua tiang bangunan tidak lagi tegak selari, sebaliknya semakin meruncing ke arah TL 3 di bawah bumi.",
+                        draw: (curr) => {
+                            let top_c = {x: 400, y: 200};
+                            let bot_c = {x: 400, y: 360};
+                            let top_l = {x: 270, y: 158.4};
+                            let top_r = {x: 520, y: 161.6};
+                            
+                            // Intersection of Top-Left to TL2 and Top-Right to TL1
+                            let back_top = getIntersect(top_l.x, top_l.y, 650, 120, top_r.x, top_r.y, 150, 120);
+
+                            // Intersection of Top-Left to TL3 and Bot-Center to TL1
+                            let bot_l = getIntersect(top_l.x, top_l.y, 400, 550, 400, 360, 150, 120);
+                            
+                            // Intersection of Top-Right to TL3 and Bot-Center to TL2
+                            let bot_r = getIntersect(top_r.x, top_r.y, 400, 550, 400, 360, 650, 120);
+
+                            // Draw thick lines
+                            // Front Y
+                            drawLine(top_c.x, top_c.y, bot_c.x, bot_c.y, false, true);
+                            
+                            // Top face
+                            drawLine(top_c.x, top_c.y, top_l.x, top_l.y, false, true);
+                            drawLine(top_c.x, top_c.y, top_r.x, top_r.y, false, true);
+                            drawLine(top_l.x, top_l.y, back_top.x, back_top.y, false, true);
+                            drawLine(top_r.x, top_r.y, back_top.x, back_top.y, false, true);
+                            
+                            // Side walls
+                            drawLine(bot_c.x, bot_c.y, bot_l.x, bot_l.y, false, true);
+                            drawLine(bot_c.x, bot_c.y, bot_r.x, bot_r.y, false, true);
+                            drawLine(top_l.x, top_l.y, bot_l.x, bot_l.y, false, true);
+                            drawLine(top_r.x, top_r.y, bot_r.x, bot_r.y, false, true);
+                        }
+                    }
+                ]
+            }
+        };
+
+        // --- CORE FUNCTIONS ---
+        
+        function renderStep() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const activeSim = simulations[currentMode];
+            
+            // Draw all steps up to current
+            for(let i = 0; i <= currentStepIndex; i++) {
+                // If it's the current step, pass 'true' to highlight it
+                activeSim.steps[i].draw(i === currentStepIndex);
+            }
+
+            // Update UI texts
+            document.getElementById('mode-title').innerText = activeSim.title;
+            document.getElementById('step-counter').innerText = `Langkah ${currentStepIndex + 1} / ${activeSim.steps.length}`;
+            document.getElementById('step-description').innerText = activeSim.steps[currentStepIndex].desc;
+
+            // Manage buttons
+            document.getElementById('btn-prev').disabled = (currentStepIndex === 0);
+            document.getElementById('btn-next').disabled = (currentStepIndex === activeSim.steps.length - 1);
+        }
+
+        function nextStep() {
+            if(currentStepIndex < simulations[currentMode].steps.length - 1) {
+                currentStepIndex++;
+                renderStep();
+            }
+        }
+
+        function prevStep() {
+            if(currentStepIndex > 0) {
+                currentStepIndex--;
+                renderStep();
+            }
+        }
+
+        function resetStep() {
+            currentStepIndex = 0;
+            renderStep();
+        }
+
+        function changeTab(mode) {
+            // Update active state
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${mode}`).classList.add('active');
+            
+            // Set variables & reset
+            currentMode = mode;
+            currentStepIndex = 0;
+            renderStep();
+        }
+
+        // --- INIT ---
+        window.onload = () => {
+            renderStep(); // Start rendering initially
+        };
+
+    </script>
+</body>
+</html>
