@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Sistem Hidroponik & Pengairan (RBT Tingkatan 1 Bab 5)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0fdf4;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-active {
+            background-color: #16a34a;
+            color: white;
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.2);
+        }
+        .btn-inactive {
+            background-color: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .btn-inactive:hover {
+            background-color: #f3f4f6;
+        }
+        .active-tab {
+            color: #16a34a; 
+            border-bottom-color: #16a34a;
+        }
+        .inactive-tab {
+            color: #6b7280; 
+            border-bottom-color: transparent;
+        }
+        .inactive-tab:hover {
+            color: #374151; 
+            border-bottom-color: #d1d5db; 
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+    </style>
+</head>
+<body class="h-screen w-full overflow-hidden flex flex-col">
+
+    <header class="bg-green-700 text-white p-4 shadow-md z-10 flex-none">
+        <div class="container mx-auto flex items-center justify-between">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold">Simulasi Aplikasi Teknologi (Pertanian)</h1>
+                <p class="text-xs md:text-sm opacity-90">Rujukan: T1 RBT Buku Teks - Bab 5</p>
+            </div>
+            <span class="text-xs bg-green-800 px-3 py-1 rounded-full border border-green-500 hidden sm:inline-block">Simulasi Interaktif</span>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b border-gray-200 flex-none z-10 shadow-sm">
+        <div class="container mx-auto px-4 flex space-x-2 overflow-x-auto">
+            <button onclick="switchCategory('hidroponik')" id="btn-tab-hidroponik" class="tab-btn active-tab px-5 py-3 font-semibold text-sm border-b-2 transition-colors whitespace-nowrap outline-none flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/></svg>
+                6 Sistem Hidroponik
+            </button>
+            <button onclick="switchCategory('pengairan')" id="btn-tab-pengairan" class="tab-btn inactive-tab px-5 py-3 font-semibold text-sm border-b-2 transition-colors whitespace-nowrap outline-none flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H5.5z"/></svg>
+                3 Sistem Pengairan
+            </button>
+            <button onclick="switchCategory('pemasangan')" id="btn-tab-pemasangan" class="tab-btn inactive-tab px-5 py-3 font-semibold text-sm border-b-2 transition-colors whitespace-nowrap outline-none flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Langkah Pemasangan
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 relative overflow-hidden flex flex-col md:flex-row bg-gray-50">
+        
+        <!-- Sidebar Menu -->
+        <aside class="w-full md:w-1/3 lg:w-1/4 bg-white shadow-lg z-10 flex flex-col overflow-y-auto">
+            <div class="p-4 border-b border-gray-200 bg-green-50 text-xs font-semibold text-green-900 flex items-center justify-between">
+                <span>Pilih Sistem:</span>
+                <span class="flex items-center"><span class="inline-block w-2.5 h-2.5 bg-blue-500 rounded-full mr-1.5 animate-pulse"></span> Aliran Air</span>
+            </div>
+            <div id="menu-container" class="flex-1 p-4 space-y-2 overflow-y-auto"></div>
+        </aside>
+
+        <!-- Main Simulation Area -->
+        <section class="flex-1 flex flex-col h-full bg-gray-50 overflow-y-auto p-4 gap-4 relative">
+            
+            <div class="flex-1 min-h-[320px] md:min-h-[420px] w-full bg-white rounded-xl shadow-inner relative overflow-hidden flex items-center justify-center p-2 border border-gray-200">
+                <canvas id="simCanvas"></canvas>
+            </div>
+
+            <!-- Info Panel -->
+            <div class="bg-white p-5 md:p-6 rounded-xl shadow-md border border-gray-200 flex-none">
+                <h3 id="info-title" class="text-xl md:text-2xl font-bold text-gray-800 mb-3 border-b pb-2">Tajuk Sistem</h3>
+                
+                <div id="info-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="col-desc">
+                        <h4 class="text-base font-semibold text-blue-700 flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="header-desc-text">Penerangan & Perbezaan</span>
+                        </h4>
+                        <p id="info-desc" class="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                            Penerangan akan muncul di sini.
+                        </p>
+                    </div>
+                    <div id="col-benefits">
+                        <h4 class="text-base font-semibold text-green-700 flex items-center mb-2">
+                            <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Kebaikan Sistem
+                        </h4>
+                        <p id="info-benefits" class="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                            Kebaikan akan muncul di sini.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Data for the 6 Hydroponic systems
+        const hidroponikData = [
+            {
+                id: "aliran-cetek",
+                name: "1. Teknik Aliran Cetek (NFT)",
+                desc: "Larutan baja disalurkan dalam palung yang mengandungi akar tanaman. Paras air di dalam palung adalah sangat cetek (nipis seperti filem).\n\nPerbezaan: Pam menyalurkan air tanpa henti, tetapi lapisan air yang menyentuh akar sangat nipis berbanding aliran dalam.",
+                benefits: "• Akar mendapat bekalan oksigen yang sangat baik kerana sebahagian akar terdedah kepada udara.\n• Pam air bersaiz lebih kecil boleh digunakan (menjimatkan elektrik).\n• Penyerapan nutrien yang cekap."
+            },
+            {
+                id: "aliran-dalam",
+                name: "2. Teknik Aliran Dalam",
+                desc: "Sama seperti aliran cetek, tetapi menggunakan saiz palung yang lebih lebar dan tinggi.\n\nPerbezaan: Paras larutan air baja pada akar adalah lebih dalam. Akar tenggelam sepenuhnya dalam larutan baja yang sentiasa mengalir.",
+                benefits: "• Jika pam air berhenti berfungsi (bekalan elektrik terputus), akar masih mempunyai takungan bekalan air, mengelakkan pokok cepat mati.\n• Sesuai untuk tanaman yang berakar besar dan panjang."
+            },
+            {
+                id: "takung",
+                name: "3. Teknik Takung",
+                desc: "Biji benih disemai pada media tanaman dalam bekas yang diletakkan terus di atas larutan baja pada takung.\n\nPerbezaan: Ini ialah sistem pasif sepenuhnya. TIADA pam air dan TIADA pergerakan air. Air berada dalam keadaan statik sepenuhnya.",
+                benefits: "• Sangat murah dan mudah dibina.\n• Berfungsi sepenuhnya tanpa sebarang bekalan elektrik.\n• Sangat sesuai untuk ruang terhad dan kawasan pedalaman."
+            },
+            {
+                id: "pasang-surut",
+                name: "4. Teknik Pasang Surut",
+                desc: "Alat pengatur masa (timer) digunakan untuk mengawal pengaliran larutan baja.\n\nPerbezaan: Larutan baja dipam naik membanjiri akar (pasang) dan ditahan untuk seketika. Apabila pam ditutup, air surut perlahan-lahan (3x lebih lambat melalui paip alir keluar kecil) kembali ke tangki utama.",
+                benefits: "• Pembaharuan oksigen yang sangat baik pada zon akar setiap kali air surut.\n• Medium tanaman mengekalkan kelembapan seimbang tanpa menjadi TERLALU basah."
+            },
+            {
+                id: "aeroponik",
+                name: "5. Aeroponik",
+                desc: "Akar tanaman tergantung di udara dalam ruang tanaman tertutup. Larutan baja disembur secara kabus melalui nozel mengikut pemasa.\n\nPerbezaan: Akar tidak terendam dalam air, sebaliknya bergantung di udara terbuka di dalam kebuk gelap.",
+                benefits: "• Kadar penyerapan nutrien dan oksigen paling cepat dan maksimum.\n• Pertumbuhan pokok lebih pantas berbanding sistem lain.\n• Menjimatkan penggunaan air dan baja."
+            },
+            {
+                id: "pengairan-titis",
+                name: "6. Teknik Pengairan Titis (Fertigasi)",
+                desc: "Bekalan air dan baja disalurkan terus ke zon akar pokok mengikut masa secara menitis perlahan melalui tiub mikro.\n\nPerbezaan: Pemasa mengawal masa pam hidup (ON) secara berkala dan lama, membolehkan titisan air memasuki polibeg berasingan secara perlahan.",
+                benefits: "• Kecekapan tinggi kerana penitisan air yang tepat pada pangkal pokok.\n• Mengelakkan jangkitan penyakit bawaan tanah.\n• Menjimatkan air dan nutrisi baja."
+            }
+        ];
+
+        // Data for Irrigation systems
+        const pengairanData = [
+            {
+                id: "percikan",
+                name: "1. Pengairan Percikan",
+                desc: "Sistem ini menghamburkan air ke udara melalui kepala pemercik (sprinkler) dan jatuh seperti hujan ke permukaan tanah atau daun tanaman.\n\nPerbezaan: Memerlukan tekanan air tinggi dan pam untuk memancutkan air secara membusur mengikut daya graviti.",
+                benefits: "• Liputan semburan yang meluas dan sesuai untuk tanaman berlarik/padat.\n• Menyejukkan persekitaran mikro tanaman pada hari panas.\n• Boleh membersihkan habuk pada daun."
+            },
+            {
+                id: "kabus",
+                name: "2. Pengairan Semburan Kabus",
+                desc: "Air disembur dalam bentuk titisan yang sangat halus (kabus) menggunakan nozel khas bertekanan tinggi dari bahagian atas (overhead).\n\nPerbezaan: Zarah kabus terapung di udara secara terbuka di kawasan semaian atau rumah hijau untuk melembapkan persekitaran.",
+                benefits: "• Meningkatkan kelembapan udara dengan sangat berkesan (sesuai untuk semaian/orkid).\n• Mengurangkan suhu persekitaran rumah hijau secara mendadak.\n• Penggunaan air yang lebih ekonomik."
+            },
+            {
+                id: "titis-pengairan",
+                name: "3. Pengairan Titis",
+                desc: "Bekalan air disalurkan secara menitis perlahan-lahan dari paip agihan terus ke pangkal tanaman di atas tanah.\n\nPerbezaan: Konsep sama seperti Fertigasi tetapi dilaksanakan terus pada tanah ladang terbuka mengikut jadual pemasa.",
+                benefits: "• Kecekapan penggunaan air tertinggi (tiada sejatan melampau).\n• Mengurangkan pertumbuhan rumpai liar kerana air fokus pada pangkal pokok sahaja.\n• Daun kekal kering, mengurangkan risiko kulat."
+            }
+        ];
+
+        // Data for Pemasangan Sistem Fertigasi (Bab 5.1.2)
+        const pemasanganData = [
+            {
+                id: "p-lakaran",
+                name: "1. Menyediakan lakaran reka bentuk sistem fertigasi",
+                desc: "Menyediakan lakaran reka bentuk sistem fertigasi sebelum pemasangan bermula bagi memudahkan perancangan proses kerja.",
+                benefits: "Tujuan:\n• Memudahkan perancangan pemasangan komponen.\n• Membantu menentukan kuantiti dan jenis bahan yang perlu dibeli mengikut saiz keluasan."
+            },
+            {
+                id: "p-potong",
+                name: "2. Pemotongan paip poli",
+                desc: "Memotong paip poli utama, sekunder dan tertier menggunakan alat pemotong paip khas atau gunting PVC mengikut ukuran yang telah dirancang dalam lakaran.",
+                benefits: "Tujuan:\n• Memastikan ukuran panjang paip adalah tepat dan sekata.\n• Potongan yang rata dan lurus sangat penting bagi mengelakkan kebocoran pada penyambung."
+            },
+            {
+                id: "p-tebuk",
+                name: "3. Membuat lubang untuk nipple pada paip tertier",
+                desc: "Membuat lubang pada paip menggunakan alat penebuk lubang khas (hole puncher) dengan jarak yang bersesuaian.",
+                benefits: "Tujuan:\n• Menyediakan ruang cengkam yang kedap air untuk memasukkan puting (nipple) penitis supaya tiada kebocoran tekanan."
+            },
+            {
+                id: "p-sedia-penitis",
+                name: "4. Penyediaan set penitis",
+                desc: "Memotong tiub mikro mengikut panjang yang sama, kemudian menyambungkan satu hujung dengan penitis (dripper) dan satu hujung lagi dengan puting (nipple).",
+                benefits: "Tujuan:\n• Menyiapkan set mikropenitis terlebih dahulu sebelum dipasang secara pukal pada paip tertier untuk menjimatkan masa."
+            },
+            {
+                id: "p-sambung-penitis",
+                name: "5. Penyambungan paip tertier pada set penitis",
+                desc: "Memasukkan bahagian puting (nipple) yang telah siap dipasang dengan tiub mikro ke dalam lubang yang telah ditebuk pada paip tertier.",
+                benefits: "Tujuan:\n• Menyambungkan saliran air dari paip tertier terus ke set penitis. Perlu ditekan dengan kuat supaya tidak tercabut akibat tekanan pam."
+            },
+            {
+                id: "p-sambung-sekunder",
+                name: "6. Penyambungan paip tertier pada paip sekunder",
+                desc: "Menyambungkan rangkaian paip tertier kepada paip sekunder menggunakan penyambung khas seperti penyambung Lurus, Tee, atau Siku 90 darjah.",
+                benefits: "Tujuan:\n• Membentuk rangkaian saliran berperingkat dari paip besar (sekunder) yang mengagihkan air ke paip-paip yang lebih kecil (tertier)."
+            },
+            {
+                id: "p-injap",
+                name: "7. Pemasangan injap penahan pada paip utama",
+                desc: "Memasang injap penahan (stop valve / ball valve) pada permulaan paip utama yang berhampiran dengan tangki nutrien.",
+                benefits: "Tujuan:\n• Berfungsi untuk mengawal aliran air (Buka atau Tutup) dari tangki utama masuk ke dalam sistem pengairan."
+            },
+            {
+                id: "p-lengkap-tertier",
+                name: "8. Melengkapkan pemasangan paip tertier",
+                desc: "Membentang, meluruskan dan menyusun rangkaian paip tertier ke arah barisan atau kedudukan setiap polibeg tanaman di tapak.",
+                benefits: "Tujuan:\n• Memastikan setiap pokok (polibeg) mendapat punca air dan set penitis berada tepat di pangkal tanaman."
+            },
+            {
+                id: "p-saluran-pam",
+                name: "9. Penyambungan saluran air keluar ke pam air",
+                desc: "Menyambungkan muncung saluran pam air menggunakan tiub lut sinar (paip jernih) dan kemudian disambung kepada paip poli utama.",
+                benefits: "Tujuan:\n• Tiub lut sinar digunakan supaya aliran air keluar dari pam dapat dipantau secara visual jika pam tersumbat atau rosak."
+            },
+            {
+                id: "p-pam-tangki",
+                name: "10. Memasukkan pam air ke dalam tangki nutrien",
+                desc: "Meletakkan dan merendam pam air (water pump) yang telah diikat kemas sambungan paipnya hingga ke dasar dalam tangki larutan baja.",
+                benefits: "Tujuan:\n• Sebagai kedudukan akhir pam untuk mengepam bekalan larutan baja (nutrien) bagi disalurkan ke seluruh sistem tanaman."
+            },
+            {
+                id: "p-pemasa",
+                name: "11. Pemasangan pam air pada alat pengatur masa",
+                desc: "Menyambungkan palam elektrik (plug) dari pam air kepada alat pengatur masa (timer), dan kemudian disambung ke soket elektrik.",
+                benefits: "Tujuan:\n• Membolehkan sistem mengepam air dan berhenti secara automatik mengikut jadual kekerapan (frekuensi) dan tempoh masa yang diprogramkan."
+            },
+            {
+                id: "p-lengkap-sistem",
+                name: "12. Melengkapkan penyambungan sistem pengairan pada tangki",
+                desc: "Kerja-kerja peringkat akhir (Ujian Kelancaran / Test Run) dengan menghidupkan pam secara manual buat seketika.",
+                benefits: "Tujuan:\n• Memastikan tekanan air tersebar rata.\n• Memeriksa jika terdapat kebocoran pada setiap titik penyambungan paip sebelum pokok mula ditanam."
+            }
+        ];
+
+        let currentCategory = 'hidroponik';
+        let currentIndexes = { hidroponik: 0, pengairan: 0, pemasangan: 0 };
+
+        function switchCategory(category) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('inactive-tab');
+            });
+            
+            const activeBtn = document.getElementById('btn-tab-' + category);
+            if (activeBtn) {
+                activeBtn.classList.remove('inactive-tab');
+                activeBtn.classList.add('active-tab');
+            }
+            
+            renderMenu();
+            updateInfo();
+            resetParticles();
+            setTimeout(resizeCanvas, 50);
+        }
+
+        function selectSystem(index) {
+            currentIndexes[currentCategory] = index;
+            renderMenu();
+            updateInfo();
+            resetParticles();
+        }
+
+        function renderMenu() {
+            const menuContainer = document.getElementById('menu-container');
+            if (!menuContainer) return;
+            
+            menuContainer.innerHTML = '';
+            const data = currentCategory === 'hidroponik' ? hidroponikData : currentCategory === 'pengairan' ? pengairanData : pemasanganData;
+            const activeIdx = currentIndexes[currentCategory];
+            
+            data.forEach((sys, index) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-4 py-3 mb-2 rounded-lg font-medium text-sm transition-all duration-200 border ${index === activeIdx ? 'btn-active font-semibold shadow-sm' : 'btn-inactive'}`;
+                btn.textContent = sys.name;
+                btn.onclick = () => selectSystem(index);
+                menuContainer.appendChild(btn);
+            });
+        }
+
+        function updateInfo() {
+            const infoTitle = document.getElementById('info-title');
+            const infoDesc = document.getElementById('info-desc');
+            const infoBenefits = document.getElementById('info-benefits');
+            const headerDescText = document.getElementById('header-desc-text');
+            const colBenefits = document.getElementById('col-benefits');
+            const infoGrid = document.getElementById('info-grid');
+            
+            if (!infoTitle || !infoDesc || !infoBenefits) return;
+
+            const data = currentCategory === 'hidroponik' ? hidroponikData : currentCategory === 'pengairan' ? pengairanData : pemasanganData;
+            const sys = data[currentIndexes[currentCategory]];
+            
+            infoTitle.textContent = sys.name;
+            
+            // Logik untuk mengubah susun atur jika di tab Pemasangan
+            if (currentCategory === 'pemasangan') {
+                if (headerDescText) headerDescText.textContent = 'Penerangan Langkah';
+                if (colBenefits) colBenefits.style.display = 'none';
+                if (infoGrid) {
+                    infoGrid.classList.remove('md:grid-cols-2');
+                    infoGrid.classList.add('md:grid-cols-1');
+                }
+                // Menggabungkan penerangan dan tujuan sebagai satu perenggan
+                infoDesc.textContent = sys.desc + '\n\n' + sys.benefits;
+            } else {
+                if (headerDescText) headerDescText.textContent = 'Penerangan & Perbezaan';
+                if (colBenefits) colBenefits.style.display = 'block';
+                if (infoGrid) {
+                    infoGrid.classList.remove('md:grid-cols-1');
+                    infoGrid.classList.add('md:grid-cols-2');
+                }
+                infoDesc.textContent = sys.desc;
+                infoBenefits.textContent = sys.benefits;
+            }
+        }
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const logicalWidth = 1000;
+        const logicalHeight = 500;
+        
+        let particles = [];
+        let animationFrameId;
+        let time = 0;
+
+        function resizeCanvas() {
+            if (!canvas || !canvas.parentElement) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * (window.devicePixelRatio || 1);
+            canvas.height = rect.height * (window.devicePixelRatio || 1);
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // reset scale
+            ctx.scale(canvas.width / logicalWidth, canvas.height / logicalHeight);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function resetParticles() {
+            particles = [];
+            time = 0;
+        }
+
+        class Particle {
+            constructor(x, y, vx, vy, color = '#3b82f6', life = 100, gravity = 0, size = null) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.life = life;
+                this.maxLife = life;
+                this.size = size !== null ? size : (3 + Math.random() * 2);
+                this.gravity = gravity;
+            }
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life--;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function drawTank(x, y, w, h, waterLevel, showWater = true) {
+            ctx.fillStyle = '#e5e7eb';
+            ctx.fillRect(x, y, w, h);
+            
+            if (showWater && waterLevel > 0) {
+                const waterH = h * Math.min(1, Math.max(0, waterLevel));
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.45)';
+                ctx.fillRect(x, y + (h - waterH), w, waterH);
+                
+                ctx.strokeStyle = '#2563eb';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x, y + (h - waterH));
+                ctx.lineTo(x + w, y + (h - waterH));
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#4b5563';
+            ctx.lineWidth = 5;
+            ctx.strokeRect(x, y, w, h);
+        }
+
+        function drawPipe(points, width = 12) {
+            if (!points || points.length < 2) return;
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = width;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for(let i=1; i<points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = Math.max(1, width - 4);
+            ctx.stroke();
+        }
+
+        function drawPump(x, y) {
+            ctx.fillStyle = '#1f2937';
+            ctx.fillRect(x - 20, y - 15, 40, 30);
+            ctx.fillStyle = '#ef4444';
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#111827';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - 20, y);
+            ctx.quadraticCurveTo(x - 50, y - 20, x - 60, y + 40);
+            ctx.stroke();
+
+            ctx.fillStyle = '#d1d5db';
+            ctx.fillRect(x - 70, y + 40, 20, 15);
+        }
+
+        function drawPlant(x, y, potType = 'net') {
+            if (potType === 'net') {
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath();
+                ctx.moveTo(x - 25, y);
+                ctx.lineTo(x + 25, y);
+                ctx.lineTo(x + 15, y + 30);
+                ctx.lineTo(x - 15, y + 30);
+                ctx.fill();
+            } else if (potType === 'polybag') {
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(x - 30, y, 60, 70);
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(x - 28, y+2, 56, 10);
+            }
+
+            // Static plant roots (no movement)
+            if (potType !== 'polybag') {
+                ctx.strokeStyle = potType === 'tanah' ? '#ca8a04' : '#d4d4d8';
+                ctx.lineWidth = 2;
+                
+                const rootCurves = [
+                    {x1: -10, y1: 50, x2: -15, y2: 85},
+                    {x1: 0, y1: 45, x2: -5, y2: 80},
+                    {x1: 10, y1: 55, x2: 5, y2: 90},
+                    {x1: 15, y1: 40, x2: 20, y2: 75},
+                    {x1: -18, y1: 40, x2: -25, y2: 70}
+                ];
+
+                for (let i = 0; i < rootCurves.length; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + (i * 4 - 8), y + (potType === 'tanah' ? 0 : 25)); 
+                    ctx.quadraticCurveTo(
+                        x + rootCurves[i].x1, y + rootCurves[i].y1,
+                        x + rootCurves[i].x2, y + rootCurves[i].y2
+                    );
+                    ctx.stroke();
+                }
+            }
+
+            // Plant leaves
+            ctx.fillStyle = '#22c55e';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.quadraticCurveTo(x - 40, y - 20, x - 20, y - 50);
+            ctx.quadraticCurveTo(x, y - 20, x, y);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.quadraticCurveTo(x + 40, y - 20, x + 20, y - 50);
+            ctx.quadraticCurveTo(x, y - 20, x, y);
+            ctx.fill();
+
+            ctx.fillStyle = '#16a34a';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.quadraticCurveTo(x - 10, y - 50, x, y - 70);
+            ctx.quadraticCurveTo(x + 10, y - 50, x, y);
+            ctx.fill();
+        }
+
+        function renderSimulation() {
+            ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+            
+            let mainTankX = 100, mainTankY = 320, mainTankW = 250, mainTankH = 150;
+            const data = currentCategory === 'hidroponik' ? hidroponikData : currentCategory === 'pengairan' ? pengairanData : pemasanganData;
+            const sysId = data[currentIndexes[currentCategory]].id;
+            
+            time += 0.02;
+
+            if (currentCategory === 'pemasangan') {
+                if (sysId === 'p-lakaran') {
+                    // Lakaran Blueprint Animasi
+                    ctx.fillStyle = '#1e3a8a'; 
+                    ctx.fillRect(300, 100, 400, 300); // Blueprint paper
+                    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 1;
+                    for(let i=0; i<=400; i+=20) {
+                        ctx.beginPath(); ctx.moveTo(300+i, 100); ctx.lineTo(300+i, 400); ctx.stroke();
+                        if(i<=300) { ctx.beginPath(); ctx.moveTo(300, 100+i); ctx.lineTo(700, 100+i); ctx.stroke(); }
+                    }
+                    // Lukisan skematik bersinar (pulsing)
+                    let alpha = 0.5 + Math.abs(Math.sin(time*2)) * 0.5;
+                    ctx.globalAlpha = alpha;
+                    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5;
+                    ctx.strokeRect(400, 200, 200, 100); // Rangka paip
+                    ctx.fillStyle = '#ffffff'; ctx.fillRect(370, 180, 50, 50); // Tangki
+                    ctx.beginPath(); ctx.arc(450, 200, 8, 0, Math.PI*2); ctx.fill(); // Pokok 1
+                    ctx.beginPath(); ctx.arc(550, 200, 8, 0, Math.PI*2); ctx.fill(); // Pokok 2
+                    ctx.globalAlpha = 1.0;
+                } else if (sysId === 'p-potong') {
+                    // Memotong paip poli
+                    let cycle = (time * 3) % (Math.PI * 2);
+                    let cutProgress = Math.sin(cycle);
+                    let gap = cutProgress > 0 ? 0 : Math.abs(cutProgress) * 35; // Paip terbelah apabila alat pemotong turun
+
+                    ctx.fillStyle = '#111827';
+                    ctx.fillRect(200, 230, 298 - gap/2, 40); // Paip Kiri
+                    ctx.fillRect(502 + gap/2, 230, 298 - gap/2, 40); // Paip Kanan
+
+                    let scissorY = 250 - Math.abs(cutProgress) * 40; // Gunting bergerak atas bawah
+                    ctx.fillStyle = '#ef4444'; ctx.fillRect(490, scissorY - 60, 20, 60); // Pemegang alat potong
+                    ctx.fillStyle = '#9ca3af'; 
+                    ctx.beginPath(); ctx.moveTo(490, scissorY); ctx.lineTo(515, scissorY); ctx.lineTo(500, scissorY + 35); ctx.fill(); // Mata pisau pemotong
+                } else if (sysId === 'p-tebuk') {
+                    // Menebuk Lubang
+                    let cycle = (time * 3.5) % (Math.PI * 2);
+                    let punchY = 250 - Math.abs(Math.sin(cycle)) * 80;
+
+                    ctx.fillStyle = '#111827'; ctx.fillRect(200, 250, 600, 40); // Paip utama
+                    
+                    // Tunjuk lubang terhasil jika alat naik
+                    ctx.fillStyle = '#000000'; 
+                    ctx.beginPath(); ctx.arc(500, 260, 8, 0, Math.PI*2); ctx.fill();
+
+                    // Alat Penebuk (Hole puncher)
+                    ctx.fillStyle = '#374151'; ctx.fillRect(485, punchY - 50, 30, 50); ctx.fillRect(470, punchY - 50, 60, 15);
+                    ctx.fillStyle = '#9ca3af'; ctx.fillRect(495, punchY, 10, 20); // Pin penebuk
+                } else if (sysId === 'p-sedia-penitis') {
+                    // Penyediaan Set Penitis (Cantum Nipple, Tube, Penitis)
+                    let cycle = (time * 2) % (Math.PI * 2);
+                    let gap = Math.abs(Math.sin(cycle)) * 40; // Jarak rapat/jauh semasa cantuman
+                    
+                    ctx.fillStyle = '#111827'; ctx.fillRect(350 - gap, 240, 30, 20); // Nipple base
+                    ctx.fillStyle = '#374151'; ctx.fillRect(380 - gap, 245, 10, 10); // Nipple pin
+                    
+                    ctx.fillStyle = '#9ca3af'; ctx.fillRect(410, 242, 180, 16); // Tiub mikro kelabu
+                    
+                    ctx.fillStyle = '#1e40af'; ctx.fillRect(610 + gap, 235, 40, 30); // Penitis biru
+                    ctx.fillStyle = '#111827'; ctx.fillRect(600 + gap, 242, 10, 16); // Penitis joint
+                    
+                    ctx.fillStyle = '#374151'; ctx.font = '14px Inter';
+                    ctx.fillText('Nipple', 340 - gap, 290);
+                    ctx.fillText('Tiub Mikro', 460, 290);
+                    ctx.fillText('Penitis', 610 + gap, 290);
+                } else if (sysId === 'p-sambung-penitis') {
+                    // Pemasangan Set Penitis ke Paip
+                    let cycle = (time * 2.5) % (Math.PI * 2);
+                    let insertY = 250 - Math.abs(Math.sin(cycle)) * 70;
+
+                    ctx.fillStyle = '#111827'; ctx.fillRect(200, 250, 600, 40); // Paip tertier
+                    ctx.fillStyle = '#000000'; ctx.beginPath(); ctx.arc(500, 260, 12, 0, Math.PI*2); ctx.fill(); // Lubang tebukan
+
+                    ctx.fillStyle = '#4b5563'; ctx.fillRect(495, 100, 10, insertY - 100); // Tiub mikro lentur
+                    ctx.fillStyle = '#1f2937'; ctx.fillRect(485, insertY - 15, 30, 15); // Kepala puting (nipple)
+                    ctx.fillStyle = '#374151'; ctx.fillRect(495, insertY, 10, 20); // Hujung masuk lubang
+                } else if (sysId === 'p-sambung-sekunder') {
+                    // Sambungan Paip Tertier pada Sekunder menggunakan Tee Joint
+                    let cycle = (time * 2.5) % (Math.PI * 2);
+                    let insertY = 130 + Math.abs(Math.sin(cycle)) * 50;
+                    
+                    ctx.fillStyle = '#111827'; ctx.fillRect(200, 250, 600, 40); // Sekunder
+                    ctx.fillStyle = '#374151'; ctx.fillRect(470, 220, 60, 40); // T-Joint Horizontal
+                    ctx.fillRect(485, 200, 30, 20); // T-Joint Vertical
+                    
+                    ctx.fillStyle = '#4b5563'; ctx.fillRect(490, insertY, 20, 100); // Tertier pipe connecting down
+                    
+                    ctx.fillStyle = '#111827'; ctx.font = 'bold 14px Inter';
+                    ctx.fillText('Paip Tertier', 520, insertY + 50);
+                    ctx.fillText('Paip Sekunder', 250, 310);
+                } else if (sysId === 'p-injap') {
+                    // Injap Penahan / Stop Valve
+                    let angle = Math.sin(time * 2) * (Math.PI / 4);
+                    
+                    ctx.fillStyle = '#111827'; ctx.fillRect(250, 240, 500, 40); // Paip utama
+                    ctx.fillStyle = '#1e3a8a'; ctx.fillRect(460, 220, 80, 80); // Badan injap
+                    
+                    // Rotasi pemegang injap merah
+                    ctx.save();
+                    ctx.translate(500, 260);
+                    ctx.rotate(angle);
+                    ctx.fillStyle = '#ef4444'; ctx.fillRect(-40, -10, 80, 20); // Handle
+                    ctx.restore();
+                    
+                    ctx.fillStyle = '#374151'; ctx.font = 'bold 16px Inter';
+                    ctx.fillText('Injap Penahan (Stop Valve)', 400, 340);
+                } else if (sysId === 'p-lengkap-tertier') {
+                    // Melengkapkan Paip Tertier merentasi barisan polibeg
+                    let cycle = (time * 1.5) % (Math.PI * 2);
+                    let pulse = Math.sin(cycle) > 0;
+                    
+                    ctx.fillStyle = '#111827'; ctx.fillRect(150, 180, 700, 20); // Paip sekunder header
+                    for (let i = 0; i < 4; i++) {
+                        let px = 220 + (i * 160);
+                        ctx.fillStyle = '#4b5563'; ctx.fillRect(px, 200, 15, 120); // Paip tertier
+                        drawPlant(px+8, 380, 'polybag'); // Polibeg tanaman
+                        if (pulse) {
+                            ctx.fillStyle = '#3b82f6'; 
+                            ctx.beginPath(); 
+                            ctx.arc(px+8, 200 + (cycle/Math.PI/2)*120, 6, 0, Math.PI*2); // Aliran air virtual indicator
+                            ctx.fill();
+                        }
+                    }
+                } else if (sysId === 'p-saluran-pam') {
+                    // Saluran Air Pam lut sinar
+                    drawPump(350, 280);
+                    let cycle = (time * 3) % (Math.PI * 2);
+                    let stretch = 200 + Math.abs(Math.sin(cycle)) * 100;
+                    
+                    ctx.fillStyle = 'rgba(147, 197, 253, 0.5)'; ctx.fillRect(360, 265, 100, 20); // Tiub lut sinar
+                    ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.strokeRect(360, 265, 100, 20); // Highlight tiub jernih
+                    
+                    ctx.fillStyle = '#111827'; ctx.fillRect(460, 260, stretch, 30); // Paip poli hitam mula bersambung
+                    
+                    ctx.fillStyle = '#374151'; ctx.font = 'bold 14px Inter';
+                    ctx.fillText('Pam Air', 330, 340);
+                    ctx.fillText('Tiub Lut Sinar', 365, 250);
+                    ctx.fillText('Paip Poli Utama', 520, 240);
+                } else if (sysId === 'p-pam-tangki') {
+                    // Pam direndam dalam tangki
+                    let cycle = (time * 2) % (Math.PI * 2);
+                    let pipeX = 550 + Math.abs(Math.sin(cycle)) * 50; 
+
+                    drawTank(300, 150, 250, 200, 0.5); 
+                    drawPump(425, 330); // Kedudukan pam di dalam
+
+                    // Saluran paip dari pam naik keluar
+                    ctx.fillStyle = '#111827';
+                    ctx.fillRect(415, 200, 20, 130); 
+                    ctx.fillRect(415, 200, 135, 20); 
+                    
+                    // Paip poli luar tangki
+                    ctx.fillStyle = '#374151';
+                    ctx.fillRect(pipeX, 195, 300, 30); 
+                } else if (sysId === 'p-pemasa') {
+                    // Sambungan Pam ke Timer
+                    ctx.fillStyle = '#e5e7eb'; ctx.fillRect(350, 180, 90, 90); // Soket dinding
+                    ctx.fillStyle = '#9ca3af'; ctx.beginPath(); ctx.arc(395, 225, 12, 0, Math.PI*2); ctx.fill();
+                    
+                    let cycle = (time * 2) % (Math.PI * 2);
+                    let plugX = 380 + Math.abs(Math.sin(cycle)) * 30; // Timer mencucuk soket
+                    
+                    ctx.fillStyle = '#fef08a'; ctx.fillRect(plugX - 10, 200, 60, 70); // Badan Timer Kuning
+                    ctx.fillStyle = '#374151'; ctx.fillRect(plugX + 5, 210, 30, 20); // Skrin LCD timer
+                    
+                    ctx.strokeStyle = '#111827'; ctx.lineWidth = 6;
+                    ctx.beginPath(); ctx.moveTo(plugX + 20, 270); ctx.quadraticCurveTo(plugX + 20, 350, 600, 350); ctx.stroke(); // Wayar ke pam
+                    drawPump(620, 340);
+                    
+                    ctx.fillStyle = '#374151'; ctx.font = 'bold 16px Inter';
+                    ctx.fillText('Soket 3-Pin', 355, 160);
+                    ctx.fillText('Timer', plugX - 5, 190);
+                } else if (sysId === 'p-lengkap-sistem') {
+                    // Pengujian Keseluruhan / Test Run
+                    drawTank(200, 200, 200, 150, 0.6);
+                    drawPump(300, 330);
+                    
+                    drawPipe([{x: 300, y: 330}, {x: 300, y: 150}, {x: 700, y: 150}], 12); 
+                    drawPipe([{x: 700, y: 150}, {x: 700, y: 250}], 6); 
+
+                    drawPlant(700, 320, 'polybag');
+
+                    // Aliran air menitis ujian pada pangkal
+                    if (Math.random() < 0.2) {
+                        particles.push(new Particle(700, 250, 0, 2, '#3b82f6', 40, 0.1, 2.5));
+                    }
+                    if (Math.random() < 0.4) {
+                        particles.push(new Particle(300 + (Math.random()*10-5), 330, 0, -3, '#3b82f6', 60, 0, 2)); // Riak pam
+                    }
+                }
+
+            } else if (sysId === 'percikan' || sysId === 'kabus') {
+                // IRRIGATION SYSTEMS: Sprinkler & Mist
+                ctx.fillStyle = '#854d0e';
+                ctx.fillRect(400, 320, 550, 150);
+                
+                drawTank(mainTankX, mainTankY, mainTankW, mainTankH, 0.7);
+                drawPump(mainTankX + 180, mainTankY + 120);
+                
+                let pumpX = mainTankX + 180;
+                let pumpY = mainTankY + 120;
+
+                if (sysId === 'percikan') {
+                    drawPipe([{x: pumpX, y: pumpY}, {x: pumpX, y: 340}, {x: 880, y: 340}], 12);
+                    
+                    for(let i=0; i<3; i++) {
+                        let px = 500 + (i*160);
+                        drawPipe([{x: px, y: 340}, {x: px, y: 220}], 8);
+                        drawPlant(px - 40, 320, 'tanah');
+
+                        ctx.fillStyle = '#374151';
+                        ctx.fillRect(px-10, 210, 20, 10);
+
+                        if (Math.random() < 0.6) {
+                            let sprayVx = (Math.random() - 0.5) * 8;
+                            let sprayVy = -3 - Math.random() * 3;
+                            particles.push(new Particle(px, 210, sprayVx, sprayVy, 'rgba(59, 130, 246, 0.6)', 60, 0.2));
+                        }
+                    }
+                    
+                    if (Math.random() < 0.4) {
+                        particles.push(new Particle(pumpX + (Math.random()*6-3), pumpY, 0, 4.4, '#3b82f6', 50)); 
+                        particles.push(new Particle(pumpX, 340 + (Math.random()*6-3), 4.4, 0, '#3b82f6', 120)); 
+                    }
+
+                } else if (sysId === 'kabus') {
+                    drawPipe([{x: pumpX, y: pumpY}, {x: pumpX, y: 80}, {x: 900, y: 80}], 10);
+                    
+                    for(let i=0; i<4; i++) {
+                        let px = 450 + (i*140);
+                        drawPlant(px, 320, 'tanah');
+
+                        ctx.fillStyle = '#4b5563';
+                        ctx.beginPath();
+                        ctx.moveTo(px, 80);
+                        ctx.lineTo(px - 10, 100);
+                        ctx.lineTo(px + 10, 100);
+                        ctx.fill();
+
+                        // Hasilkan partikel kabus yang lebih halus, lebih banyak & melayang
+                        for (let k = 0; k < 4; k++) {
+                            if (Math.random() < 0.7) {
+                                let mistVx = (Math.random() - 0.5) * 5; // Sebaran lebar
+                                let mistVy = 0.2 + Math.random() * 1.5; // Jatuh perlahan
+                                let mistSize = 0.8 + Math.random() * 1.5; // Saiz sangat halus
+                                // Gunakan warna biru yang lebih jelas dengan opacity sederhana supaya nampak lebih menonjol
+                                particles.push(new Particle(px, 100, mistVx, mistVy, 'rgba(59, 130, 246, 0.5)', 100 + Math.random() * 40, 0.005, mistSize)); 
+                            }
+                        }
+                    }
+                    
+                    if (Math.random() < 0.4) {
+                        particles.push(new Particle(pumpX + (Math.random()*6-3), pumpY, 0, -4.4, '#3b82f6', 60)); 
+                        particles.push(new Particle(pumpX, 80 + (Math.random()*6-3), 4.4, 0, '#3b82f6', 150)); 
+                    }
+                }
+
+            } else if (sysId === 'takung') {
+                // TEKNIK TAKUNG: Passive system without pump or moving water
+                drawTank(200, 200, 600, 200, 0.8);
+                
+                ctx.fillStyle = '#9ca3af';
+                ctx.fillRect(190, 190, 620, 15);
+                
+                for(let i=0; i<4; i++) {
+                    drawPlant(280 + (i*140), 190);
+                }
+
+            } else if (sysId === 'pengairan-titis' || sysId === 'titis-pengairan') {
+                // DRIP IRRIGATION / FERTIGASI
+                drawTank(mainTankX, mainTankY, mainTankW, mainTankH, 0.7);
+                drawPump(mainTankX + 180, mainTankY + 120);
+                
+                let pumpX = mainTankX + 180;
+                let pumpY = mainTankY + 120;
+                
+                let dripCycle = time % 12;
+                let isDripPumping = dripCycle < 9; // 75% ON, 25% OFF
+                
+                ctx.fillStyle = '#1f2937';
+                ctx.fillRect(pumpX + 30, pumpY - 40, 50, 60);
+                ctx.fillStyle = isDripPumping ? '#22c55e' : '#ef4444';
+                ctx.font = 'bold 16px Inter, sans-serif';
+                ctx.fillText(isDripPumping ? "ON" : "OFF", pumpX + 40, pumpY - 15);
+
+                const pipePath = [
+                    {x: mainTankX + 180, y: mainTankY + 120},
+                    {x: mainTankX + 180, y: 100},
+                    {x: 900, y: 100}
+                ];
+                drawPipe(pipePath);
+
+                for(let i=0; i<4; i++) {
+                    let px = 450 + (i*130);
+                    drawPipe([{x: px, y: 100}, {x: px, y: 180}], 4);
+                    
+                    ctx.fillStyle = 'gray';
+                    ctx.fillRect(px-5, 180, 10, 8);
+                    drawPlant(px, 250, 'polybag');
+
+                    if(isDripPumping && Math.random() < 0.015) {
+                        particles.push(new Particle(px, 190, 0, 1.6, '#3b82f6', 44));
+                    }
+                }
+
+                if (isDripPumping) {
+                    if(Math.random() < 0.4) {
+                        particles.push(new Particle(mainTankX + 180 + (Math.random()*6-3), mainTankY + 120, 0, -3.2, '#3b82f6', 106));
+                    }
+                    if(Math.random() < 0.4) {
+                        particles.push(new Particle(mainTankX + 180, 100 + (Math.random()*6-3), 3.2, 0, '#3b82f6', 194));
+                    }
+                }
+
+            } else {
+                // TRAY SYSTEMS (Aliran Cetek, Aliran Dalam, Pasang Surut, Aeroponik)
+                drawTank(mainTankX, mainTankY, mainTankW, mainTankH, 0.6);
+                
+                let trayX = 400, trayY = 120, trayW = 500, trayH = 120;
+                let pumpX = mainTankX + 180;
+                let pumpY = mainTankY + 120;
+                
+                drawPipe([
+                    {x: pumpX, y: pumpY},
+                    {x: pumpX, y: trayY + 20},
+                    {x: trayX + 20, y: trayY + 20}
+                ]);
+
+                let outletWidth = (sysId === 'pasang-surut') ? 6 : 12;
+                drawPipe([
+                    {x: trayX + trayW - 20, y: trayY + trayH - 10},
+                    {x: trayX + trayW - 20, y: mainTankY - 20},
+                    {x: mainTankX + 100, y: mainTankY - 20},
+                    {x: mainTankX + 100, y: mainTankY + 30}
+                ], outletWidth);
+
+                drawPump(pumpX, pumpY);
+
+                let trayWaterLevel = 0;
+                let showWater = true;
+                let isPumping = true;
+
+                if (sysId === 'aliran-cetek') {
+                    trayWaterLevel = 0.15;
+                } else if (sysId === 'aliran-dalam') {
+                    trayWaterLevel = 0.8;
+                } else if (sysId === 'pasang-surut') {
+                    let cycle = time % 21.9;
+                    isPumping = cycle < 7.2; 
+                    
+                    if (isPumping) {
+                        if (cycle < 1.2) {
+                            trayWaterLevel = 0.1;
+                        } else if (cycle < 3.6) {
+                            let progress = (cycle - 1.2) / 2.4;
+                            trayWaterLevel = 0.1 + (progress * 0.8);
+                        } else {
+                            trayWaterLevel = 0.9;
+                        }
+                    } else {
+                        if (cycle < 20.7) {
+                            let progress = (cycle - 7.2) / 13.5;
+                            trayWaterLevel = 0.9 - (progress * 0.8);
+                        } else {
+                            trayWaterLevel = 0.1;
+                        }
+                    }
+                    
+                    ctx.fillStyle = '#1f2937';
+                    ctx.fillRect(pumpX + 30, pumpY - 40, 50, 60);
+                    ctx.fillStyle = isPumping ? '#22c55e' : '#ef4444';
+                    ctx.font = 'bold 16px Inter, sans-serif';
+                    ctx.fillText(isPumping ? "ON" : "OFF", pumpX + 40, pumpY - 15);
+
+                } else if (sysId === 'aeroponik') {
+                    showWater = false;
+                    ctx.fillStyle = '#4b5563';
+                    for(let i=0; i<3; i++) {
+                        let nx = trayX + 120 + (i*150);
+                        ctx.beginPath();
+                        ctx.moveTo(nx, trayY + trayH);
+                        ctx.lineTo(nx - 10, trayY + trayH - 20);
+                        ctx.lineTo(nx + 10, trayY + trayH - 20);
+                        ctx.fill();
+                    }
+                }
+
+                drawTank(trayX, trayY, trayW, trayH, trayWaterLevel, showWater);
+                
+                ctx.fillStyle = '#d1d5db';
+                ctx.fillRect(trayX - 10, trayY, trayW + 20, 10);
+
+                for(let i=0; i<4; i++) {
+                    drawPlant(trayX + 70 + (i*120), trayY);
+                }
+
+                if (isPumping) {
+                    if(Math.random() < 0.3) { 
+                        particles.push(new Particle(pumpX + (Math.random()*6-3), pumpY, 0, -2.4, '#3b82f6', 125));
+                    }
+                    if(Math.random() < 0.3) {
+                        particles.push(new Particle(pumpX, trayY + 20 + (Math.random()*6-3), 2.4, 0, '#3b82f6', 58));
+                    }
+
+                    if (sysId === 'aeroponik') {
+                        for(let i=0; i<3; i++) {
+                            if(Math.random() < 0.3) {
+                                let nx = trayX + 120 + (i*150);
+                                particles.push(new Particle(nx, trayY + trayH - 20, (Math.random()-0.5)*1.6, -0.8 - Math.random()*1.2, 'rgba(147, 197, 253, 0.7)', 75));
+                            }
+                        }
+                    } else if (sysId === 'aliran-cetek' || sysId === 'aliran-dalam') {
+                        if(Math.random() < 0.2) {
+                            particles.push(new Particle(trayX + 20, trayY + trayH - (trayH*trayWaterLevel/2) + (Math.random()*10), 1.2, 0, '#3b82f6', 383));
+                        }
+                    }
+                }
+
+                let returnFlowRate = 0;
+                if (sysId === 'pasang-surut') {
+                    if (!isPumping && trayWaterLevel > 0.1) {
+                        returnFlowRate = 0.05;
+                    } else if (isPumping && trayWaterLevel >= 0.9) {
+                        returnFlowRate = 0.15;
+                    }
+                } else {
+                    returnFlowRate = 0.2;
+                }
+
+                if(Math.random() < returnFlowRate) {
+                    let drift = (sysId === 'pasang-surut') ? (Math.random()*2-1) : (Math.random()*6-3);
+                    particles.push(new Particle(trayX + trayW - 20 + drift, trayY + trayH - 10, 0, 3.2, '#3b82f6', 22));
+                    particles.push(new Particle(trayX + trayW - 20, mainTankY - 20 + drift, -3.2, 0, '#3b82f6', 212)); 
+                    particles.push(new Particle(mainTankX + 100 + drift, mainTankY - 20, 0, 3.2, '#3b82f6', 16));
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw(ctx);
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(renderSimulation);
+        }
+
+        window.onload = function() {
+            renderMenu();
+            updateInfo();
+            resizeCanvas();
+            renderSimulation();
+        };
+
+    </script>
+</body>
+</html>
