@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffusion Simulation: Gel vs Water</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 0.5rem;
+        }
+        .active-btn {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center py-8">
+
+    <div class="max-w-5xl w-full px-4">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Rate of Diffusion Simulation</h1>
+            <p class="text-gray-600">Comparing diffusion in a solid (Gel), a liquid (Distilled Water), and a gas (Air).</p>
+        </div>
+
+        <!-- View Tabs -->
+        <div class="flex justify-center mb-6 border-b border-gray-300">
+            <button id="tabMacroBtn" class="px-6 py-3 font-semibold text-blue-600 border-b-2 border-blue-600 transition-colors">Macroscopic (Diffusion)</button>
+            <button id="tabMicroBtn" class="px-6 py-3 font-semibold text-gray-500 border-b-2 border-transparent hover:text-gray-700 transition-colors">Microscopic (Kinetic Theory)</button>
+        </div>
+
+        <div id="macroView" class="block">
+            <div class="relative overflow-x-auto flex justify-center">
+                <canvas id="simCanvas" width="960" height="450"></canvas>
+                
+                <!-- Labels placed absolute over canvas for perfect alignment -->
+                <div class="absolute bottom-4 left-[21.35%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Colourless Gel<br><span class="text-sm font-normal text-gray-500">(Solid-like)</span>
+                </div>
+                <div class="absolute bottom-4 left-[50%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Distilled Water<br><span class="text-sm font-normal text-gray-500">(Liquid)</span>
+                </div>
+                <div class="absolute bottom-4 left-[78.65%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Air<br><span class="text-sm font-normal text-gray-500">(Gas)</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="microView" class="hidden">
+            <div class="relative overflow-x-auto flex justify-center">
+                <canvas id="microCanvas" width="960" height="450"></canvas>
+                
+                <!-- Labels placed absolute over canvas for perfect alignment -->
+                <div class="absolute bottom-4 left-[19.8%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Solid Particles<br><span class="text-sm font-normal text-gray-500">(Vibrate in fixed positions)</span>
+                </div>
+                <div class="absolute bottom-4 left-[50%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Liquid Particles<br><span class="text-sm font-normal text-gray-500">(Move around each other)</span>
+                </div>
+                <div class="absolute bottom-4 left-[80.2%] transform -translate-x-1/2 text-center font-semibold text-gray-700">
+                    Gas Particles<br><span class="text-sm font-normal text-gray-500">(Move randomly at high speed)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-md flex flex-col items-center gap-6">
+            
+            <!-- Playback Controls -->
+            <div class="flex gap-4 w-full justify-center">
+                <button id="playPauseBtn" class="px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded shadow transition-colors w-32">
+                    Start
+                </button>
+                <button id="resetBtn" class="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded shadow transition-colors">
+                    Reset
+                </button>
+            </div>
+
+            <!-- Speed Modifiers -->
+            <div class="flex flex-col items-center w-full border-t pt-4">
+                <span class="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">Simulation Speed</span>
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="0.5">0.5x</button>
+                    <button class="speed-btn active-btn px-4 py-1 border border-blue-500 rounded transition-colors" data-speed="1">1x (Normal)</button>
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="2">2x</button>
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="4">4x</button>
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="8">8x</button>
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="16">16x</button>
+                    <button class="speed-btn px-4 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition-colors" data-speed="32">32x</button>
+                </div>
+            </div>
+            
+            <div class="text-sm text-gray-500 text-center max-w-3xl">
+                <strong>Observation:</strong> Particles spread outwards randomly (Brownian motion). Diffusion is slowest in the solid (gel), faster in the liquid (water), and fastest in the gas (air).
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const microCanvas = document.getElementById('microCanvas');
+        const microCtx = microCanvas.getContext('2d');
+        
+        const tabMacroBtn = document.getElementById('tabMacroBtn');
+        const tabMicroBtn = document.getElementById('tabMicroBtn');
+        const macroView = document.getElementById('macroView');
+        const microView = document.getElementById('microView');
+
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const speedBtns = document.querySelectorAll('.speed-btn');
+
+        // Simulation State
+        let isRunning = false;
+        let activeTab = 'macro'; // 'macro' or 'micro'
+        let animationId;
+        let speedModifier = 1.0;
+        let particles = [];
+        let microParticles = [];
+
+        // Configuration
+        const NUM_PARTICLES_PER_CONTAINER = 1200;
+        const PARTICLE_RADIUS = 2;
+        
+        // Base diffusion rates
+        const DIFFUSION_RATE_GAS = 6.0;   // Very fast
+        const DIFFUSION_RATE_WATER = 1.5; // Moderate
+        const DIFFUSION_RATE_GEL = 0.15;  // Slow
+
+        // Container Geometries
+        const containerWidth = 140;
+        const containerHeight = 300;
+        const containerY = 50;
+        
+        // Calculate gaps for 3 containers
+        const gap = (canvas.width - (3 * containerWidth)) / 4;
+
+        // Left container (Gel) bounds
+        const gelLeft = gap;
+        const gelRight = gelLeft + containerWidth;
+        const gelTop = containerY;
+        const gelBottom = containerY + containerHeight;
+
+        // Middle container (Water) bounds
+        const waterLeft = gelRight + gap;
+        const waterRight = waterLeft + containerWidth;
+        const waterTop = containerY;
+        const waterBottom = containerY + containerHeight;
+
+        // Right container (Gas) bounds
+        const gasLeft = waterRight + gap;
+        const gasRight = gasLeft + containerWidth;
+        const gasTop = containerY;
+        const gasBottom = containerY + containerHeight;
+
+        class Particle {
+            constructor(type, x, y, bounds, rate, color) {
+                this.type = type; 
+                this.x = x;
+                this.y = y;
+                this.bounds = bounds;
+                this.baseRate = rate;
+                this.color = color;
+            }
+
+            update(speedMod) {
+                // Brownian motion: random step in any direction
+                const step = this.baseRate * speedMod;
+                
+                const dx = (Math.random() - 0.5) * 2 * step;
+                const dy = (Math.random() - 0.5) * 2 * step;
+
+                this.x += dx;
+                this.y += dy;
+
+                // Enforce boundaries (Bounce/Clamp)
+                if (this.x - PARTICLE_RADIUS < this.bounds.minX) this.x = this.bounds.minX + PARTICLE_RADIUS;
+                if (this.x + PARTICLE_RADIUS > this.bounds.maxX) this.x = this.bounds.maxX - PARTICLE_RADIUS;
+                if (this.y - PARTICLE_RADIUS < this.bounds.minY) this.y = this.bounds.minY + PARTICLE_RADIUS;
+                if (this.y + PARTICLE_RADIUS > this.bounds.maxY) this.y = this.bounds.maxY - PARTICLE_RADIUS;
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, PARTICLE_RADIUS, 0, Math.PI * 2);
+                ctx.fillStyle = this.color; 
+                ctx.fill();
+            }
+        }
+
+        class MicroParticle {
+            constructor(type, bounds, x, y) {
+                this.type = type;
+                this.bounds = bounds;
+                this.radius = 6;
+                this.color = type === 'gas' ? '#c2410c' : '#3b82f6';
+                
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.phaseX = Math.random() * Math.PI * 2;
+                this.phaseY = Math.random() * Math.PI * 2;
+
+                if (type === 'gas') {
+                    const speedMultiplier = 5.0; // Fast
+                    this.vx = (Math.random() - 0.5) * 2 * speedMultiplier;
+                    this.vy = (Math.random() - 0.5) * 2 * speedMultiplier;
+                } else if (type === 'liquid') {
+                    const speedMultiplier = 0.4; // Slower drift (50% reduction)
+                    this.vx = (Math.random() - 0.5) * 2 * speedMultiplier;
+                    this.vy = (Math.random() - 0.5) * 2 * speedMultiplier;
+                }
+            }
+
+            update(speedMod) {
+                if (this.type === 'solid') {
+                    // Vibrate tightly around base position to simulate a hard solid (like gold)
+                    const time = Date.now() * 0.015 * speedMod;
+                    const amplitude = 0.2 + speedMod * 0.1; // Reduced amplitude
+                    this.x = this.baseX + Math.sin(time + this.phaseX) * amplitude;
+                    this.y = this.baseY + Math.cos(time + this.phaseY) * amplitude;
+                } else if (this.type === 'liquid') {
+                    // Drift slowly
+                    this.x += this.vx * speedMod;
+                    this.y += this.vy * speedMod;
+
+                    // Add random vibration/jitter to simulate bumping in a dense liquid (50% reduction)
+                    this.x += (Math.random() - 0.5) * 0.75 * speedMod;
+                    this.y += (Math.random() - 0.5) * 0.75 * speedMod;
+
+                    // Wall collisions
+                    if (this.x - this.radius < this.bounds.minX) { this.x = this.bounds.minX + this.radius; this.vx *= -1; }
+                    if (this.x + this.radius > this.bounds.maxX) { this.x = this.bounds.maxX - this.radius; this.vx *= -1; }
+                    if (this.y - this.radius < this.bounds.minY) { this.y = this.bounds.minY + this.radius; this.vy *= -1; }
+                    if (this.y + this.radius > this.bounds.maxY) { this.y = this.bounds.maxY - this.radius; this.vy *= -1; }
+                } else {
+                    // Gas: Fast ballistic movement
+                    this.x += this.vx * speedMod;
+                    this.y += this.vy * speedMod;
+
+                    // Wall collisions
+                    if (this.x - this.radius < this.bounds.minX) { this.x = this.bounds.minX + this.radius; this.vx *= -1; }
+                    if (this.x + this.radius > this.bounds.maxX) { this.x = this.bounds.maxX - this.radius; this.vx *= -1; }
+                    if (this.y - this.radius < this.bounds.minY) { this.y = this.bounds.minY + this.radius; this.vy *= -1; }
+                    if (this.y + this.radius > this.bounds.maxY) { this.y = this.bounds.maxY - this.radius; this.vy *= -1; }
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                
+                // Add a little highlight to make them look spherical
+                const gradient = ctx.createRadialGradient(this.x - 2, this.y - 2, 0, this.x, this.y, this.radius);
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(0.3, this.color);
+                gradient.addColorStop(1, this.type === 'gas' ? '#9a3412' : '#1d4ed8');
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+                ctx.stroke();
+            }
+        }
+
+        function initMicroSimulation() {
+            microParticles = [];
+            
+            const boxSize = 200;
+            const gap = (microCanvas.width - (3 * boxSize)) / 4; // ~90
+            const startY = 100;
+            
+            // Solid Cube (Left)
+            const solidBounds = { minX: gap, maxX: gap + boxSize, minY: startY, maxY: startY + boxSize };
+            const cols = 10, rows = 10;
+            const spacing = boxSize / cols;
+            for(let r=0; r<rows; r++) {
+                for(let c=0; c<cols; c++) {
+                    const x = solidBounds.minX + spacing/2 + c * spacing;
+                    const y = solidBounds.minY + spacing/2 + r * spacing;
+                    microParticles.push(new MicroParticle('solid', solidBounds, x, y));
+                }
+            }
+
+            // Liquid Cube (Middle)
+            const liquidBounds = { minX: gap*2 + boxSize, maxX: gap*2 + boxSize*2, minY: startY, maxY: startY + boxSize };
+            const numLiquid = 90;
+            for(let i=0; i<numLiquid; i++) {
+                const x = liquidBounds.minX + 15 + Math.random() * (boxSize - 30);
+                const y = liquidBounds.minY + 15 + Math.random() * (boxSize - 30);
+                microParticles.push(new MicroParticle('liquid', liquidBounds, x, y));
+            }
+
+            // Gas Cube (Right)
+            const gasBounds = { minX: gap*3 + boxSize*2, maxX: gap*3 + boxSize*3, minY: startY, maxY: startY + boxSize };
+            const numGas = 25;
+            for(let i=0; i<numGas; i++) {
+                const x = gasBounds.minX + 15 + Math.random() * (boxSize - 30);
+                const y = gasBounds.minY + 15 + Math.random() * (boxSize - 30);
+                microParticles.push(new MicroParticle('gas', gasBounds, x, y));
+            }
+            
+            drawMicroFrame();
+        }
+
+        function initSimulation() {
+            particles = [];
+            
+            // Generate particles for Gel
+            for(let i=0; i<NUM_PARTICLES_PER_CONTAINER; i++) {
+                const x = gelLeft + 5 + Math.random() * (containerWidth - 10);
+                const startAreaHeight = containerHeight * 0.05;
+                const y = gelBottom - (Math.random() * startAreaHeight);
+                
+                particles.push(new Particle(
+                    'gel', x, y, 
+                    {minX: gelLeft, maxX: gelRight, minY: gelTop, maxY: gelBottom}, 
+                    DIFFUSION_RATE_GEL,
+                    'rgba(59, 130, 246, 0.7)' // Blue
+                ));
+            }
+
+            // Generate particles for Water
+            for(let i=0; i<NUM_PARTICLES_PER_CONTAINER; i++) {
+                const x = waterLeft + 5 + Math.random() * (containerWidth - 10);
+                const startAreaHeight = containerHeight * 0.05;
+                const y = waterBottom - (Math.random() * startAreaHeight);
+
+                particles.push(new Particle(
+                    'water', x, y, 
+                    {minX: waterLeft, maxX: waterRight, minY: waterTop, maxY: waterBottom}, 
+                    DIFFUSION_RATE_WATER,
+                    'rgba(59, 130, 246, 0.7)' // Blue
+                ));
+            }
+
+            // Generate particles for Gas (Bromine)
+            for(let i=0; i<NUM_PARTICLES_PER_CONTAINER; i++) {
+                const x = gasLeft + 5 + Math.random() * (containerWidth - 10);
+                // Bromine gas starts in the bottom half of the jars
+                const startAreaHeight = containerHeight / 2 - 5;
+                const y = (gasTop + containerHeight / 2) + Math.random() * startAreaHeight;
+
+                particles.push(new Particle(
+                    'gas', x, y, 
+                    {minX: gasLeft, maxX: gasRight, minY: gasTop, maxY: gasBottom}, 
+                    DIFFUSION_RATE_GAS,
+                    'rgba(194, 65, 12, 0.7)' // Orange-brown
+                ));
+            }
+            
+            drawFrame(); // Draw initial state
+        }
+
+        function drawContainers() {
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#4b5563'; // gray-600
+
+            // Draw Gel Container (Test Tube shape simulation)
+            ctx.fillStyle = '#f8fafc'; // Very faint gray for gel
+            ctx.beginPath();
+            ctx.moveTo(gelLeft, gelTop);
+            ctx.lineTo(gelLeft, gelBottom - 10);
+            ctx.arcTo(gelLeft, gelBottom, gelLeft + 10, gelBottom, 10);
+            ctx.lineTo(gelRight - 10, gelBottom);
+            ctx.arcTo(gelRight, gelBottom, gelRight, gelBottom - 10, 10);
+            ctx.lineTo(gelRight, gelTop);
+            ctx.fill();
+            ctx.stroke();
+            // Open top
+            ctx.beginPath();
+            ctx.moveTo(gelLeft, gelTop);
+            ctx.lineTo(gelLeft, gelTop - 20); // extended slightly up
+            ctx.moveTo(gelRight, gelTop);
+            ctx.lineTo(gelRight, gelTop - 20);
+            ctx.strokeStyle = '#9ca3af';
+            ctx.stroke();
+
+
+            // Draw Water Container (Beaker shape simulation)
+            ctx.fillStyle = '#eff6ff'; // Faint blue for water
+            ctx.beginPath();
+            ctx.rect(waterLeft, waterTop, containerWidth, containerHeight);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#4b5563';
+            ctx.beginPath();
+            ctx.moveTo(waterLeft, waterTop);
+            ctx.lineTo(waterLeft, waterBottom);
+            ctx.lineTo(waterRight, waterBottom);
+            ctx.lineTo(waterRight, waterTop);
+            ctx.stroke();
+
+            // Draw Gas Container (Two stacked gas jars)
+            ctx.fillStyle = '#f8fafc'; // Faint gray for air/gas
+            ctx.beginPath();
+            ctx.rect(gasLeft, gasTop, containerWidth, containerHeight);
+            ctx.fill();
+            
+            ctx.strokeStyle = '#4b5563';
+            ctx.beginPath();
+            ctx.rect(gasLeft, gasTop, containerWidth, containerHeight);
+            ctx.stroke();
+
+            // Joint line in the middle to represent lid/separation point
+            ctx.beginPath();
+            ctx.moveTo(gasLeft - 5, gasTop + containerHeight / 2);
+            ctx.lineTo(gasRight + 5, gasTop + containerHeight / 2);
+            ctx.strokeStyle = '#9ca3af';
+            ctx.stroke();
+
+            // Draw solid "crystal" base to anchor the visual
+            ctx.fillStyle = '#1d4ed8'; // blue-700
+            // Gel crystal base
+            ctx.fillRect(gelLeft + 20, gelBottom - 10, containerWidth - 40, 8);
+            // Water crystal base
+            ctx.fillRect(waterLeft + 20, waterBottom - 10, containerWidth - 40, 8);
+        }
+
+        function drawMicroContainers() {
+            microCtx.lineWidth = 3;
+            microCtx.strokeStyle = '#4b5563'; // gray-600
+
+            const boxSize = 200;
+            const gap = (microCanvas.width - (3 * boxSize)) / 4;
+            const startY = 100;
+
+            // Draw three boxes representing zoomed in views
+            for (let i = 0; i < 3; i++) {
+                const x = gap + i * (boxSize + gap);
+                microCtx.fillStyle = '#f8fafc';
+                microCtx.beginPath();
+                microCtx.rect(x, startY, boxSize, boxSize);
+                microCtx.fill();
+                microCtx.stroke();
+            }
+        }
+
+        function drawFrame() {
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawContainers();
+
+            // Draw all particles
+            particles.forEach(p => p.draw(ctx));
+        }
+
+        function drawMicroFrame() {
+            microCtx.clearRect(0, 0, microCanvas.width, microCanvas.height);
+            drawMicroContainers();
+            microParticles.forEach(p => p.draw(microCtx));
+        }
+
+        // --- Add Collision Resolution ---
+        function resolveMicroCollisions() {
+            for (let i = 0; i < microParticles.length; i++) {
+                for (let j = i + 1; j < microParticles.length; j++) {
+                    let p1 = microParticles[i];
+                    let p2 = microParticles[j];
+                    
+                    // Skip if they are in different containers, or if they are solids (which vibrate in a fixed lattice)
+                    if (p1.type !== p2.type || p1.type === 'solid') continue;
+
+                    let dx = p2.x - p1.x;
+                    let dy = p2.y - p1.y;
+                    let distSq = dx * dx + dy * dy;
+                    let minDist = p1.radius + p2.radius;
+
+                    // Check for collision (overlap)
+                    if (distSq < minDist * minDist) {
+                        let dist = Math.sqrt(distSq);
+                        if (dist === 0) { dist = 0.1; dx = 0.1; dy = 0; }
+                        
+                        // Normal vectors along the collision axis
+                        let nx = dx / dist;
+                        let ny = dy / dist;
+
+                        // 1. Resolve overlap (push them apart so they don't get stuck)
+                        let overlap = minDist - dist;
+                        p1.x -= nx * overlap / 2;
+                        p1.y -= ny * overlap / 2;
+                        p2.x += nx * overlap / 2;
+                        p2.y += ny * overlap / 2;
+
+                        // 2. Resolve velocity (elastic collision)
+                        let dvx = p1.vx - p2.vx;
+                        let dvy = p1.vy - p2.vy;
+                        
+                        // Velocity along the normal
+                        let vn = dvx * nx + dvy * ny;
+
+                        // Only bounce if they are moving towards each other
+                        if (vn < 0) {
+                            // Transfer momentum (assuming equal mass)
+                            p1.vx -= vn * nx;
+                            p1.vy -= vn * ny;
+                            p2.vx += vn * nx;
+                            p2.vy += vn * ny;
+                        }
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            if (!isRunning) return;
+
+            // To prevent particles from jumping out of bounds at high speeds,
+            // we simulate multiple smaller steps per frame instead of one giant step.
+            // This is computationally slightly heavier but more physically accurate for the boundaries.
+            let steps = 1;
+            let currentMod = speedModifier;
+            
+            if (speedModifier > 1) {
+                steps = Math.floor(speedModifier);
+                currentMod = speedModifier / steps;
+            }
+
+            if (activeTab === 'macro') {
+                for(let s = 0; s < steps; s++) {
+                    particles.forEach(p => p.update(currentMod));
+                }
+                drawFrame();
+            } else {
+                for(let s = 0; s < steps; s++) {
+                    microParticles.forEach(p => p.update(currentMod));
+                    resolveMicroCollisions(); // Apply collision physics
+                }
+                drawMicroFrame();
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // --- Event Listeners ---
+
+        playPauseBtn.addEventListener('click', () => {
+            isRunning = !isRunning;
+            if (isRunning) {
+                playPauseBtn.textContent = 'Pause';
+                playPauseBtn.classList.replace('bg-green-500', 'bg-yellow-500');
+                playPauseBtn.classList.replace('hover:bg-green-600', 'hover:bg-yellow-600');
+                animate();
+            } else {
+                playPauseBtn.textContent = 'Resume';
+                playPauseBtn.classList.replace('bg-yellow-500', 'bg-green-500');
+                playPauseBtn.classList.replace('hover:bg-yellow-600', 'hover:bg-green-600');
+                cancelAnimationFrame(animationId);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            cancelAnimationFrame(animationId);
+            playPauseBtn.textContent = 'Start';
+            playPauseBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            playPauseBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            initSimulation();
+            initMicroSimulation();
+        });
+
+        tabMacroBtn.addEventListener('click', () => {
+            activeTab = 'macro';
+            macroView.classList.remove('hidden');
+            macroView.classList.add('block');
+            microView.classList.remove('block');
+            microView.classList.add('hidden');
+            
+            tabMacroBtn.classList.add('text-blue-600', 'border-blue-600');
+            tabMacroBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-700');
+            
+            tabMicroBtn.classList.remove('text-blue-600', 'border-blue-600');
+            tabMicroBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-700');
+            
+            if (!isRunning) drawFrame();
+        });
+
+        tabMicroBtn.addEventListener('click', () => {
+            activeTab = 'micro';
+            microView.classList.remove('hidden');
+            microView.classList.add('block');
+            macroView.classList.remove('block');
+            macroView.classList.add('hidden');
+            
+            tabMicroBtn.classList.add('text-blue-600', 'border-blue-600');
+            tabMicroBtn.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-700');
+            
+            tabMacroBtn.classList.remove('text-blue-600', 'border-blue-600');
+            tabMacroBtn.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-700');
+            
+            if (!isRunning) drawMicroFrame();
+        });
+
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active class
+                speedBtns.forEach(b => {
+                    b.classList.remove('active-btn');
+                    b.classList.add('text-gray-700', 'border-gray-300');
+                    b.classList.remove('border-blue-500');
+                });
+                
+                const target = e.target;
+                target.classList.add('active-btn');
+                target.classList.remove('text-gray-700', 'border-gray-300');
+
+                // Update speed
+                speedModifier = parseFloat(target.dataset.speed);
+            });
+        });
+
+        // Initialize on load
+        initSimulation();
+        initMicroSimulation();
+
+    </script>
+</body>
+</html>
