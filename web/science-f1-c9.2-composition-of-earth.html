@@ -957,7 +957,57 @@
     line-height:1.65;
   }
 
+
+  #strongEvidence{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:8px !important;
+  }
+
+  #strongEvidence label,
+  #strongEvidence .chip,
+  #strongEvidence .strong-item{
+    width:100% !important;
+    box-sizing:border-box;
+    display:flex !important;
+    align-items:center;
+    justify-content:flex-start;
+    margin:0 !important;
+  }
+
+
+  .rock-photo-record{
+    display:grid;
+    grid-template-columns:minmax(180px,280px) 1fr;
+    gap:14px;
+    align-items:center;
+    margin-top:10px;
+  }
+  .rock-photo-preview{
+    width:100%;
+    aspect-ratio:4/3;
+    border:2px dashed #b9aa8c;
+    border-radius:14px;
+    background:#f7f0e2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    color:#6b6f66;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.04em;
+  }
+  .rock-photo-preview img{width:100%;height:100%;object-fit:cover;display:block}
+  .rock-photo-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .camera-card{max-width:720px}
+  .camera-view{width:100%;background:#1f2521;border-radius:14px;overflow:hidden;margin-top:12px}
+  #cameraVideo{display:block;width:100%;max-height:520px;object-fit:contain;background:#111}
+  .presentation-rock-photo{width:100%;max-width:420px;aspect-ratio:4/3;object-fit:cover;border-radius:14px;margin:12px auto;display:block;border:2px solid rgba(255,255,255,.35)}
+
   @media (max-width:850px){
+    .rock-photo-record{grid-template-columns:1fr}
     .quiz-three-inputs{grid-template-columns:1fr}
     .cycle-answer{font-size:9px;padding:5px 5px}
 
@@ -1133,6 +1183,18 @@
     </div>
     <div class="card">
       <h3>Choose exactly 3 strongest pieces of evidence</h3><div class="strong" id="strongEvidence"></div><p class="mini">These three clues will be used in your group presentation.</p>
+
+      <hr>
+      <h3>Rock Photo <span class="mini">(Optional)</span></h3>
+      <p class="mini">Take one photo to keep a record of which rock your group is investigating. If the webcam does not work, you can continue without a photo.</p>
+      <div class="rock-photo-record">
+        <div class="rock-photo-preview" id="rockPhotoPreview"><span>NO PHOTO YET</span></div>
+        <div class="rock-photo-actions">
+          <button class="btn ghost" id="takeRockPhoto">📷 TAKE PHOTO</button>
+          <button class="btn ghost hidden" id="removeRockPhoto">REMOVE PHOTO</button>
+        </div>
+      </div>
+      <div class="notice hidden" id="cameraNotice"></div>
       <div class="btn-row"><button class="btn primary" id="saveReal">SAVE THIS ROCK →</button><button class="btn ghost" id="skipReal">SKIP ROCK (TESTING) →</button></div>
     </div>
   </div>
@@ -1230,7 +1292,7 @@
       <img
         id="quizCycleImg"
         class="cycle-quiz-img"
-        src="https://tienping.github.io/public_resources/images/f1-sc-c9-rock/rock-cycle.webp"
+        src="https://tienping.github.io/public_resources/images/f1-sc-c9-rock/rock-cycle-quiz.webp"
         alt="Rock cycle diagram"
       >
 
@@ -1294,6 +1356,25 @@
 
 
 
+
+
+
+<div class="modal" id="cameraModal">
+  <div class="modal-card camera-card">
+    <div class="eyebrow">Optional Rock Photo</div>
+    <h2>Take a photo of this rock</h2>
+    <p class="mini">Hold the rock clearly in front of the webcam, then press <strong>CAPTURE PHOTO</strong>.</p>
+    <div class="camera-view">
+      <video id="cameraVideo" autoplay playsinline muted></video>
+      <canvas id="cameraCanvas" class="hidden"></canvas>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="captureRockPhoto">📷 CAPTURE PHOTO</button>
+      <button class="btn ghost" id="closeCamera">CANCEL</button>
+    </div>
+    <p class="mini">The photo is kept only in this browser session as a visual record for this activity.</p>
+  </div>
+</div>
 
 
 <script>
@@ -1363,9 +1444,9 @@ const CASES=[
   }
 ];
 const S={group:null,members:[],assets:{...DEFAULT_ASSETS},order:[],idx:0,strong:0,review:0,tempEv:{},tempType:"",realIdx:0,real:[
- {label:"A",ev:{},type:"",formation:"",strongest:[],skipped:false},
- {label:"B",ev:{},type:"",formation:"",strongest:[],skipped:false},
- {label:"C",ev:{},type:"",formation:"",strongest:[],skipped:false}
+ {label:"A",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false},
+ {label:"B",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false},
+ {label:"C",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false}
 ]};
 const $=id=>document.getElementById(id);
 function shuffle(a){let x=[...a];for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
@@ -1442,9 +1523,9 @@ function goToRealRockMode(){
   clearNavHistory();
   S.realIdx=0;
   S.real=[
-    {label:"A",ev:{},type:"",formation:"",strongest:[],skipped:false},
-    {label:"B",ev:{},type:"",formation:"",strongest:[],skipped:false},
-    {label:"C",ev:{},type:"",formation:"",strongest:[],skipped:false}
+    {label:"A",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false},
+    {label:"B",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false},
+    {label:"C",ev:{},type:"",formation:"",strongest:[],photo:null,skipped:false}
   ];
   renderReal();
 }
@@ -1490,6 +1571,7 @@ function goBack(){
     
     $("formation").value=r.formation;
     strongList(r.strongest);
+    renderRockPhotoRecord();
     $("saveReal").textContent=S.realIdx<2?`SAVE ROCK ${r.label} → NEXT ROCK`:`SAVE ROCK ${r.label} → PRESENTATION`;
   }
 
@@ -1626,9 +1708,80 @@ function renderReal(){
   
   $("formation").value=r.formation;
   strongList(r.strongest);
+  renderRockPhotoRecord();
   $("saveReal").textContent=S.realIdx<2?`SAVE ROCK ${r.label} → NEXT ROCK`:`SAVE ROCK ${r.label} → PRESENTATION`;
   show("realCase","Real Rock Mode",70+S.realIdx*8);
 }
+
+let cameraStream=null;
+
+function renderRockPhotoRecord(){
+  let r=S.real[S.realIdx];
+  let box=$("rockPhotoPreview");
+  let remove=$("removeRockPhoto");
+  if(!box||!remove)return;
+  if(r.photo){
+    box.innerHTML=`<img src="${r.photo}" alt="Photo of Rock ${r.label}">`;
+    remove.classList.remove("hidden");
+  }else{
+    box.innerHTML="<span>NO PHOTO YET</span>";
+    remove.classList.add("hidden");
+  }
+}
+
+function cameraMessage(message,isWarning=true){
+  let n=$("cameraNotice");
+  if(!n)return;
+  n.textContent=message;
+  n.className="notice "+(isWarning?"warn":"");
+  n.classList.remove("hidden");
+}
+
+async function openRockCamera(){
+  $("cameraNotice").classList.add("hidden");
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    cameraMessage("Webcam is not available in this browser. You may continue without a photo.");
+    return;
+  }
+  try{
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    $("cameraVideo").srcObject=cameraStream;
+    $("cameraModal").classList.add("open");
+  }catch(err){
+    cameraMessage("The webcam could not be opened. You may continue without a photo.");
+  }
+}
+
+function stopRockCamera(){
+  if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null}
+  $("cameraVideo").srcObject=null;
+  $("cameraModal").classList.remove("open");
+}
+
+function captureRockPhoto(){
+  let video=$("cameraVideo");
+  if(!video.videoWidth || !video.videoHeight){
+    cameraMessage("The webcam is not ready yet. Try again, or continue without a photo.");
+    return;
+  }
+  let canvas=$("cameraCanvas");
+  let maxWidth=960;
+  let scale=Math.min(1,maxWidth/video.videoWidth);
+  canvas.width=Math.round(video.videoWidth*scale);
+  canvas.height=Math.round(video.videoHeight*scale);
+  canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
+  S.real[S.realIdx].photo=canvas.toDataURL("image/jpeg",0.82);
+  stopRockCamera();
+  renderRockPhotoRecord();
+  cameraMessage(`Photo saved for Rock ${S.real[S.realIdx].label}.`,false);
+}
+
+function removeRockPhoto(){
+  S.real[S.realIdx].photo=null;
+  renderRockPhotoRecord();
+  cameraMessage("Photo removed. You can still continue without a photo.",false);
+}
+
 function chosenStrong(){return [...document.querySelectorAll("#strongEvidence input:checked")].map(x=>x.value)}
 function saveReal(){let r=S.real[S.realIdx],ev=getEv("real"),t=sel("rt"),fo=$("formation").value,st=chosenStrong();if(Object.values(ev).some(x=>!x)||!t||!fo){alert("Complete the evidence, proposal and formation.");return}if(st.length!==3){alert("Choose exactly 3 strongest pieces of evidence.");return}Object.assign(r,{ev,type:t,formation:fo,strongest:st});if(S.realIdx<2){S.realIdx++;renderReal()}else renderPresentation()}
 function skipRealRock(){let r=S.real[S.realIdx];r.skipped=true;r.ev={};r.type="";r.formation="";r.strongest=[];if(S.realIdx<2){S.realIdx++;renderReal()}else renderPresentation()}
@@ -1743,8 +1896,10 @@ function presentRock(i){
     return;
   }
   let ev=r.strongest.map(label);
+  let photoHTML=r.photo?`<img class="presentation-rock-photo" src="${r.photo}" alt="Photo of Rock ${r.label}">`:"";
   $("presentCard").innerHTML=`
     <div class=mini style="color:#d7d9e5">${S.group?`GROUP ${S.group} • `:""}ROCK ${r.label}</div>
+    ${photoHTML}
     <div class=big>${r.type.toUpperCase()}</div>
     ${ev.map(x=>`<div class=ev>✓ ${x}</div>`).join("")}
     <p><strong>Possible formation:</strong><br>${r.formation}</p>
@@ -1764,6 +1919,10 @@ $("backBtn").onclick=goBack;
 $("start").onclick=()=>{S.group=$("groupNo").value;S.members=[$("m1").value,$("m2").value,$("m3").value];$("groupPill").textContent=`Group ${S.group}`;show("guide","Investigation Guide",6)};
 $("beginTraining").onclick=startTraining;$("checkTraining").onclick=checkTraining;$("skipTraining").onclick=skipTrainingCase;$("nextTraining").onclick=nextTraining;
 $("beginReal").onclick=()=>{S.realIdx=0;renderReal()};$("saveReal").onclick=saveReal;$("skipReal").onclick=skipRealRock;
+if($("takeRockPhoto")) $("takeRockPhoto").onclick=openRockCamera;
+if($("captureRockPhoto")) $("captureRockPhoto").onclick=captureRockPhoto;
+if($("closeCamera")) $("closeCamera").onclick=stopRockCamera;
+if($("removeRockPhoto")) $("removeRockPhoto").onclick=removeRockPhoto;
 
 $("checkQ1").onclick=checkQuestion1;
 $("clearQ1").onclick=clearQuestion1;
