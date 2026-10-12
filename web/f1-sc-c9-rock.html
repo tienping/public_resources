@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Digital Stone Investigation Tool</title>
+<style>
+  :root{
+    --bg:#efe8dc;
+    --bg2:#e7dfcf;
+    --card:#fffaf0;
+    --ink:#233127;
+    --muted:#6c7568;
+    --line:#cdbf9f;
+    --brand:#315c45;
+    --brand2:#9a5e38;
+    --good:#2f6d4a;
+    --warn:#a86f22;
+    --bad:#9d3d33;
+    --sand:#d8c49f;
+    --clay:#b86f47;
+    --moss:#6f7f58;
+    --slate:#52635a;
+    --cream:#fff8e8;
+    --soft:#e4eadf;
+    --soft2:#efe0d1;
+    --shadow:0 12px 30px rgba(68,55,37,.10);
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box}
+
+  html{
+    background:#e8dfcf;
+  }
+
+  body{
+    margin:0;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.55), transparent 28%),
+      radial-gradient(circle at 85% 18%, rgba(123,145,109,.14), transparent 30%),
+      radial-gradient(circle at 75% 85%, rgba(184,111,71,.12), transparent 34%),
+      linear-gradient(180deg,#f2eadc 0%,#e8dfcf 100%);
+    min-height:100vh;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.28;
+    background-image:
+      repeating-radial-gradient(
+        ellipse at 15% 25%,
+        transparent 0 18px,
+        rgba(49,92,69,.12) 19px 20px,
+        transparent 21px 36px
+      ),
+      repeating-radial-gradient(
+        ellipse at 88% 72%,
+        transparent 0 28px,
+        rgba(154,94,56,.08) 29px 30px,
+        transparent 31px 52px
+      );
+    mix-blend-mode:multiply;
+    z-index:0;
+  }
+
+  .app{min-height:100vh;position:relative;z-index:1}
+
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+
+  .topbar{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(255,248,232,.94);
+    border-bottom:1px solid rgba(103,91,65,.28);
+    backdrop-filter:blur(9px);
+    box-shadow:0 4px 18px rgba(68,55,37,.06);
+  }
+
+  .topbar::after{
+    content:"";
+    display:block;
+    height:4px;
+    background:linear-gradient(90deg,var(--brand),var(--moss),var(--sand),var(--clay),var(--brand2));
+  }
+
+  .topbar-inner{
+    max-width:1180px;
+    margin:auto;
+    padding:12px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+
+  .brand{
+    font-weight:950;
+    letter-spacing:-.025em;
+    color:#26362b;
+  }
+
+  .brand::before{
+    content:"🧭";
+    margin-right:8px;
+  }
+
+  .brand small{
+    display:block;
+    color:#7b6f58;
+    font-weight:750;
+    font-size:11px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    margin-left:29px;
+  }
+
+  .spacer{flex:1}
+  .pill{padding:7px 10px;background:#eef2f7;border-radius:999px;font-size:12px;font-weight:800}.mode{background:var(--soft);color:#3145a1}
+
+
+
+  .quick-nav{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+
+  .quick-btn{
+    border:1px solid #cdbf9f;
+    border-radius:999px;
+    padding:7px 10px;
+    background:#fffaf0;
+    color:#315c45;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.02em;
+    cursor:pointer;
+    box-shadow:none;
+  }
+
+  .quick-btn:hover{
+    background:#e7efe2;
+  }
+
+  .quick-btn.reset{
+    color:#7b4a2e;
+    border-color:#d3b79d;
+    background:#f7eadc;
+  }
+
+  .quick-btn.reset:hover{
+    background:#efddcb;
+  }
+
+  .top-back{
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    background:#fffaf0;
+    border:1px solid #cdbf9f;
+    color:#315c45;
+    box-shadow:none;
+  }
+  .top-back:hover{
+    background:#e7efe2;
+    transform:none;
+  }
+  .group-pill,.mode-pill{
+    padding:7px 11px;
+    border-radius:999px;
+    background:#eadfcb;
+    color:#34453a;
+    font-size:13px;
+    font-weight:800;
+    border:1px solid rgba(86,75,53,.14);
+  }
+
+  .mode-pill{
+    background:#dde8d9;
+    color:#2b5a3d;
+  }
+
+  .progress-wrap{max-width:1180px;margin:auto;padding:0 20px 10px}
+  .progress{
+    height:8px;
+    background:#d9cfbb;
+    border-radius:999px;
+    overflow:hidden;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.06);
+  }
+  .progress > div{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,var(--brand),var(--moss),var(--clay));
+    transition:width .3s;
+  }
+
+  main{max-width:1180px;margin:auto;padding:28px 20px 60px}
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .hero{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:24px;
+    align-items:stretch;
+  }
+
+  .card{
+    background:rgba(255,250,240,.96);
+    border:1px solid rgba(130,110,75,.28);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-55px;
+    right:-55px;
+    width:150px;
+    height:150px;
+    border:1px solid rgba(49,92,69,.08);
+    border-radius:50%;
+    box-shadow:
+      0 0 0 18px rgba(49,92,69,.05),
+      0 0 0 36px rgba(49,92,69,.04),
+      0 0 0 54px rgba(49,92,69,.03);
+    pointer-events:none;
+  }
+
+  h1,h2,h3{
+    margin:0 0 12px;
+    letter-spacing:-.025em;
+    color:#26362b;
+  }
+  h1{font-size:clamp(32px,5vw,58px);line-height:1.02}
+  h2{font-size:clamp(26px,3vw,38px)}
+  h3{font-size:20px}
+
+  p{line-height:1.55}
+  .lead{font-size:18px;color:#4d5a50;max-width:760px}
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#7b4a2e;
+    margin-bottom:12px;
+  }
+
+  .eyebrow::before{
+    content:"◆";
+    color:var(--brand);
+    font-size:11px;
+  }
+
+  .routine{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:16px 0;
+  }
+
+  .routine span{
+    background:#30483a;
+    color:#fffaf0;
+    padding:8px 12px;
+    border-radius:10px;
+    font-weight:900;
+    font-size:14px;
+    box-shadow:0 3px 8px rgba(48,72,58,.15);
+  }
+
+  .routine b{color:#e7c779}
+
+  .btn{
+    border:1px solid rgba(84,72,49,.16);
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:900;
+    background:#eadfcb;
+    color:#33443a;
+    box-shadow:0 3px 8px rgba(67,55,37,.06);
+    transition:.15s ease;
+  }
+
+  .btn:hover{transform:translateY(-1px)}
+  .btn.primary{
+    background:linear-gradient(135deg,#315c45,#456d54);
+    color:#fff;
+    border-color:#315c45;
+  }
+  .btn.good{background:#2f6d4a;color:white}
+  .btn.warn{background:#fff3da;color:#80550f;border:1px solid #d6ad59}
+  .btn.ghost{background:#fffaf0;border:1px solid var(--line)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+  .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+
+  .field{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+  .field label{font-weight:850;font-size:14px}
+  .field input,.field select{
+    border:1px solid #cdbf9f;
+    border-radius:11px;
+    padding:11px 12px;
+    background:#fffdf8;
+    color:#2c382f;
+  }
+
+  .notice{
+    border-radius:14px;
+    padding:13px 15px;
+    background:#e8efe5;
+    border:1px solid #b7c9b1;
+    color:#315540;
+  }
+
+  .notice.warn{
+    background:#fff4df;
+    border-color:#dec083;
+    color:#765412;
+  }
+
+  .notice.good{
+    background:#e5f1e7;
+    border-color:#a8c7ae;
+    color:#2d6240;
+  }
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  .rock-img{
+    width:100%;
+    aspect-ratio:4/3;
+    object-fit:content;
+    border-radius:16px;
+    border:1px solid #bda980;
+    background:#ded2bd;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.4);
+  }
+
+  .placeholder-note{
+    font-size:12px;
+    color:#7a5220;
+    background:#fff1d4;
+    border:1px dashed #d5a955;
+    border-radius:10px;
+    padding:7px 9px;
+    margin-top:8px;
+  }
+
+  .tri{display:grid;grid-template-columns:110px 1fr 1fr 1fr 1.4fr;border:1px solid var(--line);border-radius:13px;overflow:hidden}.tri div{padding:10px;border-bottom:1px solid var(--line);background:#fff}.tri div:nth-child(-n+5){background:#eef2f7;font-weight:900}.guide-visual{display:flex;align-items:center;justify-content:center;min-height:94px}.guide-visual img{width:92px;height:72px;object-fit:cover;border-radius:10px;border:1px solid #cdbf9f;background:#f5efdf}.guide-visual.no-image{font-size:12px;text-align:center;color:#6c7568;background:#f8f2e6}
+  .evgrid{display:grid;grid-template-columns:1.5fr repeat(3,.7fr);border:1px solid var(--line);border-radius:13px;overflow:hidden}.evgrid>div{padding:10px;background:#fff;border-bottom:1px solid var(--line)}.evgrid .head{background:#eef2f7;font-weight:900;text-align:center;font-size:11px;letter-spacing:.04em}.evgrid .label{font-weight:800;background:#f8fafc}.radio{text-align:center}
+  .typegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.choice{position:relative}.choice input{position:absolute;opacity:0}.choice label{display:block;padding:14px 8px;min-height:60px;border:2px solid var(--line);border-radius:12px;background:#fff;text-align:center;font-weight:900}.choice input:checked+label{border-color:var(--brand);background:var(--soft);color:#2e439f}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    border:1px solid #c8b997;
+    background:#fffaf0;
+    padding:7px 9px;
+    border-radius:999px;
+    font-weight:780;
+    font-size:13px;
+  }
+  .chip.key-evidence{
+    background:#dff3e5;
+    border-color:#7fb28e;
+    color:#205b38;
+    box-shadow:0 0 0 2px rgba(47,109,74,.08);
+    font-weight:900;
+  }
+
+  .feedback.good{
+    background:#e6f5e9 !important;
+    border:2px solid #6ea37b !important;
+    color:#1f5b36 !important;
+    box-shadow:0 8px 20px rgba(47,109,74,.12);
+  }
+
+  .affirmation{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    padding:11px 13px;
+    border-radius:12px;
+    background:#dff3e5;
+    border:1px solid #7fb28e;
+    color:#205b38;
+    font-weight:900;
+  }
+
+  .affirmation .icon{
+    font-size:22px;
+    line-height:1;
+  }
+
+
+  .character-grid{
+    display:grid;
+    grid-template-columns:1.4fr repeat(3,.7fr);
+    border:1px solid #cdbf9f;
+    border-radius:14px;
+    overflow:hidden;
+  }
+
+  .character-grid > div{
+    padding:12px;
+    border-bottom:1px solid #ddd0b6;
+    background:#fffdf8;
+  }
+
+  .character-grid > div:nth-child(4n+1){
+    font-weight:850;
+    background:#f5efdf;
+  }
+
+  .character-grid .head{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    background:#e5dcc8;
+    font-weight:950;
+    text-align:center;
+    color:#425046;
+  }
+
+  .radio-cell{text-align:center}
+  .radio-cell input{transform:scale(1.15);accent-color:#315c45}
+
+  .trilingual{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1.3fr;
+    gap:0;
+    border:1px solid #cdbf9f;
+    border-radius:14px;
+    overflow:hidden;
+  }
+
+  .trilingual > div{
+    padding:11px;
+    border-bottom:1px solid #ddd0b6;
+    background:#fffdf8;
+  }
+
+  .trilingual > div:nth-child(-n+4){
+    background:#e5dcc8;
+    font-weight:950;
+  }
+
+  .score-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px;
+    border-radius:14px;
+    background:#f5efdf;
+    border:1px solid #d8c7a7;
+  }
+
+  .score-dot{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:#dce7d8;
+    color:#315c45;
+    font-weight:950;
+    border:1px solid #b9c9b3;
+  }
+
+  .type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .type-choice{position:relative}
+  .type-choice input{position:absolute;opacity:0}
+  .type-choice label{
+    display:block;
+    border:2px solid #d4c5a8;
+    background:#fffdf8;
+    border-radius:14px;
+    padding:15px 12px;
+    text-align:center;
+    font-weight:950;
+    min-height:64px;
+  }
+
+  .type-choice input:checked + label{
+    border-color:#315c45;
+    background:#e2ebdf;
+    color:#2b5a3d;
+  }
+
+  .evidence-list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .evidence-check{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    padding:10px;
+    background:#f8f2e6;
+    border:1px solid #d8c8a8;
+    border-radius:10px;
+  }
+
+  .evidence-check input{accent-color:#315c45}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .step{
+    background:#fffdf8;
+    border:1px solid #d5c6a8;
+    border-radius:14px;
+    padding:15px;
+  }
+
+  .step .n{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:#dfe9dc;
+    color:#315c45;
+    font-weight:950;
+    margin-bottom:10px;
+    border:1px solid #b9c9b3;
+  }
+
+
+  .rock-cycle-img{
+    display:block;
+    width:100%;
+    max-height:520px;
+    object-fit:contain;
+    border:1px solid #d2c09b;
+    border-radius:14px;
+    background:#fffdf8;
+    padding:10px;
+    margin-top:10px;
+  }
+
+  .cycle{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    align-items:stretch;
+    margin-top:16px;
+  }
+
+  .cycle .node{
+    padding:15px;
+    border-radius:14px;
+    background:#fffdf8;
+    border:1px solid #d2c09b;
+    font-weight:900;
+    text-align:center;
+    position:relative;
+  }
+
+  .cycle .node:nth-child(1){border-top:5px solid #9b4f34}
+  .cycle .node:nth-child(2){border-top:5px solid #c99a4d}
+  .cycle .node:nth-child(3){border-top:5px solid #5f735a}
+
+  .cycle .arrow{
+    font-size:13px;
+    color:#6f6d5f;
+    text-align:center;
+    padding:8px;
+  }
+
+  .feedback-box{
+    padding:18px;
+    border-radius:16px;
+    background:#f7f1e5;
+    border:1px solid #d1c1a1;
+  }
+  .feedback-box.correct{border-color:#9bb9a1;background:#e7f0e8}
+  .feedback-box.review{border-color:#dec083;background:#fff4df}
+
+  .presentation{
+    background:
+      linear-gradient(135deg,rgba(31,48,39,.97),rgba(73,56,42,.98)),
+      radial-gradient(circle at 80% 10%,rgba(255,255,255,.08),transparent 25%);
+    color:white;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .presentation h1,.presentation h2,.presentation h3{color:white}
+  .presentation .badge{
+    display:inline-flex;
+    background:rgba(255,255,255,.12);
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:850;
+  }
+  .presentation .big{
+    font-size:clamp(26px,4vw,48px);
+    font-weight:950;
+    margin:12px 0;
+    color:#f7e9c6;
+  }
+  .presentation .evidence-bullets{display:grid;gap:7px;margin:14px 0}
+  .presentation .evidence-bullets div{
+    padding:10px 12px;
+    background:rgba(255,255,255,.10);
+    border-radius:10px;
+  }
+
+  .modal{
+    position:fixed;
+    inset:0;
+    background:rgba(37,43,34,.68);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal.open{display:flex}
+
+  .modal-card{
+    max-width:720px;
+    width:100%;
+    max-height:90vh;
+    overflow:auto;
+    background:#fffaf0;
+    border:1px solid #cdbf9f;
+    border-radius:20px;
+    padding:22px;
+    box-shadow:0 30px 90px rgba(0,0,0,.24);
+  }
+
+  .mini{font-size:12px;color:var(--muted)}
+  .hidden{display:none!important}
+  hr{border:0;border-top:1px solid #d8c8aa;margin:20px 0}
+
+  .sticky-actions{
+    position:sticky;
+    bottom:0;
+    background:linear-gradient(transparent,var(--bg) 26%);
+    padding-top:22px;
+  }
+
+  /* subtle geological labels */
+  .card h3::after{
+    content:"";
+    display:block;
+    width:34px;
+    height:3px;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--brand),var(--clay));
+    margin-top:7px;
+    opacity:.7;
+  }
+
+
+  .compare-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    margin-top:10px;
+    border:1px solid #d6c7aa;
+    border-radius:14px;
+    overflow:hidden;
+    background:#fffdf8;
+  }
+
+  .compare-table th,
+  .compare-table td{
+    padding:10px 12px;
+    border-bottom:1px solid #e2d6bf;
+    text-align:left;
+    vertical-align:middle;
+    font-size:14px;
+  }
+
+  .compare-table th{
+    background:#e8dfcc;
+    color:#3a493f;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    font-weight:950;
+  }
+
+  .compare-table tr:last-child td{border-bottom:0}
+
+  .compare-table tr.key-row td{
+    background:#f2f8ef;
+  }
+
+  .compare-table tr.key-row td:first-child{
+    border-left:4px solid #4f8a60;
+    font-weight:900;
+  }
+
+  .answer-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:74px;
+    padding:6px 9px;
+    border-radius:999px;
+    font-weight:900;
+    font-size:12px;
+  }
+
+  .answer-pill.user{
+    background:#eef1f5;
+    color:#3e4a55;
+    border:1px solid #d1d7df;
+  }
+
+  .answer-pill.expected{
+    background:#e7efe2;
+    color:#315c45;
+    border:1px solid #b8caaa;
+  }
+
+  .match-badge,
+  .mismatch-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:6px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:950;
+    white-space:nowrap;
+  }
+
+  .match-badge{
+    background:#dcf3e3;
+    color:#1e653a;
+    border:1px solid #8bc49a;
+  }
+
+  .mismatch-badge{
+    background:#fff0db;
+    color:#885610;
+    border:1px solid #dfbb79;
+  }
+
+  .type-compare{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    gap:10px;
+    align-items:center;
+    margin:12px 0 16px;
+  }
+
+  .type-box{
+    border:1px solid #d6c7aa;
+    border-radius:12px;
+    padding:12px;
+    background:#fffdf8;
+  }
+
+  .type-box strong{
+    display:block;
+    margin-top:4px;
+    font-size:18px;
+  }
+
+  .type-result{
+    font-size:22px;
+    font-weight:950;
+    text-align:center;
+  }
+
+  @media (max-width:700px){
+    .type-compare{grid-template-columns:1fr}
+    .type-result{transform:rotate(90deg)}
+    .compare-table th,.compare-table td{padding:8px 7px;font-size:12px}
+  }
+
+
+  .quiz-card{
+    margin-top:18px;
+  }
+
+  .quiz-number{
+    display:inline-flex;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e2ebdf;
+    border:1px solid #b9c9b3;
+    color:#315c45;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+
+  .quiz-three-inputs{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+
+  .quiz-input{
+    width:100%;
+  }
+
+  .quiz-input.correct,
+  .q2-select.correct,
+  .cycle-answer.correct{
+    background:#e3f4e7 !important;
+    border-color:#5f9b70 !important;
+    color:#205b38 !important;
+  }
+
+  .quiz-input.incorrect,
+  .q2-select.incorrect,
+  .cycle-answer.incorrect{
+    background:#fff0dc !important;
+    border-color:#d39a58 !important;
+    color:#7b4a18 !important;
+  }
+
+  .quiz-feedback{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    font-weight:850;
+  }
+
+  .quiz-feedback.good{
+    display:block !important;
+    background:#e3f4e7;
+    border:1px solid #83b890;
+    color:#205b38;
+  }
+
+  .quiz-feedback.review{
+    display:block !important;
+    background:#fff3df;
+    border:1px solid #dfb873;
+    color:#765012;
+  }
+
+  .match-table{
+    display:grid;
+    grid-template-columns:1.25fr 1fr;
+    border:1px solid #d5c6a8;
+    border-radius:14px;
+    overflow:hidden;
+    margin-top:10px;
+  }
+
+  .match-table > div{
+    padding:11px 12px;
+    border-bottom:1px solid #e0d4bc;
+    background:#fffdf8;
+  }
+
+  .match-table > div:nth-last-child(-n+2){
+    border-bottom:0;
+  }
+
+  .match-head{
+    background:#e5dcc8 !important;
+    font-weight:950;
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:.04em;
+  }
+
+  .match-label{
+    font-weight:850;
+  }
+
+  .match-table select{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #cdbf9f;
+    border-radius:10px;
+    background:#fffdf8;
+  }
+
+  .cycle-quiz-wrap{
+    position:relative;
+    width:100%;
+    max-width:980px;
+    margin:14px auto 0;
+    border:1px solid #cdbf9f;
+    border-radius:14px;
+    background:#fff;
+    overflow:visible;
+  }
+
+  .cycle-quiz-img{
+    display:block;
+    width:100%;
+    height:auto !important;
+    max-height:none !important;
+    object-fit:contain;
+    border-radius:13px;
+  }
+
+  .cycle-answer{
+    position:absolute;
+    z-index:5;
+    transform:translate(-50%,-50%);
+    box-sizing:border-box;
+    padding:7px 8px;
+    border:2px solid #315c45;
+    border-radius:8px;
+    background:#fffaf0;
+    color:#233127;
+    font-size:clamp(9px,1.15vw,14px);
+    font-weight:850;
+    text-align:center;
+    box-shadow:0 3px 8px rgba(39,49,39,.16);
+  }
+
+  .cycle-answer::placeholder{
+    color:#6f756d;
+    opacity:1;
+  }
+
+  .cycle-rock{
+    border-color:#9a5e38;
+    background:#fff4e9;
+  }
+
+  .cycle-process{
+    border-color:#315c45;
+    background:#eff5eb;
+  }
+
+  .cycle-word-bank{
+    margin-top:12px;
+    padding:11px 13px;
+    border:1px dashed #c4ad82;
+    border-radius:12px;
+    background:#f8f0df;
+    color:#4f554b;
+    font-size:13px;
+    line-height:1.65;
+  }
+
+  @media (max-width:850px){
+    .quiz-three-inputs{grid-template-columns:1fr}
+    .cycle-answer{font-size:9px;padding:5px 5px}
+
+    .quick-nav{width:100%;order:5}
+    .quick-btn{flex:1;min-width:110px}
+
+    .tri{grid-template-columns:88px 1fr 1fr 1fr 1.2fr;font-size:12px}
+    .guide-visual img{width:72px;height:58px}
+
+    .hero,.grid2,.grid3,.steps,.cycle,.camera-grid{grid-template-columns:1fr}
+    .type-grid{grid-template-columns:1fr 1fr}
+    .character-grid{grid-template-columns:1.3fr repeat(3,.8fr);font-size:13px}
+    .trilingual{grid-template-columns:1fr 1fr}
+    .trilingual > div:nth-child(-n+4){display:none}
+    .topbar-inner{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Digital Stone Investigation Tool<small>Form 1 Science • 9.2 Composition of the Earth</small></div>
+    <div class="spacer"></div>
+    <div class="quick-nav">
+      <button class="quick-btn reset" id="resetBtn">↻ RESET</button>
+      <button class="quick-btn" id="goTrainingBtn">TRAINING MODE</button>
+      <button class="quick-btn" id="goReferenceBtn">REFERENCE</button>
+      <button class="quick-btn" id="goRealBtn">REAL ROCK MODE</button>
+      <button class="quick-btn" id="goQuizBtn">QUIZ</button>
+    </div>
+    <button class="btn ghost top-back hidden" id="backBtn">← BACK</button>
+    <div class="pill" id="groupPill">Group —</div>
+    <div class="pill mode" id="modePill">Welcome</div>
+  </div>
+  <div class="progress"><div id="progressBar"></div></div>
+</header>
+<main>
+<section class="screen active" id="welcome">
+  <div class="hero">
+    <div class="card">
+      <div class="eyebrow">🪨 Young Geologist Field Mission</div>
+      <h1>Observe first.<br>Use evidence.<br>Then propose.</h1>
+      <p class="lead">Learn with clear digital rock examples first. Then investigate your own real rocks.</p>
+      <div class="routine"><span>1 LOOK</span><span>2 TALK</span><span>3 AGREE</span><span>4 CLICK</span></div>
+      <div class="notice"><strong>Science can be uncertain.</strong> “Not enough evidence” can be a good scientific answer.</div>
+    </div>
+    <div class="card">
+      <h3>Start your group</h3>
+      <div class="field"><label>Group number</label><select id="groupNo"></select></div>
+      <div class="field"><label>Member 1</label><input id="m1" placeholder="Name (optional)"></div>
+      <div class="field"><label>Member 2</label><input id="m2" placeholder="Name (optional)"></div>
+      <div class="field"><label>Member 3</label><input id="m3" placeholder="Name (optional)"></div>
+      <button class="btn primary" id="start">START INVESTIGATION →</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="guide">
+  <div class="eyebrow">Step 1 • Learn the investigation words</div>
+  <h2>What are we looking for?</h2>
+  <p class="lead">Teacher can explain each word in English, Bahasa Melayu and Chinese.</p>
+  <div class="card">
+    <div class="tri" id="tri"></div>
+    
+    <div class="btn-row"><button class="btn primary" onclick="show('trainingIntro','Training Mode',10)">I UNDERSTAND → TRAINING MODE</button></div>
+  </div>
+</section>
+
+<section class="screen" id="trainingIntro">
+  <div class="hero">
+    <div class="card">
+      <div class="eyebrow">🗺 Training Mode • Digital Field Guide</div><h2>Learn with clear examples</h2>
+      <p>There are <strong><span id="activeCaseCount">6</span> controlled cases</strong>: 2 igneous, 2 sedimentary and 2 metamorphic. The order is random for each group.</p>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><strong>LOOK</strong><div class="mini">Study the photo.</div></div>
+        <div class="step"><div class="num">2</div><strong>CHECK EVIDENCE</strong><div class="mini">Yes / No / Not sure.</div></div>
+        <div class="step"><div class="num">3</div><strong>PROPOSE</strong><div class="mini">Choose what it may be.</div></div>
+      </div>
+      <p class="notice" style="margin-top:14px">After you submit your proposal, the app will show the expected rock type and explain the evidence.</p>
+      <button class="btn primary" id="beginTraining">BEGIN CASE 1 →</button>
+    </div>
+    <div class="card"><img class="rock-img" id="introImg" alt="Training rock sample"></div>
+  </div>
+</section>
+
+<section class="screen" id="trainingCase">
+  <div class="grid2">
+    <div class="card">
+      <div class="eyebrow" id="caseLabel"></div>
+      <img class="rock-img" id="caseImg" alt="Training rock sample">
+      <div class="notice" style="margin-top:12px"><strong>LOOK CAREFULLY.</strong> Do not guess the rock type yet.</div>
+    </div>
+    <div class="card">
+      <h3>Check the evidence</h3><div class="evgrid" id="trainEvidence"></div>
+      <hr><h3>What type MAY this rock be?</h3><div class="typegrid" id="trainTypes"></div>
+      <div class="btn-row"><button class="btn primary" id="checkTraining">CHECK MY PROPOSAL →</button><button class="btn ghost" id="skipTraining">SKIP CASE (TESTING) →</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="trainingFeedback">
+  <div class="grid2">
+    <div class="card"><img class="rock-img" id="feedbackImg" alt="Training rock sample"></div>
+    <div class="card">
+      <div class="eyebrow">Case Feedback</div><h2 id="feedbackTitle"></h2>
+      <div class="feedback" id="feedbackBox"></div>
+      <h3 style="margin-top:16px">Compare your evidence</h3>
+      <p class="mini">Compare your answer with the expected evidence. Green rows show the key characteristic(s) to notice for this rock type.</p>
+      <div id="feedbackEvidence"></div>
+      <div class="btn-row"><button class="btn primary" id="nextTraining">NEXT CASE →</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="trainingDone">
+  <div class="card">
+    <div class="eyebrow">Training Complete</div><h2><span id="completedCaseCount">6</span> digital cases completed 🎉</h2>
+    <p class="lead">Now listen to the teacher explanation about how each rock type forms.</p>
+    <div class="grid3">
+      <div class="card"><h3 id="strongScore">0</h3><div>Strong matches</div></div>
+      <div class="card"><h3 id="reviewScore">0</h3><div>Cases that needed review</div></div>
+      <div class="card"><h3 id="completedTotal">6</h3><div>Cases completed</div></div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="show('reference','Reference',65)">OPEN ROCK REFERENCE →</button></div>
+  </div>
+</section>
+
+<section class="screen" id="reference">
+  <div class="eyebrow">Teacher Explanation • 9.2.1 + 9.2.2</div><h2>What we see + How rocks form</h2>
+  <div class="grid3">
+    <div class="card"><h3>IGNEOUS</h3><p><strong>Characteristic:</strong> Contains various minerals.</p><p><strong>Formation:</strong> Magma/lava → cooling and freezing → igneous rock.</p></div>
+    <div class="card"><h3>SEDIMENTARY</h3><p><strong>Characteristics:</strong> Many layers; sometimes hollow; may contain fossils.</p><p><strong>Formation:</strong> Deposited/eroded materials → compression → sedimentary rock.</p></div>
+    <div class="card"><h3>METAMORPHIC</h3><p><strong>Characteristic:</strong> Usually harder than the original rock.</p><p><strong>Formation:</strong> Existing rock → very high heat + pressure → metamorphic rock.</p></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h3>Rock Cycle</h3>
+    <img class="rock-cycle-img" id="rockCycleImg" alt="Rock cycle diagram">
+    <p class="mini">Use the diagram to connect each rock type with the processes that form and change rocks.</p>
+    <div class="btn-row"><button class="btn primary" onclick="show('realIntro','Real Rock Mode',68)">READY FOR REAL ROCKS →</button></div>
+  </div>
+</section>
+
+<section class="screen" id="realIntro">
+  <div class="hero">
+    <div class="card">
+      <div class="eyebrow">⛏ Real Rock Mode • Field Investigation</div><h2>Now the answer may be uncertain.</h2>
+      <p class="lead">Each pupil chooses one real rock. Your group investigates Rock A, B and C.</p>
+      <div class="notice good"><strong>Your aim is NOT to prove the “correct” type.</strong><br>Observe, record evidence, and propose a possible type.</div>
+      <div class="routine"><span>LOOK</span><span>TALK</span><span>RECORD</span><span>PROPOSE</span></div>
+      <p><strong>Sentence frame:</strong><br>“We think it MAY BE ______ because we see ______, ______ and ______.”</p>
+      <button class="btn primary" id="beginReal">START ROCK A →</button>
+    </div>
+    <div class="card">
+      <h3>Rotate roles every rock</h3>
+      <p><strong>Rock Handler</strong> — holds and turns the rock safely.</p>
+      <p><strong>Evidence Checker</strong> — checks what the group can really observe.</p>
+      <p><strong>Driver</strong> — records the group decision on the laptop.</p>
+      <div class="notice warn"><strong>Safety:</strong> No tasting, scratching, breaking, throwing or inhaling dust. Keep rocks away from the laptop.</div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="realCase">
+  <div class="grid2">
+    <div class="card">
+      <div class="eyebrow" id="realLabel"></div><h2>Investigate your physical rock</h2>
+      <p>Record only what you can actually observe.</p>
+      <div class="evgrid" id="realEvidence"></div>
+      <hr><h3>This rock MAY BE…</h3><div class="typegrid" id="realTypes"></div>
+      <div class="field"><label>If your proposal is correct, how might it have formed?</label>
+        <select id="formation"><option value="">Choose…</option><option>Cooling and freezing of magma/lava</option><option>Compression of deposited materials</option><option>Very high heat and pressure</option><option>Not enough evidence</option></select>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Choose exactly 3 strongest pieces of evidence</h3><div class="strong" id="strongEvidence"></div><p class="mini">These three clues will be used in your group presentation.</p>
+      <div class="btn-row"><button class="btn primary" id="saveReal">SAVE THIS ROCK →</button><button class="btn ghost" id="skipReal">SKIP ROCK (TESTING) →</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="presentation">
+  <div class="eyebrow">Rock Case Conference</div><h2>Choose one rock to present</h2>
+  <p class="lead">The teacher may randomly call your group. No long presentation is needed.</p>
+  <div class="btn-row" id="presentButtons"></div>
+  <div class="card presentation" id="presentCard" style="margin-top:16px"></div>
+  <div class="btn-row"><button class="btn primary" onclick="show('finish','Lesson Review Complete',94)">COMPLETE LESSON REVIEW →</button></div>
+</section>
+
+
+<section class="screen" id="quiz">
+  <div class="eyebrow">Final Review • Quiz</div>
+  <h2>Let’s check what we learned</h2>
+  <p class="lead">Work together. Use short science words. You can check each question before moving on.</p>
+
+  <!-- Question 1 -->
+  <div class="card quiz-card">
+    <div class="quiz-number">QUESTION 1</div>
+    <h3>Name all 3 types of rock.</h3>
+    <p class="mini">Type one rock type in each box. The order does not matter.</p>
+
+    <div class="quiz-three-inputs">
+      <div class="field">
+        <label>Rock Type 1</label>
+        <input id="q1a" class="quiz-input" autocomplete="off" placeholder="Type here">
+      </div>
+      <div class="field">
+        <label>Rock Type 2</label>
+        <input id="q1b" class="quiz-input" autocomplete="off" placeholder="Type here">
+      </div>
+      <div class="field">
+        <label>Rock Type 3</label>
+        <input id="q1c" class="quiz-input" autocomplete="off" placeholder="Type here">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="checkQ1">CHECK QUESTION 1</button>
+      <button class="btn ghost" id="clearQ1">CLEAR</button>
+    </div>
+    <div class="quiz-feedback hidden" id="q1Feedback"></div>
+  </div>
+
+  <!-- Question 2 -->
+  <div class="card quiz-card">
+    <div class="quiz-number">QUESTION 2</div>
+    <h3>Match each characteristic to the rock type.</h3>
+    <p class="mini">Choose the best rock type for each characteristic.</p>
+
+    <div class="match-table">
+      <div class="match-head">Characteristic</div>
+      <div class="match-head">Rock type</div>
+
+      <div class="match-label">Visible mineral grains</div>
+      <div><select class="q2-select" data-answer="Igneous rock"><option value="">Choose…</option><option>Igneous rock</option><option>Sedimentary rock</option><option>Metamorphic rock</option></select></div>
+
+      <div class="match-label">Many layers</div>
+      <div><select class="q2-select" data-answer="Sedimentary rock"><option value="">Choose…</option><option>Igneous rock</option><option>Sedimentary rock</option><option>Metamorphic rock</option></select></div>
+
+      <div class="match-label">Hollow / holes</div>
+      <div><select class="q2-select" data-answer="Sedimentary rock"><option value="">Choose…</option><option>Igneous rock</option><option>Sedimentary rock</option><option>Metamorphic rock</option></select></div>
+
+      <div class="match-label">Fossil visible</div>
+      <div><select class="q2-select" data-answer="Sedimentary rock"><option value="">Choose…</option><option>Igneous rock</option><option>Sedimentary rock</option><option>Metamorphic rock</option></select></div>
+
+      <div class="match-label">Hard</div>
+      <div><select class="q2-select" data-answer="Metamorphic rock"><option value="">Choose…</option><option>Igneous rock</option><option>Sedimentary rock</option><option>Metamorphic rock</option></select></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="checkQ2">CHECK QUESTION 2</button>
+      <button class="btn ghost" id="clearQ2">CLEAR</button>
+    </div>
+    <div class="quiz-feedback hidden" id="q2Feedback"></div>
+  </div>
+
+  <!-- Question 3 -->
+  <div class="card quiz-card">
+    <div class="quiz-number">QUESTION 3</div>
+    <h3>Complete the rock cycle together.</h3>
+    <p class="mini">The boxes cover the labels in the diagram. Type the rock types and processes together as a class.</p>
+
+    <div class="cycle-quiz-wrap">
+      <!--
+        QUESTION 3 POSITIONING
+        Edit ONLY left, top and width for each input below.
+        Example: style="left:25%; top:40%; width:22%;"
+        Percentage values keep the boxes attached to the image when the screen size changes.
+      -->
+
+      <img
+        id="quizCycleImg"
+        class="cycle-quiz-img"
+        src="https://tienping.github.io/public_resources/images/f1-sc-c9-rock/rock-cycle.webp"
+        alt="Rock cycle diagram"
+      >
+
+      <!-- ===== ROCK TYPES ===== -->
+      <input class="cycle-answer cycle-rock" data-answer="Igneous rock" data-alt="Igneous|Igneous rocks" id="cycleIgneous" style="left:30%; top:54%; width:18%;" placeholder="Rock type">
+      <input class="cycle-answer cycle-rock" data-answer="Metamorphic rock" data-alt="Metamorphic|Metamorphic rocks" id="cycleMetamorphic" style="left:52%; top:91%; width:20%;" placeholder="Rock type">
+      <input class="cycle-answer cycle-rock" data-answer="Sedimentary rock" data-alt="Sedimentary|Sedimentary rocks" id="cycleSedimentary" style="left:72%; top:78%; width:27%;" placeholder="Rock type">
+
+      <!-- ===== PROCESSES ===== -->
+      <input class="cycle-answer cycle-process" data-answer="Cooling and freezing of magma" data-alt="Cooling and freezing|Cooling of magma|Cooling and freezing of lava" id="cycleCooling" style="left:27%; top:77%; width:28%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Uplift to surface" data-alt="Uplift|Uplift to the surface" id="cycleUplift" style="left:48%; top:39%; width:20%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Erosion" data-alt="Weathering and erosion|Weathering & erosion" id="cycleErosion" style="left:67%; top:45%; width:15%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Weathering" data-alt="Weathering process" id="cycleWeathering" style="left:51%; top:18%; width:15%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Sedimentation of eroded materials" data-alt="Sedimentation|Sedimentation of materials|Deposition of eroded materials" id="cycleSedimentation" style="left:89%; top:60%; width:30%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Compression" data-alt="Compaction|Compaction and compression" id="cycleCompression" style="left:75%; top:65%; width:20%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Heat and pressure" data-alt="Heat & pressure|High heat and pressure|Very high heat and pressure" id="cycleHeatPressure" style="left:54%; top:59%; width:23%;" placeholder="Process">
+      <input class="cycle-answer cycle-process" data-answer="Melting" data-alt="Melt" id="cycleMelting" style="left:36%; top:96%; width:14%;" placeholder="Process">
+    </div>
+
+    <div class="cycle-word-bank">
+      <strong>Word Bank:</strong>
+      Igneous rock • Sedimentary rock • Metamorphic rock • Cooling and freezing of magma • Uplift to surface • Weathering • Erosion • Sedimentation of eroded materials • Compression • Heat and pressure • Melting
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="checkQ3">CHECK ROCK CYCLE</button>
+      <button class="btn ghost" id="clearQ3">CLEAR</button>
+    </div>
+    <div class="quiz-feedback hidden" id="q3Feedback"></div>
+  </div>
+
+  <div class="btn-row" style="justify-content:flex-end">
+    <button class="btn primary" onclick="show('quizComplete','Quiz Complete',100)">FINISH QUIZ →</button>
+  </div>
+</section>
+
+<section class="screen" id="finish">
+  <div class="card" style="text-align:center">
+    <div class="eyebrow">Lesson Review Complete</div>
+    <h1 style="font-size:46px">Good science uses observation and evidence.</h1>
+    <p class="lead" style="margin:auto">Observe carefully, use evidence, make a proposal, and review what you know.</p>
+    <div class="routine" style="justify-content:center"><span>OBSERVE</span><span>USE EVIDENCE</span><span>PROPOSE</span><span>REVIEW</span></div>
+    <p><strong>You have completed the rock investigation. Now let’s review the lesson together with a short quiz.</strong></p>
+    <div class="btn-row" style="justify-content:center">
+      <button class="btn primary" onclick="openQuiz()">START QUIZ →</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="quizComplete">
+  <div class="card" style="text-align:center">
+    <div class="eyebrow">Quiz Complete</div>
+    <h1 style="font-size:46px">Well done!</h1>
+    <p class="lead" style="margin:auto">You have completed the Digital Stone Investigation and class quiz.</p>
+    <p><strong>Close your laptop and get ready for the paper Exit Ticket.</strong></p>
+    <button class="btn ghost" onclick="location.reload()">RESTART</button>
+  </div>
+</section>
+
+</main>
+
+
+
+
+
+<script>
+const PLACEHOLDER="https://blocks.astratic.com/img/general-img-landscape.png";
+const CH=[
+ {id:"minerals",en:"Visible mineral grains",ms:"Butiran mineral jelas",zh:"可见矿物颗粒",help:"Can you see different mineral pieces?",imageKey:"guide.minerals"},
+ {id:"layers",en:"Many layers",ms:"Banyak lapisan",zh:"多层结构",help:"Can you see clear layers?",imageKey:"guide.layers"},
+ {id:"fossil",en:"Fossil visible",ms:"Fosil kelihatan",zh:"可见化石",help:"Can you see a fossil or imprint?",imageKey:"guide.fossil"},
+ {id:"cavities",en:"Holes / cavities",ms:"Lubang / rongga",zh:"孔洞 / 空隙",help:"Can you see holes or hollow spaces?",imageKey:"guide.cavities"},
+ {id:"hardness",en:"Hardness",ms:"Kekerasan",zh:"硬度",help:"Based on the appearance and your experience, does the rock look hard?"}
+];
+const DEFAULT_ASSETS={
+  "training.ig1":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/igneous-01.jpg",
+  "training.ig2":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/igneous-02.webp",
+  "training.se1":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/sedimentary-01.jpg",
+  "training.se2":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/sedimentary-02.webp",
+  "training.me1":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/metamorphic-01.jpg",
+  "training.me2":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/metamorphic-02.jpg",
+  "guide.minerals":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/mineral-grains.webp",
+  "guide.layers":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/layers.webp",
+  "guide.fossil":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/fossil.webp",
+  "guide.cavities":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/holes-cavities.webp",
+  "reference.rockCycle":"https://tienping.github.io/public_resources/images/f1-sc-c9-rock/rock-cycle.webp"
+};
+const CASES=[
+  {
+    id:"ig1",
+    type:"Igneous",
+    key:"training.ig1",
+    exp:{minerals:"yes",layers:"no",fossil:"no",cavities:"no",hardness:"yes"},
+    note:"This sample has visible mineral grains, no layers, no fossil, no holes, and it appears hard."
+  },
+  {
+    id:"ig2",
+    type:"Igneous",
+    key:"training.ig2",
+    exp:{minerals:"yes",layers:"no",fossil:"not-sure",cavities:"not-sure",hardness:"yes"},
+    note:"This sample has visible mineral grains, no layers, the fossil is not clear, the holes are not clear, and it appears hard."
+  },
+  {
+    id:"se1",
+    type:"Sedimentary",
+    key:"training.se1",
+    exp:{minerals:"yes",layers:"yes",fossil:"not-sure",cavities:"no",hardness:"no"},
+    note:"This sample has visible mineral grains and many layers. The fossil is not clear, there are no holes, and it does not appear hard."
+  },
+  {
+    id:"se2",
+    type:"Sedimentary",
+    key:"training.se2",
+    exp:{minerals:"yes",layers:"yes",fossil:"not-sure",cavities:"no",hardness:"no"},
+    note:"This sample has visible mineral grains and many layers. The fossil is not clear, there are no holes, and it does not appear hard."
+  },
+  {
+    id:"me1",
+    type:"Metamorphic",
+    key:"training.me1",
+    exp:{minerals:"yes",layers:"yes",fossil:"no",cavities:"no",hardness:"yes"},
+    note:"This sample has visible mineral grains, many layers, no fossil, no holes, and it appears hard."
+  },
+  {
+    id:"me2",
+    type:"Metamorphic",
+    key:"training.me2",
+    exp:{minerals:"yes",layers:"yes",fossil:"not-sure",cavities:"no",hardness:"yes"},
+    note:"This sample has visible mineral grains and many layers. The fossil is not clear, there are no holes, and it appears hard."
+  }
+];
+const S={group:null,members:[],assets:{...DEFAULT_ASSETS},order:[],idx:0,strong:0,review:0,tempEv:{},tempType:"",realIdx:0,real:[
+ {label:"A",ev:{},type:"",formation:"",strongest:[],skipped:false},
+ {label:"B",ev:{},type:"",formation:"",strongest:[],skipped:false},
+ {label:"C",ev:{},type:"",formation:"",strongest:[],skipped:false}
+]};
+const $=id=>document.getElementById(id);
+function shuffle(a){let x=[...a];for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
+const NAV={stack:[],current:"welcome",mode:"Welcome",progress:0,suppress:false};
+
+function show(id,mode,p){
+  if(!NAV.suppress && NAV.current && NAV.current!==id){
+    NAV.stack.push({
+      screen:NAV.current,
+      mode:NAV.mode,
+      progress:NAV.progress,
+      idx:S.idx,
+      realIdx:S.realIdx
+    });
+  }
+
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  $(id).classList.add("active");
+
+  NAV.current=id;
+  NAV.mode=mode;
+  NAV.progress=p;
+
+  $("modePill").textContent=mode;
+  $("progressBar").style.width=p+"%";
+  $("backBtn").classList.toggle("hidden",id==="welcome"||NAV.stack.length===0);
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+
+function resetAll(){
+  // Reloading clears the current in-memory investigation while keeping the fixed app configuration.
+  location.reload();
+}
+
+function clearNavHistory(){
+  NAV.stack=[];
+  $("backBtn").classList.add("hidden");
+}
+
+function goToTrainingMode(){
+  // Start a fresh Training Mode session immediately.
+  clearNavHistory();
+  S.order=shuffle(CASES);
+  S.idx=0;
+  S.strong=0;
+  S.review=0;
+  S.tempEv={};
+  S.tempType="";
+  renderTraining();
+}
+
+function goToReference(){
+  // Jump directly to the teacher/reference section.
+  clearNavHistory();
+  show("reference","Reference",65);
+}
+
+
+function openQuiz(){
+  
+  show("quiz","Quiz",96);
+}
+
+function goToQuiz(){
+  clearNavHistory();
+  
+  show("quiz","Quiz",96);
+}
+
+function goToRealRockMode(){
+  // Start a fresh Real Rock investigation from Rock A.
+  clearNavHistory();
+  S.realIdx=0;
+  S.real=[
+    {label:"A",ev:{},type:"",formation:"",strongest:[],skipped:false},
+    {label:"B",ev:{},type:"",formation:"",strongest:[],skipped:false},
+    {label:"C",ev:{},type:"",formation:"",strongest:[],skipped:false}
+  ];
+  renderReal();
+}
+
+function goBack(){
+  if(!NAV.stack.length)return;
+
+  let prev=NAV.stack.pop();
+
+  // Restore the relevant case index so NEXT/SAVE behaves correctly
+  // after returning to a previous screen.
+  S.idx=prev.idx;
+  S.realIdx=prev.realIdx;
+
+  NAV.suppress=true;
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  $(prev.screen).classList.add("active");
+
+  NAV.current=prev.screen;
+  NAV.mode=prev.mode;
+  NAV.progress=prev.progress;
+
+  $("modePill").textContent=prev.mode;
+  $("progressBar").style.width=prev.progress+"%";
+  $("backBtn").classList.toggle("hidden",prev.screen==="welcome"||NAV.stack.length===0);
+  NAV.suppress=false;
+
+  // If the previous screen is a case screen that may have been overwritten
+  // by a later case, rebuild it using the restored case index.
+  if(prev.screen==="trainingCase" && S.order.length){
+    let c=S.order[S.idx];
+    $("caseLabel").textContent=`Training Case ${S.idx+1} of ${S.order.length}`;
+    $("caseImg").src=asset(c.key);
+    evidenceGrid("trainEvidence","tr",S.tempEv||{});
+    typeGrid("trainTypes","tt",false,S.tempType||"");
+  }
+
+  if(prev.screen==="realCase"){
+    let r=S.real[S.realIdx];
+    $("realLabel").textContent=`Real Rock ${r.label} • ${S.realIdx+1} of 3`;
+    evidenceGrid("realEvidence","real",r.ev);
+    typeGrid("realTypes","rt",true,r.type);
+    
+    $("formation").value=r.formation;
+    strongList(r.strongest);
+    $("saveReal").textContent=S.realIdx<2?`SAVE ROCK ${r.label} → NEXT ROCK`:`SAVE ROCK ${r.label} → PRESENTATION`;
+  }
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function asset(k){return S.assets[k]||PLACEHOLDER}
+function activeCases(){return CASES}
+function updateTrainingCount(){
+  let n=CASES.length;
+  let a=$("activeCaseCount"); if(a)a.textContent=n;
+  let b=$("completedCaseCount"); if(b)b.textContent=n;
+  let c=$("completedTotal"); if(c)c.textContent=n;
+}
+function buildTri(){
+  let t=$("tri");
+  t.innerHTML="<div>Visual clue</div><div>English</div><div>Bahasa Melayu</div><div>中文</div><div>Simple meaning</div>";
+  CH.forEach(c=>{
+    let visual=document.createElement("div");
+    visual.className="guide-visual"+(c.imageKey?"":" no-image");
+    if(c.imageKey){
+      visual.innerHTML=`<img src="${asset(c.imageKey)}" alt="${c.en} example">`;
+    }else{
+      visual.innerHTML="<span>✋<br>Use your feeling<br>& experience</span>";
+    }
+    t.appendChild(visual);
+    [c.en,c.ms,c.zh,c.help].forEach(v=>{
+      let d=document.createElement("div");
+      d.textContent=v;
+      t.appendChild(d);
+    });
+  });
+}
+function evidenceGrid(id,prefix,existing={}){let c=$(id);c.innerHTML="";["Characteristic","YES","NO","NOT SURE"].forEach(h=>{let d=document.createElement("div");d.className="head";d.textContent=h;c.appendChild(d)});CH.forEach(ch=>{let d=document.createElement("div");d.className="label";d.innerHTML=`${ch.en}<div class=mini>${ch.ms} • ${ch.zh}</div>`;c.appendChild(d);["yes","no","not-sure"].forEach(v=>{let x=document.createElement("div");x.className="radio";x.innerHTML=`<input type=radio name="${prefix}-${ch.id}" value="${v}" ${existing[ch.id]===v?"checked":""}>`;c.appendChild(x)})})}
+function getEv(prefix){let o={};CH.forEach(ch=>{let q=document.querySelector(`input[name="${prefix}-${ch.id}"]:checked`);o[ch.id]=q?q.value:""});return o}
+function typeGrid(id,name,unsure=false,selected=""){let c=$(id);c.innerHTML="";let arr=["Igneous","Sedimentary","Metamorphic"];if(unsure)arr.push("Not enough evidence");arr.forEach((t,i)=>{let w=document.createElement("div");w.className="choice";let x=name+i;w.innerHTML=`<input id="${x}" type=radio name="${name}" value="${t}" ${selected===t?"checked":""}><label for="${x}">${t.toUpperCase()}</label>`;c.appendChild(w)})}
+function sel(name){let q=document.querySelector(`input[name="${name}"]:checked`);return q?q.value:""}
+function keyEvidenceForType(t){
+  if(t==="Igneous") return ["minerals","cavities"];
+  if(t==="Sedimentary") return ["layers","fossil"];
+  if(t==="Metamorphic") return ["hardness"];
+  return [];
+}
+function supports(ev,t){if(t==="Igneous")return ev.minerals==="yes"&&ev.layers!=="yes";if(t==="Sedimentary")return ev.layers==="yes"||ev.fossil==="yes"||ev.cavities==="yes";if(t==="Metamorphic")return ev.fossil!=="yes"&&ev.cavities!=="yes"&&ev.layers!=="yes";return true}
+function startTraining(){S.order=shuffle(CASES);S.idx=0;S.strong=0;S.review=0;updateTrainingCount();renderTraining()}
+function renderTraining(){let c=S.order[S.idx];$("caseLabel").textContent=`Training Case ${S.idx+1} of ${S.order.length}`;$("caseImg").src=asset(c.key);evidenceGrid("trainEvidence","tr");typeGrid("trainTypes","tt");show("trainingCase","Training Mode",12+S.idx*5.5)}
+function checkTraining(){let ev=getEv("tr"),t=sel("tt");if(Object.values(ev).some(x=>!x)||!t){alert("Please answer every characteristic and choose a proposed type.");return}S.tempEv=ev;S.tempType=t;finishTrainingCase()}
+function finishTrainingCase(){
+  let c=S.order[S.idx],
+      t=S.tempType||sel("tt"),
+      studentEv={...S.tempEv},
+      ok=t===c.type;
+
+  if(ok)S.strong++;else S.review++;
+
+  $("feedbackImg").src=asset(c.key);
+  $("feedbackTitle").textContent=`Expected type: ${c.type.toUpperCase()}`;
+
+  let b=$("feedbackBox");
+  b.className="feedback "+(ok?"good":"review");
+
+  let typeStatus=ok
+    ? `<span class="match-badge">✅ MATCH</span>`
+    : `<span class="mismatch-badge">↔ NOT MATCH</span>`;
+
+  let motivation=ok
+    ? `<div class="affirmation"><span class="icon">✅</span><span>Great job! Your proposal matches the expected rock type. Keep using evidence like a scientist!</span></div>`
+    : `<div class="notice warn" style="margin-top:10px"><strong>Good try.</strong> Compare your evidence with the expected evidence below and see what you can learn from this case.</div>`;
+
+  b.innerHTML=`
+    <div class="type-compare">
+      <div class="type-box">
+        <span class="mini">YOUR PROPOSAL</span>
+        <strong>${t}</strong>
+      </div>
+      <div class="type-result">${typeStatus}</div>
+      <div class="type-box">
+        <span class="mini">EXPECTED TYPE</span>
+        <strong>${c.type}</strong>
+      </div>
+    </div>
+    ${motivation}
+    <p>${c.note}</p>`;
+
+  let keyEvidence=keyEvidenceForType(c.type);
+  let f=$("feedbackEvidence");
+
+  function pretty(v){
+    return v==="yes"?"YES":v==="no"?"NO":"NOT SURE";
+  }
+
+  let rows=CH.map(ch=>{
+    let student=studentEv[ch.id]||"not-sure";
+    let expected=c.exp[ch.id];
+    let match=student===expected;
+    let rowClass=keyEvidence.includes(ch.id)?"key-row":"";
+    return `
+      <tr class="${rowClass}">
+        <td>
+          <strong>${ch.en}</strong>
+          ${keyEvidence.includes(ch.id)?'<div class="mini">Key characteristic</div>':''}
+        </td>
+        <td><span class="answer-pill user">${pretty(student)}</span></td>
+        <td><span class="answer-pill expected">${pretty(expected)}</span></td>
+        <td>${match?'<span class="match-badge">✅ MATCH</span>':'<span class="mismatch-badge">↔ NOT MATCH</span>'}</td>
+      </tr>`;
+  }).join("");
+
+  f.innerHTML=`
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Characteristic</th>
+          <th>Your answer</th>
+          <th>Expected</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  S.tempEv={};
+  S.tempType="";
+  show("trainingFeedback","Training Feedback",17+S.idx*5.5);
+}
+function nextTraining(){S.idx++;if(S.idx>=S.order.length){$("strongScore").textContent=S.strong;$("reviewScore").textContent=S.review;$("completedCaseCount").textContent=S.order.length;$("completedTotal").textContent=S.order.length;show("trainingDone","Training Complete",62)}else renderTraining()}
+function skipTrainingCase(){S.tempEv={};S.tempType="";S.idx++;if(S.idx>=S.order.length){$("strongScore").textContent=S.strong;$("reviewScore").textContent=S.review;$("completedCaseCount").textContent=S.order.length;$("completedTotal").textContent=S.order.length;show("trainingDone","Training Complete",62)}else renderTraining()}
+
+function strongList(existing=[]){let c=$("strongEvidence");c.innerHTML="";CH.forEach(ch=>{let l=document.createElement("label");l.innerHTML=`<input type=checkbox value="${ch.id}" ${existing.includes(ch.id)?"checked":""}> ${ch.en}`;c.appendChild(l)})}
+function renderReal(){
+  let r=S.real[S.realIdx];
+  $("realLabel").textContent=`Real Rock ${r.label} • ${S.realIdx+1} of 3`;
+  evidenceGrid("realEvidence","real",r.ev);
+  typeGrid("realTypes","rt",true,r.type);
+  
+  $("formation").value=r.formation;
+  strongList(r.strongest);
+  $("saveReal").textContent=S.realIdx<2?`SAVE ROCK ${r.label} → NEXT ROCK`:`SAVE ROCK ${r.label} → PRESENTATION`;
+  show("realCase","Real Rock Mode",70+S.realIdx*8);
+}
+function chosenStrong(){return [...document.querySelectorAll("#strongEvidence input:checked")].map(x=>x.value)}
+function saveReal(){let r=S.real[S.realIdx],ev=getEv("real"),t=sel("rt"),fo=$("formation").value,st=chosenStrong();if(Object.values(ev).some(x=>!x)||!t||!fo){alert("Complete the evidence, proposal and formation.");return}if(st.length!==3){alert("Choose exactly 3 strongest pieces of evidence.");return}Object.assign(r,{ev,type:t,formation:fo,strongest:st});if(S.realIdx<2){S.realIdx++;renderReal()}else renderPresentation()}
+function skipRealRock(){let r=S.real[S.realIdx];r.skipped=true;r.ev={};r.type="";r.formation="";r.strongest=[];if(S.realIdx<2){S.realIdx++;renderReal()}else renderPresentation()}
+
+
+function normalizeAnswer(v){
+  return (v||"")
+    .toLowerCase()
+    .trim()
+    .replace(/[&]/g,"and")
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function answerMatches(input, expected, alternatives=""){
+  let value=normalizeAnswer(input);
+  let accepted=[expected,...(alternatives?alternatives.split("|"):[])].map(normalizeAnswer);
+  return accepted.includes(value);
+}
+
+function checkQuestion1(){
+  let fields=[$("q1a"),$("q1b"),$("q1c")];
+  let values=fields.map(x=>normalizeAnswer(x.value));
+  let targets=["igneous rock","sedimentary rock","metamorphic rock"].map(normalizeAnswer);
+
+  fields.forEach(x=>x.classList.remove("correct","incorrect"));
+
+  let allFilled=values.every(Boolean);
+  let unique=new Set(values);
+  let correctSet=targets.every(t=>unique.has(t) || unique.has(t.replace(" rock","")));
+
+  fields.forEach((field,i)=>{
+    let v=values[i];
+    let okay=targets.some(t=>v===t || v===t.replace(" rock","") || v===t+"s");
+    field.classList.add(okay?"correct":"incorrect");
+  });
+
+  let fb=$("q1Feedback");
+  fb.className="quiz-feedback "+(allFilled && correctSet && unique.size===3?"good":"review");
+  fb.textContent=allFilled && correctSet && unique.size===3
+    ?"✅ Great! You named all three rock types."
+    :"Review your answers. You need Igneous rock, Sedimentary rock and Metamorphic rock — one of each.";
+}
+
+function clearQuestion1(){
+  ["q1a","q1b","q1c"].forEach(id=>{$(id).value="";$(id).classList.remove("correct","incorrect")});
+  $("q1Feedback").className="quiz-feedback hidden";
+  $("q1Feedback").textContent="";
+}
+
+function checkQuestion2(){
+  let selects=[...document.querySelectorAll(".q2-select")];
+  let correct=0;
+
+  selects.forEach(s=>{
+    s.classList.remove("correct","incorrect");
+    if(s.value===s.dataset.answer){
+      s.classList.add("correct");
+      correct++;
+    }else{
+      s.classList.add("incorrect");
+    }
+  });
+
+  let fb=$("q2Feedback");
+  fb.className="quiz-feedback "+(correct===selects.length?"good":"review");
+  fb.textContent=correct===selects.length
+    ?"✅ Excellent! All five characteristics are matched correctly."
+    :`You matched ${correct} out of ${selects.length}. Look at the orange boxes and try again.`;
+}
+
+function clearQuestion2(){
+  document.querySelectorAll(".q2-select").forEach(s=>{s.value="";s.classList.remove("correct","incorrect")});
+  $("q2Feedback").className="quiz-feedback hidden";
+  $("q2Feedback").textContent="";
+}
+
+function checkQuestion3(){
+  let inputs=[...document.querySelectorAll(".cycle-answer")];
+  let correct=0;
+
+  inputs.forEach(i=>{
+    i.classList.remove("correct","incorrect");
+    let ok=answerMatches(i.value,i.dataset.answer,i.dataset.alt||"");
+    i.classList.add(ok?"correct":"incorrect");
+    if(ok)correct++;
+  });
+
+  let fb=$("q3Feedback");
+  fb.className="quiz-feedback "+(correct===inputs.length?"good":"review");
+  fb.textContent=correct===inputs.length
+    ?"✅ Rock cycle complete! All labels match."
+    :`${correct} of ${inputs.length} labels match. Check the orange boxes together and try again.`;
+}
+
+function clearQuestion3(){
+  document.querySelectorAll(".cycle-answer").forEach(i=>{i.value="";i.classList.remove("correct","incorrect")});
+  $("q3Feedback").className="quiz-feedback hidden";
+  $("q3Feedback").textContent="";
+}
+
+function label(id){let x=CH.find(c=>c.id===id);return x?x.en:id}
+function renderPresentation(){let b=$("presentButtons");b.innerHTML="";S.real.forEach((r,i)=>{let x=document.createElement("button");x.className="btn "+(i===0?"primary":"ghost");x.textContent=`ROCK ${r.label}`;x.onclick=()=>{[...b.children].forEach(z=>z.className="btn ghost");x.className="btn primary";presentRock(i)};b.appendChild(x)});presentRock(0);show("presentation","Presentation",95)}
+function presentRock(i){
+  let r=S.real[i];
+  if(r.skipped){
+    $("presentCard").innerHTML=`
+      <div class=mini style="color:#d7d9e5">${S.group?`GROUP ${S.group} • `:""}ROCK ${r.label}</div>
+      <div class=big>SKIPPED FOR TESTING</div>
+      <p>This rock investigation was skipped using the testing button.</p>`;
+    return;
+  }
+  let ev=r.strongest.map(label);
+  $("presentCard").innerHTML=`
+    <div class=mini style="color:#d7d9e5">${S.group?`GROUP ${S.group} • `:""}ROCK ${r.label}</div>
+    <div class=big>${r.type.toUpperCase()}</div>
+    ${ev.map(x=>`<div class=ev>✓ ${x}</div>`).join("")}
+    <p><strong>Possible formation:</strong><br>${r.formation}</p>
+    <hr style="border-color:rgba(255,255,255,.2)">
+    <div style="font-size:20px;font-weight:850">
+      “We think it MAY BE ${r.type==="Not enough evidence"?"uncertain":r.type} because we see ${ev.join(", ")}.”
+    </div>`;
+}
+for(let i=1;i<=13;i++){let o=document.createElement("option");o.value=i;o.textContent=`Group ${i}`;$("groupNo").appendChild(o)}
+buildTri();updateTrainingCount();$("introImg").src=asset(CASES[0].key);$("rockCycleImg").src=asset("reference.rockCycle");
+$("resetBtn").onclick=resetAll;
+$("goTrainingBtn").onclick=goToTrainingMode;
+$("goReferenceBtn").onclick=goToReference;
+$("goRealBtn").onclick=goToRealRockMode;
+$("goQuizBtn").onclick=goToQuiz;
+$("backBtn").onclick=goBack;
+$("start").onclick=()=>{S.group=$("groupNo").value;S.members=[$("m1").value,$("m2").value,$("m3").value];$("groupPill").textContent=`Group ${S.group}`;show("guide","Investigation Guide",6)};
+$("beginTraining").onclick=startTraining;$("checkTraining").onclick=checkTraining;$("skipTraining").onclick=skipTrainingCase;$("nextTraining").onclick=nextTraining;
+$("beginReal").onclick=()=>{S.realIdx=0;renderReal()};$("saveReal").onclick=saveReal;$("skipReal").onclick=skipRealRock;
+
+$("checkQ1").onclick=checkQuestion1;
+$("clearQ1").onclick=clearQuestion1;
+$("checkQ2").onclick=checkQuestion2;
+$("clearQ2").onclick=clearQuestion2;
+$("checkQ3").onclick=checkQuestion3;
+$("clearQ3").onclick=clearQuestion3;
+
+document.addEventListener("change",e=>{if(e.target.matches("#strongEvidence input[type=checkbox]")&&document.querySelectorAll("#strongEvidence input:checked").length>3){e.target.checked=false;alert("Choose only 3 strongest pieces of evidence.")}});
+</script>
+</body>
+</html>
