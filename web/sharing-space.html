@@ -122,7 +122,7 @@
 
         // Global environment variables provided by the platform
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-mascot-app';
-        const __firebase_config = {
+        const firebaseConfig = {
             apiKey: "AIzaSyCTYc7CYiJIJWLb3w_pBKNvS3NHyFRWstA",
             authDomain: "ltp-sharing-space.firebaseapp.com",
             projectId: "ltp-sharing-space",
@@ -131,7 +131,7 @@
             appId: "1:443374525177:web:f6ab69736715b6925b6028",
             measurementId: "G-59ZBNHB1F0"
         };
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
