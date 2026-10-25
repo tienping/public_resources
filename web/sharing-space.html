@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mascot Screen Sync</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        /* Grid background for the shared canvas */
+        .canvas-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                              linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+        }
+
+        .mascot-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            /* Smooth transitions between real-time data ticks */
+            transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Offset to center the mascot on the pointer */
+            margin-top: -24px;
+            margin-left: -24px;
+            z-index: 10;
+        }
+
+        .mascot-emoji {
+            font-size: 3rem;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .mascot-name {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #334155;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            margin-top: 4px;
+        }
+
+        /* Subtle pulse for active user */
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .is-me .mascot-emoji {
+            animation: gentle-pulse 2s infinite ease-in-out;
+        }
+        .is-me .mascot-name {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Loading Screen (Auth init) -->
+    <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 z-50">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p class="text-slate-500 font-medium">Connecting to shared space...</p>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 flex items-center justify-center bg-slate-50 z-40 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mx-4 border border-slate-100">
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome!</h1>
+                <p class="text-slate-500">Enter your name to join the shared screen.</p>
+            </div>
+            
+            <form id="join-form" class="space-y-4">
+                <div>
+                    <label for="nickname" class="block text-sm font-medium text-slate-700 mb-1">Your Name</label>
+                    <input type="text" id="nickname" required autocomplete="off"
+                        class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow text-lg" 
+                        placeholder="e.g. Alex">
+                </div>
+                <button type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2 text-lg">
+                    Go to Screen <span class="text-xl">🚀</span>
+                </button>
+            </form>
+            
+            <div id="error-message" class="text-red-500 text-sm mt-4 text-center hidden"></div>
+        </div>
+    </div>
+
+    <!-- Shared Canvas Screen -->
+    <div id="canvas-screen" class="fixed inset-0 canvas-bg hidden">
+        <!-- Overlay UI -->
+        <div class="absolute top-4 left-4 z-20 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow border border-slate-200 flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="font-medium text-slate-600 text-sm">Live Screen</span>
+        </div>
+        
+        <!-- Mascots will be injected here -->
+        <div id="mascots-layer" class="w-full h-full relative"></div>
+    </div>
+
+    <!-- Firebase App Configuration & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global environment variables provided by the platform
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-mascot-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // UI Elements
+        const loadingScreen = document.getElementById('loading-screen');
+        const loginScreen = document.getElementById('login-screen');
+        const canvasScreen = document.getElementById('canvas-screen');
+        const joinForm = document.getElementById('join-form');
+        const nicknameInput = document.getElementById('nickname');
+        const errorMsg = document.getElementById('error-message');
+        const mascotsLayer = document.getElementById('mascots-layer');
+
+        // App State
+        let currentUser = null;
+        let myDocRef = null;
+        const activeUsers = {}; 
+        const MASCOTS = ['🧍🏻', '🧍🏻‍♂️', '🧑🏻‍🦱', '🙋🏻‍♂️'];
+        let myMascot = '';
+        let myName = '';
+        let localX = window.innerWidth / 2;
+        let localY = window.innerHeight / 2;
+        let syncTimeout = null;
+        
+        // --- Authentication ---
+        async function authenticate() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUser = auth.currentUser;
+                
+                // Show login form
+                loadingScreen.classList.add('hidden');
+                loginScreen.classList.remove('hidden');
+            } catch (error) {
+                console.error("Auth error:", error);
+                loadingScreen.innerHTML = `<p class="text-red-500 p-4">Authentication failed. Please refresh.</p>`;
+            }
+        }
+
+        // --- Core Application Logic ---
+        function showError(msg) {
+            errorMsg.textContent = msg;
+            errorMsg.classList.remove('hidden');
+        }
+
+        joinForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = nicknameInput.value.trim();
+            if (!name) {
+                showError("Please enter your name");
+                return;
+            }
+            if (!currentUser) {
+                showError("Not connected. Try refreshing.");
+                return;
+            }
+
+            myName = name;
+            myMascot = MASCOTS[Math.floor(Math.random() * MASCOTS.length)];
+            
+            // Switch views
+            loginScreen.classList.add('hidden');
+            canvasScreen.classList.remove('hidden');
+            
+            await initMultiplayer();
+        });
+
+        async function initMultiplayer() {
+            if (!currentUser) return;
+            const uid = currentUser.uid;
+            
+            // Rule 1: Strict Paths -> artifacts/appId/public/data/users
+            const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+            myDocRef = doc(usersRef, uid);
+
+            // 1. Set initial presence
+            await setDoc(myDocRef, {
+                name: myName,
+                mascot: myMascot,
+                x: localX,
+                y: localY,
+                lastActive: Date.now()
+            });
+
+            // 2. Listen for all users (Rule 2: Fetch all, no complex queries)
+            onSnapshot(usersRef, (snapshot) => {
+                const now = Date.now();
+                const fetchedIds = new Set();
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    fetchedIds.add(id);
+
+                    // Filter out stale users (inactive for > 15 seconds)
+                    if (now - data.lastActive > 15000) {
+                        return;
+                    }
+
+                    if (!activeUsers[id]) {
+                        createMascot(id, data);
+                    } else {
+                        updateMascot(id, data);
+                    }
+                });
+
+                // Remove disconnected/stale users
+                for (let id in activeUsers) {
+                    if (!fetchedIds.has(id)) {
+                        removeMascot(id);
+                    }
+                }
+            }, (error) => {
+                console.error("Sync error:", error);
+            });
+
+            // 3. Track mouse movement
+            document.addEventListener('mousemove', (e) => {
+                localX = e.clientX;
+                localY = e.clientY;
+                
+                // Immediately update local UI for responsiveness
+                if (activeUsers[uid]) {
+                    updateMascot(uid, { x: localX, y: localY, name: myName, mascot: myMascot }, true);
+                }
+
+                throttledSync();
+            });
+
+            // Handle touch on mobile
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    localX = e.touches[0].clientX;
+                    localY = e.touches[0].clientY;
+                    if (activeUsers[uid]) {
+                        updateMascot(uid, { x: localX, y: localY, name: myName, mascot: myMascot }, true);
+                    }
+                    throttledSync();
+                }
+            }, { passive: true });
+
+            // 4. Heartbeat to keep connection alive & cleanup
+            setInterval(() => {
+                if (myDocRef) {
+                    // Update last active time
+                    updateDoc(myDocRef, { lastActive: Date.now() }).catch(e => console.log('Heartbeat fail:', e));
+                }
+                
+                // Clean up DOM for users who haven't updated
+                const now = Date.now();
+                for (let id in activeUsers) {
+                    if (now - activeUsers[id].lastActive > 15000) {
+                        removeMascot(id);
+                    }
+                }
+            }, 5000);
+        }
+
+        // --- Sync Control ---
+        function throttledSync() {
+            if (syncTimeout) return;
+            // Throttle to 4 times a second (250ms) to save on Firestore quota 
+            // CSS transitions handle the smoothness visually between ticks
+            syncTimeout = setTimeout(() => {
+                if (myDocRef) {
+                    updateDoc(myDocRef, {
+                        x: localX,
+                        y: localY,
+                        lastActive: Date.now()
+                    }).catch(err => console.log('Sync err:', err));
+                }
+                syncTimeout = null;
+            }, 250); 
+        }
+
+        // --- DOM Manipulation ---
+        function createMascot(id, data) {
+            const container = document.createElement('div');
+            container.className = 'mascot-container';
+            if (id === currentUser.uid) {
+                container.classList.add('is-me');
+                // Ensure my own mascot appears above others
+                container.style.zIndex = '100'; 
+            }
+            
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'mascot-emoji';
+            emojiEl.textContent = data.mascot;
+            
+            const nameEl = document.createElement('div');
+            nameEl.className = 'mascot-name';
+            nameEl.textContent = data.name + (id === currentUser.uid ? ' (You)' : '');
+            
+            container.appendChild(emojiEl);
+            container.appendChild(nameEl);
+            mascotsLayer.appendChild(container);
+
+            activeUsers[id] = {
+                el: container,
+                name: data.name,
+                mascot: data.mascot,
+                lastActive: data.lastActive || Date.now()
+            };
+
+            // Set initial position immediately (no transition)
+            container.style.transform = `translate(${data.x}px, ${data.y}px)`;
+        }
+
+        function updateMascot(id, data, isLocal = false) {
+            const user = activeUsers[id];
+            if (!user) return;
+
+            // Apply translation to move it to the coordinates
+            user.el.style.transform = `translate(${data.x}px, ${data.y}px)`;
+            
+            // Only update lastActive if it's from the server
+            if (!isLocal) {
+                user.lastActive = data.lastActive || Date.now();
+            }
+        }
+
+        function removeMascot(id) {
+            if (activeUsers[id]) {
+                activeUsers[id].el.remove();
+                delete activeUsers[id];
+            }
+        }
+
+        // Graceful exit cleanup
+        window.addEventListener('beforeunload', () => {
+            if (myDocRef) {
+                // Best effort sync deletion on window close
+                deleteDoc(myDocRef).catch(()=>{});
+            }
+        });
+
+        // Boot
+        authenticate();
+
+    </script>
+</body>
+</html>
