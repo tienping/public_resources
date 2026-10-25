@@ -84,20 +84,20 @@
                 <h1 class="text-3xl font-bold text-slate-800 mb-2">Welcome!</h1>
                 <p class="text-slate-500">Enter your name to join the shared screen.</p>
             </div>
-            
+
             <form id="join-form" class="space-y-4">
                 <div>
                     <label for="nickname" class="block text-sm font-medium text-slate-700 mb-1">Your Name</label>
                     <input type="text" id="nickname" required autocomplete="off"
-                        class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow text-lg" 
+                        class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow text-lg"
                         placeholder="e.g. Alex">
                 </div>
-                <button type="submit" 
+                <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2 text-lg">
                     Go to Screen <span class="text-xl">🚀</span>
                 </button>
             </form>
-            
+
             <div id="error-message" class="text-red-500 text-sm mt-4 text-center hidden"></div>
         </div>
     </div>
@@ -109,7 +109,7 @@
             <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
             <span class="font-medium text-slate-600 text-sm">Live Screen</span>
         </div>
-        
+
         <!-- Mascots will be injected here -->
         <div id="mascots-layer" class="w-full h-full relative"></div>
     </div>
@@ -122,6 +122,15 @@
 
         // Global environment variables provided by the platform
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-mascot-app';
+        const __firebase_config = {
+            apiKey: "AIzaSyCTYc7CYiJIJWLb3w_pBKNvS3NHyFRWstA",
+            authDomain: "ltp-sharing-space.firebaseapp.com",
+            projectId: "ltp-sharing-space",
+            storageBucket: "ltp-sharing-space.firebasestorage.app",
+            messagingSenderId: "443374525177",
+            appId: "1:443374525177:web:f6ab69736715b6925b6028",
+            measurementId: "G-59ZBNHB1F0"
+        };
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 
         // Initialize Firebase
@@ -141,14 +150,14 @@
         // App State
         let currentUser = null;
         let myDocRef = null;
-        const activeUsers = {}; 
+        const activeUsers = {};
         const MASCOTS = ['🧍🏻', '🧍🏻‍♂️', '🧑🏻‍🦱', '🙋🏻‍♂️'];
         let myMascot = '';
         let myName = '';
         let localX = window.innerWidth / 2;
         let localY = window.innerHeight / 2;
         let syncTimeout = null;
-        
+
         // --- Authentication ---
         async function authenticate() {
             try {
@@ -158,7 +167,7 @@
                     await signInAnonymously(auth);
                 }
                 currentUser = auth.currentUser;
-                
+
                 // Show login form
                 loadingScreen.classList.add('hidden');
                 loginScreen.classList.remove('hidden');
@@ -188,18 +197,18 @@
 
             myName = name;
             myMascot = MASCOTS[Math.floor(Math.random() * MASCOTS.length)];
-            
+
             // Switch views
             loginScreen.classList.add('hidden');
             canvasScreen.classList.remove('hidden');
-            
+
             await initMultiplayer();
         });
 
         async function initMultiplayer() {
             if (!currentUser) return;
             const uid = currentUser.uid;
-            
+
             // Rule 1: Strict Paths -> artifacts/appId/public/data/users
             const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
             myDocRef = doc(usersRef, uid);
@@ -217,7 +226,7 @@
             onSnapshot(usersRef, (snapshot) => {
                 const now = Date.now();
                 const fetchedIds = new Set();
-                
+
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const id = docSnap.id;
@@ -249,7 +258,7 @@
             document.addEventListener('mousemove', (e) => {
                 localX = e.clientX;
                 localY = e.clientY;
-                
+
                 // Immediately update local UI for responsiveness
                 if (activeUsers[uid]) {
                     updateMascot(uid, { x: localX, y: localY, name: myName, mascot: myMascot }, true);
@@ -276,7 +285,7 @@
                     // Update last active time
                     updateDoc(myDocRef, { lastActive: Date.now() }).catch(e => console.log('Heartbeat fail:', e));
                 }
-                
+
                 // Clean up DOM for users who haven't updated
                 const now = Date.now();
                 for (let id in activeUsers) {
@@ -290,7 +299,7 @@
         // --- Sync Control ---
         function throttledSync() {
             if (syncTimeout) return;
-            // Throttle to 4 times a second (250ms) to save on Firestore quota 
+            // Throttle to 4 times a second (250ms) to save on Firestore quota
             // CSS transitions handle the smoothness visually between ticks
             syncTimeout = setTimeout(() => {
                 if (myDocRef) {
@@ -301,7 +310,7 @@
                     }).catch(err => console.log('Sync err:', err));
                 }
                 syncTimeout = null;
-            }, 250); 
+            }, 250);
         }
 
         // --- DOM Manipulation ---
@@ -311,17 +320,17 @@
             if (id === currentUser.uid) {
                 container.classList.add('is-me');
                 // Ensure my own mascot appears above others
-                container.style.zIndex = '100'; 
+                container.style.zIndex = '100';
             }
-            
+
             const emojiEl = document.createElement('div');
             emojiEl.className = 'mascot-emoji';
             emojiEl.textContent = data.mascot;
-            
+
             const nameEl = document.createElement('div');
             nameEl.className = 'mascot-name';
             nameEl.textContent = data.name + (id === currentUser.uid ? ' (You)' : '');
-            
+
             container.appendChild(emojiEl);
             container.appendChild(nameEl);
             mascotsLayer.appendChild(container);
@@ -343,7 +352,7 @@
 
             // Apply translation to move it to the coordinates
             user.el.style.transform = `translate(${data.x}px, ${data.y}px)`;
-            
+
             // Only update lastActive if it's from the server
             if (!isLocal) {
                 user.lastActive = data.lastActive || Date.now();
