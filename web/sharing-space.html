@@ -104,10 +104,17 @@
 
     <!-- Shared Canvas Screen -->
     <div id="canvas-screen" class="fixed inset-0 canvas-bg hidden">
-        <!-- Overlay UI -->
+        <!-- Overlay UI (Top Left) -->
         <div class="absolute top-4 left-4 z-20 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow border border-slate-200 flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
             <span class="font-medium text-slate-600 text-sm">Live Screen</span>
+        </div>
+
+        <!-- Refresh Button (Top Right) -->
+        <div class="absolute top-4 right-4 z-20">
+            <button id="refresh-btn" class="bg-white/90 hover:bg-white text-slate-700 font-medium px-4 py-2 rounded-lg shadow border border-slate-200 transition-colors flex items-center gap-2 text-sm">
+                <span>🔄</span> Refresh Users
+            </button>
         </div>
 
         <!-- Mascots will be injected here -->
@@ -118,7 +125,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // ADDED getDocs to the import list
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global environment variables provided by the platform
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'demo-mascot-app';
@@ -131,7 +139,6 @@
             appId: "1:443374525177:web:f6ab69736715b6925b6028",
             measurementId: "G-59ZBNHB1F0"
         };
-        // const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -146,6 +153,7 @@
         const nicknameInput = document.getElementById('nickname');
         const errorMsg = document.getElementById('error-message');
         const mascotsLayer = document.getElementById('mascots-layer');
+        const refreshBtn = document.getElementById('refresh-btn'); // ADDED button element
 
         // App State
         let currentUser = null;
@@ -222,7 +230,38 @@
                 lastActive: Date.now()
             });
 
-            // 2. Listen for all users (Rule 2: Fetch all, no complex queries)
+            // ADDED: Manual Refresh Button Logic
+            refreshBtn.addEventListener('click', async () => {
+                try {
+                    // Temporarily add spinning animation to the icon
+                    const icon = refreshBtn.querySelector('span');
+                    icon.classList.add('animate-spin', 'inline-block');
+                    
+                    const snapshot = await getDocs(usersRef);
+                    const now = Date.now();
+                    
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        const id = docSnap.id;
+                        
+                        // Ignore users inactive for > 15 seconds
+                        if (now - data.lastActive > 15000) return;
+                        
+                        if (!activeUsers[id]) {
+                            createMascot(id, data);
+                        } else {
+                            updateMascot(id, data);
+                        }
+                    });
+                    
+                    // Remove spin animation after 500ms
+                    setTimeout(() => icon.classList.remove('animate-spin', 'inline-block'), 500);
+                } catch (error) {
+                    console.error("Failed to manually refresh users:", error);
+                }
+            });
+
+            // 2. Listen for all users
             onSnapshot(usersRef, (snapshot) => {
                 const now = Date.now();
                 const fetchedIds = new Set();
@@ -300,7 +339,6 @@
         function throttledSync() {
             if (syncTimeout) return;
             // Throttle to 4 times a second (250ms) to save on Firestore quota
-            // CSS transitions handle the smoothness visually between ticks
             syncTimeout = setTimeout(() => {
                 if (myDocRef) {
                     updateDoc(myDocRef, {
