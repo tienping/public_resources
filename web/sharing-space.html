@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mascot Screen Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -10,11 +10,9 @@
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
-            overflow: hidden;
             background-color: #f8fafc;
         }
 
-        /* Grid background for the shared canvas */
         .canvas-bg {
             background-size: 40px 40px;
             background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
@@ -25,14 +23,12 @@
             position: absolute;
             top: 0;
             left: 0;
-            /* Smooth transitions between real-time data ticks */
             transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.3, 1);
             pointer-events: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Offset to center the mascot on the pointer */
             margin-top: -24px;
             margin-left: -24px;
             z-index: 10;
@@ -53,9 +49,9 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             white-space: nowrap;
             margin-top: 4px;
+            transition: all 0.3s ease;
         }
 
-        /* Subtle pulse for active user */
         @keyframes gentle-pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -71,7 +67,7 @@
 </head>
 <body class="text-slate-800">
 
-    <!-- Loading Screen (Auth init) -->
+    <!-- Loading Screen -->
     <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-50 z-50">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
         <p class="text-slate-500 font-medium">Connecting to shared space...</p>
@@ -103,15 +99,19 @@
     </div>
 
     <!-- Shared Canvas Screen -->
-    <div id="canvas-screen" class="fixed inset-0 canvas-bg hidden">
+    <div id="canvas-screen" class="hidden relative w-[3000px] h-[3000px] canvas-bg">
+        
         <!-- Overlay UI (Top Left) -->
-        <div class="absolute top-4 left-4 z-20 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow border border-slate-200 flex items-center gap-2">
+        <div class="fixed top-4 left-4 z-20 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow border border-slate-200 flex items-center gap-2">
             <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
             <span class="font-medium text-slate-600 text-sm">Live Screen</span>
         </div>
 
         <!-- Controls (Top Right) -->
-        <div class="absolute top-4 right-4 z-20 flex flex-col gap-2">
+        <div class="fixed top-4 right-4 z-20 flex flex-col gap-2">
+            <button id="edit-name-btn" class="bg-indigo-600/90 hover:bg-indigo-600 text-white font-medium px-4 py-2 rounded-lg shadow border border-indigo-700 transition-colors flex items-center justify-center gap-2 text-sm w-full">
+                <span>✏️</span> Edit Name
+            </button>
             <button id="refresh-btn" class="bg-white/90 hover:bg-white text-slate-700 font-medium px-4 py-2 rounded-lg shadow border border-slate-200 transition-colors flex items-center justify-center gap-2 text-sm w-full">
                 <span>🔄</span> Refresh Users
             </button>
@@ -145,7 +145,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // UI Elements
         const loadingScreen = document.getElementById('loading-screen');
         const loginScreen = document.getElementById('login-screen');
         const canvasScreen = document.getElementById('canvas-screen');
@@ -155,19 +154,25 @@
         const mascotsLayer = document.getElementById('mascots-layer');
         const refreshBtn = document.getElementById('refresh-btn');
         const reRegisterBtn = document.getElementById('re-register-btn');
+        const editNameBtn = document.getElementById('edit-name-btn'); // ADDED
 
-        // App State
         let currentUser = null;
         let myDocRef = null;
         const activeUsers = {};
         const MASCOTS = ['🧍🏻', '🧍🏻‍♂️', '🧑🏻‍🦱', '🙋🏻‍♂️'];
         let myMascot = '';
         let myName = '';
-        let localX = window.innerWidth / 2;
-        let localY = window.innerHeight / 2;
+        
+        let localX = 1500;
+        let localY = 1500;
         let syncTimeout = null;
 
-        // --- Authentication ---
+        // Load cached name on start
+        const cachedName = localStorage.getItem('mascot-app-name');
+        if (cachedName) {
+            nicknameInput.value = cachedName;
+        }
+
         async function authenticate() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -202,6 +207,9 @@
             }
 
             myName = name;
+            // Save name to cache
+            localStorage.setItem('mascot-app-name', myName);
+            
             myMascot = MASCOTS[Math.floor(Math.random() * MASCOTS.length)];
 
             loginScreen.classList.add('hidden');
@@ -210,7 +218,24 @@
             await initMultiplayer();
         });
 
-        // Re-register Button Logic
+        // Edit Name Logic
+        editNameBtn.addEventListener('click', async () => {
+            const newName = prompt("Enter your new name:", myName);
+            if (newName && newName.trim() !== "") {
+                myName = newName.trim();
+                localStorage.setItem('mascot-app-name', myName); // Update cache
+                
+                // Instantly update database (everyone else sees it via listener)
+                if (myDocRef) {
+                    try {
+                        await updateDoc(myDocRef, { name: myName });
+                    } catch (error) {
+                        console.error("Failed to update name:", error);
+                    }
+                }
+            }
+        });
+
         reRegisterBtn.addEventListener('click', async () => {
             if (!myDocRef) return;
             try {
@@ -225,17 +250,21 @@
                     lastActive: Date.now()
                 });
                 
-                console.log("Successfully re-registered to database.");
                 setTimeout(() => icon.classList.remove('animate-bounce', 'inline-block'), 1000);
             } catch (error) {
                 console.error("Re-register failed:", error);
-                alert("Failed to write to database. Check the console for errors.");
             }
         });
 
         async function initMultiplayer() {
             if (!currentUser) return;
             const uid = currentUser.uid;
+            
+            window.scrollTo({
+                top: 1500 - (window.innerHeight / 2),
+                left: 1500 - (window.innerWidth / 2),
+                behavior: 'instant'
+            });
             
             const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
             myDocRef = doc(usersRef, uid);
@@ -260,7 +289,6 @@
                         const data = docSnap.data();
                         const id = docSnap.id;
                         
-                        // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
                         if (now - data.lastActive > 120000) return;
                         
                         if (!activeUsers[id]) {
@@ -285,7 +313,6 @@
                     const id = docSnap.id;
                     fetchedIds.add(id);
 
-                    // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
                     if (now - data.lastActive > 120000) {
                         return;
                     }
@@ -307,8 +334,8 @@
             });
 
             document.addEventListener('mousemove', (e) => {
-                localX = e.clientX;
-                localY = e.clientY;
+                localX = e.pageX;
+                localY = e.pageY;
 
                 if (activeUsers[uid]) {
                     updateMascot(uid, { x: localX, y: localY, name: myName, mascot: myMascot }, true);
@@ -318,8 +345,8 @@
 
             document.addEventListener('touchmove', (e) => {
                 if (e.touches.length > 0) {
-                    localX = e.touches[0].clientX;
-                    localY = e.touches[0].clientY;
+                    localX = e.touches[0].pageX;
+                    localY = e.touches[0].pageY;
                     if (activeUsers[uid]) {
                         updateMascot(uid, { x: localX, y: localY, name: myName, mascot: myMascot }, true);
                     }
@@ -334,7 +361,6 @@
 
                 const now = Date.now();
                 for (let id in activeUsers) {
-                    // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
                     if (now - activeUsers[id].lastActive > 120000) {
                         removeMascot(id);
                     }
@@ -386,10 +412,22 @@
             container.style.transform = `translate(${data.x}px, ${data.y}px)`;
         }
 
+        // FIXED: This function now actively checks and applies name changes
         function updateMascot(id, data, isLocal = false) {
             const user = activeUsers[id];
             if (!user) return;
+            
             user.el.style.transform = `translate(${data.x}px, ${data.y}px)`;
+            
+            // Apply name changes if someone edited their name
+            if (data.name && data.name !== user.name) {
+                user.name = data.name;
+                const nameEl = user.el.querySelector('.mascot-name');
+                if (nameEl) {
+                    nameEl.textContent = data.name + (id === currentUser.uid ? ' (You)' : '');
+                }
+            }
+
             if (!isLocal) {
                 user.lastActive = data.lastActive || Date.now();
             }
