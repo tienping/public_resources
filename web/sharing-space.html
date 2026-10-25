@@ -154,7 +154,7 @@
         const errorMsg = document.getElementById('error-message');
         const mascotsLayer = document.getElementById('mascots-layer');
         const refreshBtn = document.getElementById('refresh-btn');
-        const reRegisterBtn = document.getElementById('re-register-btn'); // ADDED element
+        const reRegisterBtn = document.getElementById('re-register-btn');
 
         // App State
         let currentUser = null;
@@ -210,14 +210,13 @@
             await initMultiplayer();
         });
 
-        // ADDED: Re-register Button Logic
+        // Re-register Button Logic
         reRegisterBtn.addEventListener('click', async () => {
             if (!myDocRef) return;
             try {
                 const icon = reRegisterBtn.querySelector('span');
                 icon.classList.add('animate-bounce', 'inline-block');
                 
-                // Force a brand new setDoc push to the database
                 await setDoc(myDocRef, {
                     name: myName,
                     mascot: myMascot,
@@ -261,7 +260,8 @@
                         const data = docSnap.data();
                         const id = docSnap.id;
                         
-                        if (now - data.lastActive > 15000) return;
+                        // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
+                        if (now - data.lastActive > 120000) return;
                         
                         if (!activeUsers[id]) {
                             createMascot(id, data);
@@ -285,7 +285,8 @@
                     const id = docSnap.id;
                     fetchedIds.add(id);
 
-                    if (now - data.lastActive > 15000) {
+                    // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
+                    if (now - data.lastActive > 120000) {
                         return;
                     }
 
@@ -333,7 +334,8 @@
 
                 const now = Date.now();
                 for (let id in activeUsers) {
-                    if (now - activeUsers[id].lastActive > 15000) {
+                    // INCREASED: 120000ms (2 minutes) to account for clock differences between devices
+                    if (now - activeUsers[id].lastActive > 120000) {
                         removeMascot(id);
                     }
                 }
