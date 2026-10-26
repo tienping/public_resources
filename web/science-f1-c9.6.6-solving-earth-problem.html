@@ -7,7 +7,31 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-height:100vh}.hidden{display:none!important}.glass{background:#0d1c2ee8;border:1px solid #31506a;border-radius:22px;box-shadow:0 20px 60px #0007}.btn{border:0;border-radius:13px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:#2f80ed;color:#fff}.green{background:#25cc7a;color:#052013}.amber{background:#ffc857;color:#291d00}.slate{background:#18334a;color:#e4f2fb;border:1px solid #315470}.red{background:#ff4d5e;color:#fff}.tag{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;border:1px solid #ffffff22}.critical{color:#ff5b66}.world{position:relative;height:calc(100vh - 118px);min-height:650px;overflow:hidden;background-color:#091826;background-size:34px 34px;background-image:linear-gradient(to right,#8ab8d311 1px,transparent 1px),linear-gradient(to bottom,#8ab8d311 1px,transparent 1px)}.avatar{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;text-align:center;transition:left .15s,top .15s}.face{font-size:34px}.label{margin-top:3px;background:#fff;color:#173149;font-size:11px;font-weight:800;padding:4px 7px;border-radius:9px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}.teacher .label{background:#ffc857}.me .label{background:#4eb5ff}.zone{position:absolute;border:3px dashed #ffffff77;border-radius:25px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px}.zone h3{font-size:22px;font-weight:900}.zone.hovered{border-style:solid;box-shadow:0 0 35px #4eb5ff55}.zone.over{border-color:#ff5b66}.z1{left:4%;top:7%;width:43%;height:36%;background:#1e6b4935}.z2{right:4%;top:7%;width:43%;height:36%;background:#9b791d35}.z3{left:4%;bottom:7%;width:43%;height:36%;background:#66758e38}.z4{right:4%;bottom:7%;width:43%;height:36%;background:#a83d2938}.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}.evcard{background:#0e2031;border:2px solid #294a63;border-radius:18px;overflow:hidden;cursor:grab}.evcard:hover{border-color:#4eb5ff;transform:translateY(-2px)}.evcard.sel{outline:3px solid #4eb5ff}.evcard img{width:100%;height:120px;object-fit:cover}.copy{padding:10px}.copy .en{font-weight:900}.copy .bm,.copy .zh{font-size:12px;color:#b8ccda;margin-top:3px}.chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:8px;align-items:stretch}.arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:#4eb5ff;font-weight:900}.slot{min-height:145px;border:2px dashed #456b86;border-radius:16px;padding:10px;background:#0b1926;position:relative}.slot.success{border-color:#25cc7a;background:#0d2a20}.slot.error{border-color:#ff4d5e;background:#3a1720}.slot h4{font-size:11px;color:#8db0c5;letter-spacing:.06em}.remove{position:absolute;right:7px;top:7px;width:28px;height:28px;border-radius:50%;border:0;background:#ff4d5e;color:#fff;font-weight:900}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:200;padding:12px 17px;border-radius:13px;font-weight:900;box-shadow:0 10px 30px #0008}.toast.good{background:#25cc7a;color:#04190f}.toast.bad{background:#ff4d5e}.toast.info{background:#4eb5ff;color:#04141f}.transport{position:fixed;inset:0;z-index:180;background:radial-gradient(circle,#2f80ed,#07111c 70%);display:flex;align-items:center;justify-content:center;flex-direction:column}.ring{width:180px;height:180px;border:6px solid #6fc8ff;border-radius:50%;box-shadow:0 0 50px #4eb5ff;animation:warp .9s linear infinite}@keyframes warp{50%{transform:scale(1.18) rotate(180deg)}}.teachergrid{display:grid;grid-template-columns:1.4fr .8fr;gap:16px}.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{padding:9px;border-bottom:1px solid #28465c;text-align:left}.modal{position:fixed;inset:0;background:#02070dd9;z-index:190;display:flex;align-items:center;justify-content:center;padding:20px}.modalbox{width:min(1100px,96vw);background:#0d1c2e;border:1px solid #315470;border-radius:20px;padding:20px}.reportchain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:7px}.reportbox{background:#102438;border:1px solid #315470;border-radius:13px;padding:12px;min-height:110px}@media(max-width:950px){.teachergrid{grid-template-columns:1fr}.chain,.reportchain{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-height:100vh}.hidden{display:none!important}.glass{background:#0d1c2ee8;border:1px solid #31506a;border-radius:22px;box-shadow:0 20px 60px #0007}.btn{border:0;border-radius:13px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:#2f80ed;color:#fff}.green{background:#25cc7a;color:#052013}.amber{background:#ffc857;color:#291d00}.slate{background:#18334a;color:#e4f2fb;border:1px solid #315470}.red{background:#ff4d5e;color:#fff}.tag{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;border:1px solid #ffffff22}.critical{color:#ff5b66}.world{position:relative;height:calc(100vh - 118px);min-height:650px;overflow:hidden;background-color:#091826;background-size:34px 34px;background-image:linear-gradient(to right,#8ab8d311 1px,transparent 1px),linear-gradient(to bottom,#8ab8d311 1px,transparent 1px)}.avatar{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;text-align:center;transition:left .15s,top .15s}.face{font-size:34px}.label{margin-top:3px;background:#fff;color:#173149;font-size:11px;font-weight:800;padding:4px 7px;border-radius:9px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}.teacher .label{background:#ffc857}.me .label{background:#4eb5ff}.zone{position:absolute;border:3px dashed #ffffff77;border-radius:25px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px}.zone h3{font-size:22px;font-weight:900}.zone.hovered{border-style:solid;box-shadow:0 0 35px #4eb5ff55}.zone.over{border-color:#ff5b66}.z1{left:4%;top:7%;width:43%;height:36%;background:#1e6b4935}.z2{right:4%;top:7%;width:43%;height:36%;background:#9b791d35}.z3{left:4%;bottom:7%;width:43%;height:36%;background:#66758e38}.z4{right:4%;bottom:7%;width:43%;height:36%;background:#a83d2938}.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}.evcard{background:#0e2031;border:2px solid #294a63;border-radius:18px;overflow:hidden;cursor:grab}.evcard:hover{border-color:#4eb5ff;transform:translateY(-2px)}.evcard.sel{outline:3px solid #4eb5ff}
+.evcard.used{
+  opacity:.38;
+  filter:grayscale(1);
+  cursor:not-allowed;
+  border-color:#526574;
+  transform:none!important;
+  pointer-events:none;
+}
+.evcard.used::after{
+  content:"SELECTED";
+  position:absolute;
+  right:9px;
+  top:9px;
+  background:#182834;
+  color:#c9d5dc;
+  border:1px solid #526574;
+  border-radius:999px;
+  padding:4px 7px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.05em;
+}
+.evcard{position:relative}
+.evcard img{width:100%;height:120px;object-fit:cover}.copy{padding:10px}.copy .en{font-weight:900}.copy .bm,.copy .zh{font-size:12px;color:#b8ccda;margin-top:3px}.chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:8px;align-items:stretch}.arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:#4eb5ff;font-weight:900}.slot{min-height:145px;border:2px dashed #456b86;border-radius:16px;padding:10px;background:#0b1926;position:relative}.slot.success{border-color:#25cc7a;background:#0d2a20}.slot.error{border-color:#ff4d5e;background:#3a1720}.slot h4{font-size:11px;color:#8db0c5;letter-spacing:.06em}.remove{position:absolute;right:7px;top:7px;width:28px;height:28px;border-radius:50%;border:0;background:#ff4d5e;color:#fff;font-weight:900}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:200;padding:12px 17px;border-radius:13px;font-weight:900;box-shadow:0 10px 30px #0008}.toast.good{background:#25cc7a;color:#04190f}.toast.bad{background:#ff4d5e}.toast.info{background:#4eb5ff;color:#04141f}.transport{position:fixed;inset:0;z-index:180;background:radial-gradient(circle,#2f80ed,#07111c 70%);display:flex;align-items:center;justify-content:center;flex-direction:column}.ring{width:180px;height:180px;border:6px solid #6fc8ff;border-radius:50%;box-shadow:0 0 50px #4eb5ff;animation:warp .9s linear infinite}@keyframes warp{50%{transform:scale(1.18) rotate(180deg)}}.teachergrid{display:grid;grid-template-columns:1.4fr .8fr;gap:16px}.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{padding:9px;border-bottom:1px solid #28465c;text-align:left}.modal{position:fixed;inset:0;background:#02070dd9;z-index:190;display:flex;align-items:center;justify-content:center;padding:20px}.modalbox{width:min(1100px,96vw);background:#0d1c2e;border:1px solid #315470;border-radius:20px;padding:20px}.reportchain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:7px}.reportbox{background:#102438;border:1px solid #315470;border-radius:13px;padding:12px;min-height:110px}@media(max-width:950px){.teachergrid{grid-template-columns:1fr}.chain,.reportchain{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
 </style>
 </head>
 <body>
@@ -19,7 +43,7 @@ body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import {getFirestore,doc,setDoc,updateDoc,onSnapshot,collection,getDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {getFirestore,doc,setDoc,updateDoc,onSnapshot,collection,getDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyCTYc7CYiJIJWLb3w_pBKNvS3NHyFRWstA",authDomain:"ltp-sharing-space.firebaseapp.com",projectId:"ltp-sharing-space",storageBucket:"ltp-sharing-space.firebasestorage.app",messagingSenderId:"443374525177",appId:"1:443374525177:web:f6ab69736715b6925b6028",measurementId:"G-59ZBNHB1F0"};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),TEACHER="g-39576509@moe-dl.edu.my",appId="mission-earth-v1";
 const $=id=>document.getElementById(id),mission=(new URLSearchParams(location.search).get("mission")||"1A4").toUpperCase(),missionRef=doc(db,"artifacts",appId,"public","data","missions",mission),participantsRef=collection(missionRef,"participants");
@@ -32,7 +56,7 @@ function mascot(r){return r==="teacher"?"👨‍🏫":["🧑🏻‍🚀","🧑�
 $("joinStudent").onclick=async()=>{const n=$("names").value.trim();$("studentErr").classList.add("hidden");if(!n){$("studentErr").textContent="Enter the three group members' names.";$("studentErr").classList.remove("hidden");return}try{const studentUser=(auth.currentUser&&auth.currentUser.isAnonymous)?auth.currentUser:(await signInAnonymously(auth)).user;me=studentUser;role="student";names=n;localStorage.setItem(`mission-${mission}-names`,n);await ensureMission();myRef=doc(participantsRef,me.uid);const old=await getDoc(myRef),p=old.exists()?old.data():{};await setDoc(myRef,{role:"student",name:n,mascot:p.mascot||mascot("student"),x:p.x??50,y:p.y??50,zone:p.zone||null,status:p.status||"lobby",chain:p.chain||{},lastActive:Date.now()},{merge:true});enterLive()}catch(e){$("studentErr").textContent=e.message;$("studentErr").classList.remove("hidden")}};
 $("joinTeacher").onclick=async()=>{try{const pr=new GoogleAuthProvider();pr.setCustomParameters({prompt:"select_account"});const c=await signInWithPopup(auth,pr);if((c.user.email||"").toLowerCase()!==TEACHER.toLowerCase()){await signOut(auth);throw new Error(`Teacher access is restricted to ${TEACHER}`)}me=c.user;role="teacher";names="Teacher";await ensureMission();myRef=doc(participantsRef,me.uid);await setDoc(myRef,{role:"teacher",name:"Teacher",email:me.email,mascot:"👨‍🏫",x:50,y:50,status:"lobby",lastActive:Date.now()},{merge:true});enterLive()}catch(e){$("teacherErr").textContent=e.message;$("teacherErr").classList.remove("hidden")}};
 function enterLive(){live();show("space");$("identity").textContent=role==="teacher"?`Teacher Command • ${me.email}`:`Team: ${names}`;updateUI()}
-function live(){unsubM?.();unsubP?.();unsubM=onSnapshot(missionRef,s=>{if(s.exists())state=s.data();updateUI();if(role==="teacher"&&state.stage==="investigation"&&!$("dashboard").classList.contains("hidden"))renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Mission sync error",e);toast("Mission sync failed. Check Firebase permissions / connection.","bad",4200)});unsubP=onSnapshot(participantsRef,s=>{participants={};s.forEach(d=>{const x=d.data();if(Date.now()-(x.lastActive||0)<180000||x.role==="teacher")participants[d.id]={id:d.id,...x}});renderAvatars();renderCounts();renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Participant sync error",e);toast("Participant sync failed. Check Firebase permissions / connection.","bad",4200)})}
+function live(){unsubM?.();unsubP?.();unsubM=onSnapshot(missionRef,s=>{if(s.exists())state=s.data();updateUI();if(role==="teacher"&&state.stage==="investigation"&&!$("dashboard").classList.contains("hidden"))renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Mission sync error",e);toast("Mission sync failed. Check Firebase permissions / connection.","bad",4200)});unsubP=onSnapshot(participantsRef,s=>{participants={};s.forEach(d=>{const x=d.data();participants[d.id]={id:d.id,...x}});renderAvatars();renderCounts();renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Participant sync error",e);toast("Participant sync failed. Check Firebase permissions / connection.","bad",4200)})}
 function updateUI(){const st=state.stage||"lobby";if(st!=="investigation"){investigationOpened=false;transportInProgress=false}$("stage").textContent=st==="zone_selection"?"Selecting Zones":st==="investigation"?"Investigation Active":"Lobby";$("zones").classList.toggle("hidden",st==="lobby");$("waitmsg").classList.toggle("hidden",st!=="lobby");$("start").classList.toggle("hidden",role!=="teacher"||st!=="lobby");$("transport").classList.toggle("hidden",role!=="teacher"||st!=="zone_selection");$("teacherDashboardBtn").classList.toggle("hidden",role!=="teacher"||st!=="investigation");$("resetSessionBtn").classList.toggle("hidden",role!=="teacher");$("lock").classList.add("hidden");if(role==="student"&&myRef&&participants[me?.uid]){const want=st==="zone_selection"?"selecting_zone":st==="lobby"?"lobby":null;if(want&&participants[me.uid].status!==want)updateDoc(myRef,{status:want,lastActive:Date.now()}).catch(()=>{})}}
 $("start").onclick=async()=>{await updateDoc(missionRef,{stage:"zone_selection",updatedAt:Date.now()});await Promise.allSettled(Object.values(participants).filter(p=>p.role==="student").map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"selecting_zone",chain:{},lastActive:Date.now()})));toast("Mission started. Choose your zones!","good")};
 function countZones(){const c={deforestation:0,agriculture:0,industrialisation:0,openburning:0};Object.values(participants).filter(p=>p.role==="student").forEach(p=>{if(c[p.zone]!==undefined)c[p.zone]++});return c}
@@ -43,26 +67,228 @@ function renderAvatars(){const layer=$("avatars"),seen=new Set();Object.values(p
 const local={x:50,y:50};$("world").addEventListener("mousemove",e=>{if(!me||!myRef)return;const r=$("world").getBoundingClientRect();local.x=Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100));local.y=Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100));const a=document.getElementById(`av-${me.uid}`);if(a){a.style.left=`${local.x}%`;a.style.top=`${local.y}%`}detectZone(e.clientX,e.clientY);if(!moveTimer){moveTimer=setTimeout(()=>{updateDoc(myRef,{x:local.x,y:local.y,lastActive:Date.now()}).catch(()=>{});moveTimer=null},250)}});
 function detectZone(x,y){if(state.stage!=="zone_selection"||role!=="student")return;let found=null;document.querySelectorAll(".zone").forEach(z=>{const r=z.getBoundingClientRect(),inside=x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;z.classList.toggle("hovered",inside);if(inside)found=z.dataset.zone});hoverZone=found;if(found&&found!==lastAutoZone&&myRef){lastAutoZone=found;updateDoc(myRef,{zone:found,status:"selecting_zone",lastActive:Date.now()}).catch(()=>{});toast(`Zone selected: ${zoneNames[found]}`,"info",1200)}$("lock").textContent=found?`LOCK ${zoneNames[found].toUpperCase()} ZONE`:"LOCK THIS ZONE"}
 $("reregister").onclick=async()=>{const p=participants[me?.uid]||{};await setDoc(myRef,{role,name:role==="teacher"?"Teacher":names,email:role==="teacher"?me.email:null,mascot:p.mascot||mascot(role),x:local.x,y:local.y,zone:p.zone||null,status:p.status||"lobby",chain:p.chain||{},lastActive:Date.now()},{merge:true});toast("Re-registered successfully.","good")};setInterval(()=>{if(myRef)updateDoc(myRef,{lastActive:Date.now()}).catch(()=>{})},5000);
+setInterval(()=>{
+  if(role==="teacher" && !$("dashboard").classList.contains("hidden")) renderDashboard();
+},1000);
 const P="https://placehold.co/400x240/173149/eaf6ff?text=";
 const cards={
 def_illegal_lumber:{cat:"activity",img:P+"Illegal+Lumbering",en:"Illegal lumbering",bm:"Pembalakan haram",zh:"非法伐木"},def_clear_forest:{cat:"activity",img:P+"Forest+Clearing",en:"Large-scale forest clearing",bm:"Pembersihan hutan secara besar-besaran",zh:"大规模清除森林"},agr_fertiliser:{cat:"activity",img:P+"Excess+Fertiliser",en:"Excessive fertiliser use",bm:"Penggunaan baja berlebihan",zh:"过量使用肥料"},agr_pesticide:{cat:"activity",img:P+"Excess+Pesticide",en:"Excessive pesticide use",bm:"Penggunaan racun perosak berlebihan",zh:"过量使用农药"},ind_toxic_waste:{cat:"activity",img:P+"Factory+Toxic+Waste",en:"Factory discharges toxic waste into river",bm:"Kilang membuang sisa toksik ke dalam sungai",zh:"工厂把有毒废料排入河流"},ind_smoke:{cat:"activity",img:P+"Factory+Smoke",en:"Factory releases excessive smoke",bm:"Kilang melepaskan asap berlebihan",zh:"工厂排放大量烟雾"},burn_rubbish:{cat:"activity",img:P+"Open+Burning",en:"Open burning of rubbish",bm:"Pembakaran sampah secara terbuka",zh:"露天焚烧垃圾"},burn_land:{cat:"activity",img:P+"Burning+Land",en:"Burning vegetation to clear land",bm:"Membakar tumbuhan untuk membersihkan tanah",zh:"焚烧植被以清理土地"},
 change_less_trees:{cat:"change",img:P+"Fewer+Trees",en:"Fewer trees remain",bm:"Bilangan pokok berkurang",zh:"树木数量减少"},change_exposed_soil:{cat:"change",img:P+"Exposed+Soil",en:"Soil becomes exposed",bm:"Tanah menjadi terdedah",zh:"土壤裸露"},change_chemicals_river:{cat:"change",img:P+"Chemicals+In+River",en:"Chemicals enter nearby water",bm:"Bahan kimia memasuki sumber air",zh:"化学物质进入水源"},change_contaminated_river:{cat:"change",img:P+"Contaminated+River",en:"River becomes contaminated",bm:"Sungai menjadi tercemar",zh:"河流受到污染"},change_smoky_air:{cat:"change",img:P+"Smoky+Air",en:"Air becomes filled with smoke",bm:"Udara dipenuhi asap",zh:"空气中充满烟雾"},change_more_co2:{cat:"change",img:P+"More+CO2",en:"More carbon dioxide enters the atmosphere",bm:"Lebih banyak karbon dioksida masuk ke atmosfera",zh:"更多二氧化碳进入大气"},change_habitat_removed:{cat:"change",img:P+"Habitat+Removed",en:"Habitats are removed",bm:"Habitat dimusnahkan",zh:"栖息地被破坏"},
 effect_erosion:{cat:"effect",img:P+"Land+Erosion",en:"Land erosion",bm:"Hakisan tanah",zh:"土壤侵蚀"},effect_flashflood:{cat:"effect",img:P+"Flash+Flood",en:"Flash flood",bm:"Banjir kilat",zh:"突发水灾"},effect_globalwarming:{cat:"effect",img:P+"Global+Warming",en:"Global warming",bm:"Pemanasan global",zh:"全球变暖"},effect_waterpollution:{cat:"effect",img:P+"Water+Pollution",en:"Water pollution",bm:"Pencemaran air",zh:"水污染"},effect_airpollution:{cat:"effect",img:P+"Air+Pollution",en:"Air pollution",bm:"Pencemaran udara",zh:"空气污染"},effect_extinction:{cat:"effect",img:P+"Extinction",en:"Loss / extinction of flora and fauna",bm:"Kehilangan / kepupusan flora dan fauna",zh:"动植物减少或灭绝"},
 living_humans:{cat:"living",img:P+"Humans",en:"Humans",bm:"Manusia",zh:"人类"},living_animals:{cat:"living",img:P+"Animals",en:"Animals",bm:"Haiwan",zh:"动物"},living_plants:{cat:"living",img:P+"Plants",en:"Plants",bm:"Tumbuhan",zh:"植物"},living_all:{cat:"living",img:P+"All+Living+Things",en:"Humans, animals and plants",bm:"Manusia, haiwan dan tumbuhan",zh:"人类、动物和植物"}};
-const matrix={deforestation:{def_illegal_lumber:{change_less_trees:{effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]},change_exposed_soil:{effect_erosion:["living_all","living_humans","living_animals","living_plants"],effect_flashflood:["living_all","living_humans","living_animals","living_plants"]},change_habitat_removed:{effect_extinction:["living_animals","living_plants","living_all"]}},def_clear_forest:{change_less_trees:{effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]},change_exposed_soil:{effect_erosion:["living_all","living_humans","living_animals","living_plants"]},change_habitat_removed:{effect_extinction:["living_animals","living_plants","living_all"]}}},agriculture:{agr_fertiliser:{change_chemicals_river:{effect_waterpollution:["living_all","living_humans","living_animals","living_plants"]}},agr_pesticide:{change_chemicals_river:{effect_waterpollution:["living_all","living_humans","living_animals","living_plants"]}}},industrialisation:{ind_toxic_waste:{change_contaminated_river:{effect_waterpollution:["living_all","living_humans","living_animals","living_plants"]}},ind_smoke:{change_smoky_air:{effect_airpollution:["living_all","living_humans","living_animals","living_plants"]},change_more_co2:{effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]}}},openburning:{burn_rubbish:{change_smoky_air:{effect_airpollution:["living_all","living_humans","living_animals","living_plants"]},change_more_co2:{effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]}},burn_land:{change_smoky_air:{effect_airpollution:["living_all","living_humans","living_animals","living_plants"]},change_more_co2:{effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]}}}};
+const matrix={
+deforestation:{
+  def_illegal_lumber:{
+    change_less_trees:{
+      effect_erosion:["living_all","living_humans","living_animals","living_plants"],
+      effect_flashflood:["living_all","living_humans","living_animals","living_plants"],
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_exposed_soil:{
+      effect_erosion:["living_all","living_humans","living_animals","living_plants"],
+      effect_flashflood:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_habitat_removed:{
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    }
+  },
+  def_clear_forest:{
+    change_less_trees:{
+      effect_erosion:["living_all","living_humans","living_animals","living_plants"],
+      effect_flashflood:["living_all","living_humans","living_animals","living_plants"],
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_exposed_soil:{
+      effect_erosion:["living_all","living_humans","living_animals","living_plants"],
+      effect_flashflood:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_habitat_removed:{
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    }
+  }
+},
+agriculture:{
+  agr_fertiliser:{
+    change_chemicals_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_contaminated_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    }
+  },
+  agr_pesticide:{
+    change_chemicals_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_contaminated_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    }
+  }
+},
+industrialisation:{
+  ind_toxic_waste:{
+    change_chemicals_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_contaminated_river:{
+      effect_waterpollution:["living_all","living_humans","living_animals","living_plants"],
+      effect_extinction:["living_all","living_humans","living_animals","living_plants"]
+    }
+  },
+  ind_smoke:{
+    change_smoky_air:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"],
+      effect_airpollution:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_more_co2:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]
+    }
+  }
+},
+openburning:{
+  burn_rubbish:{
+    change_smoky_air:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"],
+      effect_airpollution:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_more_co2:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]
+    }
+  },
+  burn_land:{
+    change_smoky_air:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"],
+      effect_airpollution:["living_all","living_humans","living_animals","living_plants"]
+    },
+    change_more_co2:{
+      effect_globalwarming:["living_all","living_humans","living_animals","living_plants"]
+    }
+  }
+}
+};
 const allIds=Object.keys(cards),order=["activity","change","effect","living"];
-function relevant(zone){const s=new Set(),z=matrix[zone]||{};Object.entries(z).forEach(([a,chs])=>{s.add(a);Object.entries(chs).forEach(([ch,efs])=>{s.add(ch);Object.entries(efs).forEach(([ef,ls])=>{s.add(ef);ls.forEach(x=>s.add(x))})})});allIds.forEach(id=>{if(s.size<18)s.add(id)});return [...s].sort(()=>Math.random()-.5)}
+function relevant(zone){
+  // Every WAR ZONE receives the complete mixed card pool.
+  // The selected zone and pathway matrix still control whether a card is valid.
+  return [...allIds].sort(()=>Math.random()-.5)
+}
 function transportMe(zone){if(transportInProgress||investigationOpened||!zone)return;transportInProgress=true;$("dest").textContent=`Destination: ${zoneEmoji[zone]} ${zoneNames[zone]}`;$("transportOverlay").classList.remove("hidden");const current=participants[me?.uid];if(current?.status!=="investigating")updateDoc(myRef,{status:"investigating",lastActive:Date.now()}).catch(()=>{});setTimeout(()=>{$("transportOverlay").classList.add("hidden");transportInProgress=false;investigationOpened=true;openInvestigation(zone)},1500)}
 function openInvestigation(zone){show("investigation");$("invTitle").textContent=`${zoneEmoji[zone]} ${zoneNames[zone].toUpperCase()}`;$("invNames").textContent=`Team: ${names}`;renderCards(zone);renderChain(participants[me.uid]?.chain||{})}
-function renderCards(zone){const b=$("cards");b.innerHTML="";relevant(zone).forEach(id=>{const c=cards[id],e=document.createElement("article");e.className="evcard";e.draggable=true;e.dataset.id=id;e.innerHTML=`<img src="${c.img}" alt=""><div class="copy"><div class="en">${c.en}</div><div class="bm">${c.bm}</div><div class="zh">${c.zh}</div></div>`;e.addEventListener("dragstart",x=>x.dataTransfer.setData("text/plain",id));e.onclick=()=>{document.querySelectorAll(".evcard").forEach(x=>x.classList.remove("sel"));selectedCard=id;e.classList.add("sel");toast("Card selected. Click a chain box to place it.","info",1400)};b.appendChild(e)})}
+function renderCards(zone){
+  const b=$("cards");
+  b.innerHTML="";
+  relevant(zone).forEach(id=>{
+    const c=cards[id],e=document.createElement("article");
+    e.className="evcard";
+    e.draggable=true;
+    e.dataset.id=id;
+    e.innerHTML=`<img src="${c.img}" alt=""><div class="copy"><div class="en">${c.en}</div><div class="bm">${c.bm}</div><div class="zh">${c.zh}</div></div>`;
+    e.addEventListener("dragstart",x=>{
+      if(e.classList.contains("used")){x.preventDefault();return}
+      x.dataTransfer.setData("text/plain",id)
+    });
+    e.onclick=()=>{
+      if(e.classList.contains("used"))return;
+      document.querySelectorAll(".evcard").forEach(x=>x.classList.remove("sel"));
+      selectedCard=id;
+      e.classList.add("sel");
+      toast("Card selected. Click a chain box to place it.","info",1400)
+    };
+    b.appendChild(e)
+  });
+}
+function updateUsedCards(ch){
+  const used=new Set(order.map(s=>ch?.[s]).filter(Boolean));
+  document.querySelectorAll(".evcard").forEach(card=>{
+    const isUsed=used.has(card.dataset.id);
+    card.classList.toggle("used",isUsed);
+    card.draggable=!isUsed;
+    if(isUsed)card.classList.remove("sel");
+  });
+  if(selectedCard && used.has(selectedCard)) selectedCard=null;
+}
 function valid(zone,slot,id,ch){const c=cards[id],z=matrix[zone]||{};if(!c||c.cat!==slot)return false;if(slot==="activity")return !!z[id];if(slot==="change")return !!z[ch.activity]?.[id];if(slot==="effect")return !!z[ch.activity]?.[ch.change]?.[id];if(slot==="living")return (z[ch.activity]?.[ch.change]?.[ch.effect]||[]).includes(id);return false}
 document.querySelectorAll(".slot").forEach(s=>{s.addEventListener("dragover",e=>e.preventDefault());s.addEventListener("drop",e=>{e.preventDefault();place(s.dataset.slot,e.dataTransfer.getData("text/plain"))});s.addEventListener("click",e=>{if(e.target.classList.contains("remove"))return;if(selectedCard)place(s.dataset.slot,selectedCard)})});
 async function place(slot,id){const p=participants[me.uid];if(!p)return;const idx=order.indexOf(slot),ch={...(p.chain||{})};if(idx>0&&!ch[order[idx-1]]){toast("Complete the previous step first.","bad");beep(false);return}if(!valid(p.zone,slot,id,ch)){const s=document.querySelector(`[data-slot="${slot}"]`);s.classList.add("error");setTimeout(()=>s.classList.remove("error"),3000);toast("Not a valid link for your current pathway. Try again.","bad",3000);beep(false);return}ch[slot]=id;for(let i=idx+1;i<order.length;i++)delete ch[order[i]];const done=order.every(x=>ch[x]);await updateDoc(myRef,{chain:ch,status:done?"investigation_done":"investigating",lastActive:Date.now()});selectedCard=null;document.querySelectorAll(".evcard").forEach(x=>x.classList.remove("sel"));renderChain(ch);beep(true);toast(done?"Investigation complete! Report sent to Teacher Command.":"Correct link! Great investigation.","good",2500)}
-function renderChain(ch){order.forEach((s,i)=>{const slot=document.querySelector(`[data-slot="${s}"]`),co=slot.querySelector(".slotcontent");slot.classList.remove("success","error");if(ch[s]&&cards[ch[s]]){const c=cards[ch[s]];slot.classList.add("success");co.innerHTML=`<button class="remove" data-rm="${s}">×</button><div class="font-black pr-8">${c.en}</div><div class="text-xs text-slate-300 mt-1">${c.bm}</div><div class="text-xs text-slate-300">${c.zh}</div>`}else co.textContent=i===0||ch[order[i-1]]?"Drop a card here":"Complete previous step"});document.querySelectorAll(".remove").forEach(b=>b.onclick=e=>{e.stopPropagation();removeFrom(b.dataset.rm)});const done=order.every(x=>ch[x]);$("invStatus").textContent=done?"Investigation Done":"Investigating Case";$("invStatus").className=`tag ${done?"bg-emerald-950 text-emerald-300":"bg-sky-950 text-sky-200"}`}
+function renderChain(ch){order.forEach((s,i)=>{const slot=document.querySelector(`[data-slot="${s}"]`),co=slot.querySelector(".slotcontent");slot.classList.remove("success","error");if(ch[s]&&cards[ch[s]]){const c=cards[ch[s]];slot.classList.add("success");co.innerHTML=`<button class="remove" data-rm="${s}">×</button><div class="font-black pr-8">${c.en}</div>`}else co.textContent=i===0||ch[order[i-1]]?"Drop a card here":"Complete previous step"});document.querySelectorAll(".remove").forEach(b=>b.onclick=e=>{e.stopPropagation();removeFrom(b.dataset.rm)});updateUsedCards(ch);const done=order.every(x=>ch[x]);$("invStatus").textContent=done?"Investigation Done":"Investigating Case";$("invStatus").className=`tag ${done?"bg-emerald-950 text-emerald-300":"bg-sky-950 text-sky-200"}`}
 async function removeFrom(slot){const p=participants[me.uid],ch={...(p.chain||{})},idx=order.indexOf(slot);for(let i=idx;i<order.length;i++)delete ch[order[i]];await updateDoc(myRef,{chain:ch,status:"investigating",lastActive:Date.now()});renderChain(ch);toast("Choice removed. Downstream steps were reset.","info")}
 function statusText(s){return {lobby:"Lobby",selecting_zone:"Selecting Zone",investigating:"Investigating Case",investigation_done:"Investigation Done",choosing_solution:"Choosing Solution",mission_done:"Mission Done"}[s]||s||"Lobby"}
-function renderDashboard(){if(role!=="teacher")return;const filter=$("filter").value||"all",students=Object.values(participants).filter(p=>p.role==="student"),rows=$("rows");rows.innerHTML="";students.filter(p=>filter==="all"||p.zone===filter).sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(p=>{const prog=order.filter(x=>p.chain?.[x]).length,tr=document.createElement("tr");tr.innerHTML=`<td><b>${esc(p.name||"Unnamed")}</b></td><td>${p.zone?`${zoneEmoji[p.zone]} ${zoneNames[p.zone]}`:"—"}</td><td><span class="tag">${statusText(p.status)}</span></td><td>${prog}/4</td><td>${p.status==="investigation_done"?`<button class="btn primary" data-view="${p.id}">VIEW REPORT</button>`:"<span class='text-slate-400 text-xs'>Waiting...</span>"}</td>`;rows.appendChild(tr)});rows.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>report(b.dataset.view));const c=countZones(),done=students.filter(p=>p.status==="investigation_done").length,inv=students.filter(p=>p.status==="investigating").length;$("stats").innerHTML=`<div class="p-3 border border-slate-700 rounded-xl"><div class="text-3xl font-black">${students.length}</div><div class="text-xs text-slate-400">Active teams</div></div><div class="p-3 border border-emerald-800 rounded-xl"><div class="text-3xl font-black text-emerald-300">${done}</div><div class="text-xs text-slate-400">Investigation done</div></div><div class="p-3 border border-sky-800 rounded-xl"><div class="text-3xl font-black text-sky-300">${inv}</div><div class="text-xs text-slate-400">Investigating</div></div><div class="p-3 border border-slate-700 rounded-xl text-sm font-black">🌳 ${c.deforestation} • 🌾 ${c.agriculture}<br>🏭 ${c.industrialisation} • 🔥 ${c.openburning}<div class="text-xs text-slate-400 font-normal mt-1">Zone distribution</div></div>`}
-$("filter").onchange=renderDashboard;$("backSpace").onclick=()=>show("space");function report(id){const p=participants[id];if(!p)return;$("reportTitle").textContent=p.name||"Team Report";$("reportMeta").textContent=`${zoneEmoji[p.zone]||""} ${zoneNames[p.zone]||"No zone"} • ${statusText(p.status)}`;const labs={activity:"Human Activity",change:"What Changed?",effect:"Negative Effect",living:"Living Things Affected"};$("reportChain").innerHTML=order.map((s,i)=>{const c=cards[p.chain?.[s]],b=`<div class="reportbox"><div class="text-xs text-slate-400 font-black">${labs[s]}</div><div class="font-black mt-2">${c?.en||"—"}</div><div class="text-xs text-slate-300 mt-1">${c?.bm||""}</div><div class="text-xs text-slate-300">${c?.zh||""}</div></div>`;return b+(i<3?'<div class="arrow">→</div>':'')}).join("");$("reportModal").classList.remove("hidden")}
+function inactivitySeconds(p){
+  return Math.max(0,Math.floor((Date.now()-(p.lastActive||0))/1000));
+}
+function isInactive(p){
+  return p.role==="student" && inactivitySeconds(p)>=10;
+}
+async function kickParticipant(id){
+  if(role!=="teacher")return;
+  const p=participants[id];
+  if(!p||p.role==="teacher")return;
+  const secs=inactivitySeconds(p);
+  if(secs<10){
+    toast("This team is active again, so it cannot be kicked as inactive.","info",2600);
+    return;
+  }
+  if(!confirm(`Remove inactive team "${p.name||"Unnamed"}"?\n\nLast heartbeat: ${secs} seconds ago.`))return;
+  try{
+    await deleteDoc(doc(participantsRef,id));
+    toast(`${p.name||"Team"} removed from the mission space.`,"good",2400);
+  }catch(e){
+    console.error("Kick participant failed",e);
+    toast("Could not remove this team. Check Firebase permissions.","bad",3200);
+  }
+}
+function renderDashboard(){
+  if(role!=="teacher")return;
+  const filter=$("filter").value||"all";
+  const students=Object.values(participants).filter(p=>p.role==="student");
+  const rows=$("rows");
+  rows.innerHTML="";
+  students
+    .filter(p=>filter==="all"||p.zone===filter)
+    .sort((a,b)=>(a.name||"").localeCompare(b.name||""))
+    .forEach(p=>{
+      const prog=order.filter(x=>p.chain?.[x]).length;
+      const inactive=isInactive(p);
+      const inactiveFor=inactivitySeconds(p);
+      const tr=document.createElement("tr");
+      const statusHTML=inactive
+        ? `<span class="tag bg-red-950 text-red-300 border-red-700">Inactive ${inactiveFor}s</span>`
+        : `<span class="tag">${statusText(p.status)}</span>`;
+      const reportBtn=p.status==="investigation_done"
+        ? `<button class="btn primary" data-view="${p.id}">VIEW REPORT</button>`
+        : "";
+      const kickBtn=inactive
+        ? `<button class="btn red ml-2" data-kick="${p.id}">KICK INACTIVE</button>`
+        : "";
+      const waiting=(!reportBtn&&!kickBtn)
+        ? "<span class='text-slate-400 text-xs'>Waiting...</span>"
+        : "";
+      tr.innerHTML=`<td><b>${esc(p.name||"Unnamed")}</b></td><td>${p.zone?`${zoneEmoji[p.zone]} ${zoneNames[p.zone]}`:"—"}</td><td>${statusHTML}</td><td>${prog}/4</td><td>${reportBtn}${kickBtn}${waiting}</td>`;
+      rows.appendChild(tr)
+    });
+  rows.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>report(b.dataset.view));
+  rows.querySelectorAll("[data-kick]").forEach(b=>b.onclick=()=>kickParticipant(b.dataset.kick));
+
+  const c=countZones();
+  const activeStudents=students.filter(p=>!isInactive(p));
+  const inactiveCount=students.filter(isInactive).length;
+  const done=activeStudents.filter(p=>p.status==="investigation_done").length;
+  const inv=activeStudents.filter(p=>p.status==="investigating").length;
+  $("stats").innerHTML=`
+    <div class="p-3 border border-slate-700 rounded-xl"><div class="text-3xl font-black">${activeStudents.length}</div><div class="text-xs text-slate-400">Active teams</div></div>
+    <div class="p-3 border border-red-800 rounded-xl"><div class="text-3xl font-black text-red-300">${inactiveCount}</div><div class="text-xs text-slate-400">Inactive ≥10s</div></div>
+    <div class="p-3 border border-emerald-800 rounded-xl"><div class="text-3xl font-black text-emerald-300">${done}</div><div class="text-xs text-slate-400">Investigation done</div></div>
+    <div class="p-3 border border-sky-800 rounded-xl"><div class="text-3xl font-black text-sky-300">${inv}</div><div class="text-xs text-slate-400">Investigating</div></div>
+    <div class="p-3 border border-slate-700 rounded-xl text-sm font-black col-span-2">🌳 ${c.deforestation} • 🌾 ${c.agriculture}<br>🏭 ${c.industrialisation} • 🔥 ${c.openburning}<div class="text-xs text-slate-400 font-normal mt-1">Zone distribution (includes inactive teams until teacher removes them)</div></div>`
+}
+$("filter").onchange=renderDashboard;$("backSpace").onclick=()=>show("space");function report(id){const p=participants[id];if(!p)return;$("reportTitle").textContent=p.name||"Team Report";$("reportMeta").textContent=`${zoneEmoji[p.zone]||""} ${zoneNames[p.zone]||"No zone"} • ${statusText(p.status)}`;const labs={activity:"Human Activity",change:"What Changed?",effect:"Negative Effect",living:"Living Things Affected"};$("reportChain").innerHTML=order.map((s,i)=>{const c=cards[p.chain?.[s]],b=`<div class="reportbox"><div class="text-xs text-slate-400 font-black">${labs[s]}</div><div class="font-black mt-2">${c?.en||"—"}</div></div>`;return b+(i<3?'<div class="arrow">→</div>':'')}).join("");$("reportModal").classList.remove("hidden")}
 $("closeReport").onclick=()=>$("reportModal").classList.add("hidden");$("reportModal").onclick=e=>{if(e.target===$("reportModal"))$("reportModal").classList.add("hidden")};function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 onAuthStateChanged(auth,user=>{if(user?.email?.toLowerCase()===TEACHER.toLowerCase()&&!me){me=user;role="teacher";names="Teacher";ensureMission().then(async()=>{myRef=doc(participantsRef,user.uid);await setDoc(myRef,{role:"teacher",name:"Teacher",email:user.email,mascot:"👨‍🏫",lastActive:Date.now()},{merge:true});enterLive()})}});
 </script>
