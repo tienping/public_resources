@@ -8,6 +8,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-height:100vh}
+.appFooter{
+  position:fixed;
+  left:10px;
+  bottom:7px;
+  z-index:1300;
+  font-size:10px;
+  line-height:1.2;
+  color:#9fb0be;
+  background:#06101acc;
+  border:1px solid #ffffff12;
+  border-radius:9px;
+  padding:5px 8px;
+  backdrop-filter:blur(6px);
+  pointer-events:none;
+  box-shadow:0 4px 14px #0005
+}
+.appFooter .ver{
+  color:#75d4ff;
+  font-weight:900;
+  margin-right:7px
+}
+@media(max-width:700px){
+  .appFooter{font-size:9px;left:6px;bottom:5px;padding:4px 6px}
+}
 body.teacherMode{padding-top:72px}
 .teacherTopNav{
   position:fixed;
@@ -2001,4 +2025,8 @@ $("filter").onchange=renderDashboard;$("backSpace").onclick=()=>{if(state.stage=
 $("closeReport").onclick=()=>$("reportModal").classList.add("hidden");$("reportModal").onclick=e=>{if(e.target===$("reportModal"))$("reportModal").classList.add("hidden")};function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 onAuthStateChanged(auth,user=>{if(user?.email?.toLowerCase()===TEACHER.toLowerCase()&&!me){me=user;role="teacher";names="Teacher";ensureMission().then(async()=>{myRef=doc(participantsRef,user.uid);await setDoc(myRef,{role:"teacher",name:"Teacher",email:user.email,mascot:"👨‍🏫",lastActive:Date.now()},{merge:true});enterLive()})}});
 </script>
+<div class="appFooter">
+  <span class="ver">Version 31</span>
+  <span>Created by Cg. Lim Tien Ping @ 2026</span>
+</div>
 </body></html>
