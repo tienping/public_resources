@@ -31,6 +31,14 @@ body.teacherMode{padding-top:72px}
 .teacherTopNav .navStage{font-size:12px;color:#a9bdcc;margin-top:2px}
 .teacherTopNav .navActions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
 .teacherTopNav .nextAction{min-width:210px;font-size:14px;box-shadow:0 0 0 1px #ffffff16,0 0 22px #2f80ed33}
+.studentGlobalLeave{
+  position:fixed;
+  top:14px;
+  right:16px;
+  z-index:1200;
+  box-shadow:0 8px 24px #0009;
+}
+body.teacherMode .studentGlobalLeave{display:none!important}
 body.teacherMode #space .world{height:calc(100vh - 190px)}
 @media(max-width:780px){
   body.teacherMode{padding-top:112px}
@@ -61,26 +69,71 @@ body.teacherMode #space .world{height:calc(100vh - 190px)}
   letter-spacing:.05em;
 }
 .evcard{position:relative}
-.evcard img{width:100%;height:120px;object-fit:cover}.copy{padding:10px}.copy .en{font-weight:900}.copy .bm,.copy .zh{font-size:12px;color:#b8ccda;margin-top:3px}.chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:8px;align-items:stretch}.arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:#4eb5ff;font-weight:900}.slot{min-height:145px;border:2px dashed #456b86;border-radius:16px;padding:10px;background:#0b1926;position:relative}.slot.success{border-color:#25cc7a;background:#0d2a20}.slot.error{border-color:#ff4d5e;background:#3a1720}.slot h4{font-size:11px;color:#8db0c5;letter-spacing:.06em}
+.evcard img{width:100%;height:120px;object-fit:cover}.copy{padding:10px}.copy .en{font-weight:900}.copy .bm,.copy .zh{font-size:12px;color:#b8ccda;margin-top:3px}.chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:8px;align-items:stretch}.arrow{display:flex;align-items:center;justify-content:center;font-size:26px;color:#4eb5ff;font-weight:900}.slot{min-height:145px;border:2px dashed #456b86;border-radius:16px;padding:10px;background:#0b1926;position:relative}.slot.success{border-color:#25cc7a;background:#0d2a20}.slot.error{border-color:#ff4d5e;background:#3a1720}.slot h4{font-size:15px;color:#9fc7dc;letter-spacing:.055em;font-weight:900;line-height:1.2;margin-bottom:7px}
 .chainPreview{margin-top:6px}
 .chainPreview img{
   width:100%;
-  height:72px;
+  height:96px;
   object-fit:cover;
-  border-radius:10px;
-  border:1px solid #ffffff22;
-  display:block
+  border-radius:12px;
+  border:1px solid #ffffff2b;
+  display:block;
+  box-shadow:0 7px 18px #0005
 }
 .chainPreview .chainLabel{
   font-weight:900;
-  font-size:14px;
+  font-size:19px;
+  line-height:1.18;
+  margin-top:8px;
+  padding-right:30px;
+  color:#f8fbfd
+}.remove{position:absolute;right:7px;top:7px;width:28px;height:28px;border-radius:50%;border:0;background:#ff4d5e;color:#fff;font-weight:900}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:200;padding:12px 17px;border-radius:13px;font-weight:900;box-shadow:0 10px 30px #0008}.toast.good{background:#25cc7a;color:#04190f}.toast.bad{background:#ff4d5e}.toast.info{background:#4eb5ff;color:#04141f}.transport{position:fixed;inset:0;z-index:180;background:radial-gradient(circle,#2f80ed,#07111c 70%);display:flex;align-items:center;justify-content:center;flex-direction:column}.ring{width:180px;height:180px;border:6px solid #6fc8ff;border-radius:50%;box-shadow:0 0 50px #4eb5ff;animation:warp .9s linear infinite}@keyframes warp{50%{transform:scale(1.18) rotate(180deg)}}.teachergrid{display:grid;grid-template-columns:1.4fr .8fr;gap:16px}.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{padding:9px;border-bottom:1px solid #28465c;text-align:left}.modal{position:fixed;inset:0;background:#02070dd9;z-index:190;display:flex;align-items:center;justify-content:center;padding:20px}.modalbox{width:min(1450px,97vw);max-height:94vh;overflow:auto;background:#0d1c2e;border:1px solid #315470;border-radius:20px;padding:24px}.reportchain{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);
+  gap:12px;
+  align-items:stretch
+}
+.reportbox{
+  background:#102438;
+  border:2px solid #315470;
+  border-radius:18px;
+  padding:12px;
+  min-height:250px;
+  box-shadow:0 12px 26px #0005
+}
+.reportbox .reportType{
+  color:#8fc9e8;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.07em;
+  margin-bottom:8px
+}
+.reportbox img{
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  border-radius:13px;
+  border:1px solid #ffffff24;
+  display:block
+}
+.reportbox .reportTitle{
+  margin-top:10px;
+  font-size:22px;
   line-height:1.15;
-  margin-top:6px;
-  padding-right:28px;
-  color:#f3f8fb
-}.remove{position:absolute;right:7px;top:7px;width:28px;height:28px;border-radius:50%;border:0;background:#ff4d5e;color:#fff;font-weight:900}.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:200;padding:12px 17px;border-radius:13px;font-weight:900;box-shadow:0 10px 30px #0008}.toast.good{background:#25cc7a;color:#04190f}.toast.bad{background:#ff4d5e}.toast.info{background:#4eb5ff;color:#04141f}.transport{position:fixed;inset:0;z-index:180;background:radial-gradient(circle,#2f80ed,#07111c 70%);display:flex;align-items:center;justify-content:center;flex-direction:column}.ring{width:180px;height:180px;border:6px solid #6fc8ff;border-radius:50%;box-shadow:0 0 50px #4eb5ff;animation:warp .9s linear infinite}@keyframes warp{50%{transform:scale(1.18) rotate(180deg)}}.teachergrid{display:grid;grid-template-columns:1.4fr .8fr;gap:16px}.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{padding:9px;border-bottom:1px solid #28465c;text-align:left}.modal{position:fixed;inset:0;background:#02070dd9;z-index:190;display:flex;align-items:center;justify-content:center;padding:20px}.modalbox{width:min(1100px,96vw);background:#0d1c2e;border:1px solid #315470;border-radius:20px;padding:20px}.reportchain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:7px}.reportbox{background:#102438;border:1px solid #315470;border-radius:13px;padding:12px;min-height:110px}@media(max-width:1050px){.cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  font-weight:900;
+  color:#f6fbff
+}
+.reportArrow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  font-weight:900;
+  color:#4eb5ff;
+  padding:0 2px
+}@media(max-width:1050px){.cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:950px){.teachergrid{grid-template-columns:1fr}.chain,.reportchain{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+@media(max-width:950px){.teachergrid{grid-template-columns:1fr}.chain,.reportchain{grid-template-columns:1fr}.arrow,.reportArrow{transform:rotate(90deg)}.reportbox img{height:190px}}
 
 .quizPrompt{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:35;width:min(920px,92%);background:#07111cee;border:1px solid #4f7390;border-radius:18px;padding:12px 18px;text-align:center;box-shadow:0 12px 35px #0008}.quizPrompt .q{font-size:24px;font-weight:900}.quizPrompt .timer{font-size:32px;font-weight:900;color:#ffc857}.quizAnswer{position:absolute;width:43%;height:31%;border:3px solid #ffffff77;border-radius:24px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-size:22px;font-weight:900;background:#102438cc;transition:.2s}.qa1{left:4%;top:18%}.qa2{right:4%;top:18%}.qa3{left:4%;bottom:7%}.qa4{right:4%;bottom:7%}.quizAnswer.safe{background:#0d6b3dcc;border-color:#50f09b;box-shadow:0 0 40px #25cc7a77}.quizAnswer.danger{background:#812532cc;border-color:#ff6d7a}
 .world.quizRevealDanger{
@@ -89,7 +142,74 @@ body.teacherMode #space .world{height:calc(100vh - 190px)}
     linear-gradient(to right,#ff8a9418 1px,transparent 1px),
     linear-gradient(to bottom,#ff8a9418 1px,transparent 1px);
   box-shadow:inset 0 0 0 9999px #a72f3d35;
-}.avatar.eliminated{filter:grayscale(1);opacity:.28}.quizNumbers{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.qbtn{background:#18334a;border:1px solid #315470;color:#e4f2fb;border-radius:12px;padding:11px;font-weight:900;cursor:pointer}.qbtn.done{background:#165a3a;border-color:#25cc7a}.qbtn.active{background:#2f80ed}.qbtn:disabled{opacity:.45;cursor:not-allowed}.prrgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.prrcard{border-radius:22px;padding:22px;border:2px solid #ffffff22;min-height:210px}.prevent{background:#0d3325;border-color:#25cc7a}.reduce{background:#463711;border-color:#ffc857}.repair{background:#15365b;border-color:#4eb5ff}.warningScreen{background:radial-gradient(circle at center,#4b0609 0,#180306 52%,#050103 100%);animation:warningPulse .7s infinite alternate}.warningLight{position:absolute;inset:0;border:18px solid #ff2338;box-shadow:inset 0 0 90px #ff001b99;pointer-events:none}@keyframes warningPulse{from{filter:brightness(.8)}to{filter:brightness(1.25)}}.earthWrap{text-align:center}.earthSphere{width:240px;height:240px;margin:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 28%,#92d7ff 0,#1e8fc7 28%,#0c436b 72%,#051523 100%);box-shadow:inset -28px -25px 50px #0009,0 0 55px #ff465866;overflow:hidden}.earthSphere span{font-size:190px;display:block;animation:earthSpin 16s linear infinite;filter:saturate(1.2)}@keyframes earthSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.healthOuter{height:28px;background:#131d26;border:2px solid #4a5e6f;border-radius:999px;overflow:hidden}.healthFill{height:100%;width:30%;transition:width .35s,background .35s}.feed{max-height:310px;overflow:auto}.feeditem{padding:9px 11px;border-bottom:1px solid #29465c;font-size:13px}.feeditem.ok{color:#72f0ad}.feeditem.bad{color:#ff8791}.rescueWorld{position:relative;height:calc(100vh - 105px);min-height:650px;overflow:hidden;background:#091826;background-image:radial-gradient(circle at 50% 30%,#16334b 0,#091826 55%,#06101a 100%)}.rescueAvatar{position:absolute;transform:translate(-50%,-50%);z-index:50;font-size:38px;text-align:center;pointer-events:none}.rescueAvatar .hand{position:absolute;left:35px;top:-6px;font-size:28px}.solutionCard{position:absolute;transform:translate(-50%,-50%);width:220px;min-height:92px;border:2px solid #4f7390;border-radius:16px;background:#102438;padding:11px;box-shadow:0 10px 24px #0008;z-index:20;font-weight:800;cursor:grab;touch-action:none;user-select:none}.solutionCard.hover{border-color:#6fc8ff;box-shadow:0 0 26px #4eb5ff88}.solutionCard.grabbed,.solutionCard.dragging{z-index:60;opacity:.94;border-color:#ffc857;cursor:grabbing;box-shadow:0 0 28px #ffc85766,0 14px 30px #0009}.rescueTarget.dragover{outline:4px solid #ffffffbb;box-shadow:0 0 32px #ffffff55}.rescueTarget{position:absolute;bottom:3%;height:24%;width:29%;border:3px dashed #ffffff77;border-radius:22px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:23px;font-weight:900}.rt1{left:2%;background:#0d3325aa}.rt2{left:35.5%;background:#463711aa}.rt3{right:2%;background:#15365baa}.feedbackBox{max-width:760px}.reviewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.reviewCol{border-radius:20px;padding:18px}.reviewItem{background:#07111caa;border:1px solid #ffffff20;border-radius:13px;padding:10px;margin-top:9px}.podium{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin:25px 0}.podiumCard{width:190px;text-align:center;border-radius:20px 20px 8px 8px;padding:18px 12px;font-weight:900}.p1{min-height:210px;background:#9c7419}.p2{min-height:165px;background:#66758e}.p3{min-height:135px;background:#7b4f35}.ranklist{max-width:850px;margin:auto}.rankrow{display:grid;grid-template-columns:60px 1fr 100px;gap:10px;padding:10px 14px;border-bottom:1px solid #315470}.chainConclusion{display:grid;grid-template-columns:repeat(9,auto);justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.chainStep{background:#102438;border:1px solid #4f7390;border-radius:16px;padding:16px;font-weight:900;text-align:center}.bigArrow{font-size:28px;color:#4eb5ff}.studentHold{background:radial-gradient(circle,#112a40,#07111c 70%)}
+}.avatar.eliminated{filter:grayscale(1);opacity:.28}.quizNumbers{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.qbtn{background:#18334a;border:1px solid #315470;color:#e4f2fb;border-radius:12px;padding:11px;font-weight:900;cursor:pointer}.qbtn.done{background:#165a3a;border-color:#25cc7a}.qbtn.active{background:#2f80ed}.qbtn:disabled{opacity:.45;cursor:not-allowed}.prrgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.prrcard{border-radius:22px;padding:22px;border:2px solid #ffffff22;min-height:210px}.prevent{background:#0d3325;border-color:#25cc7a}.reduce{background:#463711;border-color:#ffc857}.repair{background:#15365b;border-color:#4eb5ff}.warningScreen{background:radial-gradient(circle at center,#4b0609 0,#180306 52%,#050103 100%);animation:warningPulse .7s infinite alternate}.warningLight{position:absolute;inset:0;border:18px solid #ff2338;box-shadow:inset 0 0 90px #ff001b99;pointer-events:none}@keyframes warningPulse{from{filter:brightness(.8)}to{filter:brightness(1.25)}}.earthWrap{text-align:center}.earthSphere{width:240px;height:240px;margin:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 28%,#92d7ff 0,#1e8fc7 28%,#0c436b 72%,#051523 100%);box-shadow:inset -28px -25px 50px #0009,0 0 55px #ff465866;overflow:hidden}.earthSphere span{font-size:190px;display:block;animation:earthSpin 16s linear infinite;filter:saturate(1.2)}@keyframes earthSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.healthOuter{height:28px;background:#131d26;border:2px solid #4a5e6f;border-radius:999px;overflow:hidden}.healthFill{height:100%;width:30%;transition:width .35s,background .35s}.feed{max-height:310px;overflow:auto}.feeditem{padding:9px 11px;border-bottom:1px solid #29465c;font-size:13px}.feeditem.ok{color:#72f0ad}.feeditem.bad{color:#ff8791}.rescueWorld{
+  position:relative;
+  height:calc(100vh - 105px);
+  min-height:650px;
+  overflow:hidden;
+  background:#3b0a12;
+  background-image:radial-gradient(circle at 50% 30%,#7a1827 0,#3b0a12 55%,#170309 100%);
+  transition:background .55s ease,box-shadow .55s ease
+}
+.rescueDeployTransport{
+  position:fixed;
+  inset:0;
+  z-index:185;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:
+    radial-gradient(circle at 50% 45%,#ff334d 0,#7a0817 38%,#180106 72%);
+  box-shadow:inset 0 0 140px #ff001faa;
+  animation:rescueWarpPulse .35s ease-in-out infinite alternate
+}
+.rescueDeployRing{
+  width:190px;
+  height:190px;
+  border:7px solid #ff6174;
+  border-radius:50%;
+  box-shadow:
+    0 0 30px #ff2540,
+    0 0 80px #ff001f,
+    inset 0 0 35px #ff4b5f88;
+  animation:rescueWarpSpin .65s linear infinite
+}
+.rescueDeployCore{
+  position:absolute;
+  width:92px;
+  height:92px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0,#ff8997 22%,#ff2440 48%,#790015 74%);
+  box-shadow:0 0 50px #fff8,0 0 100px #ff1d39
+}
+@keyframes rescueWarpSpin{
+  from{transform:scale(.82) rotate(0deg)}
+  50%{transform:scale(1.18) rotate(180deg)}
+  to{transform:scale(.82) rotate(360deg)}
+}
+@keyframes rescueWarpPulse{
+  from{filter:brightness(.82)}
+  to{filter:brightness(1.22)}
+}.rescueAvatar{position:absolute;transform:translate(-50%,-50%);z-index:50;font-size:38px;text-align:center;pointer-events:none}.rescueAvatar .hand{position:absolute;left:35px;top:-6px;font-size:28px}.solutionCard{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:245px;
+  min-height:126px;
+  border:2px solid #4f7390;
+  border-radius:16px;
+  background:#102438ee;
+  padding:11px;
+  box-shadow:0 10px 24px #0008;
+  z-index:20;
+  font-weight:800;
+  cursor:grab;
+  touch-action:none;
+  user-select:none
+}
+.solutionCard .solEn{font-size:19px;line-height:1.18;font-weight:900}
+.solutionCard .solBm{font-size:11px;line-height:1.22;color:#c8d8e4;margin-top:6px}
+.solutionCard .solZh{font-size:11px;line-height:1.22;color:#9fc9e7;margin-top:4px}.solutionCard.hover{border-color:#6fc8ff;box-shadow:0 0 26px #4eb5ff88}.solutionCard.grabbed,.solutionCard.dragging{z-index:60;opacity:.94;border-color:#ffc857;cursor:grabbing;box-shadow:0 0 28px #ffc85766,0 14px 30px #0009}.rescueTarget.dragover{outline:4px solid #ffffffbb;box-shadow:0 0 32px #ffffff55}.rescueTarget{position:absolute;bottom:3%;height:24%;width:29%;border:3px dashed #ffffff77;border-radius:22px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:23px;font-weight:900}.rt1{left:2%;background:#0d3325aa}.rt2{left:35.5%;background:#463711aa}.rt3{right:2%;background:#15365baa}.feedbackBox{max-width:760px}.reviewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.reviewCol{border-radius:20px;padding:18px}.reviewItem{background:#07111caa;border:1px solid #ffffff20;border-radius:13px;padding:10px;margin-top:9px}.podium{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin:25px 0}.podiumCard{width:190px;text-align:center;border-radius:20px 20px 8px 8px;padding:18px 12px;font-weight:900}.p1{min-height:210px;background:#9c7419}.p2{min-height:165px;background:#66758e}.p3{min-height:135px;background:#7b4f35}.ranklist{max-width:850px;margin:auto}.rankrow{display:grid;grid-template-columns:60px 1fr 100px;gap:10px;padding:10px 14px;border-bottom:1px solid #315470}.chainConclusion{display:grid;grid-template-columns:repeat(9,auto);justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.chainStep{background:#102438;border:1px solid #4f7390;border-radius:16px;padding:16px;font-weight:900;text-align:center}.bigArrow{font-size:28px;color:#4eb5ff}.studentHold{background:radial-gradient(circle,#112a40,#07111c 70%)}
 @media(max-width:1000px){.prrgrid,.reviewGrid{grid-template-columns:1fr}.quizNumbers{grid-template-columns:repeat(4,1fr)}}
 
 </style>
@@ -104,10 +224,12 @@ body.teacherMode #space .world{height:calc(100vh - 190px)}
   <div class="navActions">
     <button id="teacherNavUsers" class="btn slate">👥 MANAGE USERS</button>
     <button id="teacherNavDashboard" class="btn slate hidden">📊 DASHBOARD / REPORTS</button>
+    <button id="teacherNavLeave" class="btn slate">🚪 LEAVE GAME</button>
     <button id="teacherNavReset" class="btn red">↺ RESET SESSION</button>
     <button id="teacherNavNext" class="btn primary nextAction">NEXT ACTION</button>
   </div>
 </div>
+<button id="studentGlobalLeaveBtn" class="btn red studentGlobalLeave hidden">🚪 LEAVE GAME</button>
 <section id="space" class="hidden min-h-screen"><header class="h-[118px] px-5 py-4 flex items-center justify-between gap-4 bg-slate-950 border-b border-slate-700"><div><div class="text-sky-300 text-xs font-black tracking-[.2em]">MISSION EARTH</div><div class="flex items-center gap-3"><h1 id="spaceTitle" class="text-3xl font-black">1A4 MISSION</h1><span class="tag bg-red-950 text-red-300">EARTH STATUS: CRITICAL</span></div><div id="identity" class="text-slate-400 text-xs mt-1"></div></div><div class="flex gap-2 flex-wrap"><span id="stage" class="tag bg-slate-800">Lobby</span><button id="start" class="btn green hidden">START MISSION</button><button id="transport" class="btn amber hidden">TRANSPORT WARRIORS</button><button id="teacherDashboardBtn" class="btn primary hidden">TEACHER DASHBOARD</button><button id="resetSessionBtn" class="btn red hidden">RESET SESSION</button><button id="lock" class="btn primary hidden">LOCK THIS ZONE</button><button id="reregister" class="btn slate">RE-REGISTER</button></div></header><div id="world" class="world"><div id="zones" class="hidden"><div class="zone z1" data-zone="deforestation"><div><h3>🌳 DEFORESTATION</h3><div id="count-deforestation">0 / 3 groups</div></div></div><div class="zone z2" data-zone="agriculture"><div><h3>🌾 AGRICULTURE</h3><div id="count-agriculture">0 / 3 groups</div></div></div><div class="zone z3" data-zone="industrialisation"><div><h3>🏭 INDUSTRIALISATION</h3><div id="count-industrialisation">0 / 3 groups</div></div></div><div class="zone z4" data-zone="openburning"><div><h3>🔥 OPEN BURNING</h3><div id="count-openburning">0 / 3 groups</div></div></div></div><div id="quizPrompt" class="quizPrompt hidden"><div class="text-sky-300 text-xs font-black tracking-[.14em]">SURVIVAL QUIZ</div><div id="quizQuestionWorld" class="q mt-1">Waiting for teacher...</div><div id="quizTimerWorld" class="timer mt-1"></div></div><div id="quizZones" class="hidden"><div class="quizAnswer qa1" data-qzone="0"></div><div class="quizAnswer qa2" data-qzone="1"></div><div class="quizAnswer qa3" data-qzone="2"></div><div class="quizAnswer qa4" data-qzone="3"></div></div><div id="avatars"></div><div id="waitmsg" class="absolute inset-0 flex items-center justify-center pointer-events-none"><div class="text-center"><div class="text-3xl font-black text-white/60">Waiting for teacher...</div><div class="text-slate-400 text-xs mt-2">Move your team avatar into a zone. Your zone is selected automatically.</div></div></div></div></section>
 <section id="investigation" class="hidden min-h-screen"><header class="sticky top-0 z-30 bg-slate-950 border-b border-slate-700 px-5 py-4 flex items-center justify-between"><div><div class="text-sky-300 text-xs font-black tracking-[.18em]">WAR ZONE INVESTIGATION</div><h1 id="invTitle" class="text-3xl font-black"></h1><div id="invNames" class="text-slate-400 text-xs"></div></div><span id="invStatus" class="tag bg-sky-950 text-sky-200">Investigating Case</span></header><main class="p-5 pb-[270px] max-w-[1500px] mx-auto"><div class="glass p-4 mb-5"><div class="font-black text-lg">Mission Brief</div><div class="text-slate-300 mt-1">All card types are mixed. Build a scientifically logical chain for your selected zone.</div><div class="text-slate-400 text-xs mt-2">English • Bahasa Melayu • 中文</div></div><div id="cards" class="cardgrid"></div></main><div class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-700 p-4"><div class="max-w-[1500px] mx-auto"><div class="font-black mb-3">BUILD YOUR CAUSE–EFFECT CHAIN</div><div class="chain"><div class="slot" data-slot="activity"><h4>Human Activity (ACTIVITY)</h4><div class="slotcontent text-slate-400 text-xs">Drop a card here</div></div><div class="arrow">→</div><div class="slot" data-slot="change"><h4>Effect (WHAT CHANGED?)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div><div class="arrow">→</div><div class="slot" data-slot="effect"><h4>Effect (NEGATIVE EFFECT)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div><div class="arrow">→</div><div class="slot" data-slot="living"><h4>Who Is Affected? (LIVING THINGS)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div></div></div></div></section>
 <section id="dashboard" class="hidden min-h-screen p-4"><div class="max-w-[1600px] mx-auto"><div class="flex justify-between items-center gap-3 mb-4"><div><div class="text-amber-300 text-xs font-black tracking-[.2em]">TEACHER COMMAND CENTRE</div><h1 class="text-3xl font-black">1A4 LIVE MISSION STATUS</h1></div><div class="flex gap-2 flex-wrap"><button id="quizModeBtn" class="btn amber hidden">🧠 SURVIVAL QUIZ</button><button id="solutionIntroBtn" class="btn green hidden">PREVENT • REDUCE • REPAIR</button><select id="filter" class="bg-slate-900 border border-slate-600 rounded-xl px-3"><option value="all">All zones</option><option value="deforestation">Deforestation</option><option value="agriculture">Agriculture</option><option value="industrialisation">Industrialisation</option><option value="openburning">Open Burning</option></select><button id="backSpace" class="btn slate">VIEW MISSION SPACE</button></div></div><div class="teachergrid"><div class="glass p-4"><div class="font-black text-lg mb-3">Team Progress</div><div class="overflow-x-auto"><table class="tbl"><thead><tr><th>Team</th><th>Zone</th><th>Status</th><th>Progress</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div></div><div class="glass p-4"><div class="font-black text-lg">Live Overview</div><div id="stats" class="grid grid-cols-2 gap-3 mt-4"></div><div class="text-slate-400 text-xs mt-5 leading-6">When groups finish, ask pupils to close/lower laptop lids. Open reports from the same zone to compare different valid pathways.</div></div></div></div></section>
@@ -181,7 +303,16 @@ body.teacherMode #space .world{height:calc(100vh - 190px)}
 
 <div id="rescueFeedback" class="modal hidden"><div class="modalbox feedbackBox"><div class="text-red-300 text-xs font-black">RESCUE CORRECTION</div><h2 id="feedbackTitle" class="text-3xl font-black mt-1"></h2><div id="feedbackEnglish" class="text-lg mt-4"></div><div id="feedbackBM" class="text-slate-300 mt-3"></div><div id="feedbackZH" class="text-slate-300 mt-2"></div><button id="closeFeedback" class="btn primary mt-5">CONTINUE</button></div></div>
 
-<div id="transportOverlay" class="transport hidden"><div class="ring"></div><div class="text-3xl font-black mt-8">TRANSPORTING WARRIORS...</div><div id="dest" class="text-sky-300 font-bold mt-2"></div></div><div id="toast" class="toast hidden"></div><div id="reportModal" class="modal hidden"><div class="modalbox"><div class="flex justify-between items-start"><div><div class="text-sky-300 text-xs font-black">TEAM REPORT</div><h2 id="reportTitle" class="text-2xl font-black"></h2><div id="reportMeta" class="text-slate-400 text-xs"></div></div><button id="closeReport" class="btn slate">CLOSE ✕</button></div><div id="reportChain" class="reportchain mt-5"></div></div></div>
+<div id="rescueDeployOverlay" class="rescueDeployTransport hidden">
+  <div class="relative flex items-center justify-center">
+    <div class="rescueDeployRing"></div>
+    <div class="rescueDeployCore"></div>
+  </div>
+  <div class="text-red-100 text-sm font-black tracking-[.28em] mt-8">EMERGENCY DEPLOYMENT</div>
+  <div class="text-4xl font-black mt-3">TRANSPORTING EARTH WARRIORS...</div>
+  <div class="text-red-200 font-bold mt-2">Destination: EARTH RESCUE ZONE</div>
+</div>
+<div id="transportOverlay" class="transport hidden"><div class="ring"></div><div class="text-3xl font-black mt-8">TRANSPORTING WARRIORS...</div><div id="dest" class="text-sky-300 font-bold mt-2"></div></div><div id="toast" class="toast hidden"></div><div id="reportModal" class="modal hidden"><div class="modalbox"><div class="flex justify-between items-start"><div><div class="text-sky-300 text-sm font-black tracking-[.16em]">TARGET TEAM • CAUSE–EFFECT REPORT</div><h2 id="reportTitle" class="text-4xl font-black mt-1"></h2><div id="reportMeta" class="text-slate-300 text-base mt-1"></div></div><button id="closeReport" class="btn slate">CLOSE ✕</button></div><div id="reportChain" class="reportchain mt-5"></div></div></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import {getAuth,signInAnonymously,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -196,15 +327,30 @@ const FIRESTORE_TUNING={
   movementMinDelta:2,
   teacherMovementDebounceMs:900,
   zoneMovementMinDelta:4,
+
+  // Smooth zone / quiz selection:
+  // do not commit immediately when the avatar only touches the border.
+  frameDwellMs:500,
+
+  // Once confirmed inside a zone/answer, keep the saved coordinate fresh
+  // without returning to high-frequency Firestore writes.
+  insideFrameSyncMs:500,
+  insideFrameMinDelta:0.8,
+
   heartbeatMs:30000,
   inactiveWarnSec:60,
   kickAfterSec:90
 };
-let quizRevealLock=false,warningPlayedKey=null,rescueCardsReady=false,rescueDragging=null,rescueDragPointerId=null,rescueEndLock=false;
+let quizRevealLock=false,warningPlayedKey=null,rescueDeployPlayedKey=null,rescueCardsReady=false,rescueDragging=null,rescueDragPointerId=null,rescueEndLock=false;
+let rescueCardMotionRAF=null,rescueCardMotionLastTs=0;
+let rescueRespawnTimers=new Set();
+let zoneDwellTimer=null,zoneCandidate=null;
+let quizDwellTimer=null,quizCandidate=null;
+let lastInsideFrameSyncAt=0;
 const zoneNames={deforestation:"Deforestation",agriculture:"Agriculture",industrialisation:"Industrialisation",openburning:"Open Burning"},zoneEmoji={deforestation:"🌳",agriculture:"🌾",industrialisation:"🏭",openburning:"🔥"},screens=["entry","space","investigation","dashboard","quizTeacher","solutionIntro","discussionStudent","warning","rescueTeacher","rescueStudent","rescueResult","solutionReview","studentReview","conclusion","studentConclusion"];
 function show(id){
   screens.forEach(x=>$(x).classList.toggle("hidden",x!==id));
-  if(role==="teacher")setTimeout(updateTeacherNav,0);
+  if(role==="teacher"||role==="student")setTimeout(updateTeacherNav,0);
 }function toast(m,t="info",ms=2200){const e=$("toast");e.textContent=m;e.className=`toast ${t}`;e.classList.remove("hidden");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.add("hidden"),ms)}
 const AUDIO_URLS={
   warning:"https://tienping.github.io/public_resources/audio/warning_sound.mp3",
@@ -369,8 +515,18 @@ async function leaveGame(){
   lastSyncedPos={x:null,y:null};
   lastQuizAnswerZone=null;
   lastQuizQuestionIndex=null;
+  rescueDeployPlayedKey=null;
+  if(rescueCardMotionRAF)cancelAnimationFrame(rescueCardMotionRAF);
+  rescueCardMotionRAF=null;
+  rescueCardMotionLastTs=0;
+  rescueRespawnTimers.forEach(t=>clearTimeout(t));
+  rescueRespawnTimers.clear();
+  cancelZoneDwell();
+  cancelQuizDwell();
+  lastInsideFrameSyncAt=0;
   document.body.classList.remove("teacherMode");
   $("teacherTopNav").classList.add("hidden");
+  $("studentGlobalLeaveBtn").classList.add("hidden");
   $("names").value="";
   show("entry");
   toast("You have left the game. Your avatar was removed.","good",2800);
@@ -581,8 +737,10 @@ function teacherNextDescriptor(){
 function updateTeacherNav(){
   const nav=$("teacherTopNav");
   const isTeacher=role==="teacher";
+  const isStudent=role==="student"&&!!me;
   document.body.classList.toggle("teacherMode",isTeacher);
   nav?.classList.toggle("hidden",!isTeacher);
+  $("studentGlobalLeaveBtn")?.classList.toggle("hidden",!isStudent);
   if(!isTeacher||!nav)return;
 
   const st=state.stage||"lobby";
@@ -625,11 +783,25 @@ function updateUI(){
      renderQuizWorld();
      if(st==="quiz"&&state.quizPhase==="running"){
        const p=participants[me?.uid];
-       if(p){
+       if(p&&lastQuizQuestionIndex!==Number(state.quizIndex)){
          local.x=p.x??local.x;
          local.y=p.y??local.y;
+         lastQuizQuestionIndex=Number(state.quizIndex);
+         lastQuizAnswerZone=null;
+         cancelQuizDwell();
+
+         // Confirm the starting answer only after the pupil has remained
+         // inside the same frame for 500 ms.
+         setTimeout(()=>{
+           if(
+             role==="student" &&
+             state.stage==="quiz" &&
+             state.quizPhase==="running"
+           ){
+             scheduleQuizAnswerCommit(currentQuizZone(),true);
+           }
+         },FIRESTORE_TUNING.frameDwellMs);
        }
-       if(lastQuizQuestionIndex!==Number(state.quizIndex))syncQuizAnswer(true);
      }
    }
    else if(st==="investigation"){maybeHandleTeamTransport()}
@@ -736,13 +908,15 @@ async function transportWarriors(){
     toast(`Transport failed: ${e?.message||"Unknown Firebase error"}`,"bad",5200);
   }
 }
-$("transport").onclick=transportWarriors;$("teacherDashboardBtn").onclick=()=>{show("dashboard");renderDashboard()};$("resetSessionBtn").onclick=async()=>{if(role!=="teacher")return;if(!confirm("Reset the complete mission? This clears investigation, quiz and rescue progress."))return;const ss=Object.values(participants).filter(p=>p.role==="student"&&!p.left);await Promise.allSettled(ss.map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"lobby",chain:{},x:50,y:50,transportTo:null,transportNonce:0,quizAnswerZone:-1,quizQuestionIndex:-1,rescueScore:0,rescueCorrect:0,rescueWrong:0,lastActive:Date.now()})));await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",earthHealth:30,quizHistory:[],quizCompleted:[],rescueFeed:[],updatedAt:Date.now()},{merge:true});investigationOpened=false;transportInProgress=false;lastAutoZone=null;lastHandledTransportNonce=0;lastSyncedPos={x:null,y:null};lastQuizAnswerZone=null;lastQuizQuestionIndex=null;quizRevealLock=false;rescueCardsReady=false;rescueEndLock=false;show("space");toast("Mission reset. Ready for a fresh run.","good",2600)};
+$("transport").onclick=transportWarriors;$("teacherDashboardBtn").onclick=()=>{show("dashboard");renderDashboard()};$("resetSessionBtn").onclick=async()=>{if(role!=="teacher")return;if(!confirm("Reset the complete mission? This clears investigation, quiz and rescue progress."))return;const ss=Object.values(participants).filter(p=>p.role==="student"&&!p.left);await Promise.allSettled(ss.map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"lobby",chain:{},x:50,y:50,transportTo:null,transportNonce:0,quizAnswerZone:-1,quizQuestionIndex:-1,rescueScore:0,rescueCorrect:0,rescueWrong:0,lastActive:Date.now()})));await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",earthHealth:30,quizHistory:[],quizCompleted:[],rescueFeed:[],updatedAt:Date.now()},{merge:true});investigationOpened=false;transportInProgress=false;lastAutoZone=null;lastHandledTransportNonce=0;lastSyncedPos={x:null,y:null};lastQuizAnswerZone=null;lastQuizQuestionIndex=null;cancelZoneDwell();cancelQuizDwell();lastInsideFrameSyncAt=0;quizRevealLock=false;rescueDeployPlayedKey=null;rescueCardsReady=false;rescueEndLock=false;if(rescueCardMotionRAF)cancelAnimationFrame(rescueCardMotionRAF);rescueCardMotionRAF=null;rescueCardMotionLastTs=0;rescueRespawnTimers.forEach(t=>clearTimeout(t));rescueRespawnTimers.clear();show("space");toast("Mission reset. Ready for a fresh run.","good",2600)};
 $("teacherNavReset").onclick=()=>$("resetSessionBtn")?.click();
 $("teacherNavUsers").onclick=()=>{
   if(role!=="teacher")return;
   renderManageUsers();
   $("manageUsersModal").classList.remove("hidden");
 };
+$("teacherNavLeave").onclick=leaveGame;
+$("studentGlobalLeaveBtn").onclick=leaveGame;
 $("closeManageUsers").onclick=()=>$("manageUsersModal").classList.add("hidden");
 $("teacherNavDashboard").onclick=()=>{
   if(role!=="teacher")return;
@@ -776,28 +950,175 @@ function queuePositionSync(minDelta=FIRESTORE_TUNING.movementMinDelta){
   },FIRESTORE_TUNING.movementDebounceMs);
 }
 
-function syncQuizAnswer(force=false){
+function syncConfirmedFramePosition(extraFields={}){
+  if(!myRef)return;
+  const now=Date.now();
+  if(now-lastInsideFrameSyncAt<FIRESTORE_TUNING.insideFrameSyncMs)return;
+  if(!positionMovedEnough(FIRESTORE_TUNING.insideFrameMinDelta))return;
+
+  lastInsideFrameSyncAt=now;
+  const x=local.x,y=local.y;
+  lastSyncedPos={x,y};
+  updateDoc(myRef,{
+    ...extraFields,
+    x,
+    y,
+    lastActive:now
+  }).catch(()=>{});
+}
+
+function cancelZoneDwell(){
+  clearTimeout(zoneDwellTimer);
+  zoneDwellTimer=null;
+  zoneCandidate=null;
+}
+
+function scheduleZoneCommit(zone){
+  if(!zone||!myRef)return;
+
+  if(zone===lastAutoZone){
+    // Already confirmed: continuously keep the coordinate fresh while the
+    // pupil moves deeper inside the same zone.
+    syncConfirmedFramePosition({
+      zone,
+      status:"selecting_zone"
+    });
+    return;
+  }
+
+  if(zoneCandidate===zone)return;
+
+  clearTimeout(zoneDwellTimer);
+  zoneCandidate=zone;
+
+  zoneDwellTimer=setTimeout(()=>{
+    if(
+      role!=="student" ||
+      state.stage!=="zone_selection" ||
+      zoneCandidate!==zone ||
+      hoverZone!==zone ||
+      !myRef
+    )return;
+
+    lastAutoZone=zone;
+    zoneCandidate=null;
+    zoneDwellTimer=null;
+    lastInsideFrameSyncAt=Date.now();
+
+    const x=local.x,y=local.y;
+    lastSyncedPos={x,y};
+
+    updateDoc(myRef,{
+      zone,
+      x,
+      y,
+      status:"selecting_zone",
+      lastActive:Date.now()
+    }).catch(()=>{});
+
+    toast(`Zone selected: ${zoneNames[zone]}`,"info",1200);
+  },FIRESTORE_TUNING.frameDwellMs);
+}
+
+function currentQuizZone(){
+  return quizZoneIndex({x:local.x,y:local.y});
+}
+
+function cancelQuizDwell(){
+  clearTimeout(quizDwellTimer);
+  quizDwellTimer=null;
+  quizCandidate=null;
+}
+
+function scheduleQuizAnswerCommit(zone,force=false){
   if(role!=="student"||state.stage!=="quiz"||state.quizPhase!=="running"||!myRef)return;
 
   const qIndex=Number(state.quizIndex);
   if(lastQuizQuestionIndex!==qIndex){
     lastQuizQuestionIndex=qIndex;
     lastQuizAnswerZone=null;
+    cancelQuizDwell();
     force=true;
   }
 
-  const zone=quizZoneIndex({x:local.x,y:local.y});
-  if(!force&&zone===lastQuizAnswerZone)return;
+  // Unsafe middle / outside all answer boxes.
+  if(zone<0){
+    cancelQuizDwell();
 
-  lastQuizAnswerZone=zone;
-  lastSyncedPos={x:local.x,y:local.y};
-  updateDoc(myRef,{
-    quizAnswerZone:zone,
-    quizQuestionIndex:qIndex,
-    x:local.x,
-    y:local.y,
-    lastActive:Date.now()
-  }).catch(()=>{});
+    // If the pupil previously had a confirmed answer, clear it only after
+    // the same 500 ms dwell so merely brushing the border does not flicker.
+    if(lastQuizAnswerZone!==-1){
+      quizCandidate=-1;
+      quizDwellTimer=setTimeout(()=>{
+        if(
+          role!=="student" ||
+          state.stage!=="quiz" ||
+          state.quizPhase!=="running" ||
+          currentQuizZone()!==-1 ||
+          Number(state.quizIndex)!==qIndex
+        )return;
+
+        lastQuizAnswerZone=-1;
+        quizCandidate=null;
+        quizDwellTimer=null;
+        lastInsideFrameSyncAt=Date.now();
+
+        const x=local.x,y=local.y;
+        lastSyncedPos={x,y};
+        updateDoc(myRef,{
+          quizAnswerZone:-1,
+          quizQuestionIndex:qIndex,
+          x,
+          y,
+          lastActive:Date.now()
+        }).catch(()=>{});
+      },FIRESTORE_TUNING.frameDwellMs);
+    }
+    return;
+  }
+
+  if(!force&&zone===lastQuizAnswerZone){
+    // Confirmed answer: continue updating the actual coordinate while the
+    // pupil moves inside the answer box so remote avatars stay smooth.
+    syncConfirmedFramePosition({
+      quizAnswerZone:zone,
+      quizQuestionIndex:qIndex
+    });
+    return;
+  }
+
+  if(quizCandidate===zone)return;
+
+  clearTimeout(quizDwellTimer);
+  quizCandidate=zone;
+
+  quizDwellTimer=setTimeout(()=>{
+    if(
+      role!=="student" ||
+      state.stage!=="quiz" ||
+      state.quizPhase!=="running" ||
+      Number(state.quizIndex)!==qIndex ||
+      quizCandidate!==zone ||
+      currentQuizZone()!==zone ||
+      !myRef
+    )return;
+
+    lastQuizAnswerZone=zone;
+    quizCandidate=null;
+    quizDwellTimer=null;
+    lastInsideFrameSyncAt=Date.now();
+
+    const x=local.x,y=local.y;
+    lastSyncedPos={x,y};
+
+    updateDoc(myRef,{
+      quizAnswerZone:zone,
+      quizQuestionIndex:qIndex,
+      x,
+      y,
+      lastActive:Date.now()
+    }).catch(()=>{});
+  },FIRESTORE_TUNING.frameDwellMs);
 }
 
 $("world").addEventListener("mousemove",e=>{
@@ -816,52 +1137,50 @@ $("world").addEventListener("mousemove",e=>{
   local.x=Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100));
   local.y=Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100));
 
+  // Always move immediately on the local screen.
+  // Firebase should never be allowed to create a visible border snap.
   const a=document.getElementById(`av-${me.uid}`);
   if(a){
     a.style.left=`${local.x}%`;
     a.style.top=`${local.y}%`;
   }
 
-  // Students write only meaningful state during game stages.
   if(role==="student"&&st==="zone_selection"){
     detectZone(e.clientX,e.clientY);
     return;
   }
 
   if(role==="student"&&st==="quiz"&&state.quizPhase==="running"){
-    syncQuizAnswer(false);
+    scheduleQuizAnswerCommit(currentQuizZone(),false);
     return;
   }
 
-  // Lobby / Quiz Ready / teacher movement:
-  // move smoothly locally, sync only after a short pause and meaningful distance.
-  const minDelta=st==="zone_selection"
-    ? FIRESTORE_TUNING.zoneMovementMinDelta
-    : FIRESTORE_TUNING.movementMinDelta;
-  queuePositionSync(minDelta);
+  // Lobby / Quiz Ready / teacher movement remains low-frequency.
+  queuePositionSync(FIRESTORE_TUNING.movementMinDelta);
 });
+
 function detectZone(x,y){
   if(state.stage!=="zone_selection"||role!=="student")return;
+
   let found=null;
   document.querySelectorAll(".zone").forEach(z=>{
-    const r=z.getBoundingClientRect(),inside=x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+    const r=z.getBoundingClientRect();
+    const inside=x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
     z.classList.toggle("hovered",inside);
     if(inside)found=z.dataset.zone;
   });
+
   hoverZone=found;
-  if(found&&found!==lastAutoZone&&myRef){
-    lastAutoZone=found;
-    lastSyncedPos={x:local.x,y:local.y};
-    updateDoc(myRef,{
-      zone:found,
-      x:local.x,
-      y:local.y,
-      status:"selecting_zone",
-      lastActive:Date.now()
-    }).catch(()=>{});
-    toast(`Zone selected: ${zoneNames[found]}`,"info",1200);
+
+  if(found){
+    scheduleZoneCommit(found);
+  }else{
+    cancelZoneDwell();
   }
-  $("lock").textContent=found?`LOCK ${zoneNames[found].toUpperCase()} ZONE`:"LOCK THIS ZONE";
+
+  $("lock").textContent=found
+    ? `LOCK ${zoneNames[found].toUpperCase()} ZONE`
+    : "LOCK THIS ZONE";
 }
 $("reregister").onclick=async()=>{const p=participants[me?.uid]||{};await setDoc(myRef,{role,name:role==="teacher"?"Teacher":names,email:role==="teacher"?me.email:null,mascot:p.mascot||mascot(role),x:local.x,y:local.y,zone:p.zone||null,status:p.status||"lobby",chain:p.chain||{},lastActive:Date.now()},{merge:true});toast("Re-registered successfully.","good")};
 setInterval(()=>{
@@ -1219,11 +1538,174 @@ $("deployRescueBtn").onclick=async()=>{if(role!=="teacher")return;const ends=Dat
 $("endRescueBtn").onclick=()=>endRescue("teacher");
 
 function healthState(h){if(h>=100)return {label:"MISSION SUCCESS",cls:"#25cc7a",msg:"Earth has been restored through collective action."};if(h>=80)return {label:"RECOVERING",cls:"#78d98b",msg:"Earth is close to recovery. Strong teamwork made a major difference."};if(h>=60)return {label:"STABILISING",cls:"#e5d64e",msg:"Earth is beginning to stabilise, but more work is still needed."};if(h>=45)return {label:"UNSTABLE",cls:"#f59e42",msg:"Some progress was made, but Earth remains unstable."};return {label:"CRITICAL",cls:"#ff4d5e",msg:"Earth remains in serious danger. More correct action is urgently needed."}}
-function renderRescueTeacher(){if(role!=="teacher")return;const h=Math.max(0,Math.min(100,Number(state.earthHealth??30))),hs=healthState(h);$("healthPct").textContent=`${h.toFixed(h%1?1:0)}%`;$("healthLabel").textContent=hs.label;$("healthLabel").style.color=hs.cls;$("healthFill").style.width=`${h}%`;$("healthFill").style.background=hs.cls;$("deployRescueBtn").classList.toggle("hidden",state.stage!=="rescue_warning");$("endRescueBtn").classList.toggle("hidden",state.stage!=="rescue");const feed=state.rescueFeed||[];$("rescueFeed").innerHTML=feed.length?feed.slice().reverse().map(e=>`<div class="feeditem ${e.ok?"ok":"bad"}">${e.ok?"✅":"❌"} ${esc(e.message||"")}</div>`).join(""):"<div class='text-slate-500 mt-4'>Waiting for rescue actions...</div>";if(state.stage==="rescue")$("rescueTimerTeacher").textContent=formatTime((state.rescueEndsAt||0)-Date.now());else $("rescueTimerTeacher").textContent="05:00"}
+function rescueHealthTheme(h){
+  if(h>=100)return {
+    bg:"radial-gradient(circle at 50% 28%,#4ad67d 0,#177a42 46%,#082f1d 78%,#04160e 100%)",
+    glow:"inset 0 0 90px #3ff58c33"
+  };
+  if(h>=80)return {
+    bg:"radial-gradient(circle at 50% 28%,#a3ed9a 0,#4d9f62 43%,#173f28 78%,#081a10 100%)",
+    glow:"inset 0 0 90px #9cff9b2e"
+  };
+  if(h>=60)return {
+    bg:"radial-gradient(circle at 50% 28%,#d8c842 0,#766717 46%,#352d08 78%,#171303 100%)",
+    glow:"inset 0 0 90px #ffe45c2d"
+  };
+  if(h>=45)return {
+    bg:"radial-gradient(circle at 50% 28%,#e98b32 0,#8a4212 45%,#3d1905 78%,#1b0902 100%)",
+    glow:"inset 0 0 95px #ff9a382f"
+  };
+  return {
+    bg:"radial-gradient(circle at 50% 28%,#b31f38 0,#6e0b1d 44%,#300611 78%,#140207 100%)",
+    glow:"inset 0 0 110px #ff294a45"
+  };
+}
+
+function applyRescueHealthBackground(h){
+  const theme=rescueHealthTheme(h);
+  if($("rescueWorld")){
+    $("rescueWorld").style.background=theme.bg;
+    $("rescueWorld").style.boxShadow=theme.glow;
+  }
+  if($("rescueTeacher")){
+    $("rescueTeacher").style.background=theme.bg;
+    $("rescueTeacher").style.boxShadow=theme.glow;
+    $("rescueTeacher").style.transition="background .55s ease, box-shadow .55s ease";
+  }
+}
+
+function playRescueDeployTransition(){
+  if(role!=="student"||state.stage!=="rescue")return;
+  const key=state.rescueStartedAt||state.updatedAt||"rescue";
+  if(rescueDeployPlayedKey===key)return;
+  rescueDeployPlayedKey=key;
+
+  const overlay=$("rescueDeployOverlay");
+  if(!overlay)return;
+  overlay.classList.remove("hidden");
+
+  setTimeout(()=>{
+    overlay.classList.add("hidden");
+  },1500);
+}
+
+function renderRescueTeacher(){if(role!=="teacher")return;const h=Math.max(0,Math.min(100,Number(state.earthHealth??30))),hs=healthState(h);applyRescueHealthBackground(h);$("healthPct").textContent=`${h.toFixed(h%1?1:0)}%`;$("healthLabel").textContent=hs.label;$("healthLabel").style.color=hs.cls;$("healthFill").style.width=`${h}%`;$("healthFill").style.background=hs.cls;$("deployRescueBtn").classList.toggle("hidden",state.stage!=="rescue_warning");$("endRescueBtn").classList.toggle("hidden",state.stage!=="rescue");const feed=state.rescueFeed||[];$("rescueFeed").innerHTML=feed.length?feed.slice().reverse().map(e=>`<div class="feeditem ${e.ok?"ok":"bad"}">${e.ok?"✅":"❌"} ${esc(e.message||"")}</div>`).join(""):"<div class='text-slate-500 mt-4'>Waiting for rescue actions...</div>";if(state.stage==="rescue")$("rescueTimerTeacher").textContent=formatTime((state.rescueEndsAt||0)-Date.now());else $("rescueTimerTeacher").textContent="05:00"}
 function formatTime(ms){const s=Math.max(0,Math.ceil(ms/1000)),m=Math.floor(s/60),r=s%60;return `${String(m).padStart(2,"0")}:${String(r).padStart(2,"0")}`}
-function openRescueStudent(){if(!rescueCardsReady){rescueCardsReady=true;spawnInitialRescueCards()}const p=participants[me?.uid];$("rescueFace").textContent=p?.mascot||"🧑🏻‍🚀";$("studentHealth").textContent=`${Number(state.earthHealth??30).toFixed((state.earthHealth??30)%1?1:0)}%`;$("studentRescueTimer").textContent=formatTime((state.rescueEndsAt||0)-Date.now())}
+function openRescueStudent(){
+  if(!rescueCardsReady){
+    rescueCardsReady=true;
+    spawnInitialRescueCards();
+  }
+  ensureRescueCardMotion();
+
+  const h=Math.max(0,Math.min(100,Number(state.earthHealth??30)));
+  applyRescueHealthBackground(h);
+  playRescueDeployTransition();
+
+  const p=participants[me?.uid];
+  $("rescueFace").textContent=p?.mascot||"🧑🏻‍🚀";
+  $("studentHealth").textContent=`${h.toFixed(h%1?1:0)}%`;
+  $("studentRescueTimer").textContent=formatTime((state.rescueEndsAt||0)-Date.now());
+}
 function randPos(){return {x:10+Math.random()*80,y:10+Math.random()*45}}
 function spawnInitialRescueCards(){const layer=$("rescueCards");layer.innerHTML="";for(let i=0;i<8;i++)spawnOneRescueCard()}
+function randomRescueVelocity(){
+  // Very slow movement: about 0.7–1.35% of the arena per second.
+  const speed=0.7+Math.random()*0.65;
+  const angle=Math.random()*Math.PI*2;
+  return {
+    vx:Math.cos(angle)*speed,
+    vy:Math.sin(angle)*speed
+  };
+}
+
+function setRescueCardMotion(card){
+  const v=randomRescueVelocity();
+  card.dataset.vx=String(v.vx);
+  card.dataset.vy=String(v.vy);
+}
+
+function randomiseReflectedVelocity(card,hitX,hitY){
+  let vx=Number(card.dataset.vx||0),vy=Number(card.dataset.vy||0);
+
+  if(hitX)vx=-vx;
+  if(hitY)vy=-vy;
+
+  // Add a small random turn after bouncing so paths do not become repetitive.
+  const speed=Math.max(0.7,Math.min(1.35,Math.hypot(vx,vy)||1));
+  let angle=Math.atan2(vy,vx)+(Math.random()-.5)*0.55;
+
+  // Preserve the reflected hemisphere after adding randomness.
+  let nvx=Math.cos(angle)*speed;
+  let nvy=Math.sin(angle)*speed;
+  if(hitX && Math.sign(nvx)===Math.sign(-vx))nvx=-nvx;
+  if(hitY && Math.sign(nvy)===Math.sign(-vy))nvy=-nvy;
+
+  card.dataset.vx=String(nvx);
+  card.dataset.vy=String(nvy);
+}
+
+function animateRescueCards(ts){
+  if(state.stage!=="rescue"){
+    rescueCardMotionRAF=null;
+    rescueCardMotionLastTs=0;
+    return;
+  }
+
+  if(!rescueCardMotionLastTs)rescueCardMotionLastTs=ts;
+  const dt=Math.min(.05,(ts-rescueCardMotionLastTs)/1000);
+  rescueCardMotionLastTs=ts;
+
+  const world=$("rescueWorld");
+  const worldRect=world?.getBoundingClientRect();
+
+  if(world&&worldRect){
+    document.querySelectorAll("#rescueCards .solutionCard").forEach(card=>{
+      if(card===rescueDragging||card.classList.contains("dragging"))return;
+
+      let x=parseFloat(card.style.left)||50;
+      let y=parseFloat(card.style.top)||30;
+      const vx=Number(card.dataset.vx||0);
+      const vy=Number(card.dataset.vy||0);
+
+      x+=vx*dt;
+      y+=vy*dt;
+
+      // Convert half-card dimensions to percentage boundaries so cards stay fully visible.
+      const halfW=(card.offsetWidth/2)/worldRect.width*100;
+      const halfH=(card.offsetHeight/2)/worldRect.height*100;
+
+      const minX=Math.max(halfW+1,2);
+      const maxX=Math.min(99-halfW,98);
+      const minY=Math.max(halfH+1,3);
+
+      // Keep drifting cards in the upper play area, above the category targets.
+      const maxY=Math.min(68-halfH,67);
+
+      let hitX=false,hitY=false;
+
+      if(x<=minX){x=minX;hitX=true}
+      else if(x>=maxX){x=maxX;hitX=true}
+
+      if(y<=minY){y=minY;hitY=true}
+      else if(y>=maxY){y=maxY;hitY=true}
+
+      card.style.left=`${x}%`;
+      card.style.top=`${y}%`;
+
+      if(hitX||hitY)randomiseReflectedVelocity(card,hitX,hitY);
+    });
+  }
+
+  rescueCardMotionRAF=requestAnimationFrame(animateRescueCards);
+}
+
+function ensureRescueCardMotion(){
+  if(rescueCardMotionRAF||state.stage!=="rescue")return;
+  rescueCardMotionLastTs=0;
+  rescueCardMotionRAF=requestAnimationFrame(animateRescueCards);
+}
+
 function spawnOneRescueCard(){
   if(state.stage!=="rescue"&&state.stage!=="rescue_warning")return;
   const sol=solutionBank[Math.floor(Math.random()*solutionBank.length)],p=randPos(),e=document.createElement("div");
@@ -1231,8 +1713,15 @@ function spawnOneRescueCard(){
   e.dataset.sid=sol.id;
   e.style.left=`${p.x}%`;
   e.style.top=`${p.y}%`;
-  e.innerHTML=`<div class="text-sky-300 text-[10px] font-black">SOLUTION • DRAG ME</div><div class="mt-1">${esc(sol.en)}</div>`;
+  e.innerHTML=`
+    <div class="text-sky-300 text-[10px] font-black">SOLUTION • DRAG ME</div>
+    <div class="solEn mt-1">${esc(sol.en)}</div>
+    <div class="solBm">${esc(sol.bm)}</div>
+    <div class="solZh">${esc(sol.zh)}</div>
+  `;
+  setRescueCardMotion(e);
   $("rescueCards").appendChild(e);
+  ensureRescueCardMotion();
 }
 function rescueTargetAt(clientX,clientY){
   return [...document.querySelectorAll("[data-rescue-target]")].find(z=>{
@@ -1307,6 +1796,7 @@ window.addEventListener("pointerup",e=>{
   if(!target){
     card.style.left=card.dataset.homeLeft||card.style.left;
     card.style.top=card.dataset.homeTop||card.style.top;
+    setRescueCardMotion(card);
     toast("Drop the card inside PREVENT, REDUCE or REPAIR.","info",1800);
     return;
   }
@@ -1322,8 +1812,25 @@ window.addEventListener("pointercancel",e=>{
   card.classList.remove("dragging");
   card.style.left=card.dataset.homeLeft||card.style.left;
   card.style.top=card.dataset.homeTop||card.style.top;
+  setRescueCardMotion(card);
   document.querySelectorAll("[data-rescue-target]").forEach(z=>z.classList.remove("dragover"));
 });
+
+function scheduleRescueRespawn(){
+  // Replace one submitted solution after a random 30–60 second delay.
+  const delay=30000+Math.floor(Math.random()*30001);
+
+  const timer=setTimeout(()=>{
+    rescueRespawnTimers.delete(timer);
+
+    // Only spawn if Rescue is still actively running.
+    if(state.stage==="rescue"){
+      spawnOneRescueCard();
+    }
+  },delay);
+
+  rescueRespawnTimers.add(timer);
+}
 
 async function submitRescue(id,chosen,cardEl){
   const sol=solutionBank.find(s=>s.id===id);
@@ -1360,7 +1867,7 @@ async function submitRescue(id,chosen,cardEl){
     });
 
     cardEl.remove();
-    spawnOneRescueCard();
+    scheduleRescueRespawn();
 
     if(ok){
       beep(true);
@@ -1461,7 +1968,36 @@ function renderDashboard(){
     <div class="p-3 border border-sky-800 rounded-xl"><div class="text-3xl font-black text-sky-300">${inv}</div><div class="text-xs text-slate-400">Investigating</div></div>
     <div class="p-3 border border-slate-700 rounded-xl text-sm font-black col-span-2">🌳 ${c.deforestation} • 🌾 ${c.agriculture}<br>🏭 ${c.industrialisation} • 🔥 ${c.openburning}<div class="text-xs text-slate-400 font-normal mt-1">Zone distribution (inactive warning at 60s; removable at 90s)</div></div>`
 }
-$("filter").onchange=renderDashboard;$("backSpace").onclick=()=>{if(state.stage==="post_quiz")show("solutionIntro");else show("space")};function report(id){const p=participants[id];if(!p)return;$("reportTitle").textContent=p.name||"Team Report";$("reportMeta").textContent=`${zoneEmoji[p.zone]||""} ${zoneNames[p.zone]||"No zone"} • ${statusText(p.status)}`;const labs={activity:"Human Activity",change:"What Changed?",effect:"Negative Effect",living:"Living Things Affected"};$("reportChain").innerHTML=order.map((s,i)=>{const c=cards[p.chain?.[s]],b=`<div class="reportbox"><div class="text-xs text-slate-400 font-black">${labs[s]}</div><div class="font-black mt-2">${c?.en||"—"}</div></div>`;return b+(i<3?'<div class="arrow">→</div>':'')}).join("");$("reportModal").classList.remove("hidden")}
+$("filter").onchange=renderDashboard;$("backSpace").onclick=()=>{if(state.stage==="post_quiz")show("solutionIntro");else show("space")};function report(id){
+  const p=participants[id];
+  if(!p)return;
+
+  $("reportTitle").textContent=p.name||"Team Report";
+  $("reportMeta").textContent=`${zoneEmoji[p.zone]||""} ${zoneNames[p.zone]||"No zone"} • ${statusText(p.status)}`;
+
+  const labs={
+    activity:"HUMAN ACTIVITY",
+    change:"WHAT CHANGED?",
+    effect:"NEGATIVE EFFECT",
+    living:"LIVING THINGS AFFECTED"
+  };
+
+  $("reportChain").innerHTML=order.map((s,i)=>{
+    const c=cards[p.chain?.[s]];
+    const b=c
+      ? `<div class="reportbox">
+           <div class="reportType">${labs[s]}</div>
+           <img src="${c.img}" alt="${esc(c.en)}">
+           <div class="reportTitle">${esc(c.en)}</div>
+         </div>`
+      : `<div class="reportbox flex items-center justify-center text-slate-500 text-xl font-black">
+           NOT COMPLETED
+         </div>`;
+    return b+(i<3?'<div class="reportArrow">→</div>':'');
+  }).join("");
+
+  $("reportModal").classList.remove("hidden");
+}
 $("closeReport").onclick=()=>$("reportModal").classList.add("hidden");$("reportModal").onclick=e=>{if(e.target===$("reportModal"))$("reportModal").classList.add("hidden")};function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 onAuthStateChanged(auth,user=>{if(user?.email?.toLowerCase()===TEACHER.toLowerCase()&&!me){me=user;role="teacher";names="Teacher";ensureMission().then(async()=>{myRef=doc(participantsRef,user.uid);await setDoc(myRef,{role:"teacher",name:"Teacher",email:user.email,mascot:"👨‍🏫",lastActive:Date.now()},{merge:true});enterLive()})}});
 </script>
