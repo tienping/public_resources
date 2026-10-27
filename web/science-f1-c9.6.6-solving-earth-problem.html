@@ -7,7 +7,37 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-height:100vh}.hidden{display:none!important}.glass{background:#0d1c2ee8;border:1px solid #31506a;border-radius:22px;box-shadow:0 20px 60px #0007}.btn{border:0;border-radius:13px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:#2f80ed;color:#fff}.green{background:#25cc7a;color:#052013}.amber{background:#ffc857;color:#291d00}.slate{background:#18334a;color:#e4f2fb;border:1px solid #315470}.red{background:#ff4d5e;color:#fff}.tag{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;border:1px solid #ffffff22}.critical{color:#ff5b66}.world{position:relative;height:calc(100vh - 118px);min-height:650px;overflow:hidden;background-color:#091826;background-size:34px 34px;background-image:linear-gradient(to right,#8ab8d311 1px,transparent 1px),linear-gradient(to bottom,#8ab8d311 1px,transparent 1px)}.avatar{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;text-align:center;transition:left .15s,top .15s}.face{font-size:34px}.label{margin-top:3px;background:#fff;color:#173149;font-size:11px;font-weight:800;padding:4px 7px;border-radius:9px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}.teacher .label{background:#ffc857}.me .label{background:#4eb5ff}.zone{position:absolute;border:3px dashed #ffffff77;border-radius:25px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px}.zone h3{font-size:22px;font-weight:900}.zone.hovered{border-style:solid;box-shadow:0 0 35px #4eb5ff55}.zone.over{border-color:#ff5b66}.z1{left:4%;top:7%;width:43%;height:36%;background:#1e6b4935}.z2{right:4%;top:7%;width:43%;height:36%;background:#9b791d35}.z3{left:4%;bottom:7%;width:43%;height:36%;background:#66758e38}.z4{right:4%;bottom:7%;width:43%;height:36%;background:#a83d2938}.cardgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.evcard{background:#0e2031;border:2px solid #294a63;border-radius:18px;overflow:hidden;cursor:grab}.evcard:hover{border-color:#4eb5ff;transform:translateY(-2px)}.evcard.sel{outline:3px solid #4eb5ff}
+body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-height:100vh}
+body.teacherMode{padding-top:72px}
+.teacherTopNav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:72px;
+  z-index:1000;
+  background:#050c17f5;
+  border-bottom:1px solid #35516a;
+  box-shadow:0 8px 24px #0008;
+  backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 18px;
+}
+.teacherTopNav .navLeft{min-width:220px}
+.teacherTopNav .navTitle{font-weight:900;font-size:15px;letter-spacing:.08em;color:#8ed7ff}
+.teacherTopNav .navStage{font-size:12px;color:#a9bdcc;margin-top:2px}
+.teacherTopNav .navActions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.teacherTopNav .nextAction{min-width:210px;font-size:14px;box-shadow:0 0 0 1px #ffffff16,0 0 22px #2f80ed33}
+body.teacherMode #space .world{height:calc(100vh - 190px)}
+@media(max-width:780px){
+  body.teacherMode{padding-top:112px}
+  .teacherTopNav{height:112px;align-items:flex-start}
+  .teacherTopNav .navActions{max-width:70%;gap:6px}
+  .teacherTopNav .nextAction{min-width:160px}
+}.hidden{display:none!important}.glass{background:#0d1c2ee8;border:1px solid #31506a;border-radius:22px;box-shadow:0 20px 60px #0007}.btn{border:0;border-radius:13px;padding:11px 16px;font-weight:800;cursor:pointer}.primary{background:#2f80ed;color:#fff}.green{background:#25cc7a;color:#052013}.amber{background:#ffc857;color:#291d00}.slate{background:#18334a;color:#e4f2fb;border:1px solid #315470}.red{background:#ff4d5e;color:#fff}.tag{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;border:1px solid #ffffff22}.critical{color:#ff5b66}.world{position:relative;height:calc(100vh - 118px);min-height:650px;overflow:hidden;background-color:#091826;background-size:34px 34px;background-image:linear-gradient(to right,#8ab8d311 1px,transparent 1px),linear-gradient(to bottom,#8ab8d311 1px,transparent 1px)}.avatar{position:absolute;transform:translate(-50%,-50%);z-index:20;pointer-events:none;text-align:center;transition:left .15s,top .15s}.face{font-size:34px}.label{margin-top:3px;background:#fff;color:#173149;font-size:11px;font-weight:800;padding:4px 7px;border-radius:9px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}.teacher .label{background:#ffc857}.me .label{background:#4eb5ff}.zone{position:absolute;border:3px dashed #ffffff77;border-radius:25px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px}.zone h3{font-size:22px;font-weight:900}.zone.hovered{border-style:solid;box-shadow:0 0 35px #4eb5ff55}.zone.over{border-color:#ff5b66}.z1{left:4%;top:7%;width:43%;height:36%;background:#1e6b4935}.z2{right:4%;top:7%;width:43%;height:36%;background:#9b791d35}.z3{left:4%;bottom:7%;width:43%;height:36%;background:#66758e38}.z4{right:4%;bottom:7%;width:43%;height:36%;background:#a83d2938}.cardgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.evcard{background:#0e2031;border:2px solid #294a63;border-radius:18px;overflow:hidden;cursor:grab}.evcard:hover{border-color:#4eb5ff;transform:translateY(-2px)}.evcard.sel{outline:3px solid #4eb5ff}
 .evcard.used{
   opacity:.38;
   filter:grayscale(1);
@@ -35,18 +65,36 @@ body{margin:0;font-family:Inter,sans-serif;background:#07111c;color:#e8f2f8;min-
 @media(max-width:760px){.cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:950px){.teachergrid{grid-template-columns:1fr}.chain,.reportchain{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
 
-.quizPrompt{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:35;width:min(920px,92%);background:#07111cee;border:1px solid #4f7390;border-radius:18px;padding:12px 18px;text-align:center;box-shadow:0 12px 35px #0008}.quizPrompt .q{font-size:24px;font-weight:900}.quizPrompt .timer{font-size:32px;font-weight:900;color:#ffc857}.quizAnswer{position:absolute;width:43%;height:31%;border:3px solid #ffffff77;border-radius:24px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-size:22px;font-weight:900;background:#102438cc;transition:.2s}.qa1{left:4%;top:18%}.qa2{right:4%;top:18%}.qa3{left:4%;bottom:7%}.qa4{right:4%;bottom:7%}.quizAnswer.safe{background:#0d6b3dcc;border-color:#50f09b;box-shadow:0 0 40px #25cc7a77}.quizAnswer.danger{background:#812532cc;border-color:#ff6d7a}.avatar.eliminated{filter:grayscale(1);opacity:.28}.quizNumbers{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.qbtn{background:#18334a;border:1px solid #315470;color:#e4f2fb;border-radius:12px;padding:11px;font-weight:900;cursor:pointer}.qbtn.done{background:#165a3a;border-color:#25cc7a}.qbtn.active{background:#2f80ed}.qbtn:disabled{opacity:.45;cursor:not-allowed}.prrgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.prrcard{border-radius:22px;padding:22px;border:2px solid #ffffff22;min-height:210px}.prevent{background:#0d3325;border-color:#25cc7a}.reduce{background:#463711;border-color:#ffc857}.repair{background:#15365b;border-color:#4eb5ff}.warningScreen{background:radial-gradient(circle at center,#4b0609 0,#180306 52%,#050103 100%);animation:warningPulse .7s infinite alternate}.warningLight{position:absolute;inset:0;border:18px solid #ff2338;box-shadow:inset 0 0 90px #ff001b99;pointer-events:none}@keyframes warningPulse{from{filter:brightness(.8)}to{filter:brightness(1.25)}}.earthWrap{text-align:center}.earthSphere{width:240px;height:240px;margin:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 28%,#92d7ff 0,#1e8fc7 28%,#0c436b 72%,#051523 100%);box-shadow:inset -28px -25px 50px #0009,0 0 55px #ff465866;overflow:hidden}.earthSphere span{font-size:190px;display:block;animation:earthSpin 16s linear infinite;filter:saturate(1.2)}@keyframes earthSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.healthOuter{height:28px;background:#131d26;border:2px solid #4a5e6f;border-radius:999px;overflow:hidden}.healthFill{height:100%;width:30%;transition:width .35s,background .35s}.feed{max-height:310px;overflow:auto}.feeditem{padding:9px 11px;border-bottom:1px solid #29465c;font-size:13px}.feeditem.ok{color:#72f0ad}.feeditem.bad{color:#ff8791}.rescueWorld{position:relative;height:calc(100vh - 105px);min-height:650px;overflow:hidden;background:#091826;background-image:radial-gradient(circle at 50% 30%,#16334b 0,#091826 55%,#06101a 100%)}.rescueAvatar{position:absolute;transform:translate(-50%,-50%);z-index:50;font-size:38px;text-align:center}.rescueAvatar .hand{position:absolute;left:35px;top:-6px;font-size:28px}.solutionCard{position:absolute;transform:translate(-50%,-50%);width:220px;min-height:92px;border:2px solid #4f7390;border-radius:16px;background:#102438;padding:11px;box-shadow:0 10px 24px #0008;z-index:20;font-weight:800;cursor:pointer}.solutionCard.hover{border-color:#6fc8ff;box-shadow:0 0 26px #4eb5ff88}.solutionCard.grabbed{z-index:60;opacity:.92;pointer-events:none;border-color:#ffc857}.rescueTarget{position:absolute;bottom:3%;height:24%;width:29%;border:3px dashed #ffffff77;border-radius:22px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:23px;font-weight:900}.rt1{left:2%;background:#0d3325aa}.rt2{left:35.5%;background:#463711aa}.rt3{right:2%;background:#15365baa}.feedbackBox{max-width:760px}.reviewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.reviewCol{border-radius:20px;padding:18px}.reviewItem{background:#07111caa;border:1px solid #ffffff20;border-radius:13px;padding:10px;margin-top:9px}.podium{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin:25px 0}.podiumCard{width:190px;text-align:center;border-radius:20px 20px 8px 8px;padding:18px 12px;font-weight:900}.p1{min-height:210px;background:#9c7419}.p2{min-height:165px;background:#66758e}.p3{min-height:135px;background:#7b4f35}.ranklist{max-width:850px;margin:auto}.rankrow{display:grid;grid-template-columns:60px 1fr 100px;gap:10px;padding:10px 14px;border-bottom:1px solid #315470}.chainConclusion{display:grid;grid-template-columns:repeat(9,auto);justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.chainStep{background:#102438;border:1px solid #4f7390;border-radius:16px;padding:16px;font-weight:900;text-align:center}.bigArrow{font-size:28px;color:#4eb5ff}.studentHold{background:radial-gradient(circle,#112a40,#07111c 70%)}
+.quizPrompt{position:absolute;left:50%;top:16px;transform:translateX(-50%);z-index:35;width:min(920px,92%);background:#07111cee;border:1px solid #4f7390;border-radius:18px;padding:12px 18px;text-align:center;box-shadow:0 12px 35px #0008}.quizPrompt .q{font-size:24px;font-weight:900}.quizPrompt .timer{font-size:32px;font-weight:900;color:#ffc857}.quizAnswer{position:absolute;width:43%;height:31%;border:3px solid #ffffff77;border-radius:24px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-size:22px;font-weight:900;background:#102438cc;transition:.2s}.qa1{left:4%;top:18%}.qa2{right:4%;top:18%}.qa3{left:4%;bottom:7%}.qa4{right:4%;bottom:7%}.quizAnswer.safe{background:#0d6b3dcc;border-color:#50f09b;box-shadow:0 0 40px #25cc7a77}.quizAnswer.danger{background:#812532cc;border-color:#ff6d7a}
+.world.quizRevealDanger{
+  background-color:#35171d;
+  background-image:
+    linear-gradient(to right,#ff8a9418 1px,transparent 1px),
+    linear-gradient(to bottom,#ff8a9418 1px,transparent 1px);
+  box-shadow:inset 0 0 0 9999px #a72f3d35;
+}.avatar.eliminated{filter:grayscale(1);opacity:.28}.quizNumbers{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.qbtn{background:#18334a;border:1px solid #315470;color:#e4f2fb;border-radius:12px;padding:11px;font-weight:900;cursor:pointer}.qbtn.done{background:#165a3a;border-color:#25cc7a}.qbtn.active{background:#2f80ed}.qbtn:disabled{opacity:.45;cursor:not-allowed}.prrgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.prrcard{border-radius:22px;padding:22px;border:2px solid #ffffff22;min-height:210px}.prevent{background:#0d3325;border-color:#25cc7a}.reduce{background:#463711;border-color:#ffc857}.repair{background:#15365b;border-color:#4eb5ff}.warningScreen{background:radial-gradient(circle at center,#4b0609 0,#180306 52%,#050103 100%);animation:warningPulse .7s infinite alternate}.warningLight{position:absolute;inset:0;border:18px solid #ff2338;box-shadow:inset 0 0 90px #ff001b99;pointer-events:none}@keyframes warningPulse{from{filter:brightness(.8)}to{filter:brightness(1.25)}}.earthWrap{text-align:center}.earthSphere{width:240px;height:240px;margin:auto;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 28%,#92d7ff 0,#1e8fc7 28%,#0c436b 72%,#051523 100%);box-shadow:inset -28px -25px 50px #0009,0 0 55px #ff465866;overflow:hidden}.earthSphere span{font-size:190px;display:block;animation:earthSpin 16s linear infinite;filter:saturate(1.2)}@keyframes earthSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}.healthOuter{height:28px;background:#131d26;border:2px solid #4a5e6f;border-radius:999px;overflow:hidden}.healthFill{height:100%;width:30%;transition:width .35s,background .35s}.feed{max-height:310px;overflow:auto}.feeditem{padding:9px 11px;border-bottom:1px solid #29465c;font-size:13px}.feeditem.ok{color:#72f0ad}.feeditem.bad{color:#ff8791}.rescueWorld{position:relative;height:calc(100vh - 105px);min-height:650px;overflow:hidden;background:#091826;background-image:radial-gradient(circle at 50% 30%,#16334b 0,#091826 55%,#06101a 100%)}.rescueAvatar{position:absolute;transform:translate(-50%,-50%);z-index:50;font-size:38px;text-align:center;pointer-events:none}.rescueAvatar .hand{position:absolute;left:35px;top:-6px;font-size:28px}.solutionCard{position:absolute;transform:translate(-50%,-50%);width:220px;min-height:92px;border:2px solid #4f7390;border-radius:16px;background:#102438;padding:11px;box-shadow:0 10px 24px #0008;z-index:20;font-weight:800;cursor:pointer}.solutionCard.hover{border-color:#6fc8ff;box-shadow:0 0 26px #4eb5ff88}.solutionCard.grabbed{z-index:60;opacity:.92;pointer-events:none;border-color:#ffc857}.rescueTarget{position:absolute;bottom:3%;height:24%;width:29%;border:3px dashed #ffffff77;border-radius:22px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:23px;font-weight:900}.rt1{left:2%;background:#0d3325aa}.rt2{left:35.5%;background:#463711aa}.rt3{right:2%;background:#15365baa}.feedbackBox{max-width:760px}.reviewGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.reviewCol{border-radius:20px;padding:18px}.reviewItem{background:#07111caa;border:1px solid #ffffff20;border-radius:13px;padding:10px;margin-top:9px}.podium{display:flex;align-items:flex-end;justify-content:center;gap:18px;margin:25px 0}.podiumCard{width:190px;text-align:center;border-radius:20px 20px 8px 8px;padding:18px 12px;font-weight:900}.p1{min-height:210px;background:#9c7419}.p2{min-height:165px;background:#66758e}.p3{min-height:135px;background:#7b4f35}.ranklist{max-width:850px;margin:auto}.rankrow{display:grid;grid-template-columns:60px 1fr 100px;gap:10px;padding:10px 14px;border-bottom:1px solid #315470}.chainConclusion{display:grid;grid-template-columns:repeat(9,auto);justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.chainStep{background:#102438;border:1px solid #4f7390;border-radius:16px;padding:16px;font-weight:900;text-align:center}.bigArrow{font-size:28px;color:#4eb5ff}.studentHold{background:radial-gradient(circle,#112a40,#07111c 70%)}
 @media(max-width:1000px){.prrgrid,.reviewGrid{grid-template-columns:1fr}.quizNumbers{grid-template-columns:repeat(4,1fr)}}
 
 </style>
 </head>
 <body>
 <section id="entry" class="min-h-screen flex items-center justify-center p-5"><div class="glass p-7 w-full max-w-3xl"><div class="text-center mb-7"><div class="text-sky-300 text-sm font-black tracking-[.25em]">MISSION EARTH</div><h1 id="missionTitle" class="text-5xl font-black mt-2">1A4 MISSION</h1><div class="critical text-2xl font-black mt-3">EARTH STATUS: CRITICAL</div></div><div class="grid md:grid-cols-2 gap-5"><div class="p-5 border border-slate-700 rounded-2xl"><div class="text-xl font-black">Student Team</div><div class="text-slate-400 text-xs mt-1">One laptop for one group of three.</div><input id="names" class="mt-4 w-full rounded-xl bg-slate-950 border border-slate-600 px-4 py-3" placeholder="Abu, Bernard, Colin"><button id="joinStudent" class="btn primary w-full mt-4">JOIN MISSION 🚀</button><div id="studentErr" class="text-red-400 text-sm mt-3 hidden"></div></div><div class="p-5 border border-amber-700/50 rounded-2xl"><div class="text-xl font-black">Teacher Command</div><div class="text-slate-400 text-xs mt-1">Google teacher sign-in.</div><button id="joinTeacher" class="btn amber w-full mt-4">SIGN IN WITH GOOGLE 👨‍🏫</button><div class="text-xs text-amber-300 mt-3">g-39576509@moe-dl.edu.my</div><div id="teacherErr" class="text-red-400 text-sm mt-3 hidden"></div></div></div></div></section>
+<div id="teacherTopNav" class="teacherTopNav hidden">
+  <div class="navLeft">
+    <div class="navTitle">👨‍🏫 TEACHER CONTROL</div>
+    <div id="teacherNavStage" class="navStage">Stage: Lobby</div>
+  </div>
+  <div class="navActions">
+    <button id="teacherNavDashboard" class="btn slate hidden">📊 DASHBOARD / REPORTS</button>
+    <button id="teacherNavReset" class="btn red">↺ RESET SESSION</button>
+    <button id="teacherNavNext" class="btn primary nextAction">NEXT ACTION</button>
+  </div>
+</div>
 <section id="space" class="hidden min-h-screen"><header class="h-[118px] px-5 py-4 flex items-center justify-between gap-4 bg-slate-950 border-b border-slate-700"><div><div class="text-sky-300 text-xs font-black tracking-[.2em]">MISSION EARTH</div><div class="flex items-center gap-3"><h1 id="spaceTitle" class="text-3xl font-black">1A4 MISSION</h1><span class="tag bg-red-950 text-red-300">EARTH STATUS: CRITICAL</span></div><div id="identity" class="text-slate-400 text-xs mt-1"></div></div><div class="flex gap-2 flex-wrap"><span id="stage" class="tag bg-slate-800">Lobby</span><button id="start" class="btn green hidden">START MISSION</button><button id="transport" class="btn amber hidden">TRANSPORT WARRIORS</button><button id="teacherDashboardBtn" class="btn primary hidden">TEACHER DASHBOARD</button><button id="resetSessionBtn" class="btn red hidden">RESET SESSION</button><button id="lock" class="btn primary hidden">LOCK THIS ZONE</button><button id="reregister" class="btn slate">RE-REGISTER</button></div></header><div id="world" class="world"><div id="zones" class="hidden"><div class="zone z1" data-zone="deforestation"><div><h3>🌳 DEFORESTATION</h3><div id="count-deforestation">0 / 3 groups</div></div></div><div class="zone z2" data-zone="agriculture"><div><h3>🌾 AGRICULTURE</h3><div id="count-agriculture">0 / 3 groups</div></div></div><div class="zone z3" data-zone="industrialisation"><div><h3>🏭 INDUSTRIALISATION</h3><div id="count-industrialisation">0 / 3 groups</div></div></div><div class="zone z4" data-zone="openburning"><div><h3>🔥 OPEN BURNING</h3><div id="count-openburning">0 / 3 groups</div></div></div></div><div id="quizPrompt" class="quizPrompt hidden"><div class="text-sky-300 text-xs font-black tracking-[.14em]">SURVIVAL QUIZ</div><div id="quizQuestionWorld" class="q mt-1">Waiting for teacher...</div><div id="quizTimerWorld" class="timer mt-1"></div></div><div id="quizZones" class="hidden"><div class="quizAnswer qa1" data-qzone="0"></div><div class="quizAnswer qa2" data-qzone="1"></div><div class="quizAnswer qa3" data-qzone="2"></div><div class="quizAnswer qa4" data-qzone="3"></div></div><div id="avatars"></div><div id="waitmsg" class="absolute inset-0 flex items-center justify-center pointer-events-none"><div class="text-center"><div class="text-3xl font-black text-white/60">Waiting for teacher...</div><div class="text-slate-400 text-xs mt-2">Move your team avatar into a zone. Your zone is selected automatically.</div></div></div></div></section>
 <section id="investigation" class="hidden min-h-screen"><header class="sticky top-0 z-30 bg-slate-950 border-b border-slate-700 px-5 py-4 flex items-center justify-between"><div><div class="text-sky-300 text-xs font-black tracking-[.18em]">WAR ZONE INVESTIGATION</div><h1 id="invTitle" class="text-3xl font-black"></h1><div id="invNames" class="text-slate-400 text-xs"></div></div><span id="invStatus" class="tag bg-sky-950 text-sky-200">Investigating Case</span></header><main class="p-5 pb-[270px] max-w-[1500px] mx-auto"><div class="glass p-4 mb-5"><div class="font-black text-lg">Mission Brief</div><div class="text-slate-300 mt-1">All card types are mixed. Build a scientifically logical chain for your selected zone.</div><div class="text-slate-400 text-xs mt-2">English • Bahasa Melayu • 中文</div></div><div id="cards" class="cardgrid"></div></main><div class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-700 p-4"><div class="max-w-[1500px] mx-auto"><div class="font-black mb-3">BUILD YOUR CAUSE–EFFECT CHAIN</div><div class="chain"><div class="slot" data-slot="activity"><h4>Human Activity (ACTIVITY)</h4><div class="slotcontent text-slate-400 text-xs">Drop a card here</div></div><div class="arrow">→</div><div class="slot" data-slot="change"><h4>Effect (WHAT CHANGED?)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div><div class="arrow">→</div><div class="slot" data-slot="effect"><h4>Effect (NEGATIVE EFFECT)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div><div class="arrow">→</div><div class="slot" data-slot="living"><h4>Who Is Affected? (LIVING THINGS)</h4><div class="slotcontent text-slate-400 text-xs">Complete previous step</div></div></div></div></div></section>
 <section id="dashboard" class="hidden min-h-screen p-4"><div class="max-w-[1600px] mx-auto"><div class="flex justify-between items-center gap-3 mb-4"><div><div class="text-amber-300 text-xs font-black tracking-[.2em]">TEACHER COMMAND CENTRE</div><h1 class="text-3xl font-black">1A4 LIVE MISSION STATUS</h1></div><div class="flex gap-2 flex-wrap"><button id="quizModeBtn" class="btn amber hidden">🧠 SURVIVAL QUIZ</button><button id="solutionIntroBtn" class="btn green hidden">PREVENT • REDUCE • REPAIR</button><select id="filter" class="bg-slate-900 border border-slate-600 rounded-xl px-3"><option value="all">All zones</option><option value="deforestation">Deforestation</option><option value="agriculture">Agriculture</option><option value="industrialisation">Industrialisation</option><option value="openburning">Open Burning</option></select><button id="backSpace" class="btn slate">VIEW MISSION SPACE</button></div></div><div class="teachergrid"><div class="glass p-4"><div class="font-black text-lg mb-3">Team Progress</div><div class="overflow-x-auto"><table class="tbl"><thead><tr><th>Team</th><th>Zone</th><th>Status</th><th>Progress</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div></div><div class="glass p-4"><div class="font-black text-lg">Live Overview</div><div id="stats" class="grid grid-cols-2 gap-3 mt-4"></div><div class="text-slate-400 text-xs mt-5 leading-6">When groups finish, ask pupils to close/lower laptop lids. Open reports from the same zone to compare different valid pathways.</div></div></div></div></section>
 
-<section id="quizTeacher" class="hidden min-h-screen p-5"><div class="max-w-[1350px] mx-auto"><div class="flex justify-between items-start gap-4"><div><div class="text-amber-300 text-xs font-black tracking-[.2em]">TEACHER QUIZ CONTROL</div><h1 class="text-4xl font-black">SURVIVAL QUIZ</h1><div class="text-slate-400 mt-1">8 questions • 2 from each war zone • 10 seconds each</div></div><button id="endQuizBtn" class="btn green">END QUIZ → DISCUSSION</button></div><div class="glass p-5 mt-5"><div id="quizNumbers" class="quizNumbers"></div></div><div class="grid lg:grid-cols-[1.25fr_.75fr] gap-5 mt-5"><div class="glass p-6"><div class="text-sky-300 text-xs font-black">CURRENT QUESTION</div><div id="teacherQuizQuestion" class="text-3xl font-black mt-2">Choose a question number to begin.</div><div id="teacherQuizOptions" class="grid grid-cols-2 gap-3 mt-5"></div></div><div class="glass p-6 text-center"><div class="text-slate-400 text-xs font-black">COUNTDOWN</div><div id="teacherQuizTimer" class="text-7xl font-black text-amber-300 mt-2">—</div><div id="teacherQuizResult" class="text-2xl font-black mt-5"></div><div id="teacherQuizProgress" class="text-slate-400 mt-2">0 / 8 completed</div></div></div></div></section>
+<section id="quizTeacher" class="hidden min-h-screen p-5"><div class="max-w-[1350px] mx-auto"><div class="flex justify-between items-start gap-4"><div><div class="text-amber-300 text-xs font-black tracking-[.2em]">TEACHER QUIZ CONTROL</div><h1 class="text-4xl font-black">SURVIVAL QUIZ</h1><div class="text-slate-400 mt-1">8 questions • 2 from each war zone • 30 seconds each</div></div><button id="endQuizBtn" class="btn green">END QUIZ → DISCUSSION</button></div><div class="glass p-5 mt-5"><div id="quizNumbers" class="quizNumbers"></div></div><div class="grid lg:grid-cols-[1.25fr_.75fr] gap-5 mt-5"><div class="glass p-6"><div class="text-sky-300 text-xs font-black">CURRENT QUESTION</div><div id="teacherQuizQuestion" class="text-3xl font-black mt-2">Choose a question number to begin.</div><div id="teacherQuizOptions" class="grid grid-cols-2 gap-3 mt-5"></div></div><div class="glass p-6 text-center"><div class="text-slate-400 text-xs font-black">COUNTDOWN</div><div id="teacherQuizTimer" class="text-7xl font-black text-amber-300 mt-2">—</div><div id="teacherQuizResult" class="text-2xl font-black mt-5"></div><div id="teacherQuizProgress" class="text-slate-400 mt-2">0 / 8 completed</div></div></div></div></section>
 
 <section id="solutionIntro" class="hidden min-h-screen p-5"><div class="max-w-[1350px] mx-auto"><div class="flex justify-between gap-3 items-start"><div><div class="text-emerald-300 text-xs font-black tracking-[.2em]">PROBLEM-SOLVING FRAMEWORK</div><h1 class="text-4xl font-black">PREVENT • REDUCE • REPAIR</h1><div class="text-slate-400 mt-2">Use completed pupil evidence before moving to the rescue mission.</div></div><div class="flex gap-2"><button id="postQuizReportsBtn" class="btn slate">VIEW TEAM REPORTS</button><button id="emergencyRescueBtn" class="btn red">🚨 EMERGENCY RESCUE</button></div></div><div class="prrgrid mt-7"><div class="prrcard prevent"><div class="text-4xl">🛑</div><div class="text-3xl font-black mt-2">PREVENT</div><div class="mt-3 text-lg">Stop the environmental problem before it happens whenever possible.</div><div class="text-sm text-emerald-200 mt-4">Preferred when practical because damage is avoided before it begins.</div></div><div class="prrcard reduce"><div class="text-4xl">⚠️</div><div class="text-3xl font-black mt-2">REDUCE</div><div class="mt-3 text-lg">If an activity must continue, minimise the harmful activity or impact as much as possible.</div><div class="text-sm text-amber-200 mt-4">Use safer methods, smaller amounts or better controls.</div></div><div class="prrcard repair"><div class="text-4xl">🔧</div><div class="text-3xl font-black mt-2">REPAIR</div><div class="mt-3 text-lg">When damage has already happened, restore and fix the environment.</div><div class="text-sm text-sky-200 mt-4">Do not play the blaming game—repair the damage.</div></div></div><div class="glass p-5 mt-6 text-center text-xl font-black">Understanding the damage is not enough. We must choose an action that really solves the problem.</div></div></section>
 
@@ -82,7 +130,10 @@ $("missionTitle").textContent=`${mission} MISSION`;$("spaceTitle").textContent=`
 let me=null,myRef=null,role=null,names=localStorage.getItem(`mission-${mission}-names`)||"",participants={},state={stage:"lobby"},hoverZone=null,selectedCard=null,unsubP=null,unsubM=null,moveTimer=null,transportInProgress=false,investigationOpened=false,lastAutoZone=null;$("names").value=names;
 let quizRevealLock=false,warningPlayedKey=null,rescueCardsReady=false,rescueGrabbed=null,rescueHover=null,rescueLastMouse={x:50,y:35,cx:0,cy:0},rescueEndLock=false;
 const zoneNames={deforestation:"Deforestation",agriculture:"Agriculture",industrialisation:"Industrialisation",openburning:"Open Burning"},zoneEmoji={deforestation:"🌳",agriculture:"🌾",industrialisation:"🏭",openburning:"🔥"},screens=["entry","space","investigation","dashboard","quizTeacher","solutionIntro","discussionStudent","warning","rescueTeacher","rescueStudent","rescueResult","solutionReview","studentReview","conclusion","studentConclusion"];
-function show(id){screens.forEach(x=>$(x).classList.toggle("hidden",x!==id))}function toast(m,t="info",ms=2200){const e=$("toast");e.textContent=m;e.className=`toast ${t}`;e.classList.remove("hidden");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.add("hidden"),ms)}
+function show(id){
+  screens.forEach(x=>$(x).classList.toggle("hidden",x!==id));
+  if(role==="teacher")setTimeout(updateTeacherNav,0);
+}function toast(m,t="info",ms=2200){const e=$("toast");e.textContent=m;e.className=`toast ${t}`;e.classList.remove("hidden");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.add("hidden"),ms)}
 function beep(ok){try{const A=new (AudioContext||webkitAudioContext)(),o=A.createOscillator(),g=A.createGain();o.frequency.value=ok?660:150;g.gain.value=.06;o.connect(g);g.connect(A.destination);o.start();o.stop(A.currentTime+.18)}catch{}}
 function mascot(r){return r==="teacher"?"👨‍🏫":["🧑🏻‍🚀","🧑🏻‍🔬","🌍","🛡️","⚔️"][Math.floor(Math.random()*5)]}async function ensureMission(){if(!(await getDoc(missionRef)).exists())await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",updatedAt:Date.now()})}
 $("joinStudent").onclick=async()=>{const n=$("names").value.trim();$("studentErr").classList.add("hidden");if(!n){$("studentErr").textContent="Enter the three group members' names.";$("studentErr").classList.remove("hidden");return}try{const studentUser=(auth.currentUser&&auth.currentUser.isAnonymous)?auth.currentUser:(await signInAnonymously(auth)).user;me=studentUser;role="student";names=n;localStorage.setItem(`mission-${mission}-names`,n);await ensureMission();myRef=doc(participantsRef,me.uid);const old=await getDoc(myRef),p=old.exists()?old.data():{};await setDoc(myRef,{role:"student",name:n,mascot:p.mascot||mascot("student"),x:p.x??50,y:p.y??50,zone:p.zone||null,status:p.status||"lobby",chain:p.chain||{},lastActive:Date.now()},{merge:true});enterLive()}catch(e){$("studentErr").textContent=e.message;$("studentErr").classList.remove("hidden")}};
@@ -90,8 +141,50 @@ $("joinTeacher").onclick=async()=>{try{const pr=new GoogleAuthProvider();pr.setC
 function enterLive(){live();show("space");$("identity").textContent=role==="teacher"?`Teacher Command • ${me.email}`:`Team: ${names}`;updateUI()}
 function live(){unsubM?.();unsubP?.();unsubM=onSnapshot(missionRef,s=>{if(s.exists())state=s.data();updateUI();if(role==="teacher"&&state.stage==="investigation"&&!$("dashboard").classList.contains("hidden"))renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Mission sync error",e);toast("Mission sync failed. Check Firebase permissions / connection.","bad",4200)});unsubP=onSnapshot(participantsRef,s=>{participants={};s.forEach(d=>{const x=d.data();participants[d.id]={id:d.id,...x}});renderAvatars();renderCounts();renderDashboard();if(role==="student"&&state.stage==="investigation"){const p=participants[me?.uid];if(p?.zone&&!investigationOpened&&!transportInProgress&&!$("space").classList.contains("hidden"))transportMe(p.zone)}},e=>{console.error("Participant sync error",e);toast("Participant sync failed. Check Firebase permissions / connection.","bad",4200)})}
 function stageLabel(st){return {lobby:"Lobby",zone_selection:"Selecting Zones",investigation:"Investigation Active",quiz_ready:"Quiz Ready",quiz:"Survival Quiz",post_quiz:"Evidence Discussion",rescue_warning:"Emergency Warning",rescue:"Earth Rescue",rescue_result:"Rescue Result",solution_review:"Solution Review",conclusion:"Conclusion"}[st]||st}
+function teacherCurrentScreen(){
+  return screens.find(id=>!$(id)?.classList.contains("hidden"))||"";
+}
+function teacherNextDescriptor(){
+  const st=state.stage||"lobby",screen=teacherCurrentScreen();
+  if(st==="lobby")return {label:"START MISSION",action:()=>$("start")?.click(),kind:"green"};
+  if(st==="zone_selection")return {label:"TRANSPORT WARRIORS",action:()=>$("transport")?.click(),kind:"amber"};
+  if(st==="investigation")return {label:"🧠 START SURVIVAL QUIZ",action:()=>$("quizModeBtn")?.click(),kind:"amber"};
+  if(st==="quiz_ready"||st==="quiz")return {label:"END QUIZ → DISCUSSION",action:()=>$("endQuizBtn")?.click(),kind:"green"};
+  if(st==="post_quiz"){
+    if(screen==="solutionIntro")return {label:"🚨 EMERGENCY RESCUE",action:()=>$("emergencyRescueBtn")?.click(),kind:"red"};
+    return {label:"PREVENT • REDUCE • REPAIR",action:()=>$("solutionIntroBtn")?.click(),kind:"green"};
+  }
+  if(st==="rescue_warning")return {label:"DEPLOY WARRIORS",action:()=>$("deployRescueBtn")?.click(),kind:"amber"};
+  if(st==="rescue")return {label:"END RESCUE",action:()=>$("endRescueBtn")?.click(),kind:"red"};
+  if(st==="rescue_result")return {label:"📋 REVIEW ALL SOLUTIONS",action:()=>$("reviewSolutionsBtn")?.click(),kind:"primary"};
+  if(st==="solution_review")return {label:"FINAL CONCLUSION →",action:()=>$("conclusionBtn")?.click(),kind:"green"};
+  if(st==="conclusion")return {label:"MISSION COMPLETE",action:null,kind:"slate"};
+  return {label:"NEXT ACTION",action:null,kind:"primary"};
+}
+function updateTeacherNav(){
+  const nav=$("teacherTopNav");
+  const isTeacher=role==="teacher";
+  document.body.classList.toggle("teacherMode",isTeacher);
+  nav?.classList.toggle("hidden",!isTeacher);
+  if(!isTeacher||!nav)return;
+
+  const st=state.stage||"lobby";
+  $("teacherNavStage").textContent=`Stage: ${stageLabel(st)}`;
+
+  const dash=$("teacherNavDashboard");
+  const canDash=st==="investigation"||st==="post_quiz";
+  dash.classList.toggle("hidden",!canDash);
+
+  const next=$("teacherNavNext"),d=teacherNextDescriptor();
+  next.textContent=d.label;
+  next.disabled=!d.action;
+  next.className=`btn nextAction ${d.kind||"primary"}`;
+  next._nextAction=d.action;
+}
+
 function updateUI(){
  const st=state.stage||"lobby";
+ updateTeacherNav();
  if(st!=="investigation"){investigationOpened=false;transportInProgress=false}
  $("stage").textContent=stageLabel(st);
  $("zones").classList.toggle("hidden",st!=="zone_selection");
@@ -133,6 +226,17 @@ function updateUI(){
 $("start").onclick=async()=>{await updateDoc(missionRef,{stage:"zone_selection",updatedAt:Date.now()});await Promise.allSettled(Object.values(participants).filter(p=>p.role==="student").map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"selecting_zone",chain:{},lastActive:Date.now()})));toast("Mission started. Choose your zones!","good")};
 function countZones(){const c={deforestation:0,agriculture:0,industrialisation:0,openburning:0};Object.values(participants).filter(p=>p.role==="student").forEach(p=>{if(c[p.zone]!==undefined)c[p.zone]++});return c}
 $("transport").onclick=async()=>{const s=Object.values(participants).filter(p=>p.role==="student"),missing=s.filter(p=>!p.zone);if(missing.length){toast(`${missing.length} team(s) have not selected a zone.`,`bad`,3200);return}const c=countZones(),balanced=Object.values(c).every(n=>n===3);if(s.length===12&&!balanced&&!confirm(`Zones are not balanced at 3 groups each.\n🌳 ${c.deforestation}  🌾 ${c.agriculture}  🏭 ${c.industrialisation}  🔥 ${c.openburning}\n\nTransport anyway?`))return;await updateDoc(missionRef,{stage:"investigation",updatedAt:Date.now()});setTimeout(()=>{show("dashboard");renderDashboard()},900)};$("teacherDashboardBtn").onclick=()=>{show("dashboard");renderDashboard()};$("resetSessionBtn").onclick=async()=>{if(role!=="teacher")return;if(!confirm("Reset the complete mission? This clears investigation, quiz and rescue progress."))return;const ss=Object.values(participants).filter(p=>p.role==="student");await Promise.allSettled(ss.map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"lobby",chain:{},x:50,y:50,rescueScore:0,rescueCorrect:0,rescueWrong:0,lastActive:Date.now()})));await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",earthHealth:30,quizHistory:[],quizCompleted:[],rescueFeed:[],updatedAt:Date.now()},{merge:true});investigationOpened=false;transportInProgress=false;lastAutoZone=null;quizRevealLock=false;rescueCardsReady=false;rescueEndLock=false;show("space");toast("Mission reset. Ready for a fresh run.","good",2600)};
+$("teacherNavReset").onclick=()=>$("resetSessionBtn")?.click();
+$("teacherNavDashboard").onclick=()=>{
+  if(role!=="teacher")return;
+  show("dashboard");
+  renderDashboard();
+};
+$("teacherNavNext").onclick=()=>{
+  const action=$("teacherNavNext")._nextAction;
+  if(typeof action==="function")action();
+};
+
 $("lock").onclick=async()=>{if(!hoverZone){toast("Move your avatar inside a zone first.","bad");return}await updateDoc(myRef,{zone:hoverZone,status:"selecting_zone",lastActive:Date.now()});toast(`Zone locked: ${zoneNames[hoverZone]}`,"good")};
 function renderCounts(){const c=countZones();Object.keys(c).forEach(z=>{const e=$(`count-${z}`),box=document.querySelector(`[data-zone="${z}"]`);if(e)e.textContent=`${c[z]} / 3 groups`;box?.classList.toggle("over",c[z]>3)})}
 function renderAvatars(){const layer=$("avatars"),seen=new Set();Object.values(participants).forEach(p=>{seen.add(p.id);let e=document.getElementById(`av-${p.id}`);if(!e){e=document.createElement("div");e.id=`av-${p.id}`;e.className="avatar";e.innerHTML='<div class="face"></div><div class="label"></div>';layer.appendChild(e)}e.classList.toggle("teacher",p.role==="teacher");e.classList.toggle("me",p.id===me?.uid);const eliminated=state.stage==="quiz"&&state.quizPhase==="reveal"&&p.role==="student"&&!(state.quizSurvivors||[]).includes(p.id);e.classList.toggle("eliminated",eliminated);e.querySelector(".face").textContent=p.mascot||"🧑🏻‍🚀";e.querySelector(".label").textContent=(p.role==="teacher"?"Teacher":p.name)+(p.id===me?.uid?" (You)":"");e.style.left=`${p.x??50}%`;e.style.top=`${p.y??50}%`});[...layer.children].forEach(e=>{if(!seen.has(e.id.slice(3)))e.remove()})}
@@ -323,17 +427,70 @@ function renderChain(ch){order.forEach((s,i)=>{const slot=document.querySelector
 async function removeFrom(slot){const p=participants[me.uid],ch={...(p.chain||{})},idx=order.indexOf(slot);for(let i=idx;i<order.length;i++)delete ch[order[i]];await updateDoc(myRef,{chain:ch,status:"investigating",lastActive:Date.now()});renderChain(ch);toast("Choice removed. Downstream steps were reset.","info")}
 
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
-function quizZoneIndex(p){const x=p.x??50,y=p.y??50;return y<50?(x<50?0:1):(x<50?2:3)}
-function renderQuizWorld(){const st=state.stage;if(!(st==="quiz_ready"||st==="quiz"))return;const prompt=$("quizQuestionWorld"),timer=$("quizTimerWorld"),zones=[...document.querySelectorAll("[data-qzone]")];if(st==="quiz_ready"){prompt.textContent="SURVIVAL QUIZ INCOMING — move freely and wait for Teacher Command";timer.textContent="";zones.forEach(z=>{z.textContent="";z.classList.remove("safe","danger")});return}prompt.textContent=state.quizQuestion||"Get ready...";const opts=state.quizOptions||[];zones.forEach((z,i)=>{z.textContent=opts[i]||"";z.classList.remove("safe","danger");if(state.quizPhase==="reveal")z.classList.add(i===state.quizCorrect?"safe":"danger")});if(state.quizPhase==="running"){timer.textContent=Math.max(0,Math.ceil(((state.quizEndsAt||0)-Date.now())/1000));}else if(state.quizPhase==="reveal"){timer.textContent=`${state.quizSurvivorCount||0} / ${state.quizTotal||0} TEAMS SURVIVED`;}else timer.textContent="";renderAvatars()}
+function quizZoneIndex(p){
+  const x=p.x??50,y=p.y??50;
+  // Match the actual visible answer-zone rectangles.
+  // Any position in the middle corridors / outside the four boxes is unsafe.
+  const areas=[
+    {x1:4,x2:47,y1:18,y2:49},
+    {x1:53,x2:96,y1:18,y2:49},
+    {x1:4,x2:47,y1:62,y2:93},
+    {x1:53,x2:96,y1:62,y2:93}
+  ];
+  return areas.findIndex(a=>x>=a.x1&&x<=a.x2&&y>=a.y1&&y<=a.y2);
+}
+function renderQuizWorld(){
+  const st=state.stage;
+  if(!(st==="quiz_ready"||st==="quiz"))return;
+  const prompt=$("quizQuestionWorld"),timer=$("quizTimerWorld"),zones=[...document.querySelectorAll("[data-qzone]")],world=$("world");
+  world.classList.toggle("quizRevealDanger",st==="quiz"&&state.quizPhase==="reveal");
+  if(st==="quiz_ready"){
+    prompt.textContent="SURVIVAL QUIZ INCOMING — move freely and wait for Teacher Command";
+    timer.textContent="";
+    zones.forEach(z=>{z.textContent="";z.classList.remove("safe","danger")});
+    return;
+  }
+  prompt.textContent=state.quizQuestion||"Get ready...";
+  const opts=state.quizOptions||[];
+  zones.forEach((z,i)=>{
+    z.textContent=opts[i]||"";
+    z.classList.remove("safe","danger");
+    if(state.quizPhase==="reveal")z.classList.add(i===state.quizCorrect?"safe":"danger");
+  });
+  if(state.quizPhase==="running"){
+    timer.textContent=Math.max(0,Math.ceil(((state.quizEndsAt||0)-Date.now())/1000));
+  }else if(state.quizPhase==="reveal"){
+    timer.textContent=`${state.quizSurvivorCount||0} / ${state.quizTotal||0} TEAMS SURVIVED`;
+  }else timer.textContent="";
+  renderAvatars();
+}
 function renderQuizTeacher(){if(role!=="teacher")return;const holder=$("quizNumbers");if(!holder.dataset.ready){holder.innerHTML=quizQuestions.map((q,i)=>`<button class="qbtn" data-qi="${i}">${i+1}</button>`).join("");holder.querySelectorAll("[data-qi]").forEach(b=>b.onclick=()=>startQuizQuestion(+b.dataset.qi));holder.dataset.ready="1"}const completed=state.quizCompleted||[];holder.querySelectorAll("[data-qi]").forEach(b=>{const i=+b.dataset.qi;b.classList.toggle("done",completed.includes(i));b.classList.toggle("active",state.quizIndex===i&&state.stage==="quiz");b.disabled=state.quizPhase==="running"});$("teacherQuizProgress").textContent=`${completed.length} / 8 completed`;$("teacherQuizQuestion").textContent=state.stage==="quiz"?(state.quizQuestion||"Choose a question number."):"Choose a question number to begin.";const opts=state.quizOptions||[];$("teacherQuizOptions").innerHTML=opts.map((x,i)=>`<div class="p-4 rounded-xl border ${state.quizPhase==="reveal"?(i===state.quizCorrect?"border-emerald-500 bg-emerald-950":"border-red-800 bg-red-950/30"):"border-slate-600 bg-slate-900"}"><b>${String.fromCharCode(65+i)}.</b> ${esc(x)}</div>`).join("");if(state.quizPhase==="running")$("teacherQuizTimer").textContent=Math.max(0,Math.ceil(((state.quizEndsAt||0)-Date.now())/1000));else $("teacherQuizTimer").textContent="—";$("teacherQuizResult").textContent=state.quizPhase==="reveal"?`${state.quizSurvivorCount||0} / ${state.quizTotal||0} TEAMS SURVIVED`:state.stage==="quiz_ready"?"READY":""}
-async function startQuizQuestion(i){if(role!=="teacher"||state.quizPhase==="running")return;const q=quizQuestions[i],opts=shuffle(q.options),correct=opts.indexOf(q.correct);quizRevealLock=false;await updateDoc(missionRef,{stage:"quiz",quizIndex:i,quizQuestion:q.q,quizOptions:opts,quizCorrect:correct,quizPhase:"running",quizEndsAt:Date.now()+10000,quizSurvivors:[],quizSurvivorCount:0,quizTotal:0,updatedAt:Date.now()})}
+async function startQuizQuestion(i){if(role!=="teacher"||state.quizPhase==="running")return;const q=quizQuestions[i],opts=shuffle(q.options),correct=opts.indexOf(q.correct);quizRevealLock=false;await updateDoc(missionRef,{stage:"quiz",quizIndex:i,quizQuestion:q.q,quizOptions:opts,quizCorrect:correct,quizPhase:"running",quizEndsAt:Date.now()+30000,quizSurvivors:[],quizSurvivorCount:0,quizTotal:0,updatedAt:Date.now()})}
 async function revealQuiz(){if(role!=="teacher"||quizRevealLock||state.stage!=="quiz"||state.quizPhase!=="running")return;quizRevealLock=true;const students=Object.values(participants).filter(p=>p.role==="student"&&!isInactive(p));const survivors=students.filter(p=>quizZoneIndex(p)===state.quizCorrect).map(p=>p.id);const completed=[...new Set([...(state.quizCompleted||[]),state.quizIndex])];const hist=[...(state.quizHistory||[]),{index:state.quizIndex,survived:survivors.length,total:students.length,at:Date.now()}].slice(-20);await updateDoc(missionRef,{quizPhase:"reveal",quizSurvivors:survivors,quizSurvivorCount:survivors.length,quizTotal:students.length,quizCompleted:completed,quizHistory:hist,updatedAt:Date.now()});quizRevealLock=false}
 $("quizModeBtn").onclick=async()=>{if(role!=="teacher")return;await updateDoc(missionRef,{stage:"quiz_ready",quizPhase:"ready",quizIndex:null,quizCompleted:[],quizHistory:[],quizSurvivors:[],updatedAt:Date.now()});toast("Survival Quiz mode activated.","good")};
 $("endQuizBtn").onclick=async()=>{if(role!=="teacher")return;await updateDoc(missionRef,{stage:"post_quiz",quizPhase:"complete",updatedAt:Date.now()})};
 $("postQuizReportsBtn").onclick=()=>{show("dashboard");renderDashboard()};
 $("solutionIntroBtn").onclick=()=>show("solutionIntro");
 
-function playEmergencyWarning(){const key=state.updatedAt||state.stage;if(warningPlayedKey===key)return;warningPlayedKey=key;try{const A=new (AudioContext||webkitAudioContext)(),g=A.createGain();g.gain.value=.035;g.connect(A.destination);[0,.35,.7].forEach((d,j)=>{const o=A.createOscillator();o.type="sawtooth";o.frequency.value=j%2?440:660;o.connect(g);o.start(A.currentTime+d);o.stop(A.currentTime+d+.22)})}catch{};try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Warning. Warning. Earth systems have reached critical condition. Environmental damage is spreading rapidly. Immediate action is required. Young Earth Warriors, prepare for emergency deployment.");u.rate=.88;u.pitch=.82;u.volume=1;speechSynthesis.speak(u)}catch{}}
+function playEmergencyWarning(){
+  const key=state.updatedAt||state.stage;
+  if(warningPlayedKey===key)return;
+  warningPlayedKey=key;
+  // Warning sound only. Teacher reads the storyline aloud.
+  try{
+    const A=new (AudioContext||webkitAudioContext)(),g=A.createGain();
+    g.gain.value=.035;
+    g.connect(A.destination);
+    [0,.35,.7].forEach((d,j)=>{
+      const o=A.createOscillator();
+      o.type="sawtooth";
+      o.frequency.value=j%2?440:660;
+      o.connect(g);
+      o.start(A.currentTime+d);
+      o.stop(A.currentTime+d+.22);
+    });
+  }catch{}
+}
 $("emergencyRescueBtn").onclick=async()=>{if(role!=="teacher")return;const students=Object.values(participants).filter(p=>p.role==="student");await Promise.allSettled(students.map(p=>updateDoc(doc(participantsRef,p.id),{rescueScore:0,rescueCorrect:0,rescueWrong:0,status:"discussion",lastActive:Date.now()})));await updateDoc(missionRef,{stage:"rescue_warning",earthHealth:30,rescueFeed:[],rescueEndsAt:null,rescueStartedAt:null,updatedAt:Date.now()})};
 $("deployRescueBtn").onclick=async()=>{if(role!=="teacher")return;const ends=Date.now()+300000;const students=Object.values(participants).filter(p=>p.role==="student");await Promise.allSettled(students.map(p=>updateDoc(doc(participantsRef,p.id),{status:"choosing_solution",lastActive:Date.now()})));await updateDoc(missionRef,{stage:"rescue",rescueStartedAt:Date.now(),rescueEndsAt:ends,updatedAt:Date.now()})};
 $("endRescueBtn").onclick=()=>endRescue("teacher");
@@ -345,8 +502,88 @@ function openRescueStudent(){if(!rescueCardsReady){rescueCardsReady=true;spawnIn
 function randPos(){return {x:10+Math.random()*80,y:10+Math.random()*45}}
 function spawnInitialRescueCards(){const layer=$("rescueCards");layer.innerHTML="";for(let i=0;i<8;i++)spawnOneRescueCard()}
 function spawnOneRescueCard(){if(state.stage!=="rescue"&&state.stage!=="rescue_warning")return;const sol=solutionBank[Math.floor(Math.random()*solutionBank.length)],p=randPos(),e=document.createElement("div");e.className="solutionCard";e.dataset.sid=sol.id;e.style.left=`${p.x}%`;e.style.top=`${p.y}%`;e.innerHTML=`<div class="text-sky-300 text-[10px] font-black">SOLUTION</div><div class="mt-1">${esc(sol.en)}</div>`;$("rescueCards").appendChild(e)}
-$("rescueWorld").addEventListener("mousemove",e=>{if(role!=="student"||state.stage!=="rescue")return;const r=$("rescueWorld").getBoundingClientRect();rescueLastMouse={x:Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100)),y:Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100)),cx:e.clientX,cy:e.clientY};$("rescueAvatar").style.left=`${rescueLastMouse.x}%`;$("rescueAvatar").style.top=`${rescueLastMouse.y}%`;if(rescueGrabbed){rescueGrabbed.style.left=`${rescueLastMouse.x}%`;rescueGrabbed.style.top=`${rescueLastMouse.y}%`;return}document.querySelectorAll(".solutionCard.hover").forEach(x=>x.classList.remove("hover"));const el=document.elementFromPoint(e.clientX,e.clientY)?.closest(".solutionCard");rescueHover=el||null;if(rescueHover)rescueHover.classList.add("hover")});
-window.addEventListener("keydown",e=>{if((e.key||"").toLowerCase()!=="c"||role!=="student"||state.stage!=="rescue")return;e.preventDefault();if(!rescueGrabbed){if(!rescueHover){toast("Move onto a solution card first.","info",1600);return}rescueGrabbed=rescueHover;rescueGrabbed.classList.add("grabbed");$("rescueHand").textContent="✊🏼";toast("Solution grabbed. Move to PREVENT, REDUCE or REPAIR and press C again.","info",2200);return}const target=[...document.querySelectorAll("[data-rescue-target]")].find(z=>{const r=z.getBoundingClientRect();return rescueLastMouse.cx>=r.left&&rescueLastMouse.cx<=r.right&&rescueLastMouse.cy>=r.top&&rescueLastMouse.cy<=r.bottom});if(!target){toast("Move into a PREVENT, REDUCE or REPAIR zone before dropping.","bad",2000);return}const card=rescueGrabbed;rescueGrabbed=null;$("rescueHand").textContent="✋🏼";submitRescue(card.dataset.sid,target.dataset.rescueTarget,card)});
+$("rescueWorld").addEventListener("mousemove",e=>{
+  if(role!=="student"||state.stage!=="rescue")return;
+  const r=$("rescueWorld").getBoundingClientRect();
+  rescueLastMouse={
+    x:Math.max(1,Math.min(99,(e.clientX-r.left)/r.width*100)),
+    y:Math.max(1,Math.min(99,(e.clientY-r.top)/r.height*100)),
+    cx:e.clientX,
+    cy:e.clientY
+  };
+  $("rescueAvatar").style.left=`${rescueLastMouse.x}%`;
+  $("rescueAvatar").style.top=`${rescueLastMouse.y}%`;
+
+  if(rescueGrabbed){
+    rescueGrabbed.style.left=`${rescueLastMouse.x}%`;
+    rescueGrabbed.style.top=`${rescueLastMouse.y}%`;
+    return;
+  }
+
+  document.querySelectorAll(".solutionCard.hover").forEach(x=>x.classList.remove("hover"));
+
+  // Look through every element under the cursor rather than only the top element.
+  // This avoids the moving avatar or overlapping cards blocking card detection.
+  const stack=document.elementsFromPoint(e.clientX,e.clientY);
+  let el=null;
+  for(const node of stack){
+    const card=node.classList?.contains("solutionCard") ? node : node.closest?.(".solutionCard");
+    if(card && !card.classList.contains("grabbed")){
+      el=card;
+      break;
+    }
+  }
+
+  rescueHover=el||null;
+  if(rescueHover)rescueHover.classList.add("hover");
+});
+window.addEventListener("keydown",e=>{
+  if((e.key||"").toLowerCase()!=="c"||role!=="student"||state.stage!=="rescue")return;
+  e.preventDefault();
+
+  if(!rescueGrabbed){
+    // Re-check what is physically beneath the cursor at the moment C is pressed.
+    if(!rescueHover && Number.isFinite(rescueLastMouse.cx) && Number.isFinite(rescueLastMouse.cy)){
+      const stack=document.elementsFromPoint(rescueLastMouse.cx,rescueLastMouse.cy);
+      for(const node of stack){
+        const card=node.classList?.contains("solutionCard") ? node : node.closest?.(".solutionCard");
+        if(card && !card.classList.contains("grabbed")){
+          rescueHover=card;
+          break;
+        }
+      }
+    }
+
+    if(!rescueHover){
+      toast("Move onto a solution card first.","info",1600);
+      return;
+    }
+
+    rescueGrabbed=rescueHover;
+    rescueHover=null;
+    rescueGrabbed.classList.remove("hover");
+    rescueGrabbed.classList.add("grabbed");
+    $("rescueHand").textContent="✊🏼";
+    toast("Solution grabbed. Move to PREVENT, REDUCE or REPAIR and press C again.","info",2200);
+    return;
+  }
+
+  const target=[...document.querySelectorAll("[data-rescue-target]")].find(z=>{
+    const r=z.getBoundingClientRect();
+    return rescueLastMouse.cx>=r.left&&rescueLastMouse.cx<=r.right&&
+           rescueLastMouse.cy>=r.top&&rescueLastMouse.cy<=r.bottom;
+  });
+
+  if(!target){
+    toast("Move into a PREVENT, REDUCE or REPAIR zone before dropping.","bad",2000);
+    return;
+  }
+
+  const card=rescueGrabbed;
+  rescueGrabbed=null;
+  $("rescueHand").textContent="✋🏼";
+  submitRescue(card.dataset.sid,target.dataset.rescueTarget,card);
+});
 async function submitRescue(id,chosen,cardEl){const sol=solutionBank.find(s=>s.id===id);if(!sol)return;const ok=sol.cat===chosen,delta=ok?.5:-1,team=participants[me?.uid]?.name||names;let newHealth=Number(state.earthHealth??30);const eventMessage=ok?`${team} successfully ${sol.feed} — ${sol.cat} plan executed.`:`${team} misclassified “${sol.en}” as ${chosen}. Correct: ${sol.cat}.`;try{await runTransaction(db,async tx=>{const snap=await tx.get(missionRef),d=snap.data()||{},h=Number(d.earthHealth??30),next=Math.max(0,Math.min(100,h+delta)),feed=[...(d.rescueFeed||[]).slice(-9),{ok,message:eventMessage,team,solution:id,chosen,correct:sol.cat,at:Date.now()}];newHealth=next;tx.update(missionRef,{earthHealth:next,rescueFeed:feed,updatedAt:Date.now()})});const p=participants[me.uid]||{},score=(p.rescueScore||0)+(ok?10:-5);await updateDoc(myRef,{rescueScore:score,rescueCorrect:(p.rescueCorrect||0)+(ok?1:0),rescueWrong:(p.rescueWrong||0)+(ok?0:1),lastActive:Date.now()});cardEl.remove();spawnOneRescueCard();if(ok){beep(true);toast(`Correct: ${sol.cat} • Earth Health +0.5%`,"good",1800)}else{beep(false);showRescueFeedback(sol,chosen)}}catch(err){console.error(err);toast("Could not submit rescue action. Check connection / Firebase rules.","bad",3200)}}
 function showRescueFeedback(sol,chosen){$("feedbackTitle").textContent=`${sol.en} is ${sol.cat}`;$("feedbackEnglish").innerHTML=`<b>You dropped it in ${esc(chosen)}.</b><br>${esc(sol.exEn)}`;$("feedbackBM").textContent=sol.exBm;$("feedbackZH").textContent=sol.exZh;$("rescueFeedback").classList.remove("hidden")}
 $("closeFeedback").onclick=()=>$("rescueFeedback").classList.add("hidden");
@@ -356,7 +593,7 @@ $("reviewSolutionsBtn").onclick=async()=>{if(role==="teacher")await updateDoc(mi
 function renderSolutionReview(){const cats=["PREVENT","REDUCE","REPAIR"],meta={PREVENT:["🛑","prevent"],REDUCE:["⚠️","reduce"],REPAIR:["🔧","repair"]};$("solutionReviewGrid").innerHTML=cats.map(cat=>`<div class="reviewCol ${meta[cat][1]}"><div class="text-3xl font-black">${meta[cat][0]} ${cat}</div>${solutionBank.filter(s=>s.cat===cat).map(s=>`<div class="reviewItem"><div class="font-black">${esc(s.en)}</div><div class="text-xs text-slate-300 mt-1">${esc(s.exEn)}</div></div>`).join("")}</div>`).join("")}
 $("conclusionBtn").onclick=async()=>{if(role==="teacher")await updateDoc(missionRef,{stage:"conclusion",updatedAt:Date.now()})};
 
-setInterval(()=>{if(state.stage==="quiz"){renderQuizWorld();if(role==="teacher"){renderQuizTeacher();if(state.quizPhase==="running"&&Date.now()>=(state.quizEndsAt||0))revealQuiz()}}if(state.stage==="rescue"){if(role==="teacher"){renderRescueTeacher();if((state.earthHealth||0)>=100)endRescue("success");else if(Date.now()>=(state.rescueEndsAt||0))endRescue("time")}else if(role==="student")openRescueStudent()}},250);
+setInterval(()=>{if(role==="teacher")updateTeacherNav();if(state.stage==="quiz"){renderQuizWorld();if(role==="teacher"){renderQuizTeacher();if(state.quizPhase==="running"&&Date.now()>=(state.quizEndsAt||0))revealQuiz()}}if(state.stage==="rescue"){if(role==="teacher"){renderRescueTeacher();if((state.earthHealth||0)>=100)endRescue("success");else if(Date.now()>=(state.rescueEndsAt||0))endRescue("time")}else if(role==="student")openRescueStudent()}},250);
 function statusText(s){return {lobby:"Lobby",selecting_zone:"Selecting Zone",investigating:"Investigating Case",investigation_done:"Investigation Done",quiz:"Survival Quiz",discussion:"Evidence Discussion",choosing_solution:"Choosing Solution",mission_done:"Mission Done"}[s]||s||"Lobby"}
 function inactivitySeconds(p){
   return Math.max(0,Math.floor((Date.now()-(p.lastActive||0))/1000));
