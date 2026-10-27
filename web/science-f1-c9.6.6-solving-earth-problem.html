@@ -112,7 +112,7 @@ body.teacherMode #space .world{height:calc(100vh - 190px)}
 
 <section id="studentReview" class="hidden min-h-screen studentHold flex items-center justify-center p-6"><div class="glass p-8 text-center max-w-3xl"><div class="text-5xl">📋</div><h1 class="text-4xl font-black mt-4">SOLUTION REVIEW</h1><div class="text-xl text-slate-300 mt-4">Follow the Smartboard and review why each action is PREVENT, REDUCE or REPAIR.</div></div></section>
 
-<section id="conclusion" class="hidden min-h-screen p-6 flex items-center justify-center"><div class="max-w-[1450px] w-full"><div class="text-center"><div class="text-emerald-300 text-xs font-black tracking-[.25em]">MISSION EARTH — FINAL CONCLUSION</div><h1 class="text-5xl font-black mt-3">THE EARTH ACTION CHAIN</h1></div><div class="chainConclusion mt-9"><div class="chainStep">HUMAN ACTIVITY</div><div class="bigArrow">→</div><div class="chainStep">WHAT CHANGED?</div><div class="bigArrow">→</div><div class="chainStep">NEGATIVE EFFECT</div><div class="bigArrow">→</div><div class="chainStep">LIVING THINGS</div><div class="bigArrow">→</div><div class="chainStep">PREVENT • REDUCE • REPAIR</div></div><div class="grid md:grid-cols-3 gap-4 mt-8"><div class="glass p-5"><div class="text-2xl font-black">1. Understand the cause</div><div class="text-slate-300 mt-2">One unplanned activity can create more than one environmental change and effect.</div></div><div class="glass p-5"><div class="text-2xl font-black">2. Predict the effect</div><div class="text-slate-300 mt-2">One negative effect may harm humans, animals and plants.</div></div><div class="glass p-5"><div class="text-2xl font-black">3. Choose the right solution</div><div class="text-slate-300 mt-2">PREVENT when possible, REDUCE unavoidable impacts, and REPAIR damage that has occurred.</div></div></div><div class="glass p-6 mt-7 text-center"><div class="text-3xl font-black text-emerald-300">UNDERSTAND THE CAUSE. PREDICT THE EFFECT. CHOOSE THE RIGHT SOLUTION.</div><div class="text-lg mt-4">Every positive environmental action matters—but the action must actually solve the problem.</div><div class="mt-7"><button id="conclusionRestartBtn" class="btn red text-lg px-8 py-4">↺ RESTART MISSION</button><div class="text-xs text-slate-400 mt-3">Resets all teams, quiz/rescue progress and Earth Health, then returns to the lobby.</div></div></div></div></section>
+<section id="conclusion" class="hidden min-h-screen p-6 flex items-center justify-center"><div class="max-w-[1450px] w-full"><div class="text-center"><div class="text-emerald-300 text-xs font-black tracking-[.25em]">MISSION EARTH — FINAL CONCLUSION</div><h1 class="text-5xl font-black mt-3">THE EARTH ACTION CHAIN</h1></div><div class="chainConclusion mt-9"><div class="chainStep">HUMAN ACTIVITY</div><div class="bigArrow">→</div><div class="chainStep">WHAT CHANGED?</div><div class="bigArrow">→</div><div class="chainStep">NEGATIVE EFFECT</div><div class="bigArrow">→</div><div class="chainStep">LIVING THINGS</div><div class="bigArrow">→</div><div class="chainStep">PREVENT • REDUCE • REPAIR</div></div><div class="grid md:grid-cols-3 gap-4 mt-8"><div class="glass p-5"><div class="text-2xl font-black">1. Understand the cause</div><div class="text-slate-300 mt-2">One unplanned activity can create more than one environmental change and effect.</div></div><div class="glass p-5"><div class="text-2xl font-black">2. Predict the effect</div><div class="text-slate-300 mt-2">One negative effect may harm humans, animals and plants.</div></div><div class="glass p-5"><div class="text-2xl font-black">3. Choose the right solution</div><div class="text-slate-300 mt-2">PREVENT when possible, REDUCE unavoidable impacts, and REPAIR damage that has occurred.</div></div></div><div class="glass p-6 mt-7 text-center"><div class="text-3xl font-black text-emerald-300">UNDERSTAND THE CAUSE. PREDICT THE EFFECT. CHOOSE THE RIGHT SOLUTION.</div><div class="text-lg mt-4">Every positive environmental action matters—but the action must actually solve the problem.</div></div></div></section>
 
 <section id="studentConclusion" class="hidden min-h-screen studentHold flex items-center justify-center p-6"><div class="glass p-8 text-center max-w-4xl"><div class="text-5xl">🌍</div><h1 class="text-4xl font-black mt-4">MISSION COMPLETE</h1><div class="text-xl mt-4">Understand the cause. Predict the effect. Choose the right solution.</div><div class="text-slate-400 mt-3">Complete the individual exit ticket when instructed.</div></div></section>
 
@@ -146,8 +146,8 @@ function teacherCurrentScreen(){
 }
 function teacherNextDescriptor(){
   const st=state.stage||"lobby",screen=teacherCurrentScreen();
-  if(st==="lobby")return {label:"START MISSION",action:startMission,kind:"green"};
-  if(st==="zone_selection")return {label:"TRANSPORT WARRIORS",action:transportWarriors,kind:"amber"};
+  if(st==="lobby")return {label:"START MISSION",action:()=>$("start")?.click(),kind:"green"};
+  if(st==="zone_selection")return {label:"TRANSPORT WARRIORS",action:()=>$("transport")?.click(),kind:"amber"};
   if(st==="investigation")return {label:"🧠 START SURVIVAL QUIZ",action:()=>$("quizModeBtn")?.click(),kind:"amber"};
   if(st==="quiz_ready"||st==="quiz")return {label:"END QUIZ → DISCUSSION",action:()=>$("endQuizBtn")?.click(),kind:"green"};
   if(st==="post_quiz"){
@@ -158,7 +158,7 @@ function teacherNextDescriptor(){
   if(st==="rescue")return {label:"END RESCUE",action:()=>$("endRescueBtn")?.click(),kind:"red"};
   if(st==="rescue_result")return {label:"📋 REVIEW ALL SOLUTIONS",action:()=>$("reviewSolutionsBtn")?.click(),kind:"primary"};
   if(st==="solution_review")return {label:"FINAL CONCLUSION →",action:()=>$("conclusionBtn")?.click(),kind:"green"};
-  if(st==="conclusion")return {label:"↺ RESTART MISSION",action:()=>$("conclusionRestartBtn")?.click(),kind:"red"};
+  if(st==="conclusion")return {label:"MISSION COMPLETE",action:null,kind:"slate"};
   return {label:"NEXT ACTION",action:null,kind:"primary"};
 }
 function updateTeacherNav(){
@@ -223,87 +223,9 @@ function updateUI(){
  }
  renderAvatars();
 }
-async function startMission(){
-  if(role!=="teacher")return;
-  try{
-    await updateDoc(missionRef,{stage:"zone_selection",updatedAt:Date.now()});
-    await Promise.allSettled(
-      Object.values(participants)
-        .filter(p=>p.role==="student")
-        .map(p=>updateDoc(doc(participantsRef,p.id),{
-          zone:null,status:"selecting_zone",chain:{},lastActive:Date.now()
-        }))
-    );
-    toast("Mission started. Choose your zones!","good");
-  }catch(e){
-    console.error("Start mission failed",e);
-    toast("Could not start the mission. Check Firebase connection / permissions.","bad",3600);
-  }
-}
-$("start").onclick=startMission;
-
-function countZones(){
-  const c={deforestation:0,agriculture:0,industrialisation:0,openburning:0};
-  Object.values(participants).filter(p=>p.role==="student").forEach(p=>{
-    if(c[p.zone]!==undefined)c[p.zone]++;
-  });
-  return c;
-}
-
-async function transportWarriors(){
-  if(role!=="teacher")return;
-
-  if(state.stage!=="zone_selection"){
-    toast(`Transport is only available during Zone Selection. Current stage: ${stageLabel(state.stage||"lobby")}.`,"bad",3200);
-    return;
-  }
-
-  const students=Object.values(participants).filter(p=>p.role==="student");
-  if(!students.length){
-    toast("No student teams are currently connected.","bad",3000);
-    return;
-  }
-
-  const missing=students.filter(p=>!p.zone);
-  if(missing.length){
-    const names=missing.slice(0,4).map(p=>p.name||"Unnamed").join(", ");
-    toast(`${missing.length} team(s) have not selected a zone${names?`: ${names}`:""}.`,`bad`,4200);
-    return;
-  }
-
-  const c=countZones();
-  const balanced=Object.values(c).every(n=>n===3);
-  if(students.length===12&&!balanced){
-    const ok=confirm(
-      `Zones are not balanced at 3 groups each.\n`+
-      `🌳 ${c.deforestation}  🌾 ${c.agriculture}  🏭 ${c.industrialisation}  🔥 ${c.openburning}\n\n`+
-      `Transport anyway?`
-    );
-    if(!ok)return;
-  }
-
-  try{
-    // Write the stage directly. Student listeners will immediately trigger transportMe().
-    await updateDoc(missionRef,{
-      stage:"investigation",
-      transportNonce:Date.now(),
-      updatedAt:Date.now()
-    });
-    toast("Transport command sent to all teams.","good",2200);
-
-    // Keep teacher navigation usable even if dashboard rendering is delayed.
-    setTimeout(()=>{
-      if(role==="teacher"){
-        show("dashboard");
-        renderDashboard();
-      }
-    },700);
-  }catch(e){
-    console.error("Transport Warriors failed",e);
-    toast("Transport failed. Check Firebase connection / permissions and try again.","bad",4200);
-  }
-}
-$("transport").onclick=transportWarriors;$("teacherDashboardBtn").onclick=()=>{show("dashboard");renderDashboard()};$("resetSessionBtn").onclick=async()=>{if(role!=="teacher")return;if(!confirm("Reset the complete mission? This clears investigation, quiz and rescue progress."))return;const ss=Object.values(participants).filter(p=>p.role==="student");await Promise.allSettled(ss.map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"lobby",chain:{},x:50,y:50,rescueScore:0,rescueCorrect:0,rescueWrong:0,lastActive:Date.now()})));await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",earthHealth:30,quizHistory:[],quizCompleted:[],rescueFeed:[],updatedAt:Date.now()},{merge:true});investigationOpened=false;transportInProgress=false;lastAutoZone=null;quizRevealLock=false;rescueCardsReady=false;rescueEndLock=false;show("space");toast("Mission reset. Ready for a fresh run.","good",2600)};
+$("start").onclick=async()=>{await updateDoc(missionRef,{stage:"zone_selection",updatedAt:Date.now()});await Promise.allSettled(Object.values(participants).filter(p=>p.role==="student").map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"selecting_zone",chain:{},lastActive:Date.now()})));toast("Mission started. Choose your zones!","good")};
+function countZones(){const c={deforestation:0,agriculture:0,industrialisation:0,openburning:0};Object.values(participants).filter(p=>p.role==="student").forEach(p=>{if(c[p.zone]!==undefined)c[p.zone]++});return c}
+$("transport").onclick=async()=>{const s=Object.values(participants).filter(p=>p.role==="student"),missing=s.filter(p=>!p.zone);if(missing.length){toast(`${missing.length} team(s) have not selected a zone.`,`bad`,3200);return}const c=countZones(),balanced=Object.values(c).every(n=>n===3);if(s.length===12&&!balanced&&!confirm(`Zones are not balanced at 3 groups each.\n🌳 ${c.deforestation}  🌾 ${c.agriculture}  🏭 ${c.industrialisation}  🔥 ${c.openburning}\n\nTransport anyway?`))return;await updateDoc(missionRef,{stage:"investigation",updatedAt:Date.now()});setTimeout(()=>{show("dashboard");renderDashboard()},900)};$("teacherDashboardBtn").onclick=()=>{show("dashboard");renderDashboard()};$("resetSessionBtn").onclick=async()=>{if(role!=="teacher")return;if(!confirm("Reset the complete mission? This clears investigation, quiz and rescue progress."))return;const ss=Object.values(participants).filter(p=>p.role==="student");await Promise.allSettled(ss.map(p=>updateDoc(doc(participantsRef,p.id),{zone:null,status:"lobby",chain:{},x:50,y:50,rescueScore:0,rescueCorrect:0,rescueWrong:0,lastActive:Date.now()})));await setDoc(missionRef,{missionId:mission,stage:"lobby",earthStatus:"critical",earthHealth:30,quizHistory:[],quizCompleted:[],rescueFeed:[],updatedAt:Date.now()},{merge:true});investigationOpened=false;transportInProgress=false;lastAutoZone=null;quizRevealLock=false;rescueCardsReady=false;rescueEndLock=false;show("space");toast("Mission reset. Ready for a fresh run.","good",2600)};
 $("teacherNavReset").onclick=()=>$("resetSessionBtn")?.click();
 $("teacherNavDashboard").onclick=()=>{
   if(role!=="teacher")return;
@@ -670,7 +592,6 @@ function renderRescueResult(){const h=Number(state.earthHealth??30),hs=healthSta
 $("reviewSolutionsBtn").onclick=async()=>{if(role==="teacher")await updateDoc(missionRef,{stage:"solution_review",updatedAt:Date.now()})};
 function renderSolutionReview(){const cats=["PREVENT","REDUCE","REPAIR"],meta={PREVENT:["🛑","prevent"],REDUCE:["⚠️","reduce"],REPAIR:["🔧","repair"]};$("solutionReviewGrid").innerHTML=cats.map(cat=>`<div class="reviewCol ${meta[cat][1]}"><div class="text-3xl font-black">${meta[cat][0]} ${cat}</div>${solutionBank.filter(s=>s.cat===cat).map(s=>`<div class="reviewItem"><div class="font-black">${esc(s.en)}</div><div class="text-xs text-slate-300 mt-1">${esc(s.exEn)}</div></div>`).join("")}</div>`).join("")}
 $("conclusionBtn").onclick=async()=>{if(role==="teacher")await updateDoc(missionRef,{stage:"conclusion",updatedAt:Date.now()})};
-$("conclusionRestartBtn").onclick=()=>{if(role!=="teacher")return;$("resetSessionBtn")?.click()};
 
 setInterval(()=>{if(role==="teacher")updateTeacherNav();if(state.stage==="quiz"){renderQuizWorld();if(role==="teacher"){renderQuizTeacher();if(state.quizPhase==="running"&&Date.now()>=(state.quizEndsAt||0))revealQuiz()}}if(state.stage==="rescue"){if(role==="teacher"){renderRescueTeacher();if((state.earthHealth||0)>=100)endRescue("success");else if(Date.now()>=(state.rescueEndsAt||0))endRescue("time")}else if(role==="student")openRescueStudent()}},250);
 function statusText(s){return {lobby:"Lobby",selecting_zone:"Selecting Zone",investigating:"Investigating Case",investigation_done:"Investigation Done",quiz:"Survival Quiz",discussion:"Evidence Discussion",choosing_solution:"Choosing Solution",mission_done:"Mission Done"}[s]||s||"Lobby"}
