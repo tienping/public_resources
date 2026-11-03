@@ -136,6 +136,20 @@
                     </div>
                     <input type="range" id="thresholdSlider" min="0" max="100" value="50">
                     <p class="text-sm text-gray-500 mt-4 text-center">Alarm triggers and life deducts if noise exceeds this limit.</p>
+
+                    <div class="border-t border-gray-200 pt-6 mt-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <label for="sustainSlider" class="text-base font-semibold text-gray-700">Sustain Time (Seconds)</label>
+                            <span id="sustainValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-yellow-600 border border-yellow-100">2.0s</span>
+                        </div>
+                        <input type="range" id="sustainSlider" min="0" max="10" step="0.5" value="2">
+                        
+                        <!-- Sustain Timer Progress -->
+                        <div class="mt-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                            <div id="sustainBar" class="h-full bg-yellow-400 w-0 transition-all duration-200 ease-linear" style="width: 0%;"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-3 text-center">Noise must stay above threshold continuously to trigger.</p>
+                    </div>
                 </div>
             </div>
             
@@ -158,6 +172,9 @@
         const thresholdSlider = document.getElementById('thresholdSlider');
         const thresholdValueDisplay = document.getElementById('thresholdValue');
         const thresholdMarker = document.getElementById('thresholdMarker');
+        const sustainSlider = document.getElementById('sustainSlider');
+        const sustainValueDisplay = document.getElementById('sustainValue');
+        const sustainBar = document.getElementById('sustainBar');
         const errorContainer = document.getElementById('errorContainer');
         const livesValueDisplay = document.getElementById('livesValue');
         const addLifeBtn = document.getElementById('addLifeBtn');
@@ -169,8 +186,10 @@
         let updateInterval = null;
         let isMonitoring = false;
         let currentThreshold = localStorage.getItem('spd_threshold') !== null ? parseInt(localStorage.getItem('spd_threshold')) : 50;
+        let sustainTime = localStorage.getItem('spd_sustain') !== null ? parseFloat(localStorage.getItem('spd_sustain')) : 2.0;
         let lives = localStorage.getItem('spd_lives') !== null ? parseInt(localStorage.getItem('spd_lives')) : 20;
         let gracePeriodEnd = 0;
+        let accumulatedSustain = 0;
         let isPenaltyActive = false;
         let penaltyTimeout = null;
         let penaltyOscillator = null;
@@ -187,6 +206,9 @@
         thresholdMarker.style.left = `${currentThreshold}%`;
         livesValueDisplay.textContent = lives;
 
+        sustainSlider.value = sustainTime;
+        sustainValueDisplay.textContent = sustainTime.toFixed(1) + 's';
+
         // Helper to update lives and persist them
         function updateLives(newLives) {
             lives = newLives;
@@ -199,6 +221,15 @@
             thresholdValueDisplay.textContent = currentThreshold;
             thresholdMarker.style.left = `${currentThreshold}%`;
             localStorage.setItem('spd_threshold', currentThreshold);
+        });
+
+        sustainSlider.addEventListener('input', (e) => {
+            sustainTime = parseFloat(e.target.value);
+            sustainValueDisplay.textContent = sustainTime.toFixed(1) + 's';
+            localStorage.setItem('spd_sustain', sustainTime);
+            // Reset accumulated if setting changes
+            accumulatedSustain = 0;
+            sustainBar.style.width = '0%';
         });
 
         addLifeBtn.addEventListener('click', () => {
@@ -286,6 +317,9 @@
             // Reset UI
             toggleUIState(false);
             resetDisplay();
+            
+            accumulatedSustain = 0;
+            if (sustainBar) sustainBar.style.width = '0%';
         }
 
         /**
@@ -345,26 +379,47 @@
             // Handle Grace Period Cooldown
             if (now < gracePeriodEnd && lives > 0) {
                 setAlertUI(false, 'Grace Period (2s)', true);
+                accumulatedSustain = 0;
+                sustainBar.style.width = '0%';
                 return;
             }
 
-            // Check against Threshold
+            // Check against Threshold continuously with Sustain Timer
             if (volumeLevel > currentThreshold) {
-                if (lives > 0) {
-                    updateLives(lives - 1);
-                    
-                    if (lives === 0) {
-                        triggerPenaltyAlarm();
-                        setAlertUI(true, 'PENALTY: 10S ALARM!');
+                accumulatedSustain += UPDATE_INTERVAL_MS;
+                const sustainTargetMs = sustainTime * 1000;
+                
+                // Update sustain progress bar visual
+                let sustainPercent = sustainTargetMs === 0 ? 100 : (accumulatedSustain / sustainTargetMs) * 100;
+                sustainBar.style.width = `${Math.min(100, sustainPercent)}%`;
+
+                if (accumulatedSustain >= sustainTargetMs) {
+                    // Sustained long enough, trigger alarm
+                    accumulatedSustain = 0;
+                    sustainBar.style.width = '0%';
+
+                    if (lives > 0) {
+                        updateLives(lives - 1);
+                        
+                        if (lives === 0) {
+                            triggerPenaltyAlarm();
+                            setAlertUI(true, 'PENALTY: 10S ALARM!');
+                        } else {
+                            triggerAlarm();
+                            gracePeriodEnd = Date.now() + 2000; // Trigger 2s grace period cooldown
+                            setAlertUI(true, 'Pollution Detected!');
+                        }
                     } else {
-                        triggerAlarm();
-                        gracePeriodEnd = Date.now() + 2000; // Trigger 2s grace period cooldown
-                        setAlertUI(true, 'Pollution Detected!');
+                        setAlertUI(true, '0 LIVES');
                     }
                 } else {
-                    setAlertUI(true, '0 LIVES');
+                    setAlertUI(false, 'Warning: High Noise!');
                 }
             } else {
+                // Sound dropped below threshold, reset timer
+                accumulatedSustain = 0;
+                sustainBar.style.width = '0%';
+
                 if (lives === 0) {
                     setAlertUI(false, '0 LIVES');
                 } else {
@@ -515,6 +570,9 @@
             levelValueDisplay.classList.remove('text-red-600', 'text-yellow-600');
             levelValueDisplay.classList.add('text-gray-800');
             
+            accumulatedSustain = 0;
+            if(sustainBar) sustainBar.style.width = '0%';
+
             statusText.textContent = 'Standby';
             statusText.className = 'mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full';
         }
