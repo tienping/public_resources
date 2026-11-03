@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound Pollution Detector</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for animations and specific visual tweaks */
+        .pulse-alert {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        /* Custom slider styling for a modern look */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #3b82f6;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans text-gray-800">
+
+    <div id="appContainer" class="bg-white rounded-3xl shadow-xl w-full max-w-5xl p-8 transition-all duration-300 border-2 border-transparent">
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4 text-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900">Sound Detector</h1>
+            <p class="text-sm text-gray-500 mt-1">Monitor surrounding noise levels</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8 w-full">
+            
+            <!-- Side Panel: Lives & Controls -->
+            <div class="w-full md:w-1/3 flex flex-col gap-6">
+                <!-- Lives Display -->
+                <div class="flex flex-col items-center justify-center p-6 bg-red-50 rounded-3xl border border-red-100 shadow-inner relative overflow-hidden">
+                    <div class="flex items-center gap-2 mb-2 z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span class="text-red-700 font-bold tracking-wide uppercase text-sm">Lives Remaining</span>
+                    </div>
+                    <span id="livesValue" class="text-[6rem] leading-none font-black text-red-600 transition-transform duration-200 z-10 my-2">20</span>
+                    <span class="text-xs text-red-500/80 font-bold mb-5 z-10 text-center bg-white/50 px-3 py-1 rounded-full">+1 Life every 60s</span>
+                    <button id="addLifeBtn" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-4 px-4 rounded-xl shadow transition-all active:scale-95 z-10">
+                        +1 Life Manually
+                    </button>
+                    <!-- Decorative background element -->
+                    <svg class="absolute -bottom-10 -right-10 text-red-100 w-48 h-48 opacity-50 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+
+                <!-- Controls: Buttons -->
+                <div class="flex flex-col gap-3 mt-auto">
+                    <button id="startBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 px-6 rounded-2xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                        Start Monitoring
+                    </button>
+                    <button id="stopBtn" disabled class="w-full bg-gray-200 text-gray-500 font-bold py-5 px-6 rounded-2xl transition-all cursor-not-allowed flex items-center justify-center gap-2 opacity-70">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+                        </svg>
+                        Stop
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Panel: Level & Visuals -->
+            <div class="w-full md:w-2/3 flex flex-col justify-center">
+                <!-- Main Display: Numerical Level -->
+                <div class="flex flex-col items-center justify-center mb-10">
+                    <div class="relative flex items-end">
+                        <span id="levelValue" class="text-[10rem] md:text-[14rem] leading-none font-extrabold tracking-tighter text-gray-800 transition-colors duration-200">0</span>
+                        <span class="text-3xl font-medium text-gray-400 mb-6 ml-2">lvl</span>
+                    </div>
+                    <div id="statusText" class="mt-6 text-lg font-semibold uppercase tracking-wider text-gray-400 bg-gray-100 px-6 py-2 rounded-full">
+                        Standby
+                    </div>
+                </div>
+
+                <!-- Visual Level Bar -->
+                <div class="mb-8 relative">
+                    <div class="w-full h-10 bg-gray-200 rounded-full overflow-hidden relative shadow-inner">
+                        <!-- Dynamic progress bar -->
+                        <div id="levelBar" class="h-full bg-blue-500 w-0 transition-all duration-200 ease-out" style="width: 0%;"></div>
+                        
+                        <!-- Threshold Marker Overlay -->
+                        <div id="thresholdMarker" class="absolute top-0 bottom-0 w-1.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)] z-10 transition-all duration-200" style="left: 70%;"></div>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-400 mt-3 font-medium px-2">
+                        <span>0</span>
+                        <span>50</span>
+                        <span>100</span>
+                    </div>
+                </div>
+
+                <!-- Controls: Slider -->
+                <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <label for="thresholdSlider" class="text-base font-semibold text-gray-700">Alarm Threshold</label>
+                        <span id="thresholdValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-red-500 border border-red-100">50</span>
+                    </div>
+                    <input type="range" id="thresholdSlider" min="0" max="100" value="50">
+                    <p class="text-sm text-gray-500 mt-4 text-center">Alarm triggers and life deducts if noise exceeds this limit.</p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Error Message Container -->
+        <div id="errorContainer" class="hidden mt-6 text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-200 text-center"></div>
+
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // DOM Elements
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const levelValueDisplay = document.getElementById('levelValue');
+        const levelBar = document.getElementById('levelBar');
+        const statusText = document.getElementById('statusText');
+        const appContainer = document.getElementById('appContainer');
+        const thresholdSlider = document.getElementById('thresholdSlider');
+        const thresholdValueDisplay = document.getElementById('thresholdValue');
+        const thresholdMarker = document.getElementById('thresholdMarker');
+        const errorContainer = document.getElementById('errorContainer');
+        const livesValueDisplay = document.getElementById('livesValue');
+        const addLifeBtn = document.getElementById('addLifeBtn');
+
+        // State Variables
+        let audioContext = null;
+        let analyser = null;
+        let microphoneStream = null;
+        let updateInterval = null;
+        let isMonitoring = false;
+        let currentThreshold = localStorage.getItem('spd_threshold') !== null ? parseInt(localStorage.getItem('spd_threshold')) : 50;
+        let lives = localStorage.getItem('spd_lives') !== null ? parseInt(localStorage.getItem('spd_lives')) : 20;
+        let gracePeriodEnd = 0;
+        let isPenaltyActive = false;
+        let penaltyTimeout = null;
+        let penaltyOscillator = null;
+        let penaltyGainNode = null;
+        let regenInterval = null;
+        
+        // Constants
+        const UPDATE_INTERVAL_MS = 200; // Update every 0.2s
+
+        // Initialization & Event Listeners
+        // Initialize UI with cached values
+        thresholdSlider.value = currentThreshold;
+        thresholdValueDisplay.textContent = currentThreshold;
+        thresholdMarker.style.left = `${currentThreshold}%`;
+        livesValueDisplay.textContent = lives;
+
+        // Helper to update lives and persist them
+        function updateLives(newLives) {
+            lives = newLives;
+            livesValueDisplay.textContent = lives;
+            localStorage.setItem('spd_lives', lives);
+        }
+
+        thresholdSlider.addEventListener('input', (e) => {
+            currentThreshold = parseInt(e.target.value);
+            thresholdValueDisplay.textContent = currentThreshold;
+            thresholdMarker.style.left = `${currentThreshold}%`;
+            localStorage.setItem('spd_threshold', currentThreshold);
+        });
+
+        addLifeBtn.addEventListener('click', () => {
+            updateLives(lives + 1);
+            // Briefly animate the lives display
+            livesValueDisplay.classList.add('scale-150');
+            setTimeout(() => livesValueDisplay.classList.remove('scale-150'), 200);
+            
+            // If user adds life during a 0 life state, clear the 0 life status text
+            if (!isPenaltyActive && lives > 0 && isMonitoring) {
+                 setAlertUI(false, 'Monitoring...');
+            }
+        });
+
+        startBtn.addEventListener('click', startMonitoring);
+        stopBtn.addEventListener('click', stopMonitoring);
+
+        /**
+         * Requests microphone access and sets up the Web Audio API nodes.
+         */
+        async function startMonitoring() {
+            try {
+                // Clear previous errors
+                errorContainer.classList.add('hidden');
+                
+                // Request Mic access
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                microphoneStream = stream;
+
+                // Handle AudioContext creation (fallback for older Safari)
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+
+                // Setup analyser node
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256; // Defines array size for frequency data (128 bins)
+                analyser.smoothingTimeConstant = 0.4; // Slightly smooth out abrupt changes
+
+                // Connect microphone to analyser
+                const source = audioContext.createMediaStreamSource(stream);
+                source.connect(analyser);
+                // Note: We do NOT connect analyser to audioContext.destination to avoid feedback loops
+
+                // Update UI state
+                isMonitoring = true;
+                toggleUIState(true);
+
+                // Start the loops
+                updateInterval = setInterval(processAudioLevel, UPDATE_INTERVAL_MS);
+                regenInterval = setInterval(regenerateLife, 60000); // 60s life regen
+
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+                showError('Microphone access denied or unavailable. Please check permissions.');
+            }
+        }
+
+        /**
+         * Stops the microphone and clears intervals.
+         */
+        function stopMonitoring() {
+            isMonitoring = false;
+            
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+            if (regenInterval) {
+                clearInterval(regenInterval);
+                regenInterval = null;
+            }
+
+            if (microphoneStream) {
+                microphoneStream.getTracks().forEach(track => track.stop());
+                microphoneStream = null;
+            }
+
+            stopPenaltyAlarm(); // ensure penalty stops when overall stop is clicked
+
+            if (audioContext && audioContext.state !== 'closed') {
+                audioContext.close();
+                audioContext = null;
+            }
+
+            // Reset UI
+            toggleUIState(false);
+            resetDisplay();
+        }
+
+        /**
+         * Automatically adds 1 life based on the 60s timer.
+         */
+        function regenerateLife() {
+            if (!isMonitoring) return;
+            updateLives(lives + 1);
+            
+            // Brief pop animation
+            livesValueDisplay.classList.add('scale-125');
+            setTimeout(() => livesValueDisplay.classList.remove('scale-125'), 200);
+            
+            // Clear '0 LIVES' status if no penalty is active
+            if (!isPenaltyActive && lives > 0) {
+                 setAlertUI(false, 'Monitoring...');
+            }
+        }
+
+        /**
+         * Calculates current volume from the analyser and updates UI/triggers alarms.
+         */
+        function processAudioLevel() {
+            if (!isMonitoring || !analyser) return;
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            // Get frequency data
+            analyser.getByteFrequencyData(dataArray);
+
+            // Calculate average volume
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            let average = sum / bufferLength;
+
+            // Map the average (0-255) to a more intuitive 0-100 scale.
+            // Human voice/room noise normally doesn't hit 255 easily without multiplier.
+            // Multiplier 1.5 boosts sensitivity so normal sounds map nicely to the 0-100 range.
+            let volumeLevel = Math.round((average / 255) * 100 * 1.5);
+            
+            // Clamp between 0 and 100
+            volumeLevel = Math.max(0, Math.min(100, volumeLevel));
+
+            // Update UI
+            updateDisplay(volumeLevel);
+
+            if (isPenaltyActive) {
+                // If in 10-second penalty, don't trigger regular alarms or deduct lives
+                return;
+            }
+            
+            const now = Date.now();
+            
+            // Handle Grace Period Cooldown
+            if (now < gracePeriodEnd && lives > 0) {
+                setAlertUI(false, 'Grace Period (2s)', true);
+                return;
+            }
+
+            // Check against Threshold
+            if (volumeLevel > currentThreshold) {
+                if (lives > 0) {
+                    updateLives(lives - 1);
+                    
+                    if (lives === 0) {
+                        triggerPenaltyAlarm();
+                        setAlertUI(true, 'PENALTY: 10S ALARM!');
+                    } else {
+                        triggerAlarm();
+                        gracePeriodEnd = Date.now() + 2000; // Trigger 2s grace period cooldown
+                        setAlertUI(true, 'Pollution Detected!');
+                    }
+                } else {
+                    setAlertUI(true, '0 LIVES');
+                }
+            } else {
+                if (lives === 0) {
+                    setAlertUI(false, '0 LIVES');
+                } else {
+                    setAlertUI(false, 'Monitoring...');
+                }
+            }
+        }
+
+        /**
+         * Synthesizes a loud "beep" using the oscillator node.
+         */
+        function triggerAlarm() {
+            if (!audioContext) return;
+            
+            // Create oscillator and gain nodes
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            // Setup type and pitch (square wave sounds more like an alarm)
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // 880Hz (A5)
+
+            // Setup volume envelope (quick attack, short decay)
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            // Ramp up quickly
+            gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.05);
+            // Ramp down smoothly
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+
+            // Connect graph: Osc -> Gain -> Destination(Speakers)
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Play the beep
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.35); // Stop slightly after decay
+        }
+
+        /**
+         * Triggers the continuous 10-second penalty alarm when lives hit 0.
+         */
+        function triggerPenaltyAlarm() {
+            if (!audioContext) return;
+            isPenaltyActive = true;
+
+            penaltyOscillator = audioContext.createOscillator();
+            penaltyGainNode = audioContext.createGain();
+
+            penaltyOscillator.type = 'sawtooth'; // Harsher sound for penalty
+            penaltyOscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A4
+            
+            // Add a continuous sirening/wobble effect
+            penaltyOscillator.frequency.linearRampToValueAtTime(880, audioContext.currentTime + 5);
+            penaltyOscillator.frequency.linearRampToValueAtTime(440, audioContext.currentTime + 10);
+
+            penaltyGainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+
+            penaltyOscillator.connect(penaltyGainNode);
+            penaltyGainNode.connect(audioContext.destination);
+
+            penaltyOscillator.start();
+
+            penaltyTimeout = setTimeout(() => {
+                stopPenaltyAlarm();
+            }, 10000); // 10 seconds
+        }
+
+        /**
+         * Stops the continuous penalty alarm.
+         */
+        function stopPenaltyAlarm() {
+            if (penaltyTimeout) {
+                clearTimeout(penaltyTimeout);
+                penaltyTimeout = null;
+            }
+            if (penaltyOscillator) {
+                try { penaltyOscillator.stop(); } catch(e) {}
+                penaltyOscillator.disconnect();
+                penaltyOscillator = null;
+            }
+            if (penaltyGainNode) {
+                penaltyGainNode.disconnect();
+                penaltyGainNode = null;
+            }
+            isPenaltyActive = false;
+            
+            if (isMonitoring && lives > 0) {
+                setAlertUI(false, 'Monitoring...');
+            } else if (isMonitoring && lives === 0) {
+                setAlertUI(false, '0 LIVES');
+            }
+        }
+
+        /**
+         * Updates the numerical and visual bar displays.
+         * @param {number} level - Calculated volume 0-100
+         */
+        function updateDisplay(level) {
+            levelValueDisplay.textContent = level;
+            levelBar.style.width = `${level}%`;
+
+            // Adjust bar color based on closeness to threshold
+            if (level > currentThreshold) {
+                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-red-500';
+            } else if (level > currentThreshold * 0.8) {
+                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-yellow-400';
+            } else {
+                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-blue-500';
+            }
+        }
+
+        /**
+         * Modifies styling based on whether pollution is detected.
+         */
+        function setAlertUI(isAlerting, text = 'Pollution Detected!', isGracePeriod = false) {
+            // Clean up states
+            appContainer.classList.remove('border-red-500', 'pulse-alert', 'border-yellow-400');
+            levelValueDisplay.classList.remove('text-red-600', 'text-yellow-600');
+            levelValueDisplay.classList.add('text-gray-800');
+
+            if (isGracePeriod) {
+                appContainer.classList.add('border-yellow-400');
+                levelValueDisplay.classList.replace('text-gray-800', 'text-yellow-600');
+                
+                statusText.textContent = text;
+                statusText.className = 'mt-4 text-sm font-bold uppercase tracking-wider text-yellow-600 bg-yellow-100 px-4 py-1 rounded-full text-center';
+            } else if (isAlerting) {
+                appContainer.classList.add('border-red-500', 'pulse-alert');
+                levelValueDisplay.classList.replace('text-gray-800', 'text-red-600');
+                
+                statusText.textContent = text;
+                statusText.className = 'mt-4 text-sm font-bold uppercase tracking-wider text-red-600 bg-red-100 px-4 py-1 rounded-full text-center';
+            } else {
+                statusText.textContent = text;
+                statusText.className = 'mt-4 text-sm font-semibold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-center';
+            }
+        }
+
+        /**
+         * Resets the display to default 0 states.
+         */
+        function resetDisplay() {
+            levelValueDisplay.textContent = '0';
+            levelBar.style.width = '0%';
+            levelBar.className = 'h-full bg-blue-500 w-0 transition-all duration-200 ease-out';
+            
+            appContainer.classList.remove('border-red-500', 'pulse-alert', 'border-yellow-400');
+            levelValueDisplay.classList.remove('text-red-600', 'text-yellow-600');
+            levelValueDisplay.classList.add('text-gray-800');
+            
+            statusText.textContent = 'Standby';
+            statusText.className = 'mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full';
+        }
+
+        /**
+         * Toggles enabled/disabled states of buttons.
+         */
+        function toggleUIState(monitoring) {
+            if (monitoring) {
+                startBtn.disabled = true;
+                startBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+                startBtn.classList.replace('text-white', 'text-gray-500');
+                startBtn.classList.replace('hover:bg-blue-700', 'cursor-not-allowed');
+                startBtn.classList.add('opacity-70');
+
+                stopBtn.disabled = false;
+                stopBtn.classList.replace('bg-gray-200', 'bg-red-500');
+                stopBtn.classList.replace('text-gray-500', 'text-white');
+                stopBtn.classList.replace('cursor-not-allowed', 'hover:bg-red-600');
+                stopBtn.classList.remove('opacity-70');
+            } else {
+                startBtn.disabled = false;
+                startBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+                startBtn.classList.replace('text-gray-500', 'text-white');
+                startBtn.classList.replace('cursor-not-allowed', 'hover:bg-blue-700');
+                startBtn.classList.remove('opacity-70');
+
+                stopBtn.disabled = true;
+                stopBtn.classList.replace('bg-red-500', 'bg-gray-200');
+                stopBtn.classList.replace('text-white', 'text-gray-500');
+                stopBtn.classList.replace('hover:bg-red-600', 'cursor-not-allowed');
+                stopBtn.classList.add('opacity-70');
+            }
+        }
+
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
