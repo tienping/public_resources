@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
+    <title>QR Code Studio | Gen & Scan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -30,7 +31,7 @@
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
         }
         
-        /* Ensure QR code scales beautifully within its box */
+        /* Generator QR code scaling */
         #qrcode {
             display: flex;
             align-items: center;
@@ -56,98 +57,200 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Scanner Reader overrides for cleaner UI */
+        #reader {
+            border: none !important;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        #reader video {
+            border-radius: 1rem;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-purple-50 min-h-screen flex flex-col items-center justify-center p-4 sm:p-8">
 
     <!-- Main Container -->
-    <div class="max-w-4xl w-full bg-white rounded-[2rem] shadow-2xl shadow-indigo-100/50 overflow-hidden flex flex-col md:flex-row border border-slate-100/60">
+    <div class="max-w-4xl w-full bg-white rounded-[2rem] shadow-2xl shadow-indigo-100/50 overflow-hidden flex flex-col border border-slate-100/60">
         
-        <!-- Left Panel: Input, Preview & Download -->
-        <div class="w-full md:w-[55%] p-8 lg:p-10 flex flex-col bg-white relative border-b md:border-b-0 md:border-r border-slate-100">
-            
-            <h1 class="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
-                <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
-                    <i data-lucide="qr-code" class="w-6 h-6"></i>
-                </div>
-                QRGEN
-            </h1>
-            <p class="text-slate-500 mb-4 text-sm font-medium italic">Used by Cg Lim.</p>
-
-            <!-- Content Input -->
-            <div class="mb-3 w-full">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">URL or Text</label>
-                <textarea id="url-input" rows="3" placeholder="https://example.com" 
-                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none text-slate-700 shadow-sm"></textarea>
-            </div>
-
-            <!-- Download Action -->
-            <button id="download-btn" disabled class="mb-3 w-full bg-slate-900 hover:bg-indigo-600 text-white font-semibold py-3.5 px-8 rounded-xl shadow-xl shadow-slate-200 hover:shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed group active:scale-95">
-                <i data-lucide="download" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
-                Download PNG
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-slate-100 bg-slate-50/50 relative">
+            <button id="btn-tab-gen" class="flex-1 py-4 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white flex items-center justify-center gap-2 transition-all">
+                <i data-lucide="qr-code" class="w-5 h-5"></i> Generate
             </button>
+            <button id="btn-tab-scan" class="flex-1 py-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all">
+                <i data-lucide="scan" class="w-5 h-5"></i> Scan
+            </button>
+        </div>
 
-            <!-- QR Code Display Box -->
-            <div class="bg-slate-50 mx-auto w-full max-w-[280px] aspect-square rounded-[1.5rem] flex items-center justify-center p-4 relative overflow-hidden shadow-inner border-2 border-slate-100 transition-all duration-300" id="qr-wrapper">
-                
-                <!-- Placeholder State -->
-                <div id="placeholder" class="text-center text-slate-400 absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300">
-                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 shadow-sm border border-slate-200/50">
-                        <i data-lucide="qr-code" class="w-8 h-8 text-slate-300"></i>
+        <!-- ==================== TAB 1: QRGEN ==================== -->
+        <div id="tab-gen" class="flex flex-col md:flex-row w-full">
+            <!-- Left Panel: Input, Preview & Download -->
+            <div class="w-full md:w-[55%] p-8 lg:p-10 flex flex-col bg-white relative border-b md:border-b-0 md:border-r border-slate-100">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <i data-lucide="qr-code" class="w-6 h-6"></i>
                     </div>
-                    <p class="text-sm font-medium">Enter content to see preview</p>
+                    QR Generator
+                </h1>
+                <p class="text-slate-500 mb-4 text-sm font-medium italic">Used by Cg Lim.</p>
+
+                <!-- Content Input -->
+                <div class="mb-3 w-full">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">URL or Text</label>
+                    <textarea id="url-input" rows="3" placeholder="https://example.com" 
+                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none text-slate-700 shadow-sm"></textarea>
                 </div>
-                
-                <!-- Active QR Code -->
-                <div id="qrcode" class="opacity-0 transition-opacity duration-500 relative z-10 scale-95 origin-center"></div>
+
+                <!-- Download Action -->
+                <button id="download-btn" disabled class="mb-3 w-full bg-slate-900 hover:bg-indigo-600 text-white font-semibold py-3.5 px-8 rounded-xl shadow-xl shadow-slate-200 hover:shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed group active:scale-95">
+                    <i data-lucide="download" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
+                    Download PNG
+                </button>
+
+                <!-- QR Code Display Box -->
+                <div class="bg-slate-50 mx-auto w-full max-w-[280px] aspect-square rounded-[1.5rem] flex items-center justify-center p-4 relative overflow-hidden shadow-inner border-2 border-slate-100 transition-all duration-300" id="qr-wrapper">
+                    <div id="placeholder" class="text-center text-slate-400 absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 shadow-sm border border-slate-200/50">
+                            <i data-lucide="qr-code" class="w-8 h-8 text-slate-300"></i>
+                        </div>
+                        <p class="text-sm font-medium">Enter content to see preview</p>
+                    </div>
+                    <div id="qrcode" class="opacity-0 transition-opacity duration-500 relative z-10 scale-95 origin-center"></div>
+                    
+                    <!-- Added Logo Overlay -->
+                    <div id="qr-logo" class="absolute bottom-5 right-5 z-20 opacity-0 transition-opacity duration-500 pointer-events-none w-[28%] shadow-md rounded-lg overflow-hidden border border-slate-900/5">
+                        <svg id="qr-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" class="w-full h-auto block">
+                            <defs>
+                                <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#1e293b" />
+                                    <stop offset="100%" stop-color="#0f172a" />
+                                </linearGradient>
+                                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#fef08a" />
+                                    <stop offset="50%" stop-color="#d4af37" />
+                                    <stop offset="100%" stop-color="#a16207" />
+                                </linearGradient>
+                            </defs>
+                            <rect width="240" height="80" rx="12" fill="url(#bgGrad)" />
+                            <text x="120" y="36" font-family="'Georgia', 'Times New Roman', serif" font-size="24" font-style="italic" fill="#f8fafc" text-anchor="middle" letter-spacing="1">Cg. Lim</text>
+                            <line x1="90" y1="46" x2="150" y2="46" stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" />
+                            <text x="122" y="66" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="4">QRGEN</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Controls -->
+            <div class="w-full md:w-[45%] p-8 lg:p-10 bg-slate-50/30 flex flex-col">
+                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>
+                    Appearance
+                </h3>
+
+                <div class="space-y-6">
+                    <!-- Color Pickers -->
+                    <div class="grid grid-cols-2 gap-6 p-5 bg-white rounded-xl border border-slate-100 shadow-sm">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Foreground</label>
+                            <div class="flex items-center gap-3">
+                                <input type="color" id="fg-color" value="#0f172a">
+                                <span class="text-sm text-slate-600 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100" id="fg-hex">#0f172a</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Background</label>
+                            <div class="flex items-center gap-3">
+                                <input type="color" id="bg-color" value="#ffffff">
+                                <span class="text-sm text-slate-600 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100" id="bg-hex">#ffffff</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Error Correction -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center justify-between">
+                            Error Correction
+                            <span class="text-xs font-normal text-slate-400">Determines damage resistance</span>
+                        </label>
+                        <div class="relative">
+                            <select id="correction-level" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 appearance-none bg-white font-medium shadow-sm cursor-pointer">
+                                <option value="L">Low (7%) - Best for small codes</option>
+                                <option value="M">Medium (15%) - Standard</option>
+                                <option value="Q">Quartile (25%) - Good for readability</option>
+                                <option value="H" selected>High (30%) - Most reliable</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Right Panel: Controls -->
-        <div class="w-full md:w-[45%] p-8 lg:p-10 bg-slate-50/30 flex flex-col">
+        <!-- ==================== TAB 2: QRSCAN ==================== -->
+        <div id="tab-scan" class="hidden flex-col md:flex-row w-full">
             
-            <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <i data-lucide="settings-2" class="w-5 h-5 text-indigo-500"></i>
-                Appearance
-            </h3>
+            <!-- Left Panel: Scanner & Controls -->
+            <div class="w-full md:w-[55%] p-8 lg:p-10 flex flex-col bg-white relative border-b md:border-b-0 md:border-r border-slate-100">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2 flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg text-indigo-600">
+                        <i data-lucide="scan-line" class="w-6 h-6"></i>
+                    </div>
+                    QR Scanner
+                </h2>
+                <p class="text-slate-500 mb-6 text-sm font-medium italic">Used by Cg Lim.</p>
 
-            <div class="space-y-6">
-                <!-- Color Pickers -->
-                <div class="grid grid-cols-2 gap-6 p-5 bg-white rounded-xl border border-slate-100 shadow-sm">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Foreground</label>
-                        <div class="flex items-center gap-3">
-                            <input type="color" id="fg-color" value="#0f172a">
-                            <span class="text-sm text-slate-600 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100" id="fg-hex">#0f172a</span>
+                <!-- Scanner Camera Box -->
+                <div class="w-full max-w-[320px] mx-auto aspect-square bg-slate-50 rounded-[1.5rem] flex items-center justify-center relative overflow-hidden shadow-inner border-2 border-slate-100 mb-6">
+                    <!-- Fallback/Placeholder before camera starts -->
+                    <div id="scanner-placeholder" class="text-center text-slate-400 absolute inset-0 flex flex-col items-center justify-center z-10 transition-opacity duration-300">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-slate-200/50">
+                            <i data-lucide="camera-off" class="w-8 h-8 text-slate-300"></i>
                         </div>
+                        <p class="text-sm font-medium">Camera is inactive</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Background</label>
-                        <div class="flex items-center gap-3">
-                            <input type="color" id="bg-color" value="#ffffff">
-                            <span class="text-sm text-slate-600 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100" id="bg-hex">#ffffff</span>
-                        </div>
-                    </div>
+                    <!-- Actual Video Target for html5-qrcode -->
+                    <div id="reader" class="w-full h-full relative z-20"></div>
                 </div>
-                
-                <!-- Error Correction -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center justify-between">
-                        Error Correction
-                        <span class="text-xs font-normal text-slate-400">Determines damage resistance</span>
-                    </label>
-                    <div class="relative">
-                        <select id="correction-level" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 appearance-none bg-white font-medium shadow-sm cursor-pointer">
-                            <option value="L">Low (7%) - Best for small codes</option>
-                            <option value="M">Medium (15%) - Standard</option>
-                            <option value="Q">Quartile (25%) - Good for readability</option>
-                            <option value="H" selected>High (30%) - Most reliable</option>
-                        </select>
-                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+
+                <!-- Action Controls -->
+                <div class="flex gap-3 w-full mt-auto">
+                    <button id="start-scan-btn" class="flex-1 bg-slate-900 hover:bg-indigo-600 text-white font-semibold py-3.5 px-6 rounded-xl shadow-xl shadow-slate-200 hover:shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95">
+                        <i data-lucide="camera" class="w-5 h-5"></i> Start Camera
+                    </button>
+                    <button id="stop-scan-btn" class="hidden flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3.5 px-6 rounded-xl shadow-xl shadow-red-200 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95">
+                        <i data-lucide="square" class="w-5 h-5"></i> Stop
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="w-full md:w-[45%] p-8 lg:p-10 bg-slate-50/30 flex flex-col">
+                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-500"></i>
+                    Scan Result
+                </h3>
+
+                <div class="relative w-full flex-grow flex flex-col">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Decoded Content</label>
+                    <div class="relative flex-grow flex flex-col min-h-[200px]">
+                        <textarea id="scan-result" readonly class="w-full h-full min-h-[200px] flex-grow px-4 py-3 pr-12 rounded-xl border border-slate-200 bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none text-slate-800 shadow-sm" placeholder="Awaiting scan..."></textarea>
+                        <button id="copy-btn" class="absolute top-2 right-2 p-2 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors hidden shadow-sm" title="Copy to clipboard">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100/50 flex items-start gap-3">
+                        <i data-lucide="info" class="w-5 h-5 text-indigo-400 mt-0.5 shrink-0"></i>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+                            Allow camera access when prompted. Point your device's camera at a QR code to automatically capture and decode its contents here.
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- Footer -->
@@ -159,7 +262,7 @@
     <div id="infoModal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300">
         <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full border border-slate-100 scale-90 transition-transform duration-300 transform opacity-0" id="modalContent">
             <div class="text-center">
-                <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">👨‍🏫</div>
+                <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">👨‍💻</div>
                 <h3 class="text-xl font-extrabold text-slate-900 mb-2">Lim Tien Ping</h3>
                 <div class="space-y-2 mb-6">
                     <p class="text-slate-500 text-sm font-medium break-all">petwesley@gmail.com</p>
@@ -172,7 +275,7 @@
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
-        <i data-lucide="alert-circle" class="w-5 h-5 text-red-400"></i>
+        <i data-lucide="info" class="w-5 h-5 text-indigo-400" id="toast-icon"></i>
         <span id="toast-msg" class="text-sm font-medium"></span>
     </div>
 
@@ -180,7 +283,61 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
-        // DOM Elements
+        // ------------------ TOAST UTILITY ------------------
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        const toastIcon = document.getElementById('toast-icon');
+        let toastTimeout;
+
+        function showToast(message, isError = false) {
+            toastMsg.innerText = message;
+            
+            // Swap icons/colors based on error state
+            if (isError) {
+                toastIcon.setAttribute('data-lucide', 'alert-circle');
+                toastIcon.classList.replace('text-indigo-400', 'text-red-400');
+            } else {
+                toastIcon.setAttribute('data-lucide', 'info');
+                toastIcon.classList.replace('text-red-400', 'text-indigo-400');
+            }
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // ------------------ TAB NAVIGATION ------------------
+        const tabGen = document.getElementById('tab-gen');
+        const tabScan = document.getElementById('tab-scan');
+        const btnTabGen = document.getElementById('btn-tab-gen');
+        const btnTabScan = document.getElementById('btn-tab-scan');
+
+        function switchTab(target) {
+            if (target === 'gen') {
+                tabGen.classList.replace('hidden', 'flex');
+                tabScan.classList.replace('flex', 'hidden');
+                
+                btnTabGen.className = "flex-1 py-4 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white flex items-center justify-center gap-2 transition-all";
+                btnTabScan.className = "flex-1 py-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all";
+                
+                stopScanner(); // Stop camera when leaving tab
+            } else {
+                tabScan.classList.replace('hidden', 'flex');
+                tabGen.classList.replace('flex', 'hidden');
+                
+                btnTabScan.className = "flex-1 py-4 font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white flex items-center justify-center gap-2 transition-all";
+                btnTabGen.className = "flex-1 py-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2 transition-all";
+            }
+        }
+
+        btnTabGen.addEventListener('click', () => switchTab('gen'));
+        btnTabScan.addEventListener('click', () => switchTab('scan'));
+
+
+        // ------------------ GENERATOR LOGIC ------------------
         const urlInput = document.getElementById('url-input');
         const fgColor = document.getElementById('fg-color');
         const bgColor = document.getElementById('bg-color');
@@ -191,88 +348,34 @@
         const placeholder = document.getElementById('placeholder');
         const downloadBtn = document.getElementById('download-btn');
         const qrWrapper = document.getElementById('qr-wrapper');
-        const toast = document.getElementById('toast');
-        const toastMsg = document.getElementById('toast-msg');
-        
-        // Easter Egg Elements
-        const infoModal = document.getElementById('infoModal');
-        const modalContent = document.getElementById('modalContent');
-
+        const qrLogo = document.getElementById('qr-logo');
         let debounceTimer;
-        let toastTimeout;
-        let clickTimes = [];
 
-        // Easter Egg Logic
-        function handleCopyrightClick() {
-            const now = Date.now();
-            clickTimes.push(now);
-            clickTimes = clickTimes.filter(t => now - t < 2000);
-            if (clickTimes.length >= 8) {
-                showInfoModal();
-                clickTimes = [];
-            }
-        }
-
-        function showInfoModal() {
-            infoModal.classList.remove('hidden');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-90', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        function closeInfoModal() {
-            modalContent.classList.add('scale-90', 'opacity-0');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            setTimeout(() => {
-                infoModal.classList.add('hidden');
-            }, 300);
-        }
-
-        // Sync Color Hex Labels
         function updateHexLabels() {
             fgHex.innerText = fgColor.value;
             bgHex.innerText = bgColor.value;
         }
 
-        // Show Toast Utility
-        function showToast(message) {
-            toastMsg.innerText = message;
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-24', 'opacity-0');
-            }, 4000);
-        }
-
-        // Generate QR Code Logic
         function generateQR() {
             const text = urlInput.value.trim();
-            
             if (!text) {
-                // Reset to placeholder state
-                qrContainer.classList.add('opacity-0');
-                qrContainer.classList.remove('scale-100');
-                qrContainer.classList.add('scale-95');
+                qrContainer.classList.remove('opacity-100', 'scale-100');
+                qrContainer.classList.add('opacity-0', 'scale-95');
                 qrContainer.style.backgroundColor = 'transparent';
                 placeholder.classList.remove('opacity-0');
+                qrLogo.classList.add('opacity-0');
                 
                 downloadBtn.disabled = true;
                 downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 downloadBtn.classList.remove('hover:bg-indigo-600', 'hover:shadow-indigo-200');
-                
                 qrWrapper.classList.replace('bg-white', 'bg-slate-50');
                 return;
             }
 
-            // Hide placeholder and clear old QR
             placeholder.classList.add('opacity-0');
             qrContainer.innerHTML = '';
             
             try {
-                // We generate a high-res 512x512 image for a crisp download.
-                // CSS max-width scales it beautifully into the preview box.
                 new QRCode(qrContainer, {
                     text: text,
                     width: 512,
@@ -285,38 +388,28 @@
                 qrContainer.style.backgroundColor = bgColor.value;
                 qrWrapper.classList.replace('bg-slate-50', 'bg-white');
 
-                // Add slight delay to allow rendering before fading in
                 setTimeout(() => {
                     qrContainer.classList.remove('opacity-0', 'scale-95');
                     qrContainer.classList.add('opacity-100', 'scale-100');
-                    
+                    qrLogo.classList.remove('opacity-0');
                     downloadBtn.disabled = false;
                     downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     downloadBtn.classList.add('hover:bg-indigo-600', 'hover:shadow-indigo-200');
                 }, 50);
-                
             } catch (e) {
-                console.error(e);
-                showToast("Text is too long for the selected Error Correction level.");
+                showToast("Text is too long for the selected Error Correction.", true);
             }
         }
 
-        // Handle Download Action
         function downloadQR() {
             if (downloadBtn.disabled) return;
-
             const canvas = qrContainer.querySelector('canvas');
             const img = qrContainer.querySelector('img');
-            
             const sourceElement = canvas || img;
 
-            if (!sourceElement) {
-                showToast("Could not find generated QR code.");
-                return;
-            }
+            if (!sourceElement) return showToast("Could not find generated QR code.", true);
 
-            // Create a temporary canvas to add the frame/padding
-            const padding = 40; // 40px padding for the frame
+            const padding = 40;
             const tempCanvas = document.createElement('canvas');
             const srcWidth = sourceElement.width || 512;
             const srcHeight = sourceElement.height || 512;
@@ -325,49 +418,161 @@
             tempCanvas.height = srcHeight + (padding * 2);
             
             const ctx = tempCanvas.getContext('2d');
-            
-            // Fill the padded area with the background color
             ctx.fillStyle = bgColor.value;
             ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            
-            // Draw original QR Code in the center
             ctx.drawImage(sourceElement, padding, padding, srcWidth, srcHeight);
 
-            const imageSrc = tempCanvas.toDataURL("image/png");
+            // Draw Logo on Downloadable Image
+            const logoSvg = document.getElementById('qr-logo-svg');
+            const svgData = new XMLSerializer().serializeToString(logoSvg);
+            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const DOMURL = window.URL || window.webkitURL || window;
+            const url = DOMURL.createObjectURL(svgBlob);
+            
+            const logoImg = new Image();
+            logoImg.onload = function() {
+                const logoW = srcWidth * 0.28; // ~28% width for a good balanced watermark
+                const logoH = logoW * (80 / 240); // Maintain 240x80 aspect ratio
+                const logoX = padding + srcWidth - logoW - (srcWidth * 0.02); // 2% inset from edge
+                const logoY = padding + srcHeight - logoH - (srcHeight * 0.02);
 
-            if (imageSrc) {
-                const link = document.createElement('a');
-                link.href = imageSrc;
-                // Generate a smart filename based on a snippet of the input
-                const safeName = urlInput.value.trim().substring(0, 15).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                link.download = `qr_${safeName || 'code'}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                showToast("Could not generate image data for download.");
-            }
+                ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+                DOMURL.revokeObjectURL(url);
+
+                const imageSrc = tempCanvas.toDataURL("image/png");
+                if (imageSrc) {
+                    const link = document.createElement('a');
+                    link.href = imageSrc;
+                    const safeName = urlInput.value.trim().substring(0, 15).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                    link.download = `qr_${safeName || 'code'}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    showToast("Failed to generate download data.", true);
+                }
+            };
+            logoImg.src = url;
         }
 
-        // Event Listeners
         urlInput.addEventListener('input', () => {
             clearTimeout(debounceTimer);
-            // 300ms debounce for typing smoothness
             debounceTimer = setTimeout(generateQR, 300);
         });
-
         [fgColor, bgColor].forEach(input => {
             input.addEventListener('input', () => {
                 updateHexLabels();
-                // We use a small timeout to avoid lagging on color drag
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(generateQR, 50);
             });
         });
-
         correctionLevel.addEventListener('change', generateQR);
         downloadBtn.addEventListener('click', downloadQR);
 
+
+        // ------------------ SCANNER LOGIC ------------------
+        let html5QrcodeScanner = null;
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const stopScanBtn = document.getElementById('stop-scan-btn');
+        const scanResult = document.getElementById('scan-result');
+        const copyBtn = document.getElementById('copy-btn');
+        const scannerPlaceholder = document.getElementById('scanner-placeholder');
+
+        function startScanner() {
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5Qrcode("reader");
+            }
+            
+            // Fade out placeholder
+            scannerPlaceholder.classList.add('opacity-0');
+            
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText, decodedResult) => {
+                    // Success callback
+                    scanResult.value = decodedText;
+                    copyBtn.classList.remove('hidden');
+                    showToast("QR Code recognized!");
+                },
+                (errorMessage) => {
+                    // Ignore background scan failures
+                }
+            ).then(() => {
+                startScanBtn.classList.add('hidden');
+                stopScanBtn.classList.remove('hidden');
+                // Ensure placeholder goes away completely
+                setTimeout(() => scannerPlaceholder.classList.add('hidden'), 300);
+            }).catch((err) => {
+                scannerPlaceholder.classList.remove('opacity-0');
+                showToast("Camera access denied or error.", true);
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => {
+                    startScanBtn.classList.remove('hidden');
+                    stopScanBtn.classList.add('hidden');
+                    scannerPlaceholder.classList.remove('hidden');
+                    setTimeout(() => scannerPlaceholder.classList.remove('opacity-0'), 10);
+                }).catch((err) => {
+                    showToast("Failed to stop camera.", true);
+                });
+            }
+        }
+
+        startScanBtn.addEventListener('click', startScanner);
+        stopScanBtn.addEventListener('click', stopScanner);
+
+        copyBtn.addEventListener('click', () => {
+            if (scanResult.value) {
+                // Handle iframe clipboard limitations by using legacy command
+                const copyText = scanResult;
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                try {
+                    document.execCommand('copy');
+                    showToast("Copied to clipboard!");
+                } catch(err) {
+                    // Fallback to clipboard API if available
+                    navigator.clipboard.writeText(scanResult.value).then(() => {
+                        showToast("Copied to clipboard!");
+                    }).catch(() => {
+                        showToast("Failed to copy text.", true);
+                    });
+                }
+                
+                // Deselect
+                window.getSelection().removeAllRanges();
+            }
+        });
+
+
+        // ------------------ EASTER EGG LOGIC ------------------
+        const infoModal = document.getElementById('infoModal');
+        const modalContent = document.getElementById('modalContent');
+        let clickTimes = [];
+
+        function handleCopyrightClick() {
+            const now = Date.now();
+            clickTimes.push(now);
+            clickTimes = clickTimes.filter(t => now - t < 2000);
+            if (clickTimes.length >= 8) {
+                infoModal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-90', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                clickTimes = [];
+            }
+        }
+
+        function closeInfoModal() {
+            modalContent.classList.add('scale-90', 'opacity-0');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            setTimeout(() => infoModal.classList.add('hidden'), 300);
+        }
     </script>
 </body>
 </html>
