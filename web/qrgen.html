@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QRGEN | QR Generator & Scanner</title>
+    <title>QR Code Studio | Gen & Scan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -32,18 +32,16 @@
         }
         
         /* Generator QR code scaling */
-        #qrcode {
+        #qrcode-container {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
-            padding: 16px;
             box-sizing: border-box;
             border-radius: 1rem;
-            transition: background-color 0.3s ease;
         }
-        #qrcode img, #qrcode canvas {
+        #qrcode-container img {
             width: 100% !important;
             height: auto !important;
             border-radius: 0.5rem;
@@ -118,28 +116,32 @@
                         </div>
                         <p class="text-sm font-medium">Enter content to see preview</p>
                     </div>
-                    <div id="qrcode" class="opacity-0 transition-opacity duration-500 relative z-10 scale-95 origin-center"></div>
                     
-                    <!-- Added Logo Overlay -->
-                    <div id="qr-logo" class="absolute bottom-5 right-5 z-20 opacity-0 transition-opacity duration-500 pointer-events-none w-[28%] shadow-md rounded-lg overflow-hidden border border-slate-900/5">
-                        <svg id="qr-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" class="w-full h-auto block">
-                            <defs>
-                                <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stop-color="#1e293b" />
-                                    <stop offset="100%" stop-color="#0f172a" />
-                                </linearGradient>
-                                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="#fef08a" />
-                                    <stop offset="50%" stop-color="#d4af37" />
-                                    <stop offset="100%" stop-color="#a16207" />
-                                </linearGradient>
-                            </defs>
-                            <rect width="240" height="80" rx="12" fill="url(#bgGrad)" />
-                            <text x="120" y="36" font-family="'Georgia', 'Times New Roman', serif" font-size="24" font-style="italic" fill="#f8fafc" text-anchor="middle" letter-spacing="1">Cg. Lim</text>
-                            <line x1="90" y1="46" x2="150" y2="46" stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" />
-                            <text x="122" y="66" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="4">QRGEN</text>
-                        </svg>
+                    <!-- Flattened Composite Image Container -->
+                    <div id="qrcode-container" class="opacity-0 transition-opacity duration-500 relative z-10 scale-95 origin-center hidden">
+                        <img id="final-qr-img" class="max-w-full max-h-full rounded-xl shadow-sm border border-slate-900/5" alt="Generated QR Code" />
                     </div>
+                    
+                    <!-- Hidden Logo SVG Template (Used for canvas drawing) -->
+                    <svg id="qr-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" class="hidden">
+                        <defs>
+                            <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#1e293b" />
+                                <stop offset="100%" stop-color="#0f172a" />
+                            </linearGradient>
+                            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#fef08a" />
+                                <stop offset="50%" stop-color="#d4af37" />
+                                <stop offset="100%" stop-color="#a16207" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="240" height="80" rx="12" fill="url(#bgGrad)" />
+                        <!-- Inner White Strip (10px gap from border) -->
+                        <rect x="10" y="10" width="220" height="60" rx="6" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.7" />
+                        <text x="120" y="36" font-family="'Georgia', 'Times New Roman', serif" font-size="24" font-style="italic" fill="#f8fafc" text-anchor="middle" letter-spacing="1">Cg. Lim</text>
+                        <line x1="90" y1="46" x2="150" y2="46" stroke="url(#goldGrad)" stroke-width="1.5" stroke-linecap="round" />
+                        <text x="122" y="66" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="800" fill="url(#goldGrad)" text-anchor="middle" letter-spacing="4">QRGEN</text>
+                    </svg>
                 </div>
             </div>
 
@@ -344,11 +346,13 @@
         const fgHex = document.getElementById('fg-hex');
         const bgHex = document.getElementById('bg-hex');
         const correctionLevel = document.getElementById('correction-level');
-        const qrContainer = document.getElementById('qrcode');
+        
         const placeholder = document.getElementById('placeholder');
         const downloadBtn = document.getElementById('download-btn');
         const qrWrapper = document.getElementById('qr-wrapper');
-        const qrLogo = document.getElementById('qr-logo');
+        const qrContainer = document.getElementById('qrcode-container');
+        const finalQrImg = document.getElementById('final-qr-img');
+        
         let debounceTimer;
 
         function updateHexLabels() {
@@ -361,9 +365,8 @@
             if (!text) {
                 qrContainer.classList.remove('opacity-100', 'scale-100');
                 qrContainer.classList.add('opacity-0', 'scale-95');
-                qrContainer.style.backgroundColor = 'transparent';
+                setTimeout(() => qrContainer.classList.add('hidden'), 500); // hide after fade out
                 placeholder.classList.remove('opacity-0');
-                qrLogo.classList.add('opacity-0');
                 
                 downloadBtn.disabled = true;
                 downloadBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -373,10 +376,11 @@
             }
 
             placeholder.classList.add('opacity-0');
-            qrContainer.innerHTML = '';
             
             try {
-                new QRCode(qrContainer, {
+                // 1. Create a temporary off-screen div for QRCode.js to render into
+                const tempDiv = document.createElement('div');
+                new QRCode(tempDiv, {
                     text: text,
                     width: 512,
                     height: 512,
@@ -384,75 +388,78 @@
                     colorLight : bgColor.value,
                     correctLevel : QRCode.CorrectLevel[correctionLevel.value]
                 });
-                
-                qrContainer.style.backgroundColor = bgColor.value;
-                qrWrapper.classList.replace('bg-slate-50', 'bg-white');
 
+                // 2. Wait a tick for QRCode.js to inject its canvas/img
                 setTimeout(() => {
-                    qrContainer.classList.remove('opacity-0', 'scale-95');
-                    qrContainer.classList.add('opacity-100', 'scale-100');
-                    qrLogo.classList.remove('opacity-0');
-                    downloadBtn.disabled = false;
-                    downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    downloadBtn.classList.add('hover:bg-indigo-600', 'hover:shadow-indigo-200');
+                    const sourceElement = tempDiv.querySelector('canvas') || tempDiv.querySelector('img');
+                    if (!sourceElement) return;
+
+                    // 3. Create our master canvas
+                    const padding = 40;
+                    const srcWidth = sourceElement.width || 512;
+                    const srcHeight = sourceElement.height || 512;
+                    
+                    const compositeCanvas = document.createElement('canvas');
+                    compositeCanvas.width = srcWidth + (padding * 2);
+                    compositeCanvas.height = srcHeight + (padding * 2);
+                    const ctx = compositeCanvas.getContext('2d');
+
+                    // 4. Draw Background & QR
+                    ctx.fillStyle = bgColor.value;
+                    ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+                    ctx.drawImage(sourceElement, padding, padding, srcWidth, srcHeight);
+
+                    // 5. Draw the Logo overlay
+                    const logoSvg = document.getElementById('qr-logo-svg');
+                    const svgData = new XMLSerializer().serializeToString(logoSvg);
+                    const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+                    const DOMURL = window.URL || window.webkitURL || window;
+                    const url = DOMURL.createObjectURL(svgBlob);
+                    
+                    const logoImg = new Image();
+                    logoImg.onload = function() {
+                        const logoW = srcWidth * 0.50; // Increased to 50% width for prominent visibility
+                        const logoH = logoW * (80 / 240); // Maintain 240x80 aspect ratio
+                        const logoX = padding + srcWidth - logoW - (srcWidth * 0.02); 
+                        const logoY = padding + srcHeight - logoH - (srcHeight * 0.02);
+
+                        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+                        DOMURL.revokeObjectURL(url);
+
+                        // 6. Output flattened image to the screen
+                        finalQrImg.src = compositeCanvas.toDataURL("image/png");
+                        
+                        qrWrapper.classList.replace('bg-slate-50', 'bg-white');
+                        qrContainer.classList.remove('hidden');
+                        
+                        // Allow DOM update, then animate in
+                        setTimeout(() => {
+                            qrContainer.classList.remove('opacity-0', 'scale-95');
+                            qrContainer.classList.add('opacity-100', 'scale-100');
+                            downloadBtn.disabled = false;
+                            downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            downloadBtn.classList.add('hover:bg-indigo-600', 'hover:shadow-indigo-200');
+                        }, 10);
+                    };
+                    logoImg.src = url;
                 }, 50);
+
             } catch (e) {
                 showToast("Text is too long for the selected Error Correction.", true);
             }
         }
 
         function downloadQR() {
-            if (downloadBtn.disabled) return;
-            const canvas = qrContainer.querySelector('canvas');
-            const img = qrContainer.querySelector('img');
-            const sourceElement = canvas || img;
-
-            if (!sourceElement) return showToast("Could not find generated QR code.", true);
-
-            const padding = 40;
-            const tempCanvas = document.createElement('canvas');
-            const srcWidth = sourceElement.width || 512;
-            const srcHeight = sourceElement.height || 512;
-
-            tempCanvas.width = srcWidth + (padding * 2);
-            tempCanvas.height = srcHeight + (padding * 2);
+            if (downloadBtn.disabled || !finalQrImg.src) return;
             
-            const ctx = tempCanvas.getContext('2d');
-            ctx.fillStyle = bgColor.value;
-            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-            ctx.drawImage(sourceElement, padding, padding, srcWidth, srcHeight);
-
-            // Draw Logo on Downloadable Image
-            const logoSvg = document.getElementById('qr-logo-svg');
-            const svgData = new XMLSerializer().serializeToString(logoSvg);
-            const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-            const DOMURL = window.URL || window.webkitURL || window;
-            const url = DOMURL.createObjectURL(svgBlob);
-            
-            const logoImg = new Image();
-            logoImg.onload = function() {
-                const logoW = srcWidth * 0.28; // ~28% width for a good balanced watermark
-                const logoH = logoW * (80 / 240); // Maintain 240x80 aspect ratio
-                const logoX = padding + srcWidth - logoW - (srcWidth * 0.02); // 2% inset from edge
-                const logoY = padding + srcHeight - logoH - (srcHeight * 0.02);
-
-                ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-                DOMURL.revokeObjectURL(url);
-
-                const imageSrc = tempCanvas.toDataURL("image/png");
-                if (imageSrc) {
-                    const link = document.createElement('a');
-                    link.href = imageSrc;
-                    const safeName = urlInput.value.trim().substring(0, 15).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                    link.download = `qr_${safeName || 'code'}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    showToast("Failed to generate download data.", true);
-                }
-            };
-            logoImg.src = url;
+            // Now download is incredibly simple - just download the displayed image!
+            const link = document.createElement('a');
+            link.href = finalQrImg.src;
+            const safeName = urlInput.value.trim().substring(0, 15).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            link.download = `qr_${safeName || 'code'}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         urlInput.addEventListener('input', () => {
