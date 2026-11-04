@@ -6,6 +6,8 @@
     <title>Sound Pollution Detector</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Custom styles for animations and specific visual tweaks */
         .pulse-alert {
@@ -74,7 +76,7 @@
                         <span class="text-red-700 font-bold tracking-wide uppercase text-sm">Lives Remaining</span>
                     </div>
                     <span id="livesValue" class="text-[6rem] leading-none font-black text-red-600 transition-transform duration-200 z-10 my-2">20</span>
-                    <span class="text-xs text-red-500/80 font-bold mb-5 z-10 text-center bg-white/50 px-3 py-1 rounded-full">+1 Life every 60s</span>
+                    <span id="regenTextIndicator" class="text-xs text-red-500/80 font-bold mb-5 z-10 text-center bg-white/50 px-3 py-1 rounded-full">+1 Life every 60s</span>
                     <button id="addLifeBtn" class="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-4 px-4 rounded-xl shadow transition-all active:scale-95 z-10">
                         +1 Life Manually
                     </button>
@@ -101,54 +103,49 @@
 
             <!-- Main Panel: Level & Visuals -->
             <div class="w-full md:w-2/3 flex flex-col justify-center">
-                <!-- Main Display: Numerical Level -->
-                <div class="flex flex-col items-center justify-center mb-10">
-                    <div class="relative flex items-end">
-                        <span id="levelValue" class="text-[10rem] md:text-[14rem] leading-none font-extrabold tracking-tighter text-gray-800 transition-colors duration-200">0</span>
-                        <span class="text-3xl font-medium text-gray-400 mb-6 ml-2">lvl</span>
-                    </div>
+                <!-- Main Display: Status -->
+                <div class="flex flex-col items-center justify-center mb-8">
                     <div id="statusText" class="mt-6 text-lg font-semibold uppercase tracking-wider text-gray-400 bg-gray-100 px-6 py-2 rounded-full">
                         Standby
                     </div>
                 </div>
 
-                <!-- Visual Level Bar -->
-                <div class="mb-8 relative">
-                    <div class="w-full h-10 bg-gray-200 rounded-full overflow-hidden relative shadow-inner">
-                        <!-- Dynamic progress bar -->
-                        <div id="levelBar" class="h-full bg-blue-500 w-0 transition-all duration-200 ease-out" style="width: 0%;"></div>
-                        
-                        <!-- Threshold Marker Overlay -->
-                        <div id="thresholdMarker" class="absolute top-0 bottom-0 w-1.5 bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)] z-10 transition-all duration-200" style="left: 70%;"></div>
-                    </div>
-                    <div class="flex justify-between text-sm text-gray-400 mt-3 font-medium px-2">
-                        <span>0</span>
-                        <span>50</span>
-                        <span>100</span>
-                    </div>
+                <!-- History Chart -->
+                <div class="mb-8 p-4 bg-gray-50 rounded-3xl border border-gray-100 h-48 relative w-full shadow-inner">
+                    <canvas id="historyChart"></canvas>
                 </div>
 
                 <!-- Controls: Slider -->
                 <div class="p-6 bg-gray-50 rounded-3xl border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
-                        <label for="thresholdSlider" class="text-base font-semibold text-gray-700">Alarm Threshold</label>
-                        <span id="thresholdValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-red-500 border border-red-100">50</span>
+                        <label for="thresholdSlider" class="text-base font-semibold text-gray-700">Alarm Threshold (Hz)</label>
+                        <span id="thresholdValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-red-500 border border-red-100">1000</span>
                     </div>
-                    <input type="range" id="thresholdSlider" min="0" max="100" value="50">
-                    <p class="text-sm text-gray-500 mt-4 text-center">Alarm triggers and life deducts if noise exceeds this limit.</p>
+                    <input type="range" id="thresholdSlider" min="0" max="5000" step="50" value="1000">
+                    <p class="text-sm text-gray-500 mt-4 text-center">Alarm triggers and life deducts if frequency exceeds this limit.</p>
 
                     <div class="border-t border-gray-200 pt-6 mt-4">
                         <div class="flex justify-between items-center mb-4">
-                            <label for="sustainSlider" class="text-base font-semibold text-gray-700">Sustain Time (Seconds)</label>
-                            <span id="sustainValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-yellow-600 border border-yellow-100">2.0s</span>
+                            <label for="consecutiveSlider" class="text-base font-semibold text-gray-700">Consecutive Triggers</label>
+                            <span id="consecutiveValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-yellow-600 border border-yellow-100">5</span>
                         </div>
-                        <input type="range" id="sustainSlider" min="0" max="10" step="0.5" value="2">
-                        
-                        <!-- Sustain Timer Progress -->
-                        <div class="mt-4 w-full h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
-                            <div id="sustainBar" class="h-full bg-yellow-400 w-0 transition-all duration-200 ease-linear" style="width: 0%;"></div>
+                        <input type="range" id="consecutiveSlider" min="1" max="20" value="5">
+                        <p class="text-sm text-gray-500 mt-4 text-center">Alarm triggers if noise stays above threshold for <span id="consecutiveTextVal">5</span> consecutive checks (each 0.2s).</p>
+
+                        <label class="text-base font-semibold text-gray-700 block mt-6 mb-2">Warning Indicator</label>
+                        <!-- Consecutive Progress -->
+                        <div class="mt-2 w-full h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                            <div id="consecutiveBar" class="h-full bg-yellow-400 w-0 transition-all duration-200 ease-linear" style="width: 0%;"></div>
                         </div>
-                        <p class="text-sm text-gray-500 mt-3 text-center">Noise must stay above threshold continuously to trigger.</p>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6 mt-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <label for="regenSlider" class="text-base font-semibold text-gray-700">Life Regen Interval (s)</label>
+                            <span id="regenValue" class="text-lg font-bold bg-white px-4 py-1.5 rounded-lg shadow-sm text-green-600 border border-green-100">60</span>
+                        </div>
+                        <input type="range" id="regenSlider" min="10" max="300" step="10" value="60">
+                        <p class="text-sm text-gray-500 mt-4 text-center">Automatically add 1 life every <span id="regenTextVal">60</span> seconds.</p>
                     </div>
                 </div>
             </div>
@@ -165,16 +162,18 @@
         // DOM Elements
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
-        const levelValueDisplay = document.getElementById('levelValue');
-        const levelBar = document.getElementById('levelBar');
         const statusText = document.getElementById('statusText');
         const appContainer = document.getElementById('appContainer');
         const thresholdSlider = document.getElementById('thresholdSlider');
         const thresholdValueDisplay = document.getElementById('thresholdValue');
-        const thresholdMarker = document.getElementById('thresholdMarker');
-        const sustainSlider = document.getElementById('sustainSlider');
-        const sustainValueDisplay = document.getElementById('sustainValue');
-        const sustainBar = document.getElementById('sustainBar');
+        const consecutiveSlider = document.getElementById('consecutiveSlider');
+        const consecutiveValueDisplay = document.getElementById('consecutiveValue');
+        const consecutiveTextVal = document.getElementById('consecutiveTextVal');
+        const consecutiveBar = document.getElementById('consecutiveBar');
+        const regenSlider = document.getElementById('regenSlider');
+        const regenValueDisplay = document.getElementById('regenValue');
+        const regenTextVal = document.getElementById('regenTextVal');
+        const regenTextIndicator = document.getElementById('regenTextIndicator');
         const errorContainer = document.getElementById('errorContainer');
         const livesValueDisplay = document.getElementById('livesValue');
         const addLifeBtn = document.getElementById('addLifeBtn');
@@ -185,17 +184,25 @@
         let microphoneStream = null;
         let updateInterval = null;
         let isMonitoring = false;
-        let currentThreshold = localStorage.getItem('spd_threshold') !== null ? parseInt(localStorage.getItem('spd_threshold')) : 50;
-        let sustainTime = localStorage.getItem('spd_sustain') !== null ? parseFloat(localStorage.getItem('spd_sustain')) : 2.0;
+        let currentThreshold = localStorage.getItem('spd_threshold_hz') !== null ? parseInt(localStorage.getItem('spd_threshold_hz')) : 1000;
+        let requiredConsecutive = localStorage.getItem('spd_consecutive') !== null ? parseInt(localStorage.getItem('spd_consecutive')) : 5;
+        let regenIntervalSeconds = localStorage.getItem('spd_regen') !== null ? parseInt(localStorage.getItem('spd_regen')) : 60;
         let lives = localStorage.getItem('spd_lives') !== null ? parseInt(localStorage.getItem('spd_lives')) : 20;
         let gracePeriodEnd = 0;
-        let accumulatedSustain = 0;
+        let consecutiveOverThreshold = 0;
         let isPenaltyActive = false;
         let penaltyTimeout = null;
         let penaltyOscillator = null;
         let penaltyGainNode = null;
         let regenInterval = null;
         
+        // Chart Variables
+        let levelChart = null;
+        const maxDataPoints = 50; // 10 seconds at 200ms per update
+        let chartData = new Array(maxDataPoints).fill(0);
+        let thresholdData = new Array(maxDataPoints).fill(currentThreshold);
+        let chartLabels = new Array(maxDataPoints).fill('');
+
         // Constants
         const UPDATE_INTERVAL_MS = 200; // Update every 0.2s
 
@@ -203,11 +210,65 @@
         // Initialize UI with cached values
         thresholdSlider.value = currentThreshold;
         thresholdValueDisplay.textContent = currentThreshold;
-        thresholdMarker.style.left = `${currentThreshold}%`;
+        consecutiveSlider.value = requiredConsecutive;
+        consecutiveValueDisplay.textContent = requiredConsecutive;
+        consecutiveTextVal.textContent = requiredConsecutive;
+        regenSlider.value = regenIntervalSeconds;
+        regenValueDisplay.textContent = regenIntervalSeconds;
+        regenTextVal.textContent = regenIntervalSeconds;
+        regenTextIndicator.textContent = '+1 Life every ' + regenIntervalSeconds + 's';
         livesValueDisplay.textContent = lives;
 
-        sustainSlider.value = sustainTime;
-        sustainValueDisplay.textContent = sustainTime.toFixed(1) + 's';
+        // Initialize Chart.js
+        const ctx = document.getElementById('historyChart').getContext('2d');
+        levelChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Frequency (Hz)',
+                    data: chartData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 0
+                },
+                {
+                    label: 'Threshold',
+                    data: thresholdData,
+                    borderColor: '#ef4444',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    fill: false,
+                    tension: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 5000,
+                        grid: { color: '#e5e7eb' },
+                        ticks: { stepSize: 1000 }
+                    },
+                    x: {
+                        display: false // Hide x-axis labels for clean look
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
 
         // Helper to update lives and persist them
         function updateLives(newLives) {
@@ -219,17 +280,30 @@
         thresholdSlider.addEventListener('input', (e) => {
             currentThreshold = parseInt(e.target.value);
             thresholdValueDisplay.textContent = currentThreshold;
-            thresholdMarker.style.left = `${currentThreshold}%`;
-            localStorage.setItem('spd_threshold', currentThreshold);
+            thresholdData.fill(currentThreshold);
+            levelChart.update();
+            localStorage.setItem('spd_threshold_hz', currentThreshold);
         });
 
-        sustainSlider.addEventListener('input', (e) => {
-            sustainTime = parseFloat(e.target.value);
-            sustainValueDisplay.textContent = sustainTime.toFixed(1) + 's';
-            localStorage.setItem('spd_sustain', sustainTime);
-            // Reset accumulated if setting changes
-            accumulatedSustain = 0;
-            sustainBar.style.width = '0%';
+        consecutiveSlider.addEventListener('input', (e) => {
+            requiredConsecutive = parseInt(e.target.value);
+            consecutiveValueDisplay.textContent = requiredConsecutive;
+            consecutiveTextVal.textContent = requiredConsecutive;
+            localStorage.setItem('spd_consecutive', requiredConsecutive);
+        });
+
+        regenSlider.addEventListener('input', (e) => {
+            regenIntervalSeconds = parseInt(e.target.value);
+            regenValueDisplay.textContent = regenIntervalSeconds;
+            regenTextVal.textContent = regenIntervalSeconds;
+            regenTextIndicator.textContent = '+1 Life every ' + regenIntervalSeconds + 's';
+            localStorage.setItem('spd_regen', regenIntervalSeconds);
+
+            // Dynamically restart regen timer if monitoring
+            if (isMonitoring) {
+                if (regenInterval) clearInterval(regenInterval);
+                regenInterval = setInterval(regenerateLife, regenIntervalSeconds * 1000);
+            }
         });
 
         addLifeBtn.addEventListener('click', () => {
@@ -265,7 +339,7 @@
 
                 // Setup analyser node
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 256; // Defines array size for frequency data (128 bins)
+                analyser.fftSize = 2048; // Higher resolution for frequency detection
                 analyser.smoothingTimeConstant = 0.4; // Slightly smooth out abrupt changes
 
                 // Connect microphone to analyser
@@ -279,7 +353,7 @@
 
                 // Start the loops
                 updateInterval = setInterval(processAudioLevel, UPDATE_INTERVAL_MS);
-                regenInterval = setInterval(regenerateLife, 60000); // 60s life regen
+                regenInterval = setInterval(regenerateLife, regenIntervalSeconds * 1000);
 
             } catch (err) {
                 console.error('Error accessing microphone:', err);
@@ -318,8 +392,8 @@
             toggleUIState(false);
             resetDisplay();
             
-            accumulatedSustain = 0;
-            if (sustainBar) sustainBar.style.width = '0%';
+            consecutiveOverThreshold = 0;
+            if (consecutiveBar) consecutiveBar.style.width = '0%';
         }
 
         /**
@@ -340,7 +414,7 @@
         }
 
         /**
-         * Calculates current volume from the analyser and updates UI/triggers alarms.
+         * Calculates current dominant frequency from the analyser and updates UI/triggers alarms.
          */
         function processAudioLevel() {
             if (!isMonitoring || !analyser) return;
@@ -351,23 +425,32 @@
             // Get frequency data
             analyser.getByteFrequencyData(dataArray);
 
-            // Calculate average volume
+            // Find the dominant frequency and calculate average volume
             let sum = 0;
+            let maxVal = -Infinity;
+            let maxIndex = 0;
+            
             for (let i = 0; i < bufferLength; i++) {
                 sum += dataArray[i];
+                if (dataArray[i] > maxVal) {
+                    maxVal = dataArray[i];
+                    maxIndex = i;
+                }
             }
             let average = sum / bufferLength;
 
-            // Map the average (0-255) to a more intuitive 0-100 scale.
-            // Human voice/room noise normally doesn't hit 255 easily without multiplier.
-            // Multiplier 1.5 boosts sensitivity so normal sounds map nicely to the 0-100 range.
-            let volumeLevel = Math.round((average / 255) * 100 * 1.5);
+            let dominantFrequency = 0;
+            // Gate: Only register frequency if there's significant sound volume (ignores low background static)
+            if (average > 5 || maxVal > 50) { 
+                const nyquist = audioContext.sampleRate / 2;
+                dominantFrequency = Math.round((maxIndex / bufferLength) * nyquist);
+            }
             
-            // Clamp between 0 and 100
-            volumeLevel = Math.max(0, Math.min(100, volumeLevel));
+            // Clamp for UI scale (0 to 5000 Hz)
+            let frequencyLevel = Math.max(0, Math.min(5000, dominantFrequency));
 
             // Update UI
-            updateDisplay(volumeLevel);
+            updateDisplay(frequencyLevel);
 
             if (isPenaltyActive) {
                 // If in 10-second penalty, don't trigger regular alarms or deduct lives
@@ -379,24 +462,23 @@
             // Handle Grace Period Cooldown
             if (now < gracePeriodEnd && lives > 0) {
                 setAlertUI(false, 'Grace Period (2s)', true);
-                accumulatedSustain = 0;
-                sustainBar.style.width = '0%';
+                consecutiveOverThreshold = 0;
+                consecutiveBar.style.width = '0%';
                 return;
             }
 
-            // Check against Threshold continuously with Sustain Timer
-            if (volumeLevel > currentThreshold) {
-                accumulatedSustain += UPDATE_INTERVAL_MS;
-                const sustainTargetMs = sustainTime * 1000;
+            // Check against Threshold continuously
+            if (frequencyLevel > currentThreshold) {
+                consecutiveOverThreshold++;
                 
-                // Update sustain progress bar visual
-                let sustainPercent = sustainTargetMs === 0 ? 100 : (accumulatedSustain / sustainTargetMs) * 100;
-                sustainBar.style.width = `${Math.min(100, sustainPercent)}%`;
+                // Update warning progress bar visual
+                let sustainPercent = (consecutiveOverThreshold / requiredConsecutive) * 100;
+                consecutiveBar.style.width = `${Math.min(100, sustainPercent)}%`;
 
-                if (accumulatedSustain >= sustainTargetMs) {
-                    // Sustained long enough, trigger alarm
-                    accumulatedSustain = 0;
-                    sustainBar.style.width = '0%';
+                if (consecutiveOverThreshold >= requiredConsecutive) {
+                    // Reached consecutive checks, trigger alarm
+                    consecutiveOverThreshold = 0;
+                    consecutiveBar.style.width = '0%';
 
                     if (lives > 0) {
                         updateLives(lives - 1);
@@ -416,9 +498,9 @@
                     setAlertUI(false, 'Warning: High Noise!');
                 }
             } else {
-                // Sound dropped below threshold, reset timer
-                accumulatedSustain = 0;
-                sustainBar.style.width = '0%';
+                // Sound dropped below threshold, reset counter
+                consecutiveOverThreshold = 0;
+                consecutiveBar.style.width = '0%';
 
                 if (lives === 0) {
                     setAlertUI(false, '0 LIVES');
@@ -515,20 +597,13 @@
 
         /**
          * Updates the numerical and visual bar displays.
-         * @param {number} level - Calculated volume 0-100
+         * @param {number} level - Calculated frequency 0-5000
          */
         function updateDisplay(level) {
-            levelValueDisplay.textContent = level;
-            levelBar.style.width = `${level}%`;
-
-            // Adjust bar color based on closeness to threshold
-            if (level > currentThreshold) {
-                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-red-500';
-            } else if (level > currentThreshold * 0.8) {
-                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-yellow-400';
-            } else {
-                levelBar.className = 'h-full w-0 transition-all duration-200 ease-out bg-blue-500';
-            }
+            // Update Chart
+            chartData.push(level);
+            chartData.shift(); // Remove oldest data point
+            levelChart.update();
         }
 
         /**
@@ -537,18 +612,14 @@
         function setAlertUI(isAlerting, text = 'Pollution Detected!', isGracePeriod = false) {
             // Clean up states
             appContainer.classList.remove('border-red-500', 'pulse-alert', 'border-yellow-400');
-            levelValueDisplay.classList.remove('text-red-600', 'text-yellow-600');
-            levelValueDisplay.classList.add('text-gray-800');
 
             if (isGracePeriod) {
                 appContainer.classList.add('border-yellow-400');
-                levelValueDisplay.classList.replace('text-gray-800', 'text-yellow-600');
                 
                 statusText.textContent = text;
                 statusText.className = 'mt-4 text-sm font-bold uppercase tracking-wider text-yellow-600 bg-yellow-100 px-4 py-1 rounded-full text-center';
             } else if (isAlerting) {
                 appContainer.classList.add('border-red-500', 'pulse-alert');
-                levelValueDisplay.classList.replace('text-gray-800', 'text-red-600');
                 
                 statusText.textContent = text;
                 statusText.className = 'mt-4 text-sm font-bold uppercase tracking-wider text-red-600 bg-red-100 px-4 py-1 rounded-full text-center';
@@ -562,19 +633,17 @@
          * Resets the display to default 0 states.
          */
         function resetDisplay() {
-            levelValueDisplay.textContent = '0';
-            levelBar.style.width = '0%';
-            levelBar.className = 'h-full bg-blue-500 w-0 transition-all duration-200 ease-out';
-            
             appContainer.classList.remove('border-red-500', 'pulse-alert', 'border-yellow-400');
-            levelValueDisplay.classList.remove('text-red-600', 'text-yellow-600');
-            levelValueDisplay.classList.add('text-gray-800');
             
-            accumulatedSustain = 0;
-            if(sustainBar) sustainBar.style.width = '0%';
+            consecutiveOverThreshold = 0;
+            if(consecutiveBar) consecutiveBar.style.width = '0%';
 
             statusText.textContent = 'Standby';
             statusText.className = 'mt-4 text-sm font-semibold uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full';
+
+            // Reset Chart
+            chartData.fill(0);
+            levelChart.update();
         }
 
         /**
