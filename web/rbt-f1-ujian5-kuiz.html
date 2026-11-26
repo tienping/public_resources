@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuiz Ulang Kaji RBT Tingkatan 1 — Persediaan Ujian</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-serif-cert {
+      font-family: 'Playfair Display', serif;
+    }
+    /* Gaya perkataan istilah dengan garis titik-titik */
+    .vocab-word {
+      border-bottom: 2px dotted #4f46e5;
+      color: #3730a3;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0 2px;
+      border-radius: 3px;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .vocab-word:hover, .vocab-word:focus {
+      background-color: #e0e7ff;
+      color: #1e1b4b;
+      outline: none;
+    }
+    /* Animasi masuk belon terjemahan & kad */
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95) translateY(6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .animate-pop {
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Corak latar sijil */
+    .cert-pattern {
+      background-color: #fffdf7;
+      background-image: radial-gradient(#d4af37 0.65px, transparent 0.65px), radial-gradient(#d4af37 0.65px, #fffdf7 0.65px);
+      background-size: 26px 26px;
+      background-position: 0 0, 13px 13px;
+    }
+    /* Bar kemajuan halus */
+    .progress-transition {
+      transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50/40 to-sky-50">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center font-extrabold text-lg shadow-md">
+          RBT
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">Kuiz Ulang Kaji RBT T1</h1>
+          <p class="text-xs text-slate-500 font-medium">50 Soalan Kefahaman &amp; Persediaan Ujian</p>
+        </div>
+      </div>
+
+      <!-- Butang Bantuan Istilah & Status Mod -->
+      <div class="flex items-center gap-2">
+        <span id="headerModeBadge" class="hidden text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-700"></span>
+        <button id="btnVocabGuide" type="button" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-1.5" title="Panduan Kamus Istilah">
+          <span>📖</span>
+          <span class="hidden sm:inline">Istilah</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-6 sm:py-8">
+
+    <!-- 1. SKRIN MULA (START SCREEN) -->
+    <section id="screenStart" class="animate-pop space-y-6">
+      <div class="bg-white rounded-3xl shadow-xl shadow-indigo-100/60 border border-slate-100 p-6 sm:p-8 overflow-hidden relative">
+        <div class="absolute -top-12 -right-12 w-40 h-40 bg-indigo-100/60 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold mb-4">
+            <span>🎯</span> Teori Zone of Proximal Development (ZPD) • Pembelajaran Adaptif
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
+            Sedia untuk Cemerlang dalam Ujian RBT Minggu Depan?
+          </h2>
+          <p class="mt-3 text-slate-600 text-sm sm:text-base leading-relaxed">
+            Kuiz ini mengandungi <strong>50 soalan berfokuskan kefahaman konsep</strong> merangkumi Lakaran Piktorial, Sistem Fertigasi, Reka Bentuk Fesyen, dan Penyelesaian Masalah Inventif. Sistem akan melaraskan aras kesukaran secara automatik mengikut tahap penguasaan anda!
+          </p>
+
+          <!-- Tip Istilah Bergaris Titik -->
+          <div class="mt-4 p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-100 text-xs sm:text-sm text-slate-700 flex items-start gap-3">
+            <span class="text-xl leading-none">💡</span>
+            <p>
+              Nampak perkataan bergaris titik-titik seperti <span class="vocab-word" data-term="fertigasi">fertigasi</span> atau <span class="vocab-word" data-term="isometrik">isometrik</span>? <strong>Klik atau sentuh</strong> perkataan tersebut untuk melihat terjemahan <strong>Bahasa Cina &amp; Bahasa Inggeris</strong> serta mendengar sebutan audio!
+            </p>
+          </div>
+
+          <!-- Pilihan Mod Pembelajaran -->
+          <div class="mt-6">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-3">Pilih Mod Latihan Anda:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              <!-- Mod Adaptif ZPD -->
+              <label class="mode-card relative cursor-pointer rounded-2xl border-2 border-indigo-500 bg-indigo-50/50 p-4 transition hover:shadow-md">
+                <input type="radio" name="quizMode" value="adaptive" checked class="sr-only" />
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🧠</span>
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-600 text-white">Disyorkan</span>
+                </div>
+                <div class="font-bold text-slate-900 text-sm sm:text-base">Mod Adaptif (ZPD)</div>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Aras soalan berubah mengikut prestasi anda. Bantuan (<em>Hints</em>) tersedia bila diperlukan.
+                </p>
+              </label>
+
+              <!-- Mod Bantuan (Hints Mode) -->
+              <label class="mode-card relative cursor-pointer rounded-2xl border-2 border-slate-200 bg-white p-4 transition hover:border-emerald-300 hover:shadow-md">
+                <input type="radio" name="quizMode" value="hints" class="sr-only" />
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">🛟</span>
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Bimbingan</span>
+                </div>
+                <div class="font-bold text-slate-900 text-sm sm:text-base">Mod Bantuan (Hints)</div>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Petunjuk ZPD dipaparkan secara automatik pada setiap soalan tanpa had masa. Sesuai untuk mula ulang kaji.
+                </p>
+              </label>
+
+              <!-- Mod Cabaran (Challenge Mode) -->
+              <label class="mode-card relative cursor-pointer rounded-2xl border-2 border-slate-200 bg-white p-4 transition hover:border-amber-300 hover:shadow-md">
+                <input type="radio" name="quizMode" value="challenge" class="sr-only" />
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-2xl">⚡</span>
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">30s / Soalan</span>
+                </div>
+                <div class="font-bold text-slate-900 text-sm sm:text-base">Mod Cabaran</div>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Uji ketangkasan dengan pemasa 30 saat setiap soalan, kombo streak, dan tanpa bantuan petunjuk!
+                </p>
+              </label>
+            </div>
+          </div>
+
+          <!-- Ringkasan Topik -->
+          <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+              <div class="text-lg font-extrabold text-indigo-600">13</div>
+              <div class="text-xs font-semibold text-slate-600">Lakaran Piktorial</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+              <div class="text-lg font-extrabold text-emerald-600">13</div>
+              <div class="text-xs font-semibold text-slate-600">Sistem Fertigasi</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+              <div class="text-lg font-extrabold text-pink-600">12</div>
+              <div class="text-xs font-semibold text-slate-600">Reka Bentuk Fesyen</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+              <div class="text-lg font-extrabold text-amber-600">12</div>
+              <div class="text-xs font-semibold text-slate-600">Masalah Inventif</div>
+            </div>
+          </div>
+
+          <!-- Butang Mula -->
+          <div class="mt-7 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-slate-500">
+              ✅ Maklum balas segera • 🔁 Ulang kaji soalan salah di akhir • 🏆 Sijil pencapaian
+            </p>
+            <button id="btnStartQuiz" type="button" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-base shadow-lg shadow-indigo-200 transition transform active:scale-95">
+              Mula Kuiz Sekarang →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SKRIN KUIZ (QUIZ SCREEN) -->
+    <section id="screenQuiz" class="hidden space-y-4">
+      <!-- Bar Status & Kemajuan -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm mb-2.5">
+          <div class="flex items-center gap-2">
+            <span id="phaseBadge" class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 font-bold text-xs">
+              Soalan 1 / 50
+            </span>
+            <span id="topicBadge" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">
+              Lakaran Piktorial
+            </span>
+            <span id="zpdLevelBadge" class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs">
+              ZPD: Asas
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3 font-bold">
+            <span id="timerDisplay" class="hidden px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs flex items-center gap-1">
+              ⏱️ <span id="timerSec">30</span>s
+            </span>
+            <span id="streakDisplay" class="text-amber-600 text-xs sm:text-sm hidden">
+              🔥 Streak: <span id="streakCount">0</span>
+            </span>
+            <span class="text-indigo-700 text-xs sm:text-sm">
+              Skor: <span id="scoreCount">0</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Bar Kemajuan -->
+        <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div id="progressBar" class="progress-transition h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full" style="width: 2%;"></div>
+        </div>
+      </div>
+
+      <!-- Notifikasi Pusingan Ulang Kaji (jika dalam Retry Phase) -->
+      <div id="retryBanner" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-center gap-2.5">
+        <span class="text-lg">🔁</span>
+        <div>
+          <strong>Pusingan Pemantapan (Ulang Kaji Soalan Salah):</strong> Cuba jawab semula soalan yang kurang tepat tadi untuk mengukuhkan kefahaman anda!
+        </div>
+      </div>
+
+      <!-- Kad Soalan -->
+      <div class="bg-white rounded-3xl shadow-lg shadow-slate-200/60 border border-slate-100 p-5 sm:p-7 animate-pop">
+        <!-- Teks Soalan -->
+        <div id="questionText" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed"></div>
+
+        <!-- Ilustrasi SVG (Jika ada) -->
+        <div id="questionVisual" class="hidden my-4 flex justify-center bg-slate-50 rounded-2xl p-4 border border-slate-200/70"></div>
+
+        <!-- Kawalan Petunjuk (ZPD Hint) -->
+        <div id="hintSection" class="mt-4">
+          <button id="btnToggleHint" type="button" class="text-xs sm:text-sm font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-3.5 py-2 rounded-xl transition inline-flex items-center gap-1.5">
+            <span>💡</span> Perlukan Petunjuk (Bantuan ZPD)?
+          </button>
+          <div id="hintBox" class="hidden mt-2.5 p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200 text-xs sm:text-sm text-amber-950 leading-relaxed animate-pop">
+            <span class="font-bold text-amber-800">💡 Petunjuk ZPD: </span>
+            <span id="hintContent"></span>
+          </div>
+        </div>
+
+        <!-- Pilihan Jawapan -->
+        <div id="optionsContainer" class="mt-5 grid grid-cols-1 gap-3"></div>
+
+        <!-- Kotak Maklum Balas Terperinci -->
+        <div id="feedbackBox" class="hidden mt-6 rounded-2xl p-4 sm:p-5 border-2 animate-pop space-y-3">
+          <div class="flex items-start gap-3">
+            <div id="feedbackIcon" class="text-2xl leading-none mt-0.5"></div>
+            <div class="flex-1">
+              <h4 id="feedbackTitle" class="font-extrabold text-base"></h4>
+              <p id="motivationMsg" class="hidden mt-1 text-xs sm:text-sm font-medium italic"></p>
+            </div>
+          </div>
+
+          <!-- Mengapa pilihan anda salah (Hanya dipaparkan jika salah) -->
+          <div id="wrongReasonBox" class="hidden p-3.5 rounded-xl bg-rose-50/90 border border-rose-200 text-xs sm:text-sm text-rose-900 leading-relaxed">
+            <span class="font-bold block mb-0.5">🔍 Mengapa pilihan anda kurang tepat:</span>
+            <span id="wrongReasonText"></span>
+          </div>
+
+          <!-- Penerangan Jawapan Tepat (Sentiasa dipaparkan sama ada betul atau salah) -->
+          <div id="correctBriefBox" class="p-3.5 rounded-xl bg-emerald-50/90 border border-emerald-200 text-xs sm:text-sm text-emerald-950 leading-relaxed">
+            <span class="font-bold block mb-0.5">📘 Penerangan Konsep &amp; Jawapan Tepat:</span>
+            <span id="correctBriefText"></span>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button id="btnNextQuestion" type="button" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md transition active:scale-95">
+              Soalan Seterusnya →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SKRIN TRANSISI ULANG KAJI SOALAN SALAH -->
+    <section id="screenRetryIntro" class="hidden animate-pop">
+      <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 text-center space-y-5">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-3xl">
+          🔁
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900">Tahniah! Anda telah tamat 50 soalan!</h2>
+        <p class="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
+          Skor pusingan pertama anda ialah <strong id="firstPassScoreText" class="text-indigo-700">0 / 50</strong>.
+          Terdapat <strong id="wrongCountText" class="text-rose-600">0</strong> soalan yang masih perlu dimantapkan. Mari kita cuba semula soalan-soalan tersebut supaya anda benar-benar bersedia untuk ujian!
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button id="btnStartRetry" type="button" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg transition">
+            Mula Ulang Kaji Soalan Salah →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SKRIN MASUKKAN NAMA UNTUK SIJIL -->
+    <section id="screenNamePrompt" class="hidden animate-pop">
+      <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 max-w-lg mx-auto text-center space-y-5">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl">
+          🏆
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900">Syabas! Misi Ulang Kaji Selesai!</h2>
+        <p class="text-sm text-slate-600">
+          Masukkan nama penuh dan kelas anda untuk menjana <strong>Sijil Pencapaian Ulang Kaji RBT</strong> rasmi anda.
+        </p>
+
+        <form id="certForm" class="space-y-4 text-left">
+          <div>
+            <label for="inputStudentName" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Nama Penuh Murid *</label>
+            <input id="inputStudentName" type="text" required maxlength="60" placeholder="Contoh: Ahmad Danial bin Azman" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium" />
+          </div>
+          <div>
+            <label for="inputStudentClass" class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Kelas (Pilihan)</label>
+            <input id="inputStudentClass" type="text" maxlength="25" placeholder="Contoh: 1 Arif" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium" />
+          </div>
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-base shadow-lg transition">
+            Jana Sijil Pencapaian 🎓
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 5. SKRIN SIJIL PENCAPAIAN (CERTIFICATE SCREEN) -->
+    <section id="screenCertificate" class="hidden animate-pop space-y-5">
+      <!-- Arahan Screenshot & Kongsi Telegram -->
+      <div class="p-4 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg flex items-start sm:items-center gap-3.5">
+        <div class="text-3xl leading-none">📲</div>
+        <div class="text-xs sm:text-sm leading-relaxed">
+          <strong class="block text-sm sm:text-base">Tindakan Seterusnya: Kongsi ke Telegram!</strong>
+          Sila <strong>tangkap layar (screenshot)</strong> sijil pencapaian di bawah dan kongsikan ke dalam <strong>kumpulan Telegram kelas</strong> sebagai bukti ulang kaji anda.
+        </div>
+      </div>
+
+      <!-- Kad Sijil -->
+      <div id="certificateCard" class="cert-pattern rounded-3xl p-4 sm:p-7 shadow-2xl border-4 border-amber-400/80 relative overflow-hidden">
+        <div class="border-2 border-indigo-900/20 rounded-2xl p-5 sm:p-8 bg-white/85 backdrop-blur-xs relative">
+          <!-- Hiasan Sudut -->
+          <div class="flex items-center justify-between border-b border-amber-200 pb-4 mb-5">
+            <div class="flex items-center gap-2.5">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-700 to-blue-600 text-white flex items-center justify-center font-extrabold text-sm shadow">
+                RBT
+              </div>
+              <div>
+                <div class="text-[11px] font-bold uppercase tracking-widest text-indigo-700">KSSM Tingkatan 1</div>
+                <div class="text-xs font-semibold text-slate-500">Reka Bentuk dan Teknologi</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-amber-700">Sesi Akademik 2026</div>
+              <div id="certDate" class="text-xs font-medium text-slate-500"></div>
+            </div>
+          </div>
+
+          <!-- Tajuk Sijil -->
+          <div class="text-center space-y-2">
+            <div class="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold tracking-wider uppercase">
+              Sijil Pencapaian Ulang Kaji
+            </div>
+            <h2 class="font-serif-cert text-2xl sm:text-4xl font-extrabold text-slate-900">
+              PENGIKTIRAFAN KEJAYAAN
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-600">Dengan ini diperakui bahawa</p>
+            <div id="certStudentName" class="text-xl sm:text-3xl font-extrabold text-indigo-800 py-1 border-b-2 border-amber-300 inline-block px-4"></div>
+            <div id="certStudentClass" class="text-xs sm:text-sm font-semibold text-slate-500"></div>
+            <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto pt-1">
+              telah berjaya menamatkan <strong>50 Soalan Kuiz Ulang Kaji Berfokuskan Kefahaman (ZPD)</strong> bagi persediaan Ujian RBT Tingkatan 1.
+            </p>
+          </div>
+
+          <!-- Paparan Skor Utama -->
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            <div class="p-4 rounded-2xl bg-indigo-50 border border-indigo-200">
+              <div class="text-xs font-bold text-indigo-700 uppercase">Skor Akhir</div>
+              <div id="certFinalScore" class="text-2xl sm:text-3xl font-extrabold text-indigo-900 mt-1">0 / 50</div>
+              <div id="certPercentage" class="text-xs font-bold text-indigo-600">0%</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+              <div class="text-xs font-bold text-emerald-700 uppercase">Tahap Penguasaan</div>
+              <div id="certGrade" class="text-xl sm:text-2xl font-extrabold text-emerald-900 mt-1">Cemerlang</div>
+              <div id="certModeUsed" class="text-xs font-semibold text-emerald-700">Mod Adaptif</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+              <div class="text-xs font-bold text-amber-700 uppercase">Pemantapan</div>
+              <div id="certRetryStat" class="text-xl sm:text-2xl font-extrabold text-amber-900 mt-1">100%</div>
+              <div class="text-xs font-semibold text-amber-700">Semua Soalan Dikuasai</div>
+            </div>
+          </div>
+
+          <!-- Analisis Mengikut Topik -->
+          <div class="mt-6 pt-5 border-t border-slate-200">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3 text-center">Analisis Prestasi Mengikut Topik</h3>
+            <div id="certTopicBreakdown" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"></div>
+          </div>
+
+          <!-- Meterai & Pengesahan -->
+          <div class="mt-6 pt-4 border-t border-amber-200 flex items-center justify-between text-xs text-slate-500">
+            <div>
+              <div class="font-bold text-slate-700">Disahkan secara digital</div>
+              <div>Sistem Ulang Kaji Adaptif RBT</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-10 h-10 rounded-full bg-amber-100 border-2 border-amber-400 flex items-center justify-center text-lg shadow-sm" title="Lencana Cemerlang">🏅</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Butang Ulang Kuiz -->
+      <div class="flex justify-center pt-2">
+        <button id="btnRestartAll" type="button" class="px-6 py-3 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-sm shadow-sm transition">
+          🔄 Jawab Kuiz Semula
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER (DENGAN EASTER EGG) ==================== -->
+  <footer class="mt-auto border-t border-slate-200/80 bg-white/80 py-4 px-4 text-center">
+    <p id="footerCopyright" class="text-xs font-semibold text-slate-500 select-none cursor-default inline-block px-3 py-1 rounded-lg">
+      copywrite to TienPing @ 2026
+    </p>
+  </footer>
+
+  <!-- ==================== BELON TERJEMAHAN & AUDIO (POPOVER) ==================== -->
+  <div id="vocabBalloon" class="hidden fixed z-50 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-indigo-200 p-4 animate-pop" role="dialog" aria-label="Terjemahan Istilah">
+    <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2.5 mb-3">
+      <div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-500">Kamus Istilah RBT</span>
+        <h4 id="balloonTermBM" class="text-base font-extrabold text-slate-900 capitalize"></h4>
+      </div>
+      <button id="btnCloseBalloon" type="button" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">✕</button>
+    </div>
+
+    <div class="space-y-2.5 text-sm">
+      <!-- Baris BM -->
+      <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 block">BAHASA MELAYU</span>
+          <span id="balloonValBM" class="font-semibold text-slate-800"></span>
+        </div>
+        <button id="btnSpeakBM" type="button" class="w-9 h-9 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-700 flex items-center justify-center transition shrink-0" title="Dengar sebutan Bahasa Melayu">
+          🔊
+        </button>
+      </div>
+
+      <!-- Baris Mandarin -->
+      <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-rose-50/60 border border-rose-100">
+        <div>
+          <span class="text-[10px] font-bold text-rose-400 block">中文 (MANDARIN)</span>
+          <span id="balloonValZH" class="font-semibold text-slate-800"></span>
+        </div>
+        <button id="btnSpeakZH" type="button" class="w-9 h-9 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 flex items-center justify-center transition shrink-0" title="Dengar sebutan Mandarin">
+          🔊
+        </button>
+      </div>
+
+      <!-- Baris English -->
+      <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-sky-50/60 border border-sky-100">
+        <div>
+          <span class="text-[10px] font-bold text-sky-500 block">ENGLISH</span>
+          <span id="balloonValEN" class="font-semibold text-slate-800"></span>
+        </div>
+        <button id="btnSpeakEN" type="button" class="w-9 h-9 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-700 flex items-center justify-center transition shrink-0" title="Listen in English">
+          🔊
+        </button>
+      </div>
+    </div>
+
+    <p id="ttsStatus" class="hidden mt-2 text-[11px] text-center text-indigo-600 font-medium"></p>
+  </div>
+
+  <!-- ==================== MODAL PANDUAN ISTILAH ==================== -->
+  <div id="modalVocabGuide" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-pop space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-slate-900">📖 Cara Guna Kamus Istilah</h3>
+        <button id="btnCloseVocabGuide" type="button" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 font-bold text-slate-600">✕</button>
+      </div>
+      <p class="text-sm text-slate-600 leading-relaxed">
+        Sepanjang kuiz ini, perkataan teknikal atau istilah yang jarang digunakan ditandakan dengan <span class="vocab-word" data-term="estetika">garis titik-titik</span>.
+      </p>
+      <ul class="text-sm text-slate-700 space-y-2 list-disc pl-5">
+        <li><strong>Klik / Sentuh</strong> mana-mana perkataan bergaris titik-titik untuk membuka belon terjemahan.</li>
+        <li>Lihat maksud dalam <strong>Bahasa Cina (Mandarin)</strong> dan <strong>Bahasa Inggeris</strong>.</li>
+        <li>Tekan ikon <strong>🔊</strong> di dalam belon untuk mendengar bacaan audio bagi ketiga-tiga bahasa!</li>
+      </ul>
+      <button id="btnOkVocabGuide" type="button" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm">Faham!</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL EASTER EGG (INFO PENULIS) ==================== -->
+  <div id="modalAuthor" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border-2 border-indigo-200 animate-pop text-center space-y-4">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center text-2xl font-extrabold shadow-md">
+        TP
+      </div>
+      <div>
+        <span class="text-[11px] font-bold uppercase tracking-widest text-indigo-600">Maklumat Pembangun</span>
+        <h3 class="text-xl font-extrabold text-slate-900 mt-1">Lim Tien Ping</h3>
+      </div>
+      <div class="space-y-2 text-sm bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-left">
+        <div class="flex items-center gap-2">
+          <span>✉️</span>
+          <a href="mailto:petwesley@gmail.com" class="text-indigo-700 font-semibold hover:underline break-all">petwesley@gmail.com</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <span>🏫</span>
+          <a href="mailto:g-39576509@moe-dl.edu.my" class="text-indigo-700 font-semibold hover:underline break-all">g-39576509@moe-dl.edu.my</a>
+        </div>
+      </div>
+      <button id="btnCloseAuthor" type="button" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm">Tutup</button>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    /*************************************************************************
+     * 1. KAMUS ISTILAH (GLOSSARY) — BM, MANDARIN & ENGLISH
+     *************************************************************************/
+    const GLOSSARY = {
+      "isometrik": { bm: "Isometrik", zh: "等轴测图 (Děngzhóucètú)", zhSpeak: "等轴测图", en: "Isometric" },
+      "oblik": { bm: "Oblik", zh: "斜视图 (Xiéshìtú)", zhSpeak: "斜视图", en: "Oblique" },
+      "perspektif": { bm: "Perspektif", zh: "透视图 (Tòushìtú)", zhSpeak: "透视图", en: "Perspective" },
+      "piktorial": { bm: "Piktorial", zh: "立体图 / 象形图 (Lìtǐtú)", zhSpeak: "立体图", en: "Pictorial" },
+      "rendering": { bm: "Rendering", zh: "渲染 (Xuànrǎn)", zhSpeak: "渲染", en: "Rendering" },
+      "estetika": { bm: "Estetika", zh: "美学 / 美观 (Měixué)", zhSpeak: "美学", en: "Aesthetics" },
+      "ergonomik": { bm: "Ergonomik", zh: "人体工学 (Réntǐ gōngxué)", zhSpeak: "人体工学", en: "Ergonomics" },
+      "garis ufuk": { bm: "Garis ufuk", zh: "地平线 / 视平线 (Shìpíngxiàn)", zhSpeak: "视平线", en: "Horizon line" },
+      "garis bumi": { bm: "Garis bumi", zh: "基线 / 地面线 (Dìmiànxiàn)", zhSpeak: "地面线", en: "Ground line" },
+      "titik lenyap": { bm: "Titik lenyap", zh: "灭点 / 消失点 (Xiāoshīdiǎn)", zhSpeak: "消失点", en: "Vanishing point" },
+      "unjuran": { bm: "Unjuran", zh: "投影 (Tóuyǐng)", zhSpeak: "投影", en: "Projection" },
+      "legapkan": { bm: "Legapkan", zh: "加深线条 (Jiāshēn xiàntiáo)", zhSpeak: "加深线条", en: "Darken / Solidify lines" },
+      "pelan": { bm: "Pelan", zh: "平面图 / 俯视图 (Fǔshìtú)", zhSpeak: "俯视图", en: "Plan view (Top view)" },
+      "kavalier": { bm: "Kavalier", zh: "斜等测图 (Xiéděngcètú)", zhSpeak: "斜等测图", en: "Cavalier" },
+      "kabinet": { bm: "Kabinet", zh: "斜二测图 (Xié'èrcètú)", zhSpeak: "斜二测图", en: "Cabinet" },
+      "tekstur": { bm: "Tekstur", zh: "质感 / 纹理 (Zhìgǎn)", zhSpeak: "质感", en: "Texture" },
+      "fertigasi": { bm: "Fertigasi", zh: "水肥一体化 / 滴灌施肥 (Dīguàn shīféi)", zhSpeak: "滴灌施肥", en: "Fertigation" },
+      "fotosintesis": { bm: "Fotosintesis", zh: "光合作用 (Guānghé zuòyòng)", zhSpeak: "光合作用", en: "Photosynthesis" },
+      "nutrien": { bm: "Nutrien", zh: "营养液 / 养分 (Yǎngfèn)", zhSpeak: "养分", en: "Nutrient" },
+      "penitis": { bm: "Penitis", zh: "滴头 (Dītóu)", zhSpeak: "滴头", en: "Dripper / Emitter" },
+      "injap penahan": { bm: "Injap penahan", zh: "截止阀 / 开关阀 (Jiézhǐfá)", zhSpeak: "截止阀", en: "Stop valve" },
+      "paip poli": { bm: "Paip poli", zh: "聚乙烯管 (Jùyǐxī guǎn)", zhSpeak: "聚乙烯管", en: "Poly pipe" },
+      "tertier": { bm: "Tertier", zh: "三级 / 末端分支 (Sānjí)", zhSpeak: "三级分支", en: "Tertiary" },
+      "sekunder": { bm: "Sekunder", zh: "二级 / 次级 (Èrjí)", zhSpeak: "次级", en: "Secondary" },
+      "gegelang": { bm: "Gegelang", zh: "环形排列 (Huánxíng)", zhSpeak: "环形排列", en: "Ring / Loop layout" },
+      "jejari": { bm: "Jejari", zh: "放射状 / 支线排列 (Fàngshèzhuàng)", zhSpeak: "放射状排列", en: "Radial / Branch layout" },
+      "aeroponik": { bm: "Aeroponik", zh: "气雾栽培 (Qìwù zāipéi)", zhSpeak: "气雾栽培", en: "Aeroponics" },
+      "hidroponik": { bm: "Hidroponik", zh: "水耕栽培 (Shuǐgēng zāipéi)", zhSpeak: "水耕栽培", en: "Hydroponics" },
+      "cocopeat": { bm: "Cocopeat", zh: "椰糠 (Yēkāng)", zhSpeak: "椰糠", en: "Cocopeat (Coconut coir)" },
+      "peramal fesyen": { bm: "Peramal fesyen", zh: "时尚趋势预测师 (Shíshàng yùcèshī)", zhSpeak: "时尚趋势预测师", en: "Fashion forecaster" },
+      "perunding imej": { bm: "Perunding imej", zh: "形象顾问 (Xíngxiàng gùwèn)", zhSpeak: "形象顾问", en: "Image consultant" },
+      "aksesori": { bm: "Aksesori", zh: "配饰 / 装饰品 (Pèishì)", zhSpeak: "配饰", en: "Accessories" },
+      "penetas": { bm: "Penetas", zh: "拆线器 (Chāixiànqì)", zhSpeak: "拆线器", en: "Seam ripper" },
+      "roda surih": { bm: "Roda surih", zh: "划轮 / 滚轮 (Huálún)", zhSpeak: "划轮", en: "Tracing wheel" },
+      "mendraf": { bm: "Mendraf", zh: "打版 / 绘图 (Dǎbǎn)", zhSpeak: "打版", en: "Drafting" },
+      "meretas": { bm: "Meretas", zh: "拆线 (Chāixiàn)", zhSpeak: "拆线", en: "Unpicking / Ripping stitches" },
+      "cantuman": { bm: "Cantuman", zh: "拼接 / 连接 (Pīnjiē)", zhSpeak: "拼接", en: "Joining / Seaming" },
+      "mock-up": { bm: "Mock-up", zh: "实物模型 / 样机 (Yàngjī)", zhSpeak: "实物模型", en: "Mock-up" },
+      "sulaman": { bm: "Sulaman", zh: "刺绣 (Cìxiù)", zhSpeak: "刺绣", en: "Embroidery" },
+      "tampalan": { bm: "Tampalan", zh: "粘贴 / 贴布 (Zhāntiē)", zhSpeak: "粘贴", en: "Patching / Gluing" },
+      "inventif": { bm: "Inventif", zh: "发明性 / 创新性 (Fāmíngxìng)", zhSpeak: "发明性", en: "Inventive" },
+      "percanggahan fizikal": { bm: "Percanggahan fizikal", zh: "物理矛盾 (Wùlǐ máodùn)", zhSpeak: "物理矛盾", en: "Physical contradiction" },
+      "model fungsi": { bm: "Model fungsi", zh: "功能模型 (Gōngnéng móxíng)", zhSpeak: "功能模型", en: "Function model" },
+      "komponen": { bm: "Komponen", zh: "组件 / 零件 (Zǔjiàn)", zhSpeak: "组件", en: "Component" },
+      "supersistem": { bm: "Supersistem", zh: "超系统 / 外部环境 (Chāoxìtǒng)", zhSpeak: "超系统", en: "Supersystem" },
+      "pemisahan ruang": { bm: "Pemisahan ruang", zh: "空间分离 (Kōngjiān fēnlí)", zhSpeak: "空间分离", en: "Separation in space" },
+      "pemisahan masa": { bm: "Pemisahan masa", zh: "时间分离 (Shíjiān fēnlí)", zhSpeak: "时间分离", en: "Separation in time" },
+
+      // Tambahan kosa kata Bahasa Melayu untuk membantu kefahaman murid
+      "percikan": { bm: "Percikan", zh: "喷洒 / 溅射 (Pēnsǎ)", zhSpeak: "喷洒", en: "Sprinkler / Splash" },
+      "kesan sampingan": { bm: "Kesan sampingan", zh: "副作用 (Fùzuòyòng)", zhSpeak: "副作用", en: "Side effect" },
+      "sampingan": { bm: "Sampingan", zh: "附带 / 副的 (Fùdài)", zhSpeak: "附带", en: "Side / Secondary" },
+      "halangan": { bm: "Halangan", zh: "障碍 / 阻碍 (Zhàng'ài)", zhSpeak: "障碍", en: "Obstacle / Barrier" },
+      "penambahbaikan": { bm: "Penambahbaikan", zh: "改进 / 改善 (Gǎijìn)", zhSpeak: "改进", en: "Improvement" },
+      "mustahil": { bm: "Mustahil", zh: "不可能 (Bù kěnéng)", zhSpeak: "不可能", en: "Impossible" },
+      "kompleks": { bm: "Kompleks", zh: "复杂 (Fùzá)", zhSpeak: "复杂", en: "Complex" },
+      "iklim": { bm: "Iklim", zh: "气候 (Qìhòu)", zhSpeak: "气候", en: "Climate" },
+      "tapak": { bm: "Tapak", zh: "场地 / 基地 (Chǎngdì)", zhSpeak: "场地", en: "Site / Base" },
+      "pinggul": { bm: "Pinggul", zh: "臀部 / 胯部 (Túnbù)", zhSpeak: "臀部", en: "Hips" },
+      "corak": { bm: "Corak", zh: "图案 / 花纹 (Tú'àn)", zhSpeak: "图案", en: "Pattern / Print" },
+      "pelapik": { bm: "Pelapik", zh: "垫肩 / 衬垫 (Chèndiàn)", zhSpeak: "衬垫", en: "Padding / Pad" },
+      "melintang": { bm: "Melintang", zh: "横向 / 水平 (Héngxiàng)", zhSpeak: "横向", en: "Horizontal" },
+      "menegak": { bm: "Menegak", zh: "垂直 / 竖直 (Chuízhí)", zhSpeak: "垂直", en: "Vertical" },
+      "paksi": { bm: "Paksi", zh: "轴线 (Zhóuxiàn)", zhSpeak: "轴线", en: "Axis" },
+      "separuh": { bm: "Separuh", zh: "一半 (Yībàn)", zhSpeak: "一半", en: "Half" },
+      "contengan": { bm: "Contengan", zh: "草图 / 涂鸦 (Cǎotú)", zhSpeak: "草图", en: "Doodle / Rough sketch" },
+      "melakar": { bm: "Melakar", zh: "素描 / 草绘 (Cǎohuì)", zhSpeak: "草绘", en: "To sketch" },
+      "realistik": { bm: "Realistik", zh: "逼真 / 写实 (Bīzhēn)", zhSpeak: "逼真", en: "Realistic" },
+      "urutan": { bm: "Urutan", zh: "顺序 / 次序 (Shùnxù)", zhSpeak: "顺序", en: "Sequence / Order" },
+
+      // Kosa kata tambahan daripada soalan & penerangan kuiz
+      "dimensi": { bm: "Dimensi", zh: "尺寸 / 维度 (Chǐcùn)", zhSpeak: "尺寸", en: "Dimension" },
+      "kecondongan": { bm: "Kecondongan", zh: "倾斜度 (Qīngxiédù)", zhSpeak: "倾斜度", en: "Inclination / Tilt" },
+      "selari": { bm: "Selari", zh: "平行 (Píngxíng)", zhSpeak: "平行", en: "Parallel" },
+      "surut": { bm: "Surut", zh: "后退 / 缩减 (Hòutuì)", zhSpeak: "后退", en: "Receding" },
+      "kedalaman": { bm: "Kedalaman", zh: "深度 (Shēndù)", zhSpeak: "深度", en: "Depth" },
+      "melengkung": { bm: "Melengkung", zh: "弯曲 (Wānqū)", zhSpeak: "弯曲", en: "Curved" },
+      "membonjol": { bm: "Membonjol", zh: "凸起 (Tūqǐ)", zhSpeak: "凸起", en: "Bulging / Convex" },
+      "melorek": { bm: "Melorek", zh: "涂阴影 / 排线 (Tú yīnyǐng)", zhSpeak: "涂阴影", en: "Shading" },
+      "ilusi": { bm: "Ilusi", zh: "错觉 / 视觉效果 (Cuòjué)", zhSpeak: "错觉", en: "Illusion" },
+      "perincian": { bm: "Perincian", zh: "细化 / 细节 (Xìjié)", zhSpeak: "细节", en: "Detailing" },
+      "kriteria": { bm: "Kriteria", zh: "标准 / 条件 (Biāozhǔn)", zhSpeak: "标准", en: "Criteria" },
+      "rumit": { bm: "Rumit", zh: "繁琐 / 复杂 (Fánsuǒ)", zhSpeak: "繁琐", en: "Complicated" },
+      "perkadaran": { bm: "Perkadaran", zh: "比例 (Bǐlì)", zhSpeak: "比例", en: "Proportion" },
+      "larutan": { bm: "Larutan", zh: "溶液 (Róngyè)", zhSpeak: "溶液", en: "Solution (liquid)" },
+      "kabus": { bm: "Kabus", zh: "雾 / 喷雾 (Pēnwù)", zhSpeak: "喷雾", en: "Mist" },
+      "benda asing": { bm: "Benda asing", zh: "异物 / 杂质 (Zázhì)", zhSpeak: "杂质", en: "Foreign matter" },
+      "mendapan": { bm: "Mendapan", zh: "沉淀物 (Chéndiànwù)", zhSpeak: "沉淀物", en: "Sediment" },
+      "tersumbat": { bm: "Tersumbat", zh: "堵塞 (Dǔsè)", zhSpeak: "堵塞", en: "Clogged / Blocked" },
+      "penyelenggaraan": { bm: "Penyelenggaraan", zh: "维护 / 保养 (Wéihù)", zhSpeak: "维护", en: "Maintenance" },
+      "layu": { bm: "Layu", zh: "枯萎 (Kūwěi)", zhSpeak: "枯萎", en: "Wilt / Wither" },
+      "racun perosak": { bm: "Racun perosak", zh: "农药 / 杀虫剂 (Nóngyào)", zhSpeak: "农药", en: "Pesticide" },
+      "lutsinar": { bm: "Lutsinar", zh: "透明 (Tòumíng)", zhSpeak: "透明", en: "Transparent" },
+      "seimbang": { bm: "Seimbang", zh: "平衡 / 均衡 (Pínghéng)", zhSpeak: "平衡", en: "Balanced" },
+      "terendam": { bm: "Terendam", zh: "浸泡 (Jìnpào)", zhSpeak: "浸泡", en: "Submerged / Soaked" },
+      "palung": { bm: "Palung", zh: "种植槽 / 水槽 (Shuǐcáo)", zhSpeak: "水槽", en: "Trough / Channel" },
+      "kelembapan": { bm: "Kelembapan", zh: "湿度 / 水分 (Shīdù)", zhSpeak: "湿度", en: "Moisture / Humidity" },
+      "kekerapan": { bm: "Kekerapan", zh: "频率 / 次数 (Pínlǜ)", zhSpeak: "频率", en: "Frequency" },
+      "tekanan": { bm: "Tekanan", zh: "压力 (Yālì)", zhSpeak: "压力", en: "Pressure" },
+      "serentak": { bm: "Serentak", zh: "同时 (Tóngshí)", zhSpeak: "同时", en: "Simultaneously" },
+      "penampilan": { bm: "Penampilan", zh: "外表 / 形象 (Wàibiǎo)", zhSpeak: "外表", en: "Appearance" },
+      "fabrik": { bm: "Fabrik", zh: "布料 / 织物 (Bùliào)", zhSpeak: "布料", en: "Fabric" },
+      "pola": { bm: "Pola", zh: "纸样 / 版型 (Zhǐyàng)", zhSpeak: "纸样", en: "Pattern (sewing)" },
+      "ramping": { bm: "Ramping", zh: "纤细 (Xiānxì)", zhSpeak: "纤细", en: "Slim" },
+      "langsing": { bm: "Langsing", zh: "苗条 (Miáotiao)", zhSpeak: "苗条", en: "Slender" },
+      "gempal": { bm: "Gempal", zh: "丰满 / 微胖 (Fēngmǎn)", zhSpeak: "丰满", en: "Plump / Stocky" },
+      "sekata": { bm: "Sekata", zh: "均匀 / 一致 (Jūnyún)", zhSpeak: "均匀", en: "Even / Uniform" },
+      "kemas": { bm: "Kemas", zh: "整齐 / 工整 (Zhěngqí)", zhSpeak: "整齐", en: "Neat / Tidy" },
+      "kukuh": { bm: "Kukuh", zh: "牢固 / 坚固 (Láogù)", zhSpeak: "牢固", en: "Sturdy / Strong" },
+      "menampung": { bm: "Menampung", zh: "承受 / 支撑 (Chéngshòu)", zhSpeak: "承受", en: "To support / Hold" },
+      "punca": { bm: "Punca", zh: "根源 / 原因 (Gēnyuán)", zhSpeak: "原因", en: "Root cause / Source" },
+      "persekitaran": { bm: "Persekitaran", zh: "环境 (Huánjìng)", zhSpeak: "环境", en: "Environment" },
+      "kestabilan": { bm: "Kestabilan", zh: "稳定性 (Wěndìngxìng)", zhSpeak: "稳定性", en: "Stability" },
+      "memudaratkan": { bm: "Memudaratkan", zh: "有害 (Yǒuhài)", zhSpeak: "有害", en: "Harmful" },
+      "fasa": { bm: "Fasa", zh: "阶段 (Jiēduàn)", zhSpeak: "阶段", en: "Phase / Stage" },
+      "sistematik": { bm: "Sistematik", zh: "系统化 (Xìtǒnghuà)", zhSpeak: "系统化", en: "Systematic" },
+      "efektif": { bm: "Efektif", zh: "有效 (Yǒuxiào)", zhSpeak: "有效", en: "Effective" },
+
+      // Kosa kata Bahasa Melayu tambahan (sokongan menyeluruh untuk murid)
+      "pandangan": { bm: "Pandangan", zh: "视图 / 视角 (Shìtú)", zhSpeak: "视图", en: "View" },
+      "hadapan": { bm: "Hadapan", zh: "正面 / 前面 (Zhèngmiàn)", zhSpeak: "正面", en: "Front" },
+      "sisi": { bm: "Sisi", zh: "侧面 (Cèmiàn)", zhSpeak: "侧面", en: "Side" },
+      "keratan": { bm: "Keratan", zh: "剖面 (Pōumiàn)", zhSpeak: "剖面", en: "Cross-section" },
+      "permukaan": { bm: "Permukaan", zh: "表面 (Biǎomiàn)", zhSpeak: "表面", en: "Surface" },
+      "condong": { bm: "Condong", zh: "倾斜 (Qīngxié)", zhSpeak: "倾斜", en: "Inclined / Slanted" },
+      "mendatar": { bm: "Mendatar", zh: "水平 (Shuǐpíng)", zhSpeak: "水平", en: "Horizontal" },
+      "mewakili": { bm: "Mewakili", zh: "代表 (Dàibiǎo)", zhSpeak: "代表", en: "Represents" },
+      "binaan": { bm: "Binaan", zh: "构造 / 辅助 (Gòuzào)", zhSpeak: "构造", en: "Construction" },
+      "membezakan": { bm: "Membezakan", zh: "区分 / 辨别 (Qūfēn)", zhSpeak: "区分", en: "Distinguish / Differentiate" },
+      "tertumpu": { bm: "Tertumpu", zh: "汇聚 / 集中 (Huìjù)", zhSpeak: "汇聚", en: "Converge / Focused" },
+      "pereka": { bm: "Pereka", zh: "设计师 (Shèjìshī)", zhSpeak: "设计师", en: "Designer" },
+      "memadam": { bm: "Memadam", zh: "擦除 (Cāchú)", zhSpeak: "擦除", en: "Erase" },
+      "tersilap": { bm: "Tersilap", zh: "出错 / 弄错 (Chūcuò)", zhSpeak: "出错", en: "Mistaken" },
+      "peringkat": { bm: "Peringkat", zh: "阶段 / 级别 (Jiēduàn)", zhSpeak: "阶段", en: "Stage / Level" },
+      "ringkas": { bm: "Ringkas", zh: "简单 / 简短 (Jiǎndān)", zhSpeak: "简单", en: "Simple / Brief" },
+      "bahan mentah": { bm: "Bahan mentah", zh: "原材料 (Yuáncáiliào)", zhSpeak: "原材料", en: "Raw material" },
+      "kemasan": { bm: "Kemasan", zh: "修饰 / 表面处理 (Xiūshì)", zhSpeak: "修饰", en: "Finishing" },
+      "menonjolkan": { bm: "Menonjolkan", zh: "突出 / 凸显 (Tūchū)", zhSpeak: "突出", en: "Highlight / Emphasize" },
+      "anggaran": { bm: "Anggaran", zh: "预算 / 估计 (Yùsuàn)", zhSpeak: "预算", en: "Estimate / Budget" },
+      "menampakkan": { bm: "Menampakkan", zh: "显示 / 呈现 (Xiǎnshì)", zhSpeak: "显示", en: "Make visible / Show" },
+      "diaplikasikan": { bm: "Diaplikasikan", zh: "应用 / 运用 (Yìngyòng)", zhSpeak: "应用", en: "Applied" },
+      "kontur": { bm: "Kontur", zh: "轮廓 (Lúnkuò)", zhSpeak: "轮廓", en: "Contour" },
+      "ortografik": { bm: "Ortografik", zh: "正投影图 (Zhèngtóuyǐng tú)", zhSpeak: "正投影图", en: "Orthographic" },
+      "bertentangan": { bm: "Bertentangan", zh: "相反 / 对立 (Xiāngfǎn)", zhSpeak: "相反", en: "Opposite" },
+      "konsep": { bm: "Konsep", zh: "概念 (Gàiniàn)", zhSpeak: "概念", en: "Concept" },
+      "pengujian": { bm: "Pengujian", zh: "测试 (Cèshì)", zhSpeak: "测试", en: "Testing" },
+      "beban": { bm: "Beban", zh: "负载 / 重量 (Fùzài)", zhSpeak: "负载", en: "Load / Weight" },
+      "memperhalusi": { bm: "Memperhalusi", zh: "细化 / 完善 (Xìhuà)", zhSpeak: "细化", en: "Refine" },
+      "dikilangkan": { bm: "Dikilangkan", zh: "制造 / 生产 (Zhìzào)", zhSpeak: "制造", en: "Manufactured" },
+      "bucu": { bm: "Bucu", zh: "角落 / 顶点 (Jiǎoluò)", zhSpeak: "角落", en: "Corner / Vertex" },
+      "unjurkan": { bm: "Unjurkan", zh: "投影 / 延伸 (Tóuyǐng)", zhSpeak: "投影", en: "Project (lines)" },
+      "rujukan": { bm: "Rujukan", zh: "参考 (Cānkǎo)", zhSpeak: "参考", en: "Reference" },
+      "cita rasa": { bm: "Cita rasa", zh: "品味 / 喜好 (Pǐnwèi)", zhSpeak: "品味", en: "Taste / Preference" },
+      "pasaran": { bm: "Pasaran", zh: "市场 (Shìchǎng)", zhSpeak: "市场", en: "Market" },
+      "pengeluaran": { bm: "Pengeluaran", zh: "生产 (Shēngchǎn)", zhSpeak: "生产", en: "Production" },
+      "mewah": { bm: "Mewah", zh: "奢华 / 昂贵 (Shēhuá)", zhSpeak: "奢华", en: "Luxurious" },
+      "ditiru": { bm: "Ditiru", zh: "模仿 / 抄袭 (Mófǎng)", zhSpeak: "模仿", en: "Imitated / Copied" },
+      "mempamerkan": { bm: "Mempamerkan", zh: "展示 (Zhǎnshì)", zhSpeak: "展示", en: "Showcase / Display" },
+      "keselesaan": { bm: "Keselesaan", zh: "舒适度 (Shūshìdù)", zhSpeak: "舒适度", en: "Comfort" },
+      "mengoptimumkan": { bm: "Mengoptimumkan", zh: "优化 (Yōuhuà)", zhSpeak: "优化", en: "Optimize" },
+      "sewenang-wenangnya": { bm: "Sewenang-wenangnya", zh: "随意 / 任意 (Suíyì)", zhSpeak: "随意", en: "Arbitrarily" },
+      "berdaya saing": { bm: "Berdaya saing", zh: "有竞争力 (Yǒu jìngzhēnglì)", zhSpeak: "有竞争力", en: "Competitive" },
+      "tarikan": { bm: "Tarikan", zh: "吸引力 (Xīyǐnlì)", zhSpeak: "吸引力", en: "Attraction / Appeal" },
+      "skala": { bm: "Skala", zh: "比例尺 (Bǐlìchǐ)", zhSpeak: "比例尺", en: "Scale" },
+      "dikurangkan": { bm: "Dikurangkan", zh: "减少 / 缩减 (Jiǎnshǎo)", zhSpeak: "减少", en: "Reduced" },
+      "dipendekkan": { bm: "Dipendekkan", zh: "缩短 (Suōduǎn)", zhSpeak: "缩短", en: "Shortened" },
+      "mengekalkan": { bm: "Mengekalkan", zh: "保持 / 维持 (Bǎochí)", zhSpeak: "保持", en: "Maintain" },
+      "mempercepat": { bm: "Mempercepat", zh: "加快 (Jiākuài)", zhSpeak: "加快", en: "Accelerate / Speed up" },
+      "pembangunan": { bm: "Pembangunan", zh: "开发 / 发展 (Kāifā)", zhSpeak: "开发", en: "Development" },
+      "meluahkan": { bm: "Meluahkan", zh: "表达 (Biǎodá)", zhSpeak: "表达", en: "Express" },
+      "mengeksplorasi": { bm: "Mengeksplorasi", zh: "探索 (Tànsuǒ)", zhSpeak: "探索", en: "Explore" },
+      "keuntungan": { bm: "Keuntungan", zh: "利润 (Lìrùn)", zhSpeak: "利润", en: "Profit" },
+      "spesifikasi": { bm: "Spesifikasi", zh: "规格 (Guīgé)", zhSpeak: "规格", en: "Specification" },
+      "ketepatan": { bm: "Ketepatan", zh: "准确性 (Zhǔnquèxìng)", zhSpeak: "准确性", en: "Accuracy" },
+      "baja": { bm: "Baja", zh: "肥料 (Féiliào)", zhSpeak: "肥料", en: "Fertilizer" },
+      "kompos": { bm: "Kompos", zh: "堆肥 (Duīféi)", zhSpeak: "堆肥", en: "Compost" },
+      "rumpai": { bm: "Rumpai", zh: "杂草 (Zácǎo)", zhSpeak: "杂草", en: "Weeds" },
+      "subur": { bm: "Subur", zh: "茂盛 / 肥沃 (Màoshèng)", zhSpeak: "茂盛", en: "Lush / Fertile" },
+      "pengairan": { bm: "Pengairan", zh: "灌溉 (Guàngài)", zhSpeak: "灌溉", en: "Irrigation" },
+      "titis": { bm: "Titis", zh: "滴灌 / 滴水 (Dīguàn)", zhSpeak: "滴灌", en: "Drip" },
+      "banjir": { bm: "Banjir", zh: "漫灌 / 洪水 (Mànguàn)", zhSpeak: "漫灌", en: "Flood" },
+      "mikrotiub": { bm: "Mikrotiub", zh: "微管 / 细管 (Wēiguǎn)", zhSpeak: "微管", en: "Microtube" },
+      "pangkal": { bm: "Pangkal", zh: "根部 / 基部 (Gēnbù)", zhSpeak: "根部", en: "Base (of plant)" },
+      "pembaziran": { bm: "Pembaziran", zh: "浪费 (Làngfèi)", zhSpeak: "浪费", en: "Wastage" },
+      "semaian": { bm: "Semaian", zh: "育苗 / 苗圃 (Yùmiáo)", zhSpeak: "育苗", en: "Seedling / Nursery" },
+      "polibeg": { bm: "Polibeg", zh: "栽培袋 / 塑料种植袋 (Zāipéidài)", zhSpeak: "栽培袋", en: "Polybag" },
+      "penyambung": { bm: "Penyambung", zh: "接头 / 连接件 (Jiētóu)", zhSpeak: "接头", en: "Connector / Fitting" },
+      "tangki": { bm: "Tangki", zh: "水箱 / 储水桶 (Shuǐxiāng)", zhSpeak: "水箱", en: "Tank" },
+      "cabang": { bm: "Cabang", zh: "分支 (Fēnzhī)", zhSpeak: "分支", en: "Branch" },
+      "bendasing": { bm: "Bendasing", zh: "杂质 / 异物 (Zázhì)", zhSpeak: "杂质", en: "Foreign matter / Impurities" },
+      "membelokkan": { bm: "Membelokkan", zh: "转向 / 拐弯 (Zhuǎnxiàng)", zhSpeak: "转向", en: "Turn / Divert" },
+      "memerangkap": { bm: "Memerangkap", zh: "截留 / 捕获 (Jiéliú)", zhSpeak: "截留", en: "Trap" },
+      "keladak": { bm: "Keladak", zh: "沉淀物 / 淤泥 (Chéndiànwù)", zhSpeak: "沉淀物", en: "Sediment / Silt" },
+      "tersekat": { bm: "Tersekat", zh: "受阻 / 堵塞 (Shòuzǔ)", zhSpeak: "受阻", en: "Blocked / Obstructed" },
+      "pemulas": { bm: "Pemulas", zh: "旋钮 / 把手 (Xuánniǔ)", zhSpeak: "旋钮", en: "Handle / Knob" },
+      "takungan": { bm: "Takungan", zh: "蓄水池 / 水槽 (Xùshuǐchí)", zhSpeak: "蓄水池", en: "Reservoir" },
+      "perlindungan": { bm: "Perlindungan", zh: "保护 (Bǎohù)", zhSpeak: "保护", en: "Protection" },
+      "jangkitan": { bm: "Jangkitan", zh: "感染 (Gǎnrǎn)", zhSpeak: "感染", en: "Infection" },
+      "kulat": { bm: "Kulat", zh: "真菌 / 霉菌 (Zhēnjūn)", zhSpeak: "真菌", en: "Fungus" },
+      "dilarutlesapkan": { bm: "Dilarutlesapkan", zh: "被冲走 / 流失 (Liúshī)", zhSpeak: "流失", en: "Leached / Washed away" },
+      "digemari": { bm: "Digemari", zh: "受青睐 / 受欢迎 (Shòu huānyíng)", zhSpeak: "受欢迎", en: "Preferred / Favored" },
+      "gelung": { bm: "Gelung", zh: "环路 / 线圈 (Huánlù)", zhSpeak: "环路", en: "Loop" },
+      "tertutup": { bm: "Tertutup", zh: "封闭 / 闭合 (Fēngbì)", zhSpeak: "封闭", en: "Closed" },
+      "merendam": { bm: "Merendam", zh: "浸泡 (Jìnpào)", zhSpeak: "浸泡", en: "Soak / Submerge" },
+      "beredar": { bm: "Beredar", zh: "循环 / 流动 (Xúnhuán)", zhSpeak: "循环", en: "Circulate" },
+      "berkala": { bm: "Berkala", zh: "定期 (Dìngqī)", zhSpeak: "定期", en: "Periodically" },
+      "gambut": { bm: "Gambut", zh: "泥炭土 (Nítàntǔ)", zhSpeak: "泥炭土", en: "Peat soil" },
+      "penentu": { bm: "Penentu", zh: "决定因素 (Juédìng yīnsù)", zhSpeak: "决定因素", en: "Determinant" },
+      "pengatur masa": { bm: "Pengatur masa", zh: "定时器 (Dìngshíqì)", zhSpeak: "定时器", en: "Timer" },
+      "pancang": { bm: "Pancang", zh: "支架 / 木桩 (Zhījià)", zhSpeak: "支架", en: "Stake / Support post" },
+      "lazim": { bm: "Lazim", zh: "常见 / 普遍 (Chángjiàn)", zhSpeak: "常见", en: "Common / Usual" },
+      "sabut": { bm: "Sabut", zh: "椰壳纤维 (Yēké xiānwéi)", zhSpeak: "椰壳纤维", en: "Coconut husk / Coir" },
+      "sekam": { bm: "Sekam", zh: "谷壳 (Gǔké)", zhSpeak: "谷壳", en: "Rice husk" },
+      "kerikil": { bm: "Kerikil", zh: "碎石 / 砾石 (Suìshí)", zhSpeak: "碎石", en: "Gravel" },
+      "pengudaraan": { bm: "Pengudaraan", zh: "通气 / 通风 (Tōngqì)", zhSpeak: "通气", en: "Aeration / Ventilation" },
+      "merosot": { bm: "Merosot", zh: "下降 / 减弱 (Xiàjiàng)", zhSpeak: "下降", en: "Decline / Drop" },
+      "legap": { bm: "Legap", zh: "不透明 (Bù tòumíng)", zhSpeak: "不透明", en: "Opaque" },
+      "lumut": { bm: "Lumut", zh: "青苔 / 藻类 (Qīngtái)", zhSpeak: "青苔", en: "Algae / Moss" },
+      "pembajaan": { bm: "Pembajaan", zh: "施肥 (Shīféi)", zhSpeak: "施肥", en: "Fertilization" },
+      "pascatuai": { bm: "Pascatuai", zh: "采后处理 (Cǎihòu)", zhSpeak: "采后处理", en: "Post-harvest" },
+      "kerjaya": { bm: "Kerjaya", zh: "职业 / 事业 (Zhíyè)", zhSpeak: "职业", en: "Career" },
+      "meramal": { bm: "Meramal", zh: "预测 (Yùcè)", zhSpeak: "预测", en: "Predict / Forecast" },
+      "khidmat nasihat": { bm: "Khidmat nasihat", zh: "咨询服务 (Zīxún fúwù)", zhSpeak: "咨询服务", en: "Advisory service" },
+      "menanggalkan": { bm: "Menanggalkan", zh: "拆下 / 去除 (Chāixià)", zhSpeak: "拆下", en: "Remove / Detach" },
+      "tergolong": { bm: "Tergolong", zh: "属于 / 归类于 (Shǔyú)", zhSpeak: "属于", en: "Classified / Belongs to" },
+      "kacip": { bm: "Kacip", zh: "纱剪 / 线剪 (Shājiǎn)", zhSpeak: "纱剪", en: "Thread clipper / Snips" },
+      "jidal": { bm: "Jidal", zh: "顶针 (Dǐngzhēn)", zhSpeak: "顶针", en: "Thimble" },
+      "melengkapkan": { bm: "Melengkapkan", zh: "完善 / 搭配 (Wánshàn)", zhSpeak: "完善", en: "Complete / Complement" },
+      "bahu": { bm: "Bahu", zh: "肩膀 (Jiānbǎng)", zhSpeak: "肩膀", en: "Shoulder" },
+      "mengimbangi": { bm: "Mengimbangi", zh: "平衡 (Pínghéng)", zhSpeak: "平衡", en: "Balance" },
+      "ketat": { bm: "Ketat", zh: "紧身 (Jǐnshēn)", zhSpeak: "紧身", en: "Tight" },
+      "berjalur": { bm: "Berjalur", zh: "条纹 (Tiáowén)", zhSpeak: "条纹", en: "Striped" },
+      "jam pasir": { bm: "Jam pasir", zh: "沙漏型 (Shālòu xíng)", zhSpeak: "沙漏型", en: "Hourglass" },
+      "menyatukan": { bm: "Menyatukan", zh: "结合 / 连接 (Jiéhé)", zhSpeak: "结合", en: "Unite / Join" },
+      "manik": { bm: "Manik", zh: "珠子 (Zhūzi)", zhSpeak: "珠子", en: "Beads" },
+      "labuci": { bm: "Labuci", zh: "亮片 (Liàngpiàn)", zhSpeak: "亮片", en: "Sequins" },
+      "tinjauan": { bm: "Tinjauan", zh: "调查 / 考察 (Diàochá)", zhSpeak: "调查", en: "Survey / Review" },
+      "penyelidikan": { bm: "Penyelidikan", zh: "研究 (Yánjiū)", zhSpeak: "研究", en: "Research" },
+      "penjanaan": { bm: "Penjanaan", zh: "产生 / 构思 (Chǎnshēng)", zhSpeak: "产生", en: "Generation" },
+      "prototaip": { bm: "Prototaip", zh: "原型 (Yuánxíng)", zhSpeak: "原型", en: "Prototype" },
+      "olokan": { bm: "Olokan", zh: "模拟 / 样板 (Mónǐ)", zhSpeak: "模拟", en: "Mock / Dummy" },
+      "tahan lasak": { bm: "Tahan lasak", zh: "耐用 / 结实 (Nàiyòng)", zhSpeak: "耐用", en: "Durable" },
+      "kelim": { bm: "Kelim", zh: "接缝 / 缝边 (Jiēfèng)", zhSpeak: "接缝", en: "Seam" },
+      "berkedut": { bm: "Berkedut", zh: "起皱 / 皱褶 (Qǐzhòu)", zhSpeak: "起皱", en: "Wrinkled" },
+      "comot": { bm: "Comot", zh: "脏乱 / 污渍 (Zāngluàn)", zhSpeak: "脏乱", en: "Messy / Smudged" },
+      "mempengaruhi": { bm: "Mempengaruhi", zh: "影响 (Yǐngxiǎng)", zhSpeak: "影响", en: "Influence" },
+      "tubuh": { bm: "Tubuh", zh: "身体 (Shēntǐ)", zhSpeak: "身体", en: "Body" },
+      "mencederakan": { bm: "Mencederakan", zh: "伤害 (Shānghài)", zhSpeak: "伤害", en: "Injure" },
+      "struktur": { bm: "Struktur", zh: "结构 (Jiégòu)", zhSpeak: "结构", en: "Structure" },
+      "diasah": { bm: "Diasah", zh: "削尖 / 磨利 (Xuējiān)", zhSpeak: "削尖", en: "Sharpened" },
+      "tumpul": { bm: "Tumpul", zh: "钝 (Dùn)", zhSpeak: "钝", en: "Blunt" },
+      "dialihkan": { bm: "Dialihkan", zh: "移动 / 搬动 (Yídòng)", zhSpeak: "移动", en: "Moved" },
+      "keberkesanan": { bm: "Keberkesanan", zh: "有效性 / 效果 (Yǒuxiàoxìng)", zhSpeak: "有效性", en: "Effectiveness" },
+      "aliran": { bm: "Aliran", zh: "流程 / 水流 (Liúchéng)", zhSpeak: "流程", en: "Flow" },
+      "pengikat": { bm: "Pengikat", zh: "紧固件 (Jǐngùjiàn)", zhSpeak: "紧固件", en: "Fastener" },
+      "kerangka": { bm: "Kerangka", zh: "框架 (Kuàngjià)", zhSpeak: "框架", en: "Frame" },
+      "menjejak": { bm: "Menjejak", zh: "追踪 (Zhuīzōng)", zhSpeak: "追踪", en: "Trace / Track" },
+      "berantai": { bm: "Berantai", zh: "连锁 (Liánsuǒ)", zhSpeak: "连锁", en: "Chained / Sequential" },
+      "perkhemahan": { bm: "Perkhemahan", zh: "露营 (Lùyíng)", zhSpeak: "露营", en: "Camping" },
+      "kusyen": { bm: "Kusyen", zh: "坐垫 / 软垫 (Zuòdiàn)", zhSpeak: "坐垫", en: "Cushion" },
+      "rawak": { bm: "Rawak", zh: "随机 (Suíjī)", zhSpeak: "随机", en: "Random" },
+      "haba": { bm: "Haba", zh: "热量 (Rèliàng)", zhSpeak: "热量", en: "Heat" }
+    };
+
+    /*************************************************************************
+     * 2. KATA-KATA MOTIVASI (APABILA MURID SALAH MENJAWAB)
+     *************************************************************************/
+    const MOTIVATIONS = [
+      "Jangan risau! Setiap kesilapan hari ini adalah langkah besar menuju skor A dalam ujian nanti. 💪",
+      "Bagus kerana mencuba! Otak kita paling banyak belajar apabila kita menyedari punca kesilapan. 🌟",
+      "Teruskan usaha! Fahami penerangan di bawah — anda pasti tidak akan tersilap lagi dalam exam! 🚀",
+      "Tidak mengapa tersilap sekarang. Lebih baik silap semasa latihan daripada silap semasa ujian sebenar! 😊",
+      "Hebat! Anda sedang berada dalam zon pembelajaran (ZPD). Baca konsep ini dan cuba lagi nanti! 🎯",
+      "Kejayaan datang daripada latihan yang konsisten. Anda semakin hampir menguasai topik ini! ✨"
+    ];
+
+    /*************************************************************************
+     * 3. BANK 50 SOALAN UBAH SUAI BERFOKUSKAN KEFAHAMAN (DENGAN ZPD)
+     * difficulty: 1 (Asas), 2 (Sederhana), 3 (Tinggi / KBAT)
+     *************************************************************************/
+    const QUESTIONS = [
+      // ===================== TOPIK 1: LAKARAN PIKTORIAL (13 SOALAN) =====================
+      {
+        id: 1,
+        topic: "Lakaran Piktorial",
+        difficulty: 1,
+        q: "Dalam sebuah lakaran isometrik, pandangan yang dilihat tepat dari bahagian atas objek dikenali sebagai...",
+        svg: `<svg viewBox="0 0 220 130" class="w-48 h-28"><polygon points="110,20 180,55 110,90 40,55" fill="#e0e7ff" stroke="#3730a3" stroke-width="2"/><polygon points="40,55 110,90 110,120 40,85" fill="#f1f5f9" stroke="#3730a3" stroke-width="2"/><polygon points="180,55 110,90 110,120 180,85" fill="#cbd5e1" stroke="#3730a3" stroke-width="2"/><path d="M110,2 L110,38" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arr)"/><text x="118" y="16" font-size="11" font-weight="bold" fill="#dc2626">Arah X</text></svg>`,
+        options: ["Pelan", "Pandangan hadapan", "Pandangan sisi", "Pandangan keratan"],
+        answer: 0,
+        hint: "Fikirkan istilah teknikal yang sering digunakan oleh arkitek untuk lukisan bangunan dilihat dari atas.",
+        correctBrief: "Pelan ialah pandangan sesuatu objek apabila dilihat tepat dari arah atas (90° dari permukaan atas).",
+        wrongReasons: {
+          1: "Pandangan hadapan dilihat dari bahagian depan objek, bukan dari atas.",
+          2: "Pandangan sisi dilihat dari sebelah kiri atau kanan objek.",
+          3: "Pandangan keratan menunjukkan bahagian dalam objek yang seolah-olah dipotong."
+        }
+      },
+      {
+        id: 2,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Semasa membina paksi asas lakaran isometrik mengikut standard KSSM (paksi menegak OY dan paksi condong 30° OX serta OZ), paksi OZ mewakili dimensi...",
+        svg: `<svg viewBox="0 0 200 120" class="w-44 h-28"><line x1="100" y1="95" x2="100" y2="18" stroke="#334155" stroke-width="2"/><line x1="100" y1="95" x2="175" y2="55" stroke="#dc2626" stroke-width="2.5"/><line x1="100" y1="95" x2="25" y2="55" stroke="#334155" stroke-width="2"/><line x1="20" y1="95" x2="180" y2="95" stroke="#94a3b8" stroke-dasharray="4"/><text x="106" y="25" font-size="12" font-weight="bold" fill="#334155">Y</text><text x="178" y="55" font-size="12" font-weight="bold" fill="#dc2626">Z</text><text x="12" y="55" font-size="12" font-weight="bold" fill="#334155">X</text><text x="96" y="110" font-size="12" font-weight="bold" fill="#334155">O</text><text x="132" y="90" font-size="10" fill="#475569">30°</text><text x="52" y="90" font-size="10" fill="#475569">30°</text></svg>`,
+        options: ["Lebar objek", "Tinggi objek", "Panjang objek", "Sudut kecondongan objek"],
+        answer: 0,
+        hint: "Dalam buku teks RBT Tingkatan 1: OY ialah tinggi objek (menegak), OX ialah panjang objek, manakala OZ ialah...",
+        correctBrief: "Mengikut paksi isometrik KSSM RBT Tingkatan 1, paksi menegak OY menunjukkan tinggi objek, paksi OX menunjukkan panjang objek, dan paksi OZ menunjukkan lebar objek.",
+        wrongReasons: {
+          1: "Tinggi objek diwakili oleh paksi menegak OY, bukan paksi OZ.",
+          2: "Panjang objek diwakili oleh paksi condong OX.",
+          3: "Sudut 30° ialah sudut binaan antara garisan mendatar dengan paksi OX dan OZ, bukan dimensi paksi OZ."
+        }
+      },
+      {
+        id: 3,
+        topic: "Lakaran Piktorial",
+        difficulty: 1,
+        q: "Apakah ciri utama yang membezakan lakaran oblik daripada lakaran isometrik?",
+        svg: `<svg viewBox="0 0 210 110" class="w-44 h-24"><rect x="35" y="40" width="80" height="50" fill="#e0e7ff" stroke="#1e293b" stroke-width="2"/><polygon points="115,40 155,15 155,65 115,90" fill="#cbd5e1" stroke="#1e293b" stroke-width="2"/><polygon points="35,40 75,15 155,15 115,40" fill="#f1f5f9" stroke="#1e293b" stroke-width="2"/><line x1="115" y1="90" x2="175" y2="90" stroke="#94a3b8" stroke-dasharray="3"/><text x="142" y="85" font-size="11" font-weight="bold" fill="#dc2626">45°</text></svg>`,
+        options: [
+          "Permukaan hadapan selari dengan paksi mendatar dan paksi surut bersudut 45°",
+          "Kedua-dua paksi surut dilukis pada sudut 30° dari garisan mendatar",
+          "Semua garisan objek tertumpu ke satu titik lenyap di garis ufuk",
+          "Hanya memaparkan bentuk 2D tanpa sebarang kedalaman"
+        ],
+        answer: 0,
+        hint: "Perhatikan sudut paksi surut pada lakaran oblik — adakah ia 30° atau 45°?",
+        correctBrief: "Lakaran oblik mempunyai satu paksi mendatar (0°), satu paksi menegak (90°), dan satu paksi surut yang biasanya bersudut 45° (atau 30°/60°).",
+        wrongReasons: {
+          1: "Kedua-dua paksi surut 30° ialah ciri khas lakaran isometrik, bukan oblik.",
+          2: "Garisan yang tertumpu ke titik lenyap ialah ciri lakaran perspektif.",
+          3: "Lakaran oblik ialah lakaran piktorial 3D yang menunjukkan panjang, lebar dan tinggi."
+        }
+      },
+      {
+        id: 4,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Mengapakah pereka menggunakan teknik rendering pada sesuatu lakaran produk?",
+        options: [
+          "Menjadikan gaya visual lebih menarik menggunakan warna, tekstur, garisan dan bentuk agar permukaan rata kelihatan melengkung atau membonjol",
+          "Untuk memadam garisan binaan yang tersilap dilukis pada peringkat awal",
+          "Untuk menukar lukisan 3D menjadi lukisan 2D yang lebih ringkas",
+          "Untuk mengira kos sebenar bahan mentah yang diperlukan"
+        ],
+        answer: 0,
+        hint: "Fikirkan bagaimana lukisan gelas kaca atau objek di atas kertas rata boleh nampak melengkung dan menarik.",
+        correctBrief: "Rendering ialah teknik gaya visual yang menggunakan warna, tekstur, garisan, dan bentuk untuk menjadikan lakaran lebih menarik serta memaparkan permukaan rata supaya kelihatan melengkung atau membonjol.",
+        wrongReasons: {
+          1: "Memadam garisan binaan hanyalah kerja kemasan asas, bukan teknik rendering.",
+          2: "Rendering menonjolkan lagi bentuk 3D supaya kelihatan nyata, bukan menukarnya kepada 2D.",
+          3: "Pengiraan kos dilakukan dalam jadual anggaran kos, bukan melalui teknik rendering."
+        }
+      },
+      {
+        id: 5,
+        topic: "Lakaran Piktorial",
+        difficulty: 1,
+        q: "Seorang murid melorek bahagian bawah sebuah cawan bagi menampakkan seolah-olah terdapat cahaya dari sebelah kiri. Apakah teknik gaya visual yang diaplikasikan?",
+        options: ["Kesan bayang", "Lakaran kontur", "Lakaran digital", "Unjuran ortografik"],
+        answer: 0,
+        hint: "Apabila cahaya menyinari objek dari satu arah, apakah yang terhasil di bahagian bertentangan?",
+        correctBrief: "Kesan bayang (shading/shadow) digunakan bersama sumber cahaya untuk memberi ilusi kedalaman dan bentuk 3D pada lakaran.",
+        wrongReasons: {
+          1: "Lakaran kontur hanya melibatkan garisan luar bentuk objek tanpa lorekan bayang.",
+          2: "Lakaran digital merujuk kepada medium perisian komputer, bukan teknik lorekan bayang itu sendiri.",
+          3: "Unjuran ortografik ialah lukisan teknikal 2D berasingan (pelan, hadapan, sisi)."
+        }
+      },
+      {
+        id: 6,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Dalam urutan proses penghasilan lakaran reka bentuk: Contengan idea → Perincian konsep asas → [ X ] → Lakaran lengkap. Apakah peringkat [ X ]?",
+        options: ["Perincian visual", "Penjualan produk", "Pembinaan mock-up", "Pengujian beban"],
+        answer: 0,
+        hint: "Selepas konsep asas diperincikan, kita menambah nilai visual seperti warna, tekstur dan bentuk akhir sebelum ia menjadi lakaran lengkap.",
+        correctBrief: "Peringkat selepas perincian konsep asas ialah Perincian visual, di mana pereka memperhalusi rupa, warna, dan gaya visual sebelum menghasilkan lakaran lengkap.",
+        wrongReasons: {
+          1: "Penjualan produk berlaku selepas produk sebenar siap dikilangkan.",
+          2: "Mock-up dibina selepas lakaran lengkap dipilih, bukan di tengah proses melakar.",
+          3: "Pengujian beban dilakukan ke atas model atau produk yang telah dibina."
+        }
+      },
+      {
+        id: 7,
+        topic: "Lakaran Piktorial",
+        difficulty: 3,
+        q: "Susun langkah asas melakar lakaran perspektif satu titik mengikut urutan yang betul:\nI. Bina garis bumi (GB) dan garis ufuk (GU)\nII. Tentukan titik lenyap (TL) dan bina pandangan hadapan\nIII. Unjurkan bucu pandangan hadapan ke titik lenyap\nIV. Tentukan ukuran kedalaman dan legapkan garisan objek",
+        options: ["I → II → III → IV", "II → I → IV → III", "I → III → II → IV", "III → I → II → IV"],
+        answer: 0,
+        hint: "Anda mesti menyediakan garis rujukan (bumi & ufuk) dahulu sebelum melukis pandangan hadapan dan mengunjurkannya.",
+        correctBrief: "Urutan tepat: Bina garis bumi & garis ufuk → Tetapkan titik lenyap & lukis pandangan hadapan → Unjurkan bucu ke titik lenyap → Tentukan ukuran kedalaman & legapkan garisan objek.",
+        wrongReasons: {
+          1: "Titik lenyap perlu berada di atas garis ufuk, jadi garis ufuk mesti dibina terlebih dahulu.",
+          2: "Anda tidak dapat mengunjurkan pandangan hadapan sebelum pandangan hadapan itu sendiri dilukis.",
+          3: "Unjuran ke titik lenyap hanya boleh dilakukan selepas garis ufuk dan pandangan hadapan siap."
+        }
+      },
+      {
+        id: 8,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Mengapakah pereka bentuk perlu melakukan penambahbaikan ke atas lakaran yang telah dipilih?",
+        options: [
+          "Memenuhi cita rasa pengguna, mengikut trend semasa dan meningkatkan aspek keselamatan",
+          "Supaya kos pengeluaran menjadi setinggi mungkin untuk kelihatan mewah",
+          "Untuk memastikan produk sukar ditiru walaupun susah digunakan",
+          "Sekadar mempamerkan kebolehan melukis pereka grafik semata-mata"
+        ],
+        answer: 0,
+        hint: "Fokus utama reka bentuk ialah pengguna — keselesaan, keselamatan, dan kehendak pasaran semasa.",
+        correctBrief: "Penambahbaikan lakaran bertujuan memenuhi kehendak pasaran, cita rasa pengguna terkini, trend semasa, serta menambah nilai estetika, keselamatan dan ergonomik.",
+        wrongReasons: {
+          1: "Reka bentuk yang baik mengoptimumkan kos, bukan menaikkan kos sewenang-wenangnya.",
+          2: "Produk yang sukar digunakan tidak mesra pengguna dan gagal dari segi ergonomik.",
+          3: "Tujuan utama ialah kepuasan dan keperluan pengguna, bukan menunjuk-nunjuk bakat pereka."
+        }
+      },
+      {
+        id: 9,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Antara berikut, yang manakah BUKAN kriteria pemilihan lakaran produk terbaik?",
+        options: [
+          "Mempunyai bentuk yang sangat rumit dan sukar dihasilkan",
+          "Mempunyai nilai estetika yang tinggi",
+          "Penggunaan warna yang seimbang dan sesuai",
+          "Berupaya menarik perhatian pelanggan"
+        ],
+        answer: 0,
+        hint: "Pilih satu penyataan yang sebenarnya memberi masalah semasa pembuatan produk.",
+        correctBrief: "Lakaran terbaik mestilah menarik perhatian pelanggan, mempunyai nilai estetika, warna seimbang, dan praktikal untuk dihasilkan (bukan terlalu rumit sehingga mustahil dibuat).",
+        wrongReasons: {
+          1: "Nilai estetika (keindahan) ialah kriteria penting dalam pemilihan lakaran.",
+          2: "Warna yang seimbang dan sesuai membantu meningkatkan daya tarikan produk.",
+          3: "Menarik perhatian pelanggan ialah kriteria utama produk berdaya saing."
+        }
+      },
+      {
+        id: 10,
+        topic: "Lakaran Piktorial",
+        difficulty: 3,
+        q: "Dalam lakaran oblik, bagaimanakah lakaran oblik kabinet berbeza daripada lakaran oblik kavalier?",
+        options: [
+          "Skala paksi surut oblik kabinet dikurangkan kepada separuh (1/2) daripada ukuran sebenar",
+          "Oblik kabinet menggunakan sudut 30° pada kedua-dua belah paksi",
+          "Oblik kabinet tidak mempunyai paksi menegak",
+          "Skala paksi surut oblik kavalier adalah separuh daripada ukuran sebenar"
+        ],
+        answer: 0,
+        hint: "Ingat: 'Kabinet' dipendekkan separuh supaya objek nampak lebih realistik dan tidak terlalu panjang.",
+        correctBrief: "Oblik kavalier menggunakan ukuran penuh (1:1) pada paksi surut, manakala oblik kabinet mengurangkan ukuran paksi surut kepada separuh (1/2) agar perkadaran objek nampak lebih natural.",
+        wrongReasons: {
+          1: "Sudut 30° pada kedua-dua belah paksi ialah lakaran isometrik.",
+          2: "Semua lakaran oblik mempunyai paksi menegak (90°).",
+          3: "Terbalik! Oblik kavalier menggunakan skala penuh (1:1), manakala kabinet menggunakan skala separuh."
+        }
+      },
+      {
+        id: 11,
+        topic: "Lakaran Piktorial",
+        difficulty: 1,
+        q: "Apakah peranan utama lakaran dalam peringkat awal sesuatu projek reka bentuk?",
+        options: [
+          "Mempercepat pembangunan konsep dan menjadi medium komunikasi antara pereka dengan pelanggan",
+          "Menggantikan keperluan membuat mock-up atau produk sebenar",
+          "Menentukan keuntungan jualan tahunan syarikat dengan tepat",
+          "Melatih murid menggunakan mesin di bengkel"
+        ],
+        answer: 0,
+        hint: "Sebelum membina produk, pereka perlu meluahkan idea di atas kertas supaya orang lain faham.",
+        correctBrief: "Lakaran berperanan mempercepat pembangunan konsep, mengeksplorasi visual, dan menjadi medium komunikasi pantas antara pereka dengan pelanggan.",
+        wrongReasons: {
+          1: "Lakaran tidak menggantikan mock-up; mock-up tetap diperlukan untuk menguji bentuk fizikal 3D.",
+          2: "Keuntungan jualan dianggarkan melalui analisis kewangan, bukan melalui lakaran.",
+          3: "Lakaran dilakukan di atas kertas atau perisian, bukan latihan mengendalikan mesin."
+        }
+      },
+      {
+        id: 12,
+        topic: "Lakaran Piktorial",
+        difficulty: 2,
+        q: "Apakah maklumat penting yang perlu dilabelkan pada lakaran terbaik yang dipilih?",
+        options: [
+          "Jenis bahan, dimensi (ukuran), dan fungsi bahagian produk",
+          "Nama semua kedai yang menjual bahan tersebut",
+          "Senarai nama rakan sekelas yang melihat lakaran itu",
+          "Tarikh luput pensel yang digunakan untuk melakar"
+        ],
+        answer: 0,
+        hint: "Bayangkan anda menyerahkan lakaran kepada pembuat produk — apakah info yang mereka perlukan untuk membinanya?",
+        correctBrief: "Lakaran bermaklumat perlu menyatakan jenis bahan, dimensi/ukuran, fungsi komponen, serta elemen dan prinsip reka bentuk yang diaplikasikan.",
+        wrongReasons: {
+          1: "Nama kedai tidak relevan dengan spesifikasi teknikal lakaran produk.",
+          2: "Nama rakan sekelas bukan maklumat teknikal reka bentuk.",
+          3: "Alat tulis yang digunakan tidak perlu direkodkan pada label produk."
+        }
+      },
+      {
+        id: 13,
+        topic: "Lakaran Piktorial",
+        difficulty: 3,
+        q: "Jika anda ingin melakar sebuah bangunan tinggi dilihat dari sudut tepi jalan supaya kelihatan realistik dengan kedalaman ke kiri dan ke kanan, lakaran apakah yang paling sesuai?",
+        options: [
+          "Lakaran perspektif dua titik",
+          "Lakaran oblik kavalier",
+          "Lakaran 2D pandangan pelan",
+          "Lakaran contengan kasar"
+        ],
+        answer: 0,
+        hint: "Apabila melihat bucu bangunan dari tepi jalan, garisan dinding kiri dan kanan masing-masing mengecil ke arah kaki langit.",
+        correctBrief: "Lakaran perspektif dua titik menggunakan dua titik lenyap di atas garis ufuk, menjadikannya paling realistik untuk memaparkan sudut bucu bangunan atau produk 3D.",
+        wrongReasons: {
+          1: "Oblik kavalier mengekalkan garisan selari dan tidak menghasilkan kesan mengecil pada jarak jauh.",
+          2: "Pandangan pelan 2D hanya menunjukkan bumbung bangunan dari atas.",
+          3: "Contengan kasar tidak memberikan ketepatan sudut dan kedalaman perspektif."
+        }
+      },
+
+      // ===================== TOPIK 2: REKA BENTUK SISTEM FERTIGASI (13 SOALAN) =====================
+      {
+        id: 14,
+        topic: "Sistem Fertigasi",
+        difficulty: 1,
+        q: "Walaupun tanaman fertigasi menerima air dan nutrien secara automatik, ia masih memerlukan __________ secara langsung untuk menjalankan proses fotosintesis.",
+        options: ["Cahaya matahari", "Tanah liat", "Baja kompos haiwan", "Racun rumpai"],
+        answer: 0,
+        hint: "Ingat pelajaran Sains: apakah sumber tenaga utama untuk tumbuhan hijau membuat makanan sendiri?",
+        correctBrief: "Cahaya matahari amat penting untuk proses fotosintesis bagi membolehkan tumbuhan menghasilkan makanan dan membesar dengan subur.",
+        wrongReasons: {
+          1: "Sistem fertigasi ialah teknik penanaman tanpa tanah (menggunakan media seperti cocopeat).",
+          2: "Fertigasi menggunakan larutan baja mineral khusus, bukan baja kompos pepejal untuk fotosintesis.",
+          3: "Racun rumpai tidak diperlukan untuk fotosintesis malah boleh merosakkan tanaman jika tersalah guna."
+        }
+      },
+      {
+        id: 15,
+        topic: "Sistem Fertigasi",
+        difficulty: 1,
+        q: "Kaedah pengairan dalam sistem fertigasi yang membekalkan larutan baja secara perlahan dan terus ke zon akar tanaman ialah...",
+        options: [
+          "Sistem pengairan titis",
+          "Sistem pengairan percikan",
+          "Sistem pengairan semburan kabus",
+          "Sistem pengairan banjir"
+        ],
+        answer: 0,
+        hint: "Larutan baja keluar setitis demi setitis melalui mikrotiub terus ke pangkal pokok.",
+        correctBrief: "Sistem pengairan titis menyalurkan air dan larutan baja terus ke zon akar dengan cekap, menjimatkan air dan mengurangkan pembaziran.",
+        wrongReasons: {
+          1: "Pengairan percikan menyembur air ke udara seperti hujan, membasahkan daun dan kurang jimat baja.",
+          2: "Semburan kabus biasanya digunakan untuk melembapkan udara di rumah semaian atau aeroponik.",
+          3: "Pengairan banjir membanjiri seluruh batas tanah dan tidak digunakan dalam fertigasi polibeg."
+        }
+      },
+      {
+        id: 16,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Apakah fungsi penyambung 'siku 90°' dalam pemasangan sistem paip poli fertigasi?",
+        svg: `<svg viewBox="0 0 180 100" class="w-40 h-24"><path d="M40,80 L40,35 Q40,25 50,25 L120,25" fill="none" stroke="#334155" stroke-width="10" stroke-linecap="round"/><circle cx="48" cy="33" r="18" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="4"/><text x="72" y="55" font-size="11" font-weight="bold" fill="#dc2626">Penyambung X</text></svg>`,
+        options: [
+          "Menyambung dua batang paip poli untuk menukar arah aliran air sebanyak 90 darjah",
+          "Mengawal tekanan dan menutup aliran air daripada tangki nutrien",
+          "Membahagikan aliran air kepada tiga cabang yang berbeza",
+          "Menapis kotoran dan bendasing daripada memasuki paip"
+        ],
+        answer: 0,
+        hint: "Lihat bentuk huruf 'L' pada penyambung tersebut — ia membelokkan arah paip.",
+        correctBrief: "Siku 90° (elbow) digunakan untuk menyambung dua batang paip poli pada sudut tepat 90° bagi membelokkan laluan paip (contohnya keluar dari tangki nutrien).",
+        wrongReasons: {
+          1: "Fungsi mengawal dan menutup aliran air dilakukan oleh injap penahan (stop valve).",
+          2: "Membahagikan aliran kepada tiga cabang ialah fungsi Tee sama.",
+          3: "Menapis kotoran ialah fungsi penapis (filter)."
+        }
+      },
+      {
+        id: 17,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Mengapakah penapis (filter) dalam sistem fertigasi perlu kerap dibuka dan dibersihkan?",
+        options: [
+          "Kerana ia memerangkap benda asing dan mendapan agar set penitis tidak tersumbat",
+          "Kerana penapis menghasilkan oksigen tambahan untuk akar pokok",
+          "Kerana penapis berfungsi sebagai alat pemasa automatik",
+          "Kerana penapis diletakkan di dalam polibeg pada pangkal tanaman"
+        ],
+        answer: 0,
+        hint: "Lubang pada penitis sangat halus. Apa akan terjadi jika keladak baja atau pasir terlepas masuk?",
+        correctBrief: "Penapis menapis benda asing/keladak daripada larutan baja. Jika tidak kerap dibersihkan, aliran air akan tersekat dan mikrotiub/penitis boleh tersumbat.",
+        wrongReasons: {
+          1: "Penapis tidak menghasilkan oksigen; ia hanya menyaring partikel fizikal.",
+          2: "Alat pemasa (timer) ialah komponen elektrik berasingan yang mengawal pam air.",
+          3: "Penapis dipasang pada paip utama selepas pam air, bukan di pangkal tanaman."
+        }
+      },
+      {
+        id: 18,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Semasa pemasangan sistem fertigasi, komponen apakah yang dipasang pada paip utama untuk membolehkan petani mengawal atau menghentikan aliran larutan baja?",
+        options: ["Injap penahan", "Set penitis", "Nipple", "Tangki nutrien"],
+        answer: 0,
+        hint: "Ia mempunyai pemulas (handle) yang boleh dipusing untuk membuka atau menutup laluan air.",
+        correctBrief: "Injap penahan (stop valve) dipasang pada paip utama atau sekunder untuk mengawal kelajuan atau menutup terus aliran larutan baja ketika penyelenggaraan.",
+        wrongReasons: {
+          1: "Set penitis berada di hujung mikrotiub untuk menitiskan baja ke polibeg.",
+          2: "Nipple ialah penyambung kecil untuk menyambungkan mikrotiub ke paip tertier.",
+          3: "Tangki nutrien ialah bekas takungan untuk menyimpan campuran air dan baja."
+        }
+      },
+      {
+        id: 19,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Apakah kebaikan utama menanam secara fertigasi di bawah Struktur Perlindungan Hujan (SPH)?",
+        options: [
+          "Mengelakkan tanaman cepat layu, mengurangkan serangan penyakit dan mengurangkan penggunaan racun perosak",
+          "Meningkatkan penggunaan baja kimia supaya buah menjadi lebih masam",
+          "Menghalang cahaya matahari daripada sampai ke daun tanaman",
+          "Membolehkan air hujan bercampur terus ke dalam polibeg tanaman"
+        ],
+        answer: 0,
+        hint: "Bumbung plastik lutsinar SPH melindungi pokok daripada hujan lebat dan serangga perosak.",
+        correctBrief: "SPH melindungi tanaman daripada hujan lebat (elak baja cair & pokok layu), mengurangkan risiko jangkitan kulat/penyakit, serta mengurangkan penggunaan racun perosak.",
+        wrongReasons: {
+          1: "SPH membantu menjimatkan baja kerana baja tidak dilarutlesapkan oleh hujan.",
+          2: "Bumbung SPH diperbuat daripada plastik lutsinar (UV) supaya cahaya matahari tetap menembusinya.",
+          3: "Tujuan utama SPH adalah tepat sebaliknya — menghalang air hujan daripada membasahi polibeg."
+        }
+      },
+      {
+        id: 20,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Perhatikan perbezaan teknik penyusunan fertigasi jejari dan gegelang. Mengapakah teknik penyusunan gegelang lebih digemari untuk kawasan tanaman yang luas?",
+        svg: `<svg viewBox="0 0 220 95" class="w-52 h-24"><rect x="45" y="15" width="150" height="65" rx="6" fill="none" stroke="#059669" stroke-width="3"/><circle cx="22" cy="48" r="12" fill="#e0e7ff" stroke="#3730a3" stroke-width="2"/><line x1="34" y1="48" x2="45" y2="48" stroke="#059669" stroke-width="3"/><circle cx="80" cy="15" r="5" fill="#10b981"/><circle cx="120" cy="15" r="5" fill="#10b981"/><circle cx="160" cy="15" r="5" fill="#10b981"/><circle cx="80" cy="80" r="5" fill="#10b981"/><circle cx="120" cy="80" r="5" fill="#10b981"/><circle cx="160" cy="80" r="5" fill="#10b981"/><text x="68" y="52" font-size="10" font-weight="bold" fill="#065f46">Susunan Gegelang</text></svg>`,
+        options: [
+          "Ia mengagihkan tekanan air dan larutan baja secara seimbang ke setiap bekas tanaman",
+          "Ia tidak memerlukan pam air atau tenaga elektrik",
+          "Ia hanya menggunakan satu batang paip lurus tanpa sebarang penyambung",
+          "Ia membolehkan pokok ditanam secara bertingkat di dalam tangki"
+        ],
+        answer: 0,
+        hint: "Dalam gelung tertutup (gegelang), air mengalir dari kedua-dua arah paip, jadi tekanan di hujung baris tetap kuat.",
+        correctBrief: "Teknik penyusunan sistem fertigasi gegelang membentuk laluan tertutup yang mengagihkan tekanan air dan larutan baja secara seimbang kepada semua tanaman.",
+        wrongReasons: {
+          1: "Sistem gegelang masih memerlukan pam air (atau graviti tinggi) untuk mengepam larutan baja.",
+          2: "Susunan gegelang memerlukan lebih banyak penyambung (seperti siku dan tee) untuk membentuk gelung.",
+          3: "Gegelang merujuk kepada susunan paip agihan, bukan penanaman di dalam tangki."
+        }
+      },
+      {
+        id: 21,
+        topic: "Sistem Fertigasi",
+        difficulty: 3,
+        q: "Dalam teknik penanaman hidroponik, apakah ciri utama 'Teknik Aliran Dalam' (Deep Flow Technique)?",
+        options: [
+          "Akar tanaman terendam di dalam takungan larutan nutrien yang mengalir dan beredar semula ke tangki",
+          "Akar tanaman tergantung di udara dan disembur dengan kabus nutrien secara berkala",
+          "Larutan nutrien hanya mengalir dalam lapisan yang sangat nipis di dasar palung condong",
+          "Tanaman ditanam terus di atas tanah gambut tanpa menggunakan pam"
+        ],
+        answer: 0,
+        hint: "Perhatikan perkataan 'Aliran Dalam' — paras air di dalam palung akar adalah dalam dan sentiasa beredar.",
+        correctBrief: "Teknik Aliran Dalam mengekalkan paras larutan nutrien yang dalam di dalam palung sehingga merendam akar tanaman, dan larutan itu dipam beredar semula ke tangki.",
+        wrongReasons: {
+          1: "Akar tergantung dan disembur kabus ialah teknik Aeroponik.",
+          2: "Aliran lapisan sangat nipis pada palung condong ialah Teknik Aliran Cetek (NFT).",
+          3: "Hidroponik ialah penanaman tanpa tanah."
+        }
+      },
+      {
+        id: 22,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Antara berikut, yang manakah merupakan faktor penentu semasa memilih sistem pengairan fertigasi yang sesuai?\nI. Iklim kawasan\nII. Jenis tanaman\nIII. Kesesuaian tapak/tanah\nIV. Warna pakaian petani",
+        options: ["I, II dan III", "I, II dan IV", "I, III dan IV", "II, III dan IV"],
+        answer: 0,
+        hint: "Pilih faktor-faktor saintifik dan persekitaran yang mempengaruhi pertumbuhan tanaman.",
+        correctBrief: "Pemilihan sistem pengairan fertigasi bergantung kepada iklim, jenis tanaman, kesesuaian tanah/tapak, serta jenis sumber air yang ada.",
+        wrongReasons: {
+          1: "Warna pakaian petani langsung tidak mempengaruhi reka bentuk sistem pengairan.",
+          2: "Pernyataan IV tidak relevan dengan kejuruteraan pertanian.",
+          3: "Pernyataan IV salah; faktor iklim (I) adalah sangat penting."
+        }
+      },
+      {
+        id: 23,
+        topic: "Sistem Fertigasi",
+        difficulty: 1,
+        q: "Apakah fungsi utama alat pengatur masa (timer) dalam sistem fertigasi komersial?",
+        options: [
+          "Memastikan bekalan larutan baja disalurkan secara automatik mengikut jadual dan kekerapan yang ditetapkan",
+          "Mengukur kemanisan buah yang dihasilkan oleh pokok",
+          "Menapis lumpur daripada sumber air perigi",
+          "Menyokong batang pokok cili supaya tidak tumbang"
+        ],
+        answer: 0,
+        hint: "Alat ini disambungkan kepada punca elektrik dan pam air seperti jam loceng automatik.",
+        correctBrief: "Alat pengatur masa (timer) menghidupkan dan mematikan pam air secara automatik mengikut kekerapan dan tempoh siraman yang ditetapkan.",
+        wrongReasons: {
+          1: "Kemanisan buah diukur menggunakan refraktometer, bukan timer.",
+          2: "Menapis lumpur ialah tugas penapis (filter).",
+          3: "Menyokong batang pokok menggunakan pancang kayu atau tali."
+        }
+      },
+      {
+        id: 24,
+        topic: "Sistem Fertigasi",
+        difficulty: 2,
+        q: "Apakah media tanaman yang paling lazim digunakan di dalam polibeg sistem fertigasi di Malaysia kerana sifatnya yang ringan dan mampu memegang kelembapan?",
+        options: ["Cocopeat (sabut kelapa)", "Pasir pantai masin", "Batu kerikil besar", "Tanah liat keras"],
+        answer: 0,
+        hint: "Ia dihasilkan daripada sisa tempurung/sabut kelapa yang diproses halus.",
+        correctBrief: "Cocopeat (habuk sabut kelapa), sekam padi bakar, dan peat moss ialah media tanpa tanah yang popular kerana ringan, mudah memegang air dan pengudaraan akar yang baik.",
+        wrongReasons: {
+          1: "Pasir pantai mengandungi garam tinggi yang boleh mematikan akar tanaman.",
+          2: "Batu kerikil besar tidak dapat memegang kelembapan larutan baja dengan baik.",
+          3: "Tanah liat keras menyekat pengudaraan akar dan mudah menakung air berlebihan."
+        }
+      },
+      {
+        id: 25,
+        topic: "Sistem Fertigasi",
+        difficulty: 3,
+        q: "Seorang murid melihat pokok di barisan paling hujung sistem fertigasi jejari kelihatan layu berbanding pokok berhampiran tangki. Apakah punca paling berkemungkinan?",
+        options: [
+          "Tekanan air berkurangan di hujung paip susunan jejari atau penitis tersumbat",
+          "Pokok di hujung menerima terlalu banyak cahaya matahari",
+          "Paip utama diperbuat daripada bahan lutsinar",
+          "Tangki nutrien terlalu besar saiznya"
+        ],
+        answer: 0,
+        hint: "Bandingkan kelemahan susunan jejari dengan kelebihan susunan gegelang.",
+        correctBrief: "Dalam susunan jejari, tekanan air boleh merosot di bahagian paling hujung menyebabkan pokok kurang menerima larutan baja, atau penitis pada pokok tersebut tersumbat.",
+        wrongReasons: {
+          1: "Cahaya matahari diperlukan untuk fotosintesis; layu setempat pada hujung baris biasanya berpunca daripada kurang air.",
+          2: "Paip poli fertigasi biasanya berwarna hitam (legap) untuk menghalang pertumbuhan lumut.",
+          3: "Tangki nutrien yang besar tidak menyebabkan pokok layu."
+        }
+      },
+      {
+        id: 26,
+        topic: "Sistem Fertigasi",
+        difficulty: 1,
+        q: "Apakah yang dimaksudkan dengan istilah 'fertigasi'?",
+        options: [
+          "Kaedah penanaman yang menggabungkan pembajaan dan pengairan secara serentak",
+          "Kaedah memetik buah menggunakan dron automatik",
+          "Kaedah menanam pokok di dalam tanah tanpa membaja",
+          "Kaedah mengeringkan daun sayuran menggunakan tenaga suria"
+        ],
+        answer: 0,
+        hint: "Perkataan 'Fertigasi' berasal daripada gabungan dua perkataan Inggeris: Fertilization (pembajaan) + Irrigation (pengairan).",
+        correctBrief: "Fertigasi (Fertilization + Irrigation) ialah sistem pengeluaran tanaman tanpa tanah yang menyalurkan air dan larutan baja secara serentak ke akar tanaman.",
+        wrongReasons: {
+          1: "Penggunaan dron ialah teknologi pemantauan/tuai, bukan definisi fertigasi.",
+          2: "Fertigasi sememangnya menggunakan baja cecair dan tanpa tanah.",
+          3: "Pengeringan daun ialah proses pascatuai, bukan penanaman fertigasi."
+        }
+      },
+
+      // ===================== TOPIK 3: REKA BENTUK FESYEN (12 SOALAN) =====================
+      {
+        id: 27,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 1,
+        q: "Siapakah individu dalam kerjaya fesyen yang bertanggungjawab membuat analisis trend fesyen dari dahulu hingga sekarang untuk meramal gaya masa hadapan?",
+        options: ["Peramal fesyen", "Perunding imej", "Pengajar fesyen", "Tukang jahit"],
+        answer: 0,
+        hint: "Perhatikan kata kunci 'meramal' dan 'analisis trend'.",
+        correctBrief: "Peramal fesyen (Fashion Forecaster) mengkaji dan menganalisis trend warna, fabrik serta gaya fesyen masa lalu dan kini bagi meramalkan trend akan datang.",
+        wrongReasons: {
+          1: "Perunding imej memberi khidmat nasihat penampilan dan gaya pakaian kepada individu/pelanggan.",
+          2: "Pengajar fesyen mengajar kemahiran jahitan dan reka bentuk fesyen secara formal.",
+          3: "Tukang jahit memfokuskan kepada proses memotong dan menjahit pakaian mengikut ukuran."
+        }
+      },
+      {
+        id: 28,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 2,
+        q: "Penetas jahitan (seam ripper) digunakan untuk menanggalkan benang jahitan yang tersilap. Dalam kategori alatan fesyen, penetas tergolong dalam...",
+        options: ["Alatan memotong", "Alatan menanda", "Alatan mengukur", "Alatan mendraf"],
+        answer: 0,
+        hint: "Penetas mempunyai mata pisau halus yang tajam untuk memotong benang jahitan.",
+        correctBrief: "Penetas dikategorikan sebagai alatan memotong (bersama gunting fabrik, gunting kertas dan kacip) kerana ia berfungsi memotong benang dan membuka lubang butang.",
+        wrongReasons: {
+          1: "Alatan menanda ialah seperti pensel tukang jahit, kapur tukang jahit, dan roda surih.",
+          2: "Alatan mengukur ialah seperti pita ukur dan pembaris.",
+          3: "Alatan mendraf ialah seperti pembaris sesiku L dan pembaris melengkung."
+        }
+      },
+      {
+        id: 29,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 2,
+        q: "Antara alatan berikut, yang manakah kesemuanya termasuk dalam kategori ALATAN MENANDA?",
+        options: [
+          "Pensel tukang jahit, kapur tukang jahit, roda surih dan kertas karbon",
+          "Pita ukur, pembaris sesiku L, dan penetas",
+          "Gunting fabrik, kacip, dan mesin jahit",
+          "Seterika, jarum tangan, dan jidal"
+        ],
+        answer: 0,
+        hint: "Alatan ini digunakan untuk memindahkan garisan pola atau membuat tanda pada permukaan fabrik.",
+        correctBrief: "Pensel tukang jahit, kapur tukang jahit, roda surih, kertas karbon dan jarum peniti digunakan untuk menanda garisan pola pada fabrik.",
+        wrongReasons: {
+          1: "Pita ukur ialah alatan mengukur, sesiku L ialah alatan mendraf, dan penetas ialah alatan memotong.",
+          2: "Gunting dan kacip ialah alatan memotong, manakala mesin jahit ialah alatan menjahit.",
+          3: "Seterika ialah alatan menekan, manakala jarum dan jidal ialah alatan menjahit."
+        }
+      },
+      {
+        id: 30,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 1,
+        q: "Reka bentuk fesyen terbahagi kepada dua jenis utama iaitu pakaian dan aksesori. Antara berikut, yang manakah contoh AKSESORI?",
+        options: [
+          "Rantai leher, topi, beg tangan dan jam tangan",
+          "Baju kurung, seluar panjang dan kemeja",
+          "Tudung, baju kebaya dan skirt labuh",
+          "Jaket, baju-T dan seluar sukan"
+        ],
+        answer: 0,
+        hint: "Aksesori ialah benda yang dipakai sebagai hiasan tambahan untuk melengkapkan gaya pakaian.",
+        correctBrief: "Aksesori ialah barang hiasan tambahan seperti topi, rantai, gelang, beg tangan, tali pinggang dan jam tangan; manakala baju, seluar dan tudung ialah pakaian.",
+        wrongReasons: {
+          1: "Baju kurung, seluar dan kemeja ialah pakaian asas yang menutup tubuh.",
+          2: "Baju kebaya, skirt dan tudung dikategorikan sebagai pakaian.",
+          3: "Jaket, baju-T dan seluar sukan semuanya ialah pakaian."
+        }
+      },
+      {
+        id: 31,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 3,
+        q: "Individu yang mempunyai bentuk badan 'segi tiga terbalik' (bahu lebar, pinggul kecil) digalakkan memilih pakaian yang...",
+        svg: `<svg viewBox="0 0 120 110" class="w-28 h-24"><polygon points="20,15 100,15 60,95" fill="#fce7f3" stroke="#be185d" stroke-width="2.5"/><text x="34" y="38" font-size="9" font-weight="bold" fill="#9d174d">Bahu Lebar</text><text x="32" y="106" font-size="9" font-weight="bold" fill="#9d174d">Pinggul Kecil</text></svg>`,
+        options: [
+          "Mempunyai pelapik bahu kecil atau tanpa pelapik bahu, serta berwarna gelap di bahagian atas",
+          "Mempunyai pelapik bahu yang sangat tebal untuk melebarkan lagi bahu",
+          "Memakai skirt pensel ketat berwarna gelap dan baju berjalur melintang di bahu",
+          "Mengelakkan sebarang corak atau warna cerah di bahagian pinggul"
+        ],
+        answer: 0,
+        hint: "Matlamat fesyen ialah mengimbangi bahagian bahu yang lebar dengan bahagian pinggul yang kecil.",
+        correctBrief: "Untuk bentuk badan segi tiga terbalik, elakkan pelapik bahu besar; pilih warna gelap di bahagian atas (mengurangkan ilusi lebar bahu) dan warna cerah/bercorak di bahagian bawah untuk keseimbangan.",
+        wrongReasons: {
+          1: "Pelapik bahu tebal akan menampakkan bahu yang sedia lebar kelihatan lebih besar.",
+          2: "Garisan melintang di bahu menambah kelebaran visual pada bahagian atas badan.",
+          3: "Warna cerah di bahagian bawah sebenarnya membantu mengimbangi pinggul yang kecil."
+        }
+      },
+      {
+        id: 32,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 2,
+        q: "Apakah bentuk badan yang dianggap paling ideal dan seimbang (ukuran bahu dan pinggul hampir sama dengan pinggang yang ramping)?",
+        options: ["Bentuk jam pasir", "Bentuk segi empat", "Bentuk segi tiga", "Bentuk segi tiga terbalik"],
+        answer: 0,
+        hint: "Bentuknya menyerupai dua segi tiga yang bertemu di bahagian tengah yang ramping.",
+        correctBrief: "Bentuk badan jam pasir (hourglass) mempunyai perkadaran bahu dan pinggul yang seimbang dengan pinggang ramping, menjadikannya sesuai dengan hampir semua gaya pakaian.",
+        wrongReasons: {
+          1: "Bentuk segi empat mempunyai ukuran bahu, pinggang dan pinggul yang hampir lurus/sama.",
+          2: "Bentuk segi tiga mempunyai pinggul yang lebih lebar berbanding bahu.",
+          3: "Bentuk segi tiga terbalik mempunyai bahu yang lebih lebar berbanding pinggul."
+        }
+      },
+      {
+        id: 33,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 1,
+        q: "Proses cantuman dalam reka bentuk fesyen melibatkan aktiviti menyambung dan menyatukan bahan. Aktiviti manakah yang BUKAN proses cantuman?",
+        options: ["Meretas", "Menjahit", "Menampal", "Menyulam"],
+        answer: 0,
+        hint: "Cari satu perkataan yang membawa maksud 'membuka' atau 'memisahkan' jahitan.",
+        correctBrief: "Meretas ialah proses membuka atau menanggalkan jahitan yang telah dibuat, bukan proses mencantum/menyatukan bahan.",
+        wrongReasons: {
+          1: "Menjahit ialah kaedah cantuman utama yang kukuh dan kemas.",
+          2: "Menampal (menggunakan gam fabrik/hot glue) ialah kaedah cantuman tampalan.",
+          3: "Menyulam digunakan untuk mencantum hiasan manik, labuci atau benang pada fabrik."
+        }
+      },
+      {
+        id: 34,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 2,
+        q: "Dalam carta alir penghasilan reka bentuk fesyen: Pilih tema → Tinjauan & penyelidikan → Penjanaan idea → [ X ] → Pengujian & penambahbaikan. Apakah fasa [ X ]?",
+        options: ["Pembinaan mock-up", "Jualan di butik", "Pengiklanan media sosial", "Pembungkusan produk"],
+        answer: 0,
+        hint: "Selepas idea dilakar, kita perlu menghasilkan model awal (prototaip kasar) sebelum mengujinya.",
+        correctBrief: "Selepas penjanaan idea, pereka akan melaksanakan Pembinaan mock-up (model olokan) untuk menilai bentuk, saiz dan kesesuaian sebelum pengujian dan penambahbaikan.",
+        wrongReasons: {
+          1: "Jualan hanya berlaku selepas produk akhir siap sepenuhnya.",
+          2: "Pengiklanan ialah fasa pemasaran, bukan fasa sebelum pengujian produk.",
+          3: "Pembungkusan dilakukan pada peringkat akhir selepas produk lulus penilaian."
+        }
+      },
+      {
+        id: 35,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 1,
+        q: "Antara teknik cantuman berikut, yang manakah menghasilkan sambungan fabrik yang paling kukuh, sekata dan kemas?",
+        options: ["Kaedah jahitan", "Kaedah tampalan gam kertas", "Kaedah ikatan tali", "Kaedah stapler"],
+        answer: 0,
+        hint: "Kaedah ini menggunakan jarum dan benang sama ada secara jahitan tangan atau mesin jahit.",
+        correctBrief: "Kaedah jahitan (terutamanya jahitan mesin) menghasilkan cantuman fabrik yang paling kukuh, sekata, tahan lasak dan kemas.",
+        wrongReasons: {
+          1: "Gam kertas mudah tertanggal apabila dibasuh dan tidak sesuai untuk fabrik.",
+          2: "Ikatan tali biasanya untuk kemasan tertentu sahaja dan tidak sekata sebagai kelim utama.",
+          3: "Stapler sesuai untuk kertas atau bahan kaku sementara, bukan pakaian harian."
+        }
+      },
+      {
+        id: 36,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 1,
+        q: "Jika murid ingin mencantumkan bahan reka bentuk fesyen yang diperbuat daripada kepingan kertas, alat cantuman manakah yang paling sesuai digunakan?",
+        options: ["Stapler", "Jarum dan benang", "Gam serba guna", "Ikatan tali"],
+        answer: 0,
+        hint: "Fikirkan alat ringkas yang cepat, kemas dan tidak merosakkan atau membasahkan kepingan kertas.",
+        correctBrief: "Kepingan kertas lebih sesuai dicantumkan menggunakan stapler kerana ia cepat, kemas, kukuh dan tidak melembapkan kertas berbanding gam cecair.",
+        wrongReasons: {
+          1: "Jarum dan benang sesuai untuk fabrik; ia mudah mengoyakkan kepingan kertas.",
+          2: "Gam serba guna mengambil masa untuk kering dan boleh menyebabkan kertas berkedut atau comot.",
+          3: "Ikatan tali kurang kemas untuk cantuman kepingan kertas nipis."
+        }
+      },
+      {
+        id: 37,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 2,
+        q: "Bagaimanakah garisan menegak pada corak pakaian mempengaruhi penampilan si pemakai?",
+        options: [
+          "Memberi ilusi pemakai kelihatan lebih tinggi dan langsing",
+          "Memberi ilusi pemakai kelihatan lebih rendah dan gempal",
+          "Menjadikan bahu kelihatan jauh lebih lebar",
+          "Menghilangkan kesan warna pada fabrik"
+        ],
+        answer: 0,
+        hint: "Mata orang yang memandang akan bergerak dari atas ke bawah mengikut arah garisan.",
+        correctBrief: "Garisan menegak membawa pandangan mata secara memanjang ke atas dan ke bawah, sekali gus memberi ilusi tubuh kelihatan lebih tinggi dan ramping.",
+        wrongReasons: {
+          1: "Ilusi lebih rendah dan lebar dihasilkan oleh garisan melintang, bukan menegak.",
+          2: "Garisan melintang pada bahagian bahu yang menampakkan bahu lebih lebar.",
+          3: "Garisan tidak menghilangkan warna; ia ialah elemen reka bentuk yang melengkapi warna."
+        }
+      },
+      {
+        id: 38,
+        topic: "Reka Bentuk Fesyen",
+        difficulty: 3,
+        q: "Seorang murid ingin menghasilkan beg tote daripada fabrik denim tebal dan menambah hiasan butang kayu. Gabungan teknik cantuman apakah yang paling efektif?",
+        options: [
+          "Kaedah jahitan untuk badan beg dan kaedah jahitan/tampalan hot glue untuk hiasan butang",
+          "Kaedah stapler untuk badan beg dan kapur untuk butang",
+          "Kaedah meretas untuk badan beg dan kertas karbon untuk butang",
+          "Kaedah ikatan getah semata-mata untuk keseluruhan beg"
+        ],
+        answer: 0,
+        hint: "Beg denim perlu menampung berat buku, jadi badan beg memerlukan cantuman yang sangat kukuh.",
+        correctBrief: "Fabrik denim memerlukan kaedah jahitan yang kukuh untuk menampung beban, manakala hiasan butang kayu boleh dijahit atau ditampal menggunakan hot glue gun.",
+        wrongReasons: {
+          1: "Stapler tidak cukup kuat untuk fabrik denim tebal dan boleh mencederakan pengguna.",
+          2: "Meretas ialah membuka jahitan, bukan mencantum.",
+          3: "Ikatan getah tidak kukuh dan tidak sesuai bagi struktur beg tote."
+        }
+      },
+
+      // ===================== TOPIK 4: PENYELESAIAN MASALAH INVENTIF (12 SOALAN) =====================
+      {
+        id: 39,
+        topic: "Masalah Inventif",
+        difficulty: 1,
+        q: "Apakah yang dimaksudkan dengan 'masalah bukan inventif'?",
+        options: [
+          "Masalah biasa dalam kehidupan harian yang dapat diselesaikan tanpa menimbulkan kesan sampingan",
+          "Masalah kompleks yang sentiasa mencipta masalah baharu selepas dibaiki",
+          "Masalah yang mustahil untuk diselesaikan oleh manusia",
+          "Masalah yang hanya berlaku di makmal sains sahaja"
+        ],
+        answer: 0,
+        hint: "Contohnya: pensel tumpul → diasah → tajam semula dan tiada masalah baharu timbul.",
+        correctBrief: "Masalah bukan inventif ialah masalah biasa harian yang apabila diselesaikan, ia selesai sepenuhnya tanpa kesan sampingan negatif.",
+        wrongReasons: {
+          1: "Masalah yang menimbulkan kesan sampingan baharu ialah takrifan masalah INVENTIF.",
+          2: "Masalah bukan inventif sememangnya mudah dan dapat diselesaikan.",
+          3: "Ia berlaku dalam kehidupan seharian semua orang, bukan di makmal sahaja."
+        }
+      },
+      {
+        id: 40,
+        topic: "Masalah Inventif",
+        difficulty: 1,
+        q: "Bagaimanakah kita membezakan 'masalah inventif' daripada masalah bukan inventif?",
+        options: [
+          "Masalah inventif menimbulkan kesan sampingan apabila usaha penambahbaikan dilakukan",
+          "Masalah inventif tidak memerlukan sebarang proses analisis",
+          "Masalah inventif hanya melibatkan penggunaan peralatan elektrik",
+          "Masalah inventif boleh selesai dengan sekali cubaan tanpa halangan"
+        ],
+        answer: 0,
+        hint: "Contoh: Meja perlu besar untuk menampung ramai orang, TETAPI jika terlalu besar, ia berat dan sukar dialihkan!",
+        correctBrief: "Masalah inventif ialah masalah yang mempunyai kesan sampingan apabila usaha penambahbaikan dilakukan (wujud percanggahan fizikal).",
+        wrongReasons: {
+          1: "Masalah inventif memerlukan analisis punca masalah dan model fungsi yang sistematik.",
+          2: "Masalah inventif boleh berlaku pada produk bukan elektrik seperti meja, kerusi atau cermin mata.",
+          3: "Ia tidak selesai secara mudah kerana adanya percanggahan antara dua keperluan."
+        }
+      },
+      {
+        id: 41,
+        topic: "Masalah Inventif",
+        difficulty: 1,
+        q: "Apakah langkah PERTAMA dalam proses kerja penyelesaian masalah bukan inventif?",
+        options: [
+          "Mengenal pasti masalah yang dihadapi",
+          "Menilai keberkesanan penyelesaian",
+          "Membuat pilihan penyelesaian terbaik",
+          "Menyenaraikan semua pilihan penyelesaian"
+        ],
+        answer: 0,
+        hint: "Sebelum mencari jalan penyelesaian, anda mesti tahu terlebih dahulu apakah masalah sebenarnya.",
+        correctBrief: "Langkah pertama ialah Mengenal pasti masalah, diikuti menyenaraikan pilihan, membuat pilihan, melaksanakan pilihan, dan akhirnya menilai penyelesaian.",
+        wrongReasons: {
+          1: "Menilai penyelesaian ialah langkah TERAKHIR selepas penyelesaian dilaksanakan.",
+          2: "Membuat pilihan hanya dilakukan selepas pilihan disenaraikan.",
+          3: "Menyenaraikan pilihan ialah langkah kedua, selepas masalah dikenal pasti."
+        }
+      },
+      {
+        id: 42,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Antara proses berikut, yang manakah terlibat dalam penyelesaian masalah BUKAN inventif?",
+        options: [
+          "Mengenal pasti masalah, menyenaraikan pilihan dan menilai penyelesaian",
+          "Menentukan percanggahan fizikal dan kaedah pemisahan",
+          "Membina model masalah dan penyelesaian umum",
+          "Menganalisis model fungsi dan supersistem"
+        ],
+        answer: 0,
+        hint: "Masalah bukan inventif menggunakan proses aliran mudah, tanpa perlu membina model masalah atau percanggahan fizikal.",
+        correctBrief: "Penyelesaian masalah bukan inventif melibatkan langkah mengenal pasti masalah, menyenaraikan pilihan, membuat pilihan, melaksanakan, dan menilai penyelesaian.",
+        wrongReasons: {
+          1: "Percanggahan fizikal dan kaedah pemisahan ialah langkah dalam penyelesaian masalah INVENTIF.",
+          2: "Model masalah ialah fasa dalam penyelesaian masalah INVENTIF.",
+          3: "Model fungsi digunakan untuk menganalisis masalah INVENTIF."
+        }
+      },
+      {
+        id: 43,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Susun empat fasa utama dalam penyelesaian masalah inventif mengikut urutan yang tepat:\nI. Analisis punca masalah\nII. Model masalah\nIII. Kaedah penyelesaian\nIV. Model penyelesaian",
+        options: ["I → II → III → IV", "II → I → III → IV", "I → III → II → IV", "IV → III → II → I"],
+        answer: 0,
+        hint: "Bermula dengan menganalisis punca → membina model masalah → memilih kaedah → menghasilkan model penyelesaian.",
+        correctBrief: "Empat fasa penyelesaian masalah inventif ialah: 1) Analisis punca masalah, 2) Model masalah (percanggahan fizikal), 3) Kaedah penyelesaian (pemisahan), dan 4) Model penyelesaian (penyelesaian khusus).",
+        wrongReasons: {
+          1: "Model masalah tidak boleh dibina sebelum punca masalah dianalisis.",
+          2: "Kaedah penyelesaian hanya dipilih selepas model masalah (percanggahan fizikal) ditentukan.",
+          3: "Urutan ini terbalik sepenuhnya."
+        }
+      },
+      {
+        id: 44,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Dalam fasa manakah dua kaedah penyelesaian (pemisahan ruang dan pemisahan masa) diperkenalkan untuk menyelesaikan masalah inventif?",
+        options: [
+          "Fasa kaedah penyelesaian",
+          "Fasa analisis punca masalah",
+          "Fasa model masalah",
+          "Fasa pengujian pasaran"
+        ],
+        answer: 0,
+        hint: "Fasa ini secara khusus menentukan kaedah pemisahan mana yang sesuai digunakan.",
+        correctBrief: "Fasa Kaedah Penyelesaian memperkenalkan dua prinsip pemisahan — Pemisahan Ruang dan Pemisahan Masa — berdasarkan percanggahan fizikal yang dikenal pasti.",
+        wrongReasons: {
+          1: "Fasa analisis punca masalah bertujuan mencari komponen yang bermasalah melalui model fungsi.",
+          2: "Fasa model masalah bertujuan mengenal pasti percanggahan fizikal sahaja.",
+          3: "Pengujian pasaran bukan salah satu daripada empat fasa penyelesaian masalah inventif."
+        }
+      },
+      {
+        id: 45,
+        topic: "Masalah Inventif",
+        difficulty: 1,
+        q: "Apakah yang dimaksudkan dengan 'komponen' dalam sesuatu sistem fungsi produk?",
+        options: [
+          "Bahagian-bahagian kecil yang berfungsi menyokong dan membentuk produk tersebut",
+          "Objek luar yang diletakkan di atas produk oleh pengguna",
+          "Hanya bahagian produk yang telah rosak dan perlu dibuang",
+          "Faktor cuaca seperti hujan dan panas di sekeliling produk"
+        ],
+        answer: 0,
+        hint: "Contohnya bagi sebuah meja: kaki meja, muka meja, dan skru ialah komponennya.",
+        correctBrief: "Komponen ialah bahagian-bahagian kecil yang saling berinteraksi dan berfungsi untuk menyokong sesuatu produk supaya produk itu dapat melaksanakan fungsinya.",
+        wrongReasons: {
+          1: "Objek luar yang menerima kesan produk (contoh: buku di atas meja) ialah 'Objek', bukan komponen.",
+          2: "Semua bahagian yang membentuk produk ialah komponen, tidak kira rosak atau elok.",
+          3: "Faktor persekitaran seperti cuaca dan lantai ialah 'Supersistem'."
+        }
+      },
+      {
+        id: 46,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Sebuah rak kasut dibina daripada kayu beroti, papan lapis, paku dan skru. Antara berikut, yang manakah BUKAN komponen bagi rak kasut tersebut?",
+        options: ["Kasut", "Kayu beroti", "Skru", "Paku"],
+        answer: 0,
+        hint: "Bezakan antara bahagian yang membina rak dengan 'objek' yang diletakkan di atas rak itu.",
+        correctBrief: "Kayu beroti, paku dan skru ialah komponen yang membentuk rak kasut. Kasut ialah 'Objek' (penerima kesan daripada fungsi rak), bukan komponen rak.",
+        wrongReasons: {
+          1: "Kayu beroti ialah komponen kerangka utama rak kasut.",
+          2: "Skru ialah komponen pengikat yang mencantumkan bahagian rak.",
+          3: "Paku ialah komponen pengikat dalam pembinaan rak kasut."
+        }
+      },
+      {
+        id: 47,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Apakah tindakan utama yang perlu dilakukan untuk mencari punca masalah dalam analisis masalah inventif?",
+        options: [
+          "Mengenal pasti masalah pada model fungsi dan menganalisis punca-kesan halangan",
+          "Menukar warna produk kepada warna yang lebih cerah",
+          "Membuang semua komponen produk tanpa membuat pemeriksaan",
+          "Menjual produk pada harga yang lebih murah"
+        ],
+        answer: 0,
+        hint: "Gunakan model fungsi untuk melihat interaksi mana yang bermasalah (tidak mencukupi / berlebihan / memudaratkan).",
+        correctBrief: "Untuk mencari punca masalah, pereka perlu membina dan mengenal pasti masalah pada model fungsi serta menjejak faktor halangan melalui analisis berantai punca-kesan.",
+        wrongReasons: {
+          1: "Menukar warna tidak menyelesaikan masalah fungsi teknikal sesuatu produk.",
+          2: "Membuang komponen tanpa analisis tidak akan mengenal pasti punca sebenar kerosakan.",
+          3: "Menurunkan harga ialah strategi pemasaran, bukan penyelesaian punca masalah kejuruteraan."
+        }
+      },
+      {
+        id: 48,
+        topic: "Masalah Inventif",
+        difficulty: 3,
+        q: "Sebuah khemah perkhemahan perlu bersaiz BESAR apabila digunakan untuk tidur, tetapi perlu bersaiz KECIL apabila disimpan di dalam beg. Kaedah pemisahan apakah yang sesuai digunakan?",
+        options: [
+          "Kaedah pemisahan masa",
+          "Kaedah pemisahan ruang",
+          "Kaedah penyelesaian bukan inventif",
+          "Kaedah pemisahan warna"
+        ],
+        answer: 0,
+        hint: "Tanya soalan ini: Adakah percanggahan (besar vs kecil) berlaku pada MASA yang sama atau MASA yang berbeza?",
+        correctBrief: "Percanggahan berlaku pada masa yang berbeza (besar semasa digunakan, kecil semasa disimpan), maka Kaedah Pemisahan Masa digunakan (contohnya: khemah boleh lipat).",
+        wrongReasons: {
+          1: "Pemisahan ruang digunakan jika percanggahan berlaku pada masa yang SAMA di ruang berbeza.",
+          2: "Ini ialah masalah inventif yang melibatkan percanggahan fizikal, bukan masalah bukan inventif.",
+          3: "Tiada istilah 'kaedah pemisahan warna' dalam teori penyelesaian masalah inventif."
+        }
+      },
+      {
+        id: 49,
+        topic: "Masalah Inventif",
+        difficulty: 3,
+        q: "Sebuah kerusi perlu mempunyai kaki yang KERAS untuk menyokong berat, tetapi tempat duduk yang LEMBUT pada masa yang sama untuk keselesaan. Kaedah pemisahan apakah yang digunakan?",
+        options: [
+          "Kaedah pemisahan ruang",
+          "Kaedah pemisahan masa",
+          "Kaedah pemisahan suhu",
+          "Kaedah percubaan rawak"
+        ],
+        answer: 0,
+        hint: "Kedua-dua sifat (keras dan lembut) diperlukan pada MASA YANG SAMA, tetapi pada bahagian (ruang) kerusi yang berbeza.",
+        correctBrief: "Apabila percanggahan fizikal (keras vs lembut) berlaku pada masa yang sama, Kaedah Pemisahan Ruang digunakan — bahagian kaki dibuat keras manakala tempat duduk diletakkan kusyen lembut.",
+        wrongReasons: {
+          1: "Pemisahan masa hanya digunakan jika keperluan bertentangan berlaku pada waktu yang berbeza.",
+          2: "Pemisahan suhu bukan salah satu daripada dua kaedah pemisahan utama RBT.",
+          3: "Penyelesaian inventif bersifat sistematik, bukan percubaan rawak."
+        }
+      },
+      {
+        id: 50,
+        topic: "Masalah Inventif",
+        difficulty: 2,
+        q: "Dalam analisis fungsi sebuah meja tulis yang diletakkan di dalam bilik, lantai yang menyokong kaki meja dikategorikan sebagai...",
+        options: ["Supersistem", "Komponen meja", "Produk utama", "Kesan sampingan"],
+        answer: 0,
+        hint: "Lantai bukan sebahagian daripada meja yang dibeli, tetapi ia berada di persekitaran luar yang mempengaruhi kestabilan meja.",
+        correctBrief: "Supersistem ialah faktor persekitaran luar (seperti lantai, kelembapan, haba, cahaya) yang memberikan kesan terhadap produk tetapi bukan komponen produk tersebut.",
+        wrongReasons: {
+          1: "Lantai bukan komponen yang membentuk meja itu sendiri.",
+          2: "Produk utama ialah meja tulis tersebut.",
+          3: "Lantai ialah elemen persekitaran fizikal, bukan kesan sampingan."
+        }
+      }
+    ];
+
+    /*************************************************************************
+     * 4. KEADAAN APLIKASI (STATE)
+     *************************************************************************/
+    const state = {
+      mode: "adaptive", // 'adaptive' | 'hints' | 'challenge'
+      phase: "main",    // 'main' | 'retry'
+      remainingPool: [],
+      currentQuestion: null,
+      answeredCount: 0,
+      firstPassScore: 0,
+      wrongIds: new Set(),
+      retryQueue: [],
+      retryTotal: 0,
+      retryDone: 0,
+      streak: 0,
+      wrongStreak: 0,
+      targetDifficulty: 1, // 1: Asas, 2: Sederhana, 3: KBAT (ZPD Adaptive)
+      topicStats: {},
+      timerInterval: null,
+      timeLeft: 30,
+      hasAnsweredCurrent: false,
+      activeBalloonTerm: null
+    };
+
+    // Elemen DOM Utama
+    const screens = {
+      start: document.getElementById("screenStart"),
+      quiz: document.getElementById("screenQuiz"),
+      retryIntro: document.getElementById("screenRetryIntro"),
+      namePrompt: document.getElementById("screenNamePrompt"),
+      certificate: document.getElementById("screenCertificate")
+    };
+
+    /*************************************************************************
+     * 5. FUNGSI PEMBANTU: SOROT ISTILAH & BELON TERJEMAHAN + AUDIO TTS
+     *************************************************************************/
+    // Susun istilah paling panjang dahulu supaya frasa seperti "garis ufuk" dipadankan sebelum perkataan pendek
+    const SORTED_TERMS = Object.keys(GLOSSARY).sort((a, b) => b.length - a.length);
+    const GLOSSARY_REGEX = new RegExp(`\\b(${SORTED_TERMS.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join("|")})\\b`, "gi");
+
+    function highlightGlossary(text) {
+      if (!text) return "";
+      return text.replace(GLOSSARY_REGEX, (match) => {
+        const key = match.toLowerCase();
+        return `<span class="vocab-word" tabindex="0" role="button" data-term="${key}">${match}</span>`;
+      });
+    }
+
+    const vocabBalloon = document.getElementById("vocabBalloon");
+    const ttsStatus = document.getElementById("ttsStatus");
+
+    function openVocabBalloon(termKey, anchorEl) {
+      const entry = GLOSSARY[termKey.toLowerCase()];
+      if (!entry) return;
+      state.activeBalloonTerm = entry;
+
+      document.getElementById("balloonTermBM").textContent = entry.bm;
+      document.getElementById("balloonValBM").textContent = entry.bm;
+      document.getElementById("balloonValZH").textContent = entry.zh;
+      document.getElementById("balloonValEN").textContent = entry.en;
+      ttsStatus.classList.add("hidden");
+
+      vocabBalloon.classList.remove("hidden");
+
+      // Kira kedudukan belon berhampiran perkataan yang diklik tanpa terkeluar skrin
+      const rect = anchorEl.getBoundingClientRect();
+      const bWidth = vocabBalloon.offsetWidth || 300;
+      const bHeight = vocabBalloon.offsetHeight || 240;
+
+      let left = rect.left + (rect.width / 2) - (bWidth / 2);
+      left = Math.max(12, Math.min(left, window.innerWidth - bWidth - 12));
+
+      let top = rect.bottom + 10;
+      if (top + bHeight > window.innerHeight - 12) {
+        top = rect.top - bHeight - 10;
+      }
+      top = Math.max(12, top);
+
+      vocabBalloon.style.left = `${left}px`;
+      vocabBalloon.style.top = `${top}px`;
+    }
+
+    function closeVocabBalloon() {
+      vocabBalloon.classList.add("hidden");
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    // Fungsi bacaan suara (Web Speech API)
+    function speakText(text, langCode, label) {
+      if (!("speechSynthesis" in window)) {
+        ttsStatus.textContent = "Pelayar anda tidak menyokong bacaan audio.";
+        ttsStatus.classList.remove("hidden");
+        return;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = langCode;
+        utter.rate = 0.92;
+
+        // Cuba cari suara yang paling sepadan
+        const voices = window.speechSynthesis.getVoices();
+        const prefix = langCode.split("-")[0].toLowerCase();
+        const matched = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase()) ||
+                        voices.find(v => v.lang.toLowerCase().startsWith(prefix));
+        if (matched) utter.voice = matched;
+
+        ttsStatus.textContent = `🔊 Sedang membaca (${label})...`;
+        ttsStatus.classList.remove("hidden");
+        utter.onend = () => {
+          ttsStatus.classList.add("hidden");
+        };
+        utter.onerror = () => {
+          ttsStatus.textContent = `Audio (${label}) tidak tersedia pada peranti ini.`;
+        };
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        ttsStatus.textContent = "Gagal memainkan audio.";
+        ttsStatus.classList.remove("hidden");
+      }
+    }
+
+    // Delegasi klik untuk semua perkataan .vocab-word di seluruh halaman
+    document.addEventListener("click", (e) => {
+      const target = e.target.closest(".vocab-word");
+      if (target) {
+        e.stopPropagation();
+        openVocabBalloon(target.dataset.term, target);
+        return;
+      }
+      if (!e.target.closest("#vocabBalloon")) {
+        closeVocabBalloon();
+      }
+    });
+
+    document.getElementById("btnCloseBalloon").addEventListener("click", closeVocabBalloon);
+    document.getElementById("btnSpeakBM").addEventListener("click", () => {
+      if (state.activeBalloonTerm) speakText(state.activeBalloonTerm.bm, "ms-MY", "Bahasa Melayu");
+    });
+    document.getElementById("btnSpeakZH").addEventListener("click", () => {
+      if (state.activeBalloonTerm) speakText(state.activeBalloonTerm.zhSpeak, "zh-CN", "Mandarin");
+    });
+    document.getElementById("btnSpeakEN").addEventListener("click", () => {
+      if (state.activeBalloonTerm) speakText(state.activeBalloonTerm.en, "en-US", "English");
+    });
+
+    // Pastikan senarai suara dimuatkan pada pelayar Chrome/Safari
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    /*************************************************************************
+     * 6. NAVIGASI SKRIN & PILIHAN MOD
+     *************************************************************************/
+    function showScreen(name) {
+      Object.values(screens).forEach(s => s.classList.add("hidden"));
+      screens[name].classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      closeVocabBalloon();
+    }
+
+    // Gaya kad pilihan mod
+    document.querySelectorAll('input[name="quizMode"]').forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        state.mode = e.target.value;
+        document.querySelectorAll(".mode-card").forEach(card => {
+          card.classList.remove("border-indigo-500", "bg-indigo-50/50");
+          card.classList.add("border-slate-200", "bg-white");
+        });
+        const selectedCard = e.target.closest(".mode-card");
+        selectedCard.classList.remove("border-slate-200", "bg-white");
+        selectedCard.classList.add("border-indigo-500", "bg-indigo-50/50");
+      });
+    });
+
+    /*************************************************************************
+     * 7. ENJIN KUIZ ADAPTIF (ZPD) & PEMASA CABARAN
+     *************************************************************************/
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function initQuiz() {
+      const selectedRadio = document.querySelector('input[name="quizMode"]:checked');
+      state.mode = selectedRadio ? selectedRadio.value : "adaptive";
+      state.phase = "main";
+      state.remainingPool = shuffleArray(QUESTIONS);
+      state.answeredCount = 0;
+      state.firstPassScore = 0;
+      state.wrongIds = new Set();
+      state.retryQueue = [];
+      state.streak = 0;
+      state.wrongStreak = 0;
+      state.targetDifficulty = state.mode === "challenge" ? 2 : 1;
+
+      // Inisialisasi statistik topik
+      state.topicStats = {
+        "Lakaran Piktorial": { correct: 0, total: 0 },
+        "Sistem Fertigasi": { correct: 0, total: 0 },
+        "Reka Bentuk Fesyen": { correct: 0, total: 0 },
+        "Masalah Inventif": { correct: 0, total: 0 }
+      };
+
+      // Kemas kini lencana mod di header
+      const badge = document.getElementById("headerModeBadge");
+      badge.classList.remove("hidden");
+      if (state.mode === "adaptive") badge.textContent = "🧠 Mod Adaptif ZPD";
+      else if (state.mode === "hints") badge.textContent = "🛟 Mod Bantuan";
+      else badge.textContent = "⚡ Mod Cabaran";
+
+      document.getElementById("retryBanner").classList.add("hidden");
+      document.getElementById("scoreCount").textContent = "0";
+      showScreen("quiz");
+      loadNextQuestion();
+    }
+
+    // Pilih soalan seterusnya mengikut aras ZPD adaptif
+    function pickAdaptiveQuestion() {
+      if (state.remainingPool.length === 0) return null;
+
+      // Cari soalan yang sepadan dengan targetDifficulty
+      let idx = state.remainingPool.findIndex(q => q.difficulty === state.targetDifficulty);
+      if (idx === -1) {
+        // Jika tiada, cari aras terdekat
+        idx = state.remainingPool.findIndex(q => Math.abs(q.difficulty - state.targetDifficulty) === 1);
+      }
+      if (idx === -1) idx = 0;
+
+      const [picked] = state.remainingPool.splice(idx, 1);
+      return picked;
+    }
+
+    function loadNextQuestion() {
+      clearTimer();
+      state.hasAnsweredCurrent = false;
+      closeVocabBalloon();
+
+      let q = null;
+      if (state.phase === "main") {
+        q = pickAdaptiveQuestion();
+        if (!q) {
+          finishMainPhase();
+          return;
+        }
+      } else {
+        if (state.retryQueue.length === 0) {
+          showScreen("namePrompt");
+          return;
+        }
+        q = state.retryQueue.shift();
+      }
+
+      state.currentQuestion = q;
+      renderQuestion(q);
+    }
+
+    function renderQuestion(q) {
+      // Kemas kini bar status
+      const phaseBadge = document.getElementById("phaseBadge");
+      const progressBar = document.getElementById("progressBar");
+
+      if (state.phase === "main") {
+        const num = state.answeredCount + 1;
+        phaseBadge.textContent = `Soalan ${num} / ${QUESTIONS.length}`;
+        progressBar.style.width = `${(num / QUESTIONS.length) * 100}%`;
+      } else {
+        const num = state.retryDone + 1;
+        phaseBadge.textContent = `Ulang Kaji ${num} / ${state.retryTotal}`;
+        progressBar.style.width = `${(num / state.retryTotal) * 100}%`;
+      }
+
+      document.getElementById("topicBadge").textContent = q.topic;
+
+      // Lencana ZPD Aras
+      const zpdBadge = document.getElementById("zpdLevelBadge");
+      if (q.difficulty === 1) {
+        zpdBadge.textContent = "ZPD: Asas";
+        zpdBadge.className = "px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 font-bold text-xs";
+      } else if (q.difficulty === 2) {
+        zpdBadge.textContent = "ZPD: Sederhana";
+        zpdBadge.className = "px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 font-bold text-xs";
+      } else {
+        zpdBadge.textContent = "ZPD: Cabaran KBAT";
+        zpdBadge.className = "px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 font-bold text-xs";
+      }
+
+      // Streak
+      const streakEl = document.getElementById("streakDisplay");
+      if (state.streak >= 2) {
+        streakEl.classList.remove("hidden");
+        document.getElementById("streakCount").textContent = state.streak;
+      } else {
+        streakEl.classList.add("hidden");
+      }
+
+      // Papar teks soalan dengan sorotan istilah
+      const qHtml = highlightGlossary(q.q).replace(/\n/g, "<br>");
+      document.getElementById("questionText").innerHTML = qHtml;
+
+      // Papar SVG jika ada
+      const visualBox = document.getElementById("questionVisual");
+      if (q.svg) {
+        visualBox.innerHTML = q.svg;
+        visualBox.classList.remove("hidden");
+      } else {
+        visualBox.innerHTML = "";
+        visualBox.classList.add("hidden");
+      }
+
+      // Urus bahagian Hints (ZPD Scaffolding)
+      const hintSection = document.getElementById("hintSection");
+      const btnToggleHint = document.getElementById("btnToggleHint");
+      const hintBox = document.getElementById("hintBox");
+      document.getElementById("hintContent").innerHTML = highlightGlossary(q.hint);
+
+      if (state.mode === "challenge" && state.phase === "main") {
+        hintSection.classList.add("hidden");
+      } else {
+        hintSection.classList.remove("hidden");
+        if (state.mode === "hints" || state.phase === "retry" || state.wrongStreak >= 1) {
+          // Dalam Mod Bantuan, Pusingan Ulang Kaji, atau selepas murid salah (ZPD scaffolding), tunjuk petunjuk dengan mudah
+          hintBox.classList.remove("hidden");
+          btnToggleHint.classList.add("hidden");
+        } else {
+          hintBox.classList.add("hidden");
+          btnToggleHint.classList.remove("hidden");
+        }
+      }
+
+      // Rawak susunan pilihan jawapan sambil mengekalkan indeks asal
+      const mappedOptions = q.options.map((text, idx) => ({ text, origIdx: idx }));
+      const shuffledOptions = shuffleArray(mappedOptions);
+      const letters = ["A", "B", "C", "D"];
+
+      const optContainer = document.getElementById("optionsContainer");
+      optContainer.innerHTML = "";
+
+      shuffledOptions.forEach((opt, displayIdx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.origIdx = opt.origIdx;
+        btn.className = "option-btn w-full text-left p-4 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50/40 transition flex items-start gap-3.5 group";
+        btn.innerHTML = `
+          <span class="opt-letter w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-indigo-100 text-slate-700 group-hover:text-indigo-700 font-extrabold text-sm flex items-center justify-center shrink-0 transition">
+            ${letters[displayIdx]}
+          </span>
+          <span class="text-sm sm:text-base text-slate-800 font-medium leading-snug pt-0.5 flex-1">
+            ${highlightGlossary(opt.text)}
+          </span>
+        `;
+        btn.addEventListener("click", (e) => {
+          // Elak menjawab jika murid hanya klik perkataan istilah di dalam pilihan jawapan
+          if (e.target.closest(".vocab-word")) return;
+          handleAnswer(opt.origIdx, btn);
+        });
+        optContainer.appendChild(btn);
+      });
+
+      // Sembunyikan kotak maklum balas
+      document.getElementById("feedbackBox").classList.add("hidden");
+
+      // Mulakan pemasa jika Mod Cabaran (fasa utama)
+      const timerDisplay = document.getElementById("timerDisplay");
+      if (state.mode === "challenge" && state.phase === "main") {
+        timerDisplay.classList.remove("hidden");
+        startTimer();
+      } else {
+        timerDisplay.classList.add("hidden");
+      }
+    }
+
+    document.getElementById("btnToggleHint").addEventListener("click", () => {
+      document.getElementById("hintBox").classList.remove("hidden");
+      document.getElementById("btnToggleHint").classList.add("hidden");
+    });
+
+    function startTimer() {
+      state.timeLeft = 30;
+      const secEl = document.getElementById("timerSec");
+      const timerBadge = document.getElementById("timerDisplay");
+      secEl.textContent = state.timeLeft;
+      timerBadge.className = "px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs flex items-center gap-1";
+
+      state.timerInterval = setInterval(() => {
+        state.timeLeft--;
+        secEl.textContent = state.timeLeft;
+        if (state.timeLeft <= 8) {
+          timerBadge.className = "px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 text-xs flex items-center gap-1 animate-pulse";
+        }
+        if (state.timeLeft <= 0) {
+          clearTimer();
+          handleAnswer(-1, null); // Masa tamat
+        }
+      }, 1000);
+    }
+
+    function clearTimer() {
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+    }
+
+    /*************************************************************************
+     * 8. PENGENDALIAN JAWAPAN, MAKLUM BALAS & PELARASAN ADAPTIF ZPD
+     *************************************************************************/
+    function handleAnswer(chosenOrigIdx, clickedBtn) {
+      if (state.hasAnsweredCurrent) return;
+      state.hasAnsweredCurrent = true;
+      clearTimer();
+
+      const q = state.currentQuestion;
+      const isCorrect = chosenOrigIdx === q.answer;
+      const isTimeout = chosenOrigIdx === -1;
+
+      // Nyahaktif semua butang pilihan & tandakan jawapan betul/salah
+      document.querySelectorAll(".option-btn").forEach(btn => {
+        btn.disabled = true;
+        btn.classList.remove("hover:border-indigo-400", "hover:bg-indigo-50/40");
+        const orig = parseInt(btn.dataset.origIdx, 10);
+        const letterBox = btn.querySelector(".opt-letter");
+
+        if (orig === q.answer) {
+          btn.classList.remove("border-slate-200", "bg-white");
+          btn.classList.add("border-emerald-500", "bg-emerald-50");
+          letterBox.classList.remove("bg-slate-100", "text-slate-700");
+          letterBox.classList.add("bg-emerald-600", "text-white");
+        } else if (btn === clickedBtn && !isCorrect) {
+          btn.classList.remove("border-slate-200", "bg-white");
+          btn.classList.add("border-rose-500", "bg-rose-50");
+          letterBox.classList.remove("bg-slate-100", "text-slate-700");
+          letterBox.classList.add("bg-rose-600", "text-white");
+        } else {
+          btn.classList.add("opacity-60");
+        }
+      });
+
+      // Kemas kini statistik & adaptasi ZPD
+      if (state.phase === "main") {
+        state.answeredCount++;
+        state.topicStats[q.topic].total++;
+
+        if (isCorrect) {
+          state.firstPassScore++;
+          state.topicStats[q.topic].correct++;
+          state.streak++;
+          state.wrongStreak = 0;
+          // ZPD Adaptif: Jika betul 2 kali berturut-turut, naikkan aras cabaran!
+          if (state.streak >= 2 && state.targetDifficulty < 3) {
+            state.targetDifficulty++;
+          }
+        } else {
+          state.wrongIds.add(q.id);
+          state.streak = 0;
+          state.wrongStreak++;
+          // ZPD Adaptif: Jika salah, turunkan aras untuk bina semula keyakinan
+          if (state.targetDifficulty > 1) {
+            state.targetDifficulty--;
+          }
+        }
+        document.getElementById("scoreCount").textContent = state.firstPassScore;
+      } else {
+        // Dalam Fasa Ulang Kaji Soalan Salah
+        if (isCorrect) {
+          state.retryDone++;
+          state.streak++;
+        } else {
+          // Masukkan semula ke hujung barisan supaya murid kuasai sebelum tamat!
+          state.retryQueue.push(q);
+          state.streak = 0;
+        }
+      }
+
+      // Papar kotak maklum balas
+      const fbBox = document.getElementById("feedbackBox");
+      const fbIcon = document.getElementById("feedbackIcon");
+      const fbTitle = document.getElementById("feedbackTitle");
+      const motMsg = document.getElementById("motivationMsg");
+      const wrongBox = document.getElementById("wrongReasonBox");
+      const wrongText = document.getElementById("wrongReasonText");
+      const correctText = document.getElementById("correctBriefText");
+
+      fbBox.classList.remove("hidden", "border-emerald-300", "bg-emerald-50/40", "border-rose-300", "bg-rose-50/40");
+
+      if (isCorrect) {
+        fbBox.classList.add("border-emerald-300", "bg-emerald-50/40");
+        fbIcon.textContent = state.phase === "retry" ? "🌟" : "✅";
+        fbTitle.className = "font-extrabold text-base text-emerald-800";
+        fbTitle.textContent = state.phase === "retry"
+          ? "Syabas! Anda berjaya membetulkan kesilapan tadi dengan tepat!"
+          : "Tahniah! Jawapan anda tepat!";
+        motMsg.classList.add("hidden");
+        wrongBox.classList.add("hidden");
+      } else {
+        fbBox.classList.add("border-rose-300", "bg-rose-50/40");
+        fbIcon.textContent = isTimeout ? "⏱️" : "💡";
+        fbTitle.className = "font-extrabold text-base text-rose-800";
+        fbTitle.textContent = isTimeout
+          ? "Masa tamat! Mari kita semak konsep soalan ini."
+          : "Kurang tepat, jangan putus asa!";
+
+        // Kata motivasi rawak
+        const randomMot = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
+        motMsg.textContent = randomMot;
+        motMsg.className = "mt-1 text-xs sm:text-sm font-medium italic text-rose-700";
+        motMsg.classList.remove("hidden");
+
+        // Sebab mengapa pilihan murid salah
+        const reason = isTimeout
+          ? "Anda tidak sempat memilih jawapan dalam tempoh 30 saat. Dalam peperiksaan, cuba baca kata kunci soalan dahulu."
+          : (q.wrongReasons[chosenOrigIdx] || "Pilihan ini tidak menepati konsep RBT yang ditanya.");
+        wrongText.innerHTML = highlightGlossary(reason);
+        wrongBox.classList.remove("hidden");
+      }
+
+      // Penerangan jawapan tepat (SENTIASA dipaparkan sama ada betul atau salah)
+      correctText.innerHTML = highlightGlossary(q.correctBrief);
+
+      // Teks butang seterusnya
+      const btnNext = document.getElementById("btnNextQuestion");
+      if (state.phase === "main" && state.remainingPool.length === 0) {
+        btnNext.textContent = "Lihat Keputusan Pusingan Pertama →";
+      } else if (state.phase === "retry" && state.retryQueue.length === 0) {
+        btnNext.textContent = "Tamat & Jana Sijil Pencapaian 🎓";
+      } else {
+        btnNext.textContent = "Soalan Seterusnya →";
+      }
+    }
+
+    document.getElementById("btnNextQuestion").addEventListener("click", loadNextQuestion);
+
+    /*************************************************************************
+     * 9. TRANSISI ULANG KAJI SOALAN SALAH & PENJANAAN SIJIL
+     *************************************************************************/
+    function finishMainPhase() {
+      if (state.wrongIds.size > 0) {
+        document.getElementById("firstPassScoreText").textContent = `${state.firstPassScore} / ${QUESTIONS.length}`;
+        document.getElementById("wrongCountText").textContent = state.wrongIds.size;
+        showScreen("retryIntro");
+      } else {
+        // Semua 50 soalan betul terus!
+        showScreen("namePrompt");
+      }
+    }
+
+    document.getElementById("btnStartRetry").addEventListener("click", () => {
+      state.phase = "retry";
+      state.retryQueue = QUESTIONS.filter(q => state.wrongIds.has(q.id));
+      state.retryTotal = state.retryQueue.length;
+      state.retryDone = 0;
+      document.getElementById("retryBanner").classList.remove("hidden");
+      showScreen("quiz");
+      loadNextQuestion();
+    });
+
+    document.getElementById("certForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const studentName = document.getElementById("inputStudentName").value.trim();
+      const studentClass = document.getElementById("inputStudentClass").value.trim();
+      if (!studentName) return;
+
+      generateCertificate(studentName, studentClass);
+      showScreen("certificate");
+    });
+
+    function generateCertificate(name, cls) {
+      const total = QUESTIONS.length;
+      const score = state.firstPassScore;
+      const pct = Math.round((score / total) * 100);
+
+      document.getElementById("certStudentName").textContent = name;
+      document.getElementById("certStudentClass").textContent = cls ? `Kelas: ${cls}` : "Tingkatan 1";
+      document.getElementById("certFinalScore").textContent = `${score} / ${total}`;
+      document.getElementById("certPercentage").textContent = `${pct}%`;
+
+      // Tarikh semasa dalam format Malaysia
+      const today = new Date();
+      document.getElementById("certDate").textContent = today.toLocaleDateString("ms-MY", {
+        day: "numeric", month: "long", year: "numeric"
+      });
+
+      // Tahap Penguasaan
+      let gradeText = "Perlu Usaha Lagi";
+      if (pct >= 85) gradeText = "Cemerlang (TP6)";
+      else if (pct >= 70) gradeText = "Kepujian (TP5)";
+      else if (pct >= 55) gradeText = "Baik (TP4)";
+      else if (pct >= 40) gradeText = "Memuaskan (TP3)";
+      document.getElementById("certGrade").textContent = gradeText;
+
+      const modeLabel = state.mode === "adaptive" ? "Mod Adaptif ZPD" : (state.mode === "hints" ? "Mod Bantuan" : "Mod Cabaran");
+      document.getElementById("certModeUsed").textContent = modeLabel;
+      document.getElementById("certRetryStat").textContent = "100% Selesai";
+
+      // Pecahan prestasi mengikut topik
+      const breakdownEl = document.getElementById("certTopicBreakdown");
+      breakdownEl.innerHTML = "";
+      Object.entries(state.topicStats).forEach(([topic, data]) => {
+        const tPct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+        const barColor = tPct >= 75 ? "bg-emerald-500" : (tPct >= 50 ? "bg-amber-500" : "bg-rose-500");
+        breakdownEl.innerHTML += `
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div class="flex justify-between font-bold text-slate-700 mb-1.5">
+              <span>${topic}</span>
+              <span>${data.correct}/${data.total} (${tPct}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div class="${barColor} h-full rounded-full" style="width: ${tPct}%"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById("btnStartQuiz").addEventListener("click", initQuiz);
+    document.getElementById("btnRestartAll").addEventListener("click", () => {
+      document.getElementById("headerModeBadge").classList.add("hidden");
+      showScreen("start");
+    });
+
+    /*************************************************************************
+     * 10. MODAL PANDUAN ISTILAH & EASTER EGG FOOTER (8 KLIK DALAM 2 SAAT)
+     *************************************************************************/
+    const modalVocabGuide = document.getElementById("modalVocabGuide");
+    document.getElementById("btnVocabGuide").addEventListener("click", () => modalVocabGuide.classList.remove("hidden"));
+    document.getElementById("btnCloseVocabGuide").addEventListener("click", () => modalVocabGuide.classList.add("hidden"));
+    document.getElementById("btnOkVocabGuide").addEventListener("click", () => modalVocabGuide.classList.add("hidden"));
+
+    // Easter Egg: Klik 8 kali dalam tempoh 2 saat pada teks hak cipta footer
+    const footerCopyright = document.getElementById("footerCopyright");
+    const modalAuthor = document.getElementById("modalAuthor");
+    let footerClickTimestamps = [];
+
+    footerCopyright.addEventListener("click", () => {
+      const now = Date.now();
+      footerClickTimestamps.push(now);
+      // Kekalkan hanya klik dalam tempoh 2000ms (2 saat) terkini
+      footerClickTimestamps = footerClickTimestamps.filter(ts => now - ts <= 2000);
+
+      if (footerClickTimestamps.length >= 8) {
+        footerClickTimestamps = [];
+        modalAuthor.classList.remove("hidden");
+      }
+    });
+
+    document.getElementById("btnCloseAuthor").addEventListener("click", () => {
+      modalAuthor.classList.add("hidden");
+    });
+    modalAuthor.addEventListener("click", (e) => {
+      if (e.target === modalAuthor) modalAuthor.classList.add("hidden");
+    });
+  </script>
+</body>
+</html>

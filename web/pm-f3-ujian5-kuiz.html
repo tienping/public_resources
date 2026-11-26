@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kuiz Interaktif Set 2 (Sesi 2): Norma Masyarakat (50 Soalan) - Pendidikan Moral T4</title>
+  <!-- Memuatkan Tailwind CSS dan fon Inter -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Gaya cetakan untuk menyimpan atau mencetak slip keputusan murid */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+      }
+      .print-card {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- Pengepala Utama (Header) -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 no-print">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-extrabold text-base shrink-0 shadow-sm">
+          S2
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-base font-bold text-slate-900 truncate">
+            Pendidikan Moral Tingkatan 4 — Unit 1 (Set 2)
+          </h1>
+          <p class="text-xs text-slate-500 truncate">
+            Sesi 2: Norma Masyarakat Pemangkin Kesejahteraan (50 Soalan Baharu)
+          </p>
+        </div>
+      </div>
+
+      <!-- Paparan Status Semasa Kuiz -->
+      <div id="header-status" class="hidden items-center gap-2 sm:gap-3 shrink-0">
+        <span id="header-mode-badge" class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200">
+          Mod Latihan
+        </span>
+        <button id="btn-open-nav" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <span>Senarai</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Kandungan Utama -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- SKRIN 1: LAMAN MULA (WELCOME SCREEN) -->
+    <section id="screen-start" class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold mb-4 border border-teal-100">
+          <span>Sesi 2 • Set 2</span>
+          <span>•</span>
+          <span>50 Soalan Objektif Baharu</span>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+          Norma Masyarakat Pemangkin Kesejahteraan
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+          Selamat datang ke <b>Sesi Latihan Kedua (Set 2)</b>. Set ini mengandungi 50 soalan situasi baharu bagi mengukuhkan penguasaan anda terhadap konsep, nilai universal, kesan pengabaian norma, budaya hedonisme, dan dimensi moral Unit 1.
+        </p>
+
+        <!-- Maklumat Murid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label for="input-name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Nama Murid (Pilihan)
+            </label>
+            <input id="input-name" type="text" placeholder="Contoh: Nurul Izzah"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-sm transition" />
+          </div>
+          <div>
+            <label for="input-class" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+              Kelas (Pilihan)
+            </label>
+            <input id="input-class" type="text" placeholder="Contoh: 4 Bestari"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none text-sm transition" />
+          </div>
+        </div>
+
+        <!-- Pilihan Mod Kuiz -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2.5">
+            Pilih Mod Kuiz
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="relative flex items-start gap-3 p-4 rounded-2xl border-2 border-teal-600 bg-teal-50/50 cursor-pointer transition" id="card-mode-practice">
+              <input type="radio" name="quiz-mode" value="practice" checked class="mt-1 accent-teal-600" />
+              <div>
+                <span class="block text-sm font-bold text-slate-900">Mod Latihan</span>
+                <span class="block text-xs text-slate-600 mt-0.5">Semakan jawapan dan penerangan dipaparkan serta-merta selepas memilih jawapan.</span>
+              </div>
+            </label>
+            <label class="relative flex items-start gap-3 p-4 rounded-2xl border-2 border-slate-200 hover:border-slate-300 bg-white cursor-pointer transition" id="card-mode-exam">
+              <input type="radio" name="quiz-mode" value="exam" class="mt-1 accent-teal-600" />
+              <div>
+                <span class="block text-sm font-bold text-slate-900">Mod Ujian</span>
+                <span class="block text-xs text-slate-600 mt-0.5">Markah dan semakan penuh hanya dipaparkan selepas anda menghantar semua jawapan.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pilihan Tambahan -->
+        <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200 mb-6">
+          <div>
+            <p class="text-sm font-semibold text-slate-800">Rawakkan Susunan Soalan</p>
+            <p class="text-xs text-slate-500">Susunan soalan akan diubah secara rawak setiap kali sesi dimulakan.</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input id="toggle-shuffle" type="checkbox" class="sr-only peer" />
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+          </label>
+        </div>
+
+        <button id="btn-start" type="button"
+          class="w-full py-3.5 px-6 rounded-2xl bg-teal-600 hover:bg-teal-700 active:scale-[0.99] text-white font-bold text-base shadow-sm transition flex items-center justify-center gap-2">
+          <span>Mula Sesi 2 (50 Soalan)</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- SKRIN 2: PAPARAN KUIZ (QUIZ SCREEN) -->
+    <section id="screen-quiz" class="hidden">
+      <!-- Bar Kemajuan (Progress Bar) -->
+      <div class="mb-5">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-600 mb-2">
+          <span id="progress-label">Soalan 1 daripada 50</span>
+          <span id="answered-label">Dijawab: 0 / 50</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+          <div id="progress-bar" class="h-full bg-teal-600 rounded-full transition-all duration-300" style="width: 2%;"></div>
+        </div>
+      </div>
+
+      <!-- Kad Soalan -->
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5 sm:p-8 mb-5">
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <span id="question-number-badge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700">
+            Soalan 1
+          </span>
+          <span id="question-topic-badge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+            Unit 1: Norma Masyarakat
+          </span>
+        </div>
+
+        <h3 id="question-text" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug mb-6">
+          <!-- Teks soalan akan dimasukkan melalui JavaScript -->
+        </h3>
+
+        <!-- Senarai Pilihan Jawapan -->
+        <div id="options-container" class="space-y-3">
+          <!-- Butang pilihan A, B, C, D akan dijana secara dinamik -->
+        </div>
+
+        <!-- Kotak Maklum Balas / Penerangan (Mod Latihan) -->
+        <div id="feedback-box" class="hidden mt-6 p-4 rounded-2xl border text-sm leading-relaxed">
+          <p id="feedback-title" class="font-bold mb-1"></p>
+          <p id="feedback-text" class="text-slate-700"></p>
+        </div>
+      </div>
+
+      <!-- Butang Navigasi Bawah -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <button id="btn-prev" type="button"
+          class="px-5 py-3 rounded-2xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-sm transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Sebelum</span>
+        </button>
+
+        <div class="flex items-center gap-2.5 ml-auto">
+          <button id="btn-finish-trigger" type="button"
+            class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm shadow-sm transition">
+            Hantar & Semak
+          </button>
+          <button id="btn-next" type="button"
+            class="px-5 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm shadow-sm transition flex items-center gap-2">
+            <span>Seterusnya</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKRIN 3: KEPUTUSAN & SEMAKAN (RESULT SCREEN) -->
+    <section id="screen-result" class="hidden">
+      <!-- Kad Ringkasan Skor -->
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8 mb-6 print-card">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 mb-3">
+              Keputusan Latihan Sesi 2 (Set 2) — Unit 1
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-1" id="result-student-heading">
+              Tahniah, Sesi 2 Tamat!
+            </h2>
+            <p class="text-sm text-slate-600" id="result-meta"></p>
+            <p class="text-sm font-medium text-teal-700 mt-2" id="result-message"></p>
+          </div>
+
+          <!-- Paparan Skor Ringkas -->
+          <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 shrink-0">
+            <div class="text-center px-3">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Markah</p>
+              <p class="text-3xl font-extrabold text-teal-600"><span id="score-correct">0</span><span class="text-lg text-slate-400">/50</span></p>
+            </div>
+            <div class="h-10 w-px bg-slate-200"></div>
+            <div class="text-center px-3">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Peratus</p>
+              <p class="text-3xl font-extrabold text-slate-900" id="score-percent">0%</p>
+            </div>
+            <div class="h-10 w-px bg-slate-200"></div>
+            <div class="text-center px-3">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Gred</p>
+              <p class="text-3xl font-extrabold text-emerald-600" id="score-grade">-</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistik Ringkas -->
+        <div class="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-slate-100">
+          <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
+            <p class="text-xs font-semibold text-emerald-700">Betul</p>
+            <p class="text-xl font-extrabold text-emerald-700" id="stat-correct">0</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-rose-50 border border-rose-100 text-center">
+            <p class="text-xs font-semibold text-rose-700">Salah</p>
+            <p class="text-xl font-extrabold text-rose-700" id="stat-wrong">0</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-100 border border-slate-200 text-center">
+            <p class="text-xs font-semibold text-slate-600">Tidak Dijawab</p>
+            <p class="text-xl font-extrabold text-slate-700" id="stat-unanswered">0</p>
+          </div>
+        </div>
+
+        <!-- Butang Tindakan -->
+        <div class="flex flex-wrap items-center gap-3 mt-6 no-print">
+          <button id="btn-restart" type="button"
+            class="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm transition">
+            Ulang Sesi 2 Semula
+          </button>
+          <button id="btn-print" type="button"
+            class="px-5 py-2.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold text-sm transition">
+            Cetak / Simpan PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Penapis Semakan Jawapan -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 no-print">
+        <h3 class="text-lg font-bold text-slate-900">Semakan Jawapan Terperinci (Set 2)</h3>
+        <div class="inline-flex rounded-xl bg-white border border-slate-200 p-1">
+          <button type="button" data-filter="all" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-600 text-white transition">Semua (50)</button>
+          <button type="button" data-filter="wrong" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Salah / Kosong</button>
+          <button type="button" data-filter="correct" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">Betul</button>
+        </div>
+      </div>
+
+      <!-- Senarai Semakan Soalan -->
+      <div id="review-container" class="space-y-4">
+        <!-- Kad semakan setiap soalan akan dijana di sini -->
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: PETA NAVIGASI SOALAN (1 - 50) -->
+  <div id="modal-nav" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl shadow-xl max-w-lg w-full p-6 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Senarai Soalan Sesi 2 (1 – 50)</h3>
+          <p class="text-xs text-slate-500">Klik nombor untuk melompat terus ke soalan tersebut.</p>
+        </div>
+        <button id="btn-close-nav" type="button" class="p-2 rounded-xl hover:bg-slate-100 text-slate-500">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2 overflow-y-auto py-1">
+        <!-- Nombor 1-50 dijana secara dinamik -->
+      </div>
+      <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 mt-5 pt-4 border-t border-slate-100">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-teal-600 inline-block"></span> Semasa</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-100 border border-emerald-400 inline-block"></span> Dijawab / Betul</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Belum Dijawab</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PENGESAHAN HANTAR KUIZ -->
+  <div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6">
+      <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-slate-900 mb-1">Hantar Jawapan Sesi 2?</h3>
+      <p id="confirm-message" class="text-sm text-slate-600 leading-relaxed mb-6">
+        Adakah anda pasti mahu menamatkan kuiz dan melihat keputusan sekarang?
+      </p>
+      <div class="flex items-center justify-end gap-3">
+        <button id="btn-confirm-cancel" type="button" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition">
+          Teruskan Menjawab
+        </button>
+        <button id="btn-confirm-submit" type="button" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition">
+          Ya, Hantar Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pengaki (Footer) -->
+  <footer class="py-5 text-center text-xs text-slate-400 no-print">
+    Latihan Interaktif Sesi 2 (Set 2) • Pendidikan Moral Tingkatan 4 • Unit 1: Norma Masyarakat Pemangkin Kesejahteraan
+  </footer>
+
+  <script>
+    /**
+     * Pangkalan Data 50 Soalan Objektif Baharu — SET 2 (SESI 2)
+     * Unit 1: Norma Masyarakat Pemangkin Kesejahteraan (Pendidikan Moral Tingkatan 4)
+     */
+    const RAW_QUESTIONS_SET2 = [
+      {
+        id: 1,
+        topic: "Konsep Norma Masyarakat",
+        question: "Di dalam wad hospital, pelawat secara automatik memperlahankan suara dan menukar telefon bimbit kepada mod senyap walaupun tidak ditegur oleh jururawat. Apakah ciri norma masyarakat yang paling tepat menggambarkan situasi ini?",
+        options: [
+          "Peraturan sosial yang menjadi kebiasaan bersama",
+          "Undang-undang jenayah yang membawa hukuman penjara",
+          "Arahan sementara yang hanya terpakai pada hujung minggu",
+          "Kepercayaan peribadi yang tidak difahami orang lain"
+        ],
+        answer: "Peraturan sosial yang menjadi kebiasaan bersama",
+        explanation: "Menjaga ketenteraman di hospital ialah peraturan sosial yang telah menjadi kebiasaan dan dijangka dipatuhi oleh semua pelawat."
+      },
+      {
+        id: 2,
+        topic: "Konsep Norma Masyarakat",
+        question: "Mengapakah peraturan perpustakaan sekolah seperti menyusun semula kerusi selepas membaca boleh berkembang menjadi norma masyarakat dalam kalangan murid?",
+        options: [
+          "Kerana diamalkan secara berulang sehingga menjadi kebiasaan yang diterima",
+          "Kerana murid dibayar upah setiap kali menyusun kerusi",
+          "Kerana peraturan tersebut hanya diamalkan oleh pengawas pusat sumber",
+          "Kerana kerusi perpustakaan tidak boleh digunakan jika tidak disusun"
+        ],
+        answer: "Kerana diamalkan secara berulang sehingga menjadi kebiasaan yang diterima",
+        explanation: "Peraturan sosial yang dibentuk secara sedar dan diamalkan secara berterusan akan menjadi kebiasaan serta diterima sebagai norma."
+      },
+      {
+        id: 3,
+        topic: "Konsep Norma Masyarakat",
+        question: "Antara berikut, perbuatan manakah yang termasuk dalam kategori 'perbuatan yang patut dihindari' dalam amalan norma masyarakat?",
+        options: [
+          "Mencelah perbualan orang yang lebih tua tanpa meminta izin",
+          "Membantu jiran mengangkat barang yang berat",
+          "Memberi laluan kepada warga emas di laluan pejalan kaki",
+          "Mengucapkan terima kasih selepas menerima bantuan"
+        ],
+        answer: "Mencelah perbualan orang yang lebih tua tanpa meminta izin",
+        explanation: "Norma masyarakat merangkumi perbuatan wajar dilakukan dan perbuatan patut dihindari seperti mencelah perbualan orang tua."
+      },
+      {
+        id: 4,
+        topic: "Konsep Pemangkin",
+        question: "Bagaimanakah amalan norma masyarakat bertindak sebagai 'pemangkin' dalam membina sebuah negara yang sejahtera?",
+        options: [
+          "Mempercepat proses pemupukan perpaduan dan keharmonian rakyat",
+          "Menghapuskan sepenuhnya perbezaan bahasa ibunda setiap kaum",
+          "Memastikan semua rakyat memilih bidang kerjaya yang sama",
+          "Mengurangkan peranan undang-undang dalam mentadbir negara"
+        ],
+        answer: "Mempercepat proses pemupukan perpaduan dan keharmonian rakyat",
+        explanation: "Sebagai pemangkin (catalyst), amalan norma mempercepat pembentukan masyarakat yang aman, bersatu padu dan sejahtera."
+      },
+      {
+        id: 5,
+        topic: "Menyesuaikan Diri",
+        question: "Nadia mengikuti lawatan sekolah ke sebuah rumah panjang di Sarawak. Sebelum masuk, dia mendengar taklimat pemandu pelancong mengenai pantang larang dan adab tetamu di situ lalu mematuhinya. Apakah sikap yang ditunjukkan oleh Nadia?",
+        options: [
+          "Akur dan menyesuaikan diri dengan peraturan komuniti setempat",
+          "Memaksa penduduk tempatan mengikut cara hidup bandar",
+          "Mengabaikan adat setempat kerana dia hanya pelawat sementara",
+          "Menganggap adat komuniti lain tidak relevan pada zaman moden"
+        ],
+        answer: "Akur dan menyesuaikan diri dengan peraturan komuniti setempat",
+        explanation: "Akur dan dapat menyesuaikan diri dengan peraturan serta adat yang ditetapkan dalam sesuatu komuniti adalah teras konsep norma masyarakat."
+      },
+      {
+        id: 6,
+        topic: "Amalan Agama & Norma",
+        question: "Ketika melawat masjid bersejarah bersama rombongan pelancong, Kevin memakai seluar panjang dan menanggalkan kasut di tempat yang disediakan. Apakah mesej yang tersirat daripada tindakan Kevin?",
+        options: [
+          "Menghormati amalan agama sebagai sebahagian daripada norma masyarakat",
+          "Menunjukkan bahawa pelancong wajib menukar agama sebelum melawat",
+          "Mengelakkan dirinya daripada dikenakan denda oleh pemandu pelancong",
+          "Menyembunyikan identiti budayanya daripada orang awam"
+        ],
+        answer: "Menghormati amalan agama sebagai sebahagian daripada norma masyarakat",
+        explanation: "Amalan agama dan tatacara di rumah ibadat adalah sebahagian daripada norma masyarakat yang perlu dihormati oleh semua."
+      },
+      {
+        id: 7,
+        topic: "Contoh Norma Masyarakat",
+        question: "Setiap pagi sebelum masuk ke kelas, murid-murid Tingkatan 4 menyapa dan melemparkan senyuman kepada pekerja pembersihan sekolah. Apakah contoh norma masyarakat yang diamalkan?",
+        options: [
+          "Menghargai semua manusia tanpa mengira latar belakang",
+          "Beratur dengan tertib semasa menggunakan kemudahan awam",
+          "Mengetuk pintu sebelum memasuki bilik pentadbiran",
+          "Duduk dengan sopan ketika menikmati makanan di kantin"
+        ],
+        answer: "Menghargai semua manusia tanpa mengira latar belakang",
+        explanation: "Menyantuni pekerja pembersihan dengan mesra menunjukkan norma menghargai semua manusia tanpa mengira status atau pekerjaan."
+      },
+      {
+        id: 8,
+        topic: "Contoh Norma Masyarakat",
+        question: "Apabila bertembung dengan jiran di dalam lif pangsapuri pada waktu pagi, apakah amalan norma masyarakat paling asas yang wajar dilakukan?",
+        options: [
+          "Memberi salam atau bertegur sapa dengan mesra",
+          "Menundukkan wajah dan berpura-pura sibuk dengan telefon",
+          "Memandang jiran dengan mimik muka yang masam",
+          "Menekan butang tutup pintu lif dengan segera sebelum jiran masuk"
+        ],
+        answer: "Memberi salam atau bertegur sapa dengan mesra",
+        explanation: "Memberi salam dan bertegur sapa adalah contoh norma masyarakat yang mengeratkan hubungan kejiranan."
+      },
+      {
+        id: 9,
+        topic: "Contoh Norma Masyarakat",
+        question: "Shalini ingin berjumpa guru kaunseling untuk mendapatkan nasihat. Pintu bilik kaunseling tertutup rapat. Apakah langkah pertama yang menepati norma masyarakat?",
+        options: [
+          "Mengetuk pintu dan menunggu keizinan sebelum masuk",
+          "Membuka pintu secara perlahan-lahan tanpa mengetuk",
+          "Memanggil nama guru kaunseling dengan suara yang lantang dari luar",
+          "Terus masuk ke dalam bilik kerana waktu persekolahan masih berjalan"
+        ],
+        answer: "Mengetuk pintu dan menunggu keizinan sebelum masuk",
+        explanation: "Mengetuk pintu sebelum masuk menghormati privasi penghuni bilik, terutamanya di bilik kaunseling yang mungkin sedang menjalankan sesi."
+      },
+      {
+        id: 10,
+        topic: "Contoh Norma Masyarakat",
+        question: "Semasa jamuan akhir tahun kelas, beberapa orang murid memilih untuk duduk di kerusi yang disediakan ketika menikmati hidangan walaupun rakan lain sedang berbual sambil berdiri. Apakah norma masyarakat yang dipelihara oleh mereka?",
+        options: [
+          "Duduk ketika makan",
+          "Bercakap jujur dalam pergaulan",
+          "Mengetuk pintu sebelum masuk",
+          "Beratur ketika menggunakan pengangkutan awam"
+        ],
+        answer: "Duduk ketika makan",
+        explanation: "Duduk ketika makan adalah norma masyarakat yang mencerminkan kesopanan, ketertiban dan adab makan yang baik."
+      },
+      {
+        id: 11,
+        topic: "Contoh Norma Masyarakat",
+        question: "Di kaunter pembayaran pasar raya yang panjang, seorang lelaki melihat rakan lamanya berada di hadapan barisan. Dia tetap kekal di kedudukan belakang tanpa meminta rakannya memotong giliran untuknya. Mengapakah tindakannya terpuji?",
+        options: [
+          "Mematuhi norma beratur dan menghormati hak pengguna lain",
+          "Mengelakkan dirinya daripada perlu berbual dengan rakan lama",
+          "Menunjukkan bahawa dia tidak tergesa-gesa untuk pulang ke rumah",
+          "Memastikan juruwang dapat bekerja dengan lebih perlahan"
+        ],
+        answer: "Mematuhi norma beratur dan menghormati hak pengguna lain",
+        explanation: "Beratur mengikut giliran menunjukkan disiplin diri serta keadilan terhadap semua pengguna lain yang turut menunggu."
+      },
+      {
+        id: 12,
+        topic: "Contoh Norma Masyarakat",
+        question: "Ketika bermain bola di halaman rumah, tendangan Danish secara tidak sengaja memecahkan pasu bunga jirannya. Danish segera berjumpa jirannya untuk mengakui kesilapan dan memohon maaf. Apakah norma masyarakat yang dipamerkan?",
+        options: [
+          "Bercakap jujur dan bertanggungjawab",
+          "Bersikap individualistik terhadap harta jiran",
+          "Menghindari pergaulan dengan jiran tetangga",
+          "Mengutamakan keseronokan diri semata-mata"
+        ],
+        answer: "Bercakap jujur dan bertanggungjawab",
+        explanation: "Bercakap jujur dan mengakui kesilapan ialah norma masyarakat yang membina kepercayaan dan rasa hormat dalam komuniti."
+      },
+      {
+        id: 13,
+        topic: "Contoh Norma Masyarakat",
+        question: "Dalam sebuah majlis kenduri, golongan muda mendahulukan warga emas dan kanak-kanak untuk mengambil makanan terlebih dahulu. Amalan ini melambangkan norma ____________.",
+        options: [
+          "menghormati orang yang lebih tua dan prihatin",
+          "meminggirkan golongan muda dalam majlis sosial",
+          "mengamalkan budaya hedonisme secara terbuka",
+          "mempersendakan tatacara majlis tradisional"
+        ],
+        answer: "menghormati orang yang lebih tua dan prihatin",
+        explanation: "Mendahulukan warga emas dalam urusan harian dan majlis keraian adalah manifestasi norma menghormati orang yang lebih tua."
+      },
+      {
+        id: 14,
+        topic: "Kepentingan Norma",
+        question: "Amira baru sahaja mendaftar masuk ke sekolah berasrama penuh. Dengan memerhatikan adab di dewan makan dan asrama, dia cepat memahami perkara yang wajar dilakukan dan dijauhi. Apakah kepentingan norma masyarakat dalam situasi ini?",
+        options: [
+          "Sebagai panduan bertingkah laku",
+          "Sebagai punca tekanan emosi murid baharu",
+          "Sebagai penghalang persahabatan antara murid",
+          "Sebagai alat untuk menghukum murid yang lemah"
+        ],
+        answer: "Sebagai panduan bertingkah laku",
+        explanation: "Norma masyarakat membantu dan mengawal individu agar memahami dan mengamalkan tingkah laku yang diterima dalam komuniti."
+      },
+      {
+        id: 15,
+        topic: "Kepentingan Norma",
+        question: "Pada hari pendaftaran sukan tahunan, ibu bapa meletakkan kenderaan di petak yang ditetapkan dan mendaftar mengikut giliran sehingga majlis berjalan lancar tanpa kesesakan. Apakah kepentingan norma masyarakat yang tercapai?",
+        options: [
+          "Membentuk masyarakat yang teratur",
+          "Mewujudkan sikap mementingkan diri sendiri",
+          "Mengurangkan jumlah kehadiran ibu bapa",
+          "Meningkatkan kos penganjuran acara sekolah"
+        ],
+        answer: "Membentuk masyarakat yang teratur",
+        explanation: "Keputusan dan tindakan individu yang selaras dengan norma masyarakat melahirkan suasana serta masyarakat yang teratur."
+      },
+      {
+        id: 16,
+        topic: "Kepentingan Norma",
+        question: "Keluarga Encik Wong memperlahankan bunyi televisyen dan muzik selepas pukul 10 malam bagi menghormati jiran yang sedang berehat. Apakah kepentingan amalan norma masyarakat ini?",
+        options: [
+          "Membina masyarakat yang harmoni dan menghindari perselisihan",
+          "Mengurangkan bil elektrik di seluruh kawasan perumahan",
+          "Memaksa semua jiran tidur pada waktu yang sama",
+          "Menunjukkan keluarga Encik Wong tidak gemar berhibur"
+        ],
+        answer: "Membina masyarakat yang harmoni dan menghindari perselisihan",
+        explanation: "Menjaga tingkah laku dan bertimbang rasa terhadap jiran mengelakkan perselisihan faham lalu membina masyarakat harmoni."
+      },
+      {
+        id: 17,
+        topic: "Kepentingan Norma",
+        question: "Dalam sesi temu duga biasiswa, panel penilai bukan sahaja melihat keputusan peperiksaan calon, malah menilai cara calon mengetuk pintu, memberi salam dan bertutur. Hal ini membuktikan norma masyarakat berfungsi sebagai ____________.",
+        options: [
+          "ukuran bertingkah laku",
+          "syarat kelayakan akademik semata-mata",
+          "pengganti kepada sijil peperiksaan",
+          "penghalang peluang pendidikan tinggi"
+        ],
+        answer: "ukuran bertingkah laku",
+        explanation: "Amalan norma yang diakui dan diterima menjadi kayu pengukur masyarakat untuk menilai keperibadian dan adab seseorang."
+      },
+      {
+        id: 18,
+        topic: "Insan Bermoral",
+        question: "Mengapakah penghayatan norma masyarakat sejak usia remaja amat penting dalam era kecerdasan buatan (AI) dan teknologi digital masa kini?",
+        options: [
+          "Membentuk insan bermoral yang beradab walaupun hidup dalam dunia moden",
+          "Memastikan remaja tidak menggunakan sebarang peranti pintar",
+          "Menggantikan sepenuhnya kemahiran sains dan matematik di sekolah",
+          "Menjadikan remaja sentiasa bergantung kepada pandangan orang lain"
+        ],
+        answer: "Membentuk insan bermoral yang beradab walaupun hidup dalam dunia moden",
+        explanation: "Kemajuan teknologi tidak seharusnya mengikis akhlak; norma masyarakat terus berperanan membentuk insan bermoral."
+      },
+      {
+        id: 19,
+        topic: "Nilai Universal",
+        question: "Apabila perarakan upacara pengebumian jiran berlainan agama melintasi hadapan rumah, Pak Ali mematikan mesin pemotong rumput dan berdiri dengan tenang sebagai tanda simpati. Nilai universal manakah yang diamalkan oleh Pak Ali?",
+        options: [
+          "Hormat",
+          "Kebebasan",
+          "Kerajinan",
+          "Kejujuran"
+        ],
+        answer: "Hormat",
+        explanation: "Menghargai dan memuliakan sensitiviti serta upacara keagamaan jiran lain mencerminkan nilai Hormat."
+      },
+      {
+        id: 20,
+        topic: "Nilai Universal",
+        question: "Semasa berjalan di pasar malam yang sesak, bahu Haris terlanggar seorang warga emas. Haris segera berhenti, menundukkan sedikit badan dan memohon maaf dengan nada yang lembut. Apakah nilai universal yang dipamerkan oleh Haris?",
+        options: [
+          "Hemah tinggi",
+          "Kebebasan",
+          "Berdikari",
+          "Keberanian"
+        ],
+        answer: "Hemah tinggi",
+        explanation: "Kesantunan dalam pertuturan dan tindakan memohon maaf dengan berbudi bahasa merupakan ciri nilai Hemah Tinggi."
+      },
+      {
+        id: 21,
+        topic: "Nilai Universal",
+        question: "Remaja berbilang kaum di sebuah taman perumahan berkongsi satu gelanggang serbaguna. Mereka bersetuju menetapkan jadual giliran antara permainan bola keranjang dan sepak takraw tanpa bertengkar. Apakah nilai universal yang diamalkan?",
+        options: [
+          "Toleransi",
+          "Individualistik",
+          "Kesederhanaan",
+          "Patriotisme"
+        ],
+        answer: "Toleransi",
+        explanation: "Kesanggupan bertolak ansur, sabar dan mengawal diri bagi mengelakkan pertelingkahan melambangkan nilai Toleransi."
+      },
+      {
+        id: 22,
+        topic: "Nilai Universal",
+        question: "Semasa sambutan perayaan, Puan Laila menyediakan juadah yang mencukupi untuk tetamu tanpa membazir dan menghias rumah secara sederhana tetapi kemas. Nilai universal Unit 1 manakah yang paling tepat?",
+        options: [
+          "Kesederhanaan",
+          "Kebebasan",
+          "Keberanian",
+          "Kerjasama"
+        ],
+        answer: "Kesederhanaan",
+        explanation: "Bersikap tidak keterlaluan dalam perbelanjaan dan penyediaan makanan tanpa mengabaikan kepentingan diri serta tetamu ialah nilai Kesederhanaan."
+      },
+      {
+        id: 23,
+        topic: "Nilai Universal",
+        question: "Dalam kumpulan sembang WhatsApp kejiranan, setiap penduduk bebas menyuarakan cadangan penambahbaikan taman, namun dilarang menyebarkan khabar angin atau menghina jiran. Situasi ini mencerminkan nilai ____________.",
+        options: [
+          "Kebebasan yang tertakluk kepada peraturan dan batas norma",
+          "Kebebasan mutlak tanpa sebarang had undang-undang",
+          "Sekatan bersuara yang menindas hak penduduk",
+          "Sikap individualistik dalam pengurusan komuniti"
+        ],
+        answer: "Kebebasan yang tertakluk kepada peraturan dan batas norma",
+        explanation: "Nilai Kebebasan bermaksud bebas melakukan sesuatu atau bersuara tertakluk kepada peraturan, undang-undang dan batas norma masyarakat."
+      },
+      {
+        id: 24,
+        topic: "Kesan Pengabaian Norma",
+        question: "Seorang pemandu enggan memberi laluan kepada ambulans yang sedang membunyikan siren kecemasan semata-mata kerana tidak mahu terlewat ke tempat kerja. Apakah kesan pengabaian norma yang jelas terlihat?",
+        options: [
+          "Bersikap individualistik tanpa mengambil kira kepentingan orang lain",
+          "Menunjukkan kecekapan pemanduan di jalan raya sibuk",
+          "Mengamalkan nilai kebebasan di jalan raya awam",
+          "Mematuhi ukuran bertingkah laku masyarakat moden"
+        ],
+        answer: "Bersikap individualistik tanpa mengambil kira kepentingan orang lain",
+        explanation: "Mengutamakan kepentingan sendiri sehingga mengabaikan nyawa atau kesusahan orang lain adalah contoh ketara sikap individualistik."
+      },
+      {
+        id: 25,
+        topic: "Kesan Pengabaian Norma",
+        question: "Encik Karim meletakkan rak kasut besar dan basikalnya di tengah-tengah koridor pangsapuri sehingga menyukarkan jiran sebelah melintas, tanpa pernah berbincang dengan mereka. Apakah ciri sikap individualistik yang ditunjukkan?",
+        options: [
+          "Keputusan dan tindakan berasaskan keinginan dan pertimbangan diri sendiri sahaja",
+          "Menghormati hak penggunaan ruang bersama di pangsapuri",
+          "Menggalakkan jiran-jiran berbual di koridor setiap hari",
+          "Mengamalkan kesederhanaan dalam penyimpanan barang"
+        ],
+        answer: "Keputusan dan tindakan berasaskan keinginan dan pertimbangan diri sendiri sahaja",
+        explanation: "Bertindak mengikut keselesaan sendiri tanpa memikirkan kesusahan jiran merupakan ciri utama sikap individualistik."
+      },
+      {
+        id: 26,
+        topic: "Kesan Pengabaian Norma",
+        question: "Seorang pelanggan remaja memarahi dan menengking juruwang pasar raya yang tersilap mengimbas harga barang walaupun juruwang tersebut sudah meminta maaf. Apakah kesan pengabaian norma yang dipamerkan?",
+        options: [
+          "Manusia kurang beradab",
+          "Hubungan antarabangsa terjejas",
+          "Peningkatan mutu perkhidmatan",
+          "Masyarakat semakin berdisiplin"
+        ],
+        answer: "Manusia kurang beradab",
+        explanation: "Cara berkomunikasi yang kasar dan tidak sopan bertentangan dengan norma masyarakat serta menggambarkan manusia kurang beradab."
+      },
+      {
+        id: 27,
+        topic: "Bahasa Badan",
+        question: "Ketika ditegur oleh ibunya kerana pulang lewat, Rina menghentak-hentakkan kaki, menggulingkan mata dan menghempas pintu biliknya. Berdasarkan Unit 1, apakah bentuk tingkah laku yang ditunjukkan oleh Rina?",
+        options: [
+          "Menggunakan bahasa badan yang kurang menyenangkan",
+          "Menunjukkan ketegasan moral yang matang",
+          "Mengamalkan komunikasi berkesan dalam keluarga",
+          "Mempamerkan nilai kebebasan yang terpuji"
+        ],
+        answer: "Menggunakan bahasa badan yang kurang menyenangkan",
+        explanation: "Bahasa badan termasuk gerak tubuh dan mimik muka; menggulingkan mata dan menghentak kaki adalah bahasa badan yang tidak sopan."
+      },
+      {
+        id: 28,
+        topic: "Bahasa Badan",
+        question: "Manakah antara berikut merupakan contoh bahasa badan yang selari dengan amalan norma masyarakat ketika mendengar nasihat datuk atau nenek?",
+        options: [
+          "Duduk dengan tertib, memandang wajah mereka dan mengangguk sopan",
+          "Berbaring di sofa sambil memakai fon telinga",
+          "Melihat jam tangan berulang kali dengan wajah yang bosan",
+          "Memalingkan badan ke arah televisyen sambil menyilangkan kaki"
+        ],
+        answer: "Duduk dengan tertib, memandang wajah mereka dan mengangguk sopan",
+        explanation: "Gaya duduk tertib, kontak mata yang sopan dan anggukan menunjukkan penghargaan serta adab terhadap orang lebih tua."
+      },
+      {
+        id: 29,
+        topic: "Kesan Pengabaian Norma",
+        question: "Akibat sibuk mengejar gaya hidup moden, sesetengah anak tidak lagi menjemput atau mengunjungi ibu bapa yang uzur semasa hari perayaan. Pengabaian norma ini tergolong dalam kesan ____________.",
+        options: [
+          "hubungan sosial terjejas kerana meminggirkan orang yang lebih tua",
+          "kemajuan ekonomi negara yang terlalu pesat",
+          "kekurangan kemudahan pengangkutan awam ke kampung",
+          "peningkatan tahap kesedaran tentang hak warga emas"
+        ],
+        answer: "hubungan sosial terjejas kerana meminggirkan orang yang lebih tua",
+        explanation: "Perubahan gaya hidup yang meminggirkan orang yang lebih tua disenaraikan di bawah kesan pengabaian norma 'hubungan sosial terjejas'."
+      },
+      {
+        id: 30,
+        topic: "Kesan Pengabaian Norma",
+        question: "Seorang remaja sering keluar berdua-duaan hingga lewat malam dengan kenalan baharu dari media sosial tanpa pengetahuan ibu bapa. Apakah risiko utama pengabaian norma ini dari aspek sosial?",
+        options: [
+          "Pergaulan di luar batasan yang menjejaskan hubungan sosial dan maruah diri",
+          "Menjadikan remaja lebih matang dan dipercayai oleh komuniti",
+          "Mengeratkan hubungan silaturahim antara dua buah keluarga",
+          "Meningkatkan kemahiran komunikasi rasmi di sekolah"
+        ],
+        answer: "Pergaulan di luar batasan yang menjejaskan hubungan sosial dan maruah diri",
+        explanation: "Pergaulan di luar batasan merupakan antara kesan pengabaian norma di bawah kategori hubungan sosial terjejas."
+      },
+      {
+        id: 31,
+        topic: "Kesan Pengabaian Norma",
+        question: "Seorang pengguna media sosial menulis komen menghina pakaian tradisional satu etnik di Malaysia sebagai 'pelik dan kolot'. Mengapakah perbuatan ini mesti dibanteras?",
+        options: [
+          "Memandang rendah norma berbeza akan menjejaskan keharmonian masyarakat",
+          "Komen tersebut akan menyebabkan jualan telefon pintar menurun",
+          "Pakaian tradisional hanya sesuai dipakai oleh golongan warga emas",
+          "Media sosial tidak membenarkan sebarang gambar pakaian dimuat naik"
+        ],
+        answer: "Memandang rendah norma berbeza akan menjejaskan keharmonian masyarakat",
+        explanation: "Mempersendakan cara berpakaian dan budaya kaum lain boleh mencetuskan rasa tidak puas hati dan menjejaskan keharmonian negara."
+      },
+      {
+        id: 32,
+        topic: "Kesan Pengabaian Norma",
+        question: "Sekumpulan remaja sengaja membunyikan ekzos motosikal dengan kuat di hadapan sebuah rumah ibadat ketika penganutnya sedang khusyuk bersembahyang. Apakah kesan perbuatan tidak bertanggungjawab ini?",
+        options: [
+          "Menjejaskan keharmonian masyarakat kerana tidak menghormati amalan beribadat kaum lain",
+          "Meningkatkan semangat kejiranan antara golongan belia dan warga emas",
+          "Menunjukkan kebebasan bersuara dan berekspresi dalam masyarakat majmuk",
+          "Membantu menyedarkan orang ramai tentang keselamatan jalan raya"
+        ],
+        answer: "Menjejaskan keharmonian masyarakat kerana tidak menghormati amalan beribadat kaum lain",
+        explanation: "Tidak menghormati amalan beribadat kaum lain ialah punca utama keharmonian masyarakat berbilang kaum terjejas."
+      },
+      {
+        id: 33,
+        topic: "Perasaan Mematuhi Norma",
+        question: "Suresh membantu jirannya, Mak Cik Aminah, mengangkat beg barang dapur dari kereta hingga ke pintu rumah. Apakah perasaan yang wajar dialami oleh Suresh selepas mengamalkan norma kejiranan tersebut?",
+        options: [
+          "Gembira dan berpuas hati kerana dapat meringankan beban jiran",
+          "Rugi dan menyesal kerana membuang masa rehatnya",
+          "Bimbang dan takut jika jirannya tidak memberi upah",
+          "Malu kerana dilihat oleh rakan-rakannya di luar rumah"
+        ],
+        answer: "Gembira dan berpuas hati kerana dapat meringankan beban jiran",
+        explanation: "Mematuhi norma saling membantu melahirkan emosi positif seperti gembira, tenang dan berpuas hati."
+      },
+      {
+        id: 34,
+        topic: "Perasaan Mematuhi Norma",
+        question: "Apabila seluruh warga sekolah sentiasa memberi salam, bertutur sopan dan mematuhi giliran, apakah suasana emosi yang akan dirasai oleh guru dan murid?",
+        options: [
+          "Selesa, tenang dan berbangga menjadi warga sekolah tersebut",
+          "Tertekan dan terkongkong kerana terlalu banyak peraturan",
+          "Bosan kerana tiada persaingan fizikal di kantin",
+          "Curiga terhadap keikhlasan setiap individu di sekolah"
+        ],
+        answer: "Selesa, tenang dan berbangga menjadi warga sekolah tersebut",
+        explanation: "Amalan norma masyarakat secara konsisten mewujudkan persekitaran positif yang mendatangkan rasa selesa, tenang dan bangga."
+      },
+      {
+        id: 35,
+        topic: "Situasi Meja Makan",
+        question: "Di rumah keluarga Encik Azman, suasana makan malam menjadi sunyi kerana semua ahli keluarga leka dengan telefon masing-masing. Apakah langkah paling praktikal untuk memulihkan norma di meja makan?",
+        options: [
+          "Bersetuju mewujudkan zon bebas gajet semasa makan dan berbual tentang aktiviti harian",
+          "Makan secara berasingan di dalam bilik tidur masing-masing",
+          "Memasang televisyen dengan suara yang kuat semasa makan malam",
+          "Mengharamkan penggunaan internet di rumah sepanjang minggu"
+        ],
+        answer: "Bersetuju mewujudkan zon bebas gajet semasa makan dan berbual tentang aktiviti harian",
+        explanation: "Zon bebas gajet di meja makan menggalakkan interaksi bersemuka dan menghidupkan semula kemesraan keluarga."
+      },
+      {
+        id: 36,
+        topic: "Pengekalan Adat Resam",
+        question: "Walaupun berkahwin di hotel moden, pasangan pengantin tetap menyertakan upacara minum teh tradisional sebagai tanda hormat kepada ibu bapa dan warga tua. Apakah kepentingan tindakan pasangan ini?",
+        options: [
+          "Mengekalkan adat resam warisan agar tidak pupus ditelan kemodenan",
+          "Memanjangkan tempoh majlis supaya tetamu pulang lewat",
+          "Menunjukkan bahawa majlis di hotel tidak mempunyai sebarang peraturan",
+          "Mengelakkan pasangan daripada perlu melayan tetamu muda"
+        ],
+        answer: "Mengekalkan adat resam warisan agar tidak pupus ditelan kemodenan",
+        explanation: "Menggabungkan elemen moden dengan pengekalan adat resam membuktikan generasi muda menghargai jati diri dan norma hormat."
+      },
+      {
+        id: 37,
+        topic: "Adab di Rumah Ibadat",
+        question: "Anda dan rakan anda bercadang melawat sebuah tokong bersejarah sebagai destinasi pelancongan budaya. Anda mendapati rakan anda memakai seluar terlalu pendek. Apakah tindakan paling wajar anda lakukan?",
+        options: [
+          "Menasihatinya secara sopan supaya memakai pakaian yang lebih labuh atau menggunakan kain lilit yang disediakan",
+          "Membiarkannya masuk sahaja kerana dia hanyalah pelancong luar",
+          "Mengejek cara pemakaiannya di hadapan pengunjung lain",
+          "Membatalkan persahabatan dengannya serta-merta"
+        ],
+        answer: "Menasihatinya secara sopan supaya memakai pakaian yang lebih labuh atau menggunakan kain lilit yang disediakan",
+        explanation: "Menegur rakan secara berhemah membantu memastikan kesucian rumah ibadat dan sensitiviti masyarakat terus dihormati."
+      },
+      {
+        id: 38,
+        topic: "Kehidupan Berjiran",
+        question: "Sebuah keluarga baharu sedang memindahkan perabot masuk ke rumah di sebelah rumah anda. Apakah amalan norma kejiranan terbaik yang boleh dilakukan oleh keluarga anda?",
+        options: [
+          "Menyapa mereka, menawarkan bantuan ringan atau menghidangkan minuman sejuk",
+          "Menutup langsir tingkap supaya mereka tidak menyedari kehadiran anda",
+          "Menunggu selama setahun sebelum mula bertegur sapa",
+          "Mengambil gambar perabot mereka dan berkongsi dalam kumpulan sembang"
+        ],
+        answer: "Menyapa mereka, menawarkan bantuan ringan atau menghidangkan minuman sejuk",
+        explanation: "Menyambut dan membantu jiran baharu seperti yang digambarkan dalam Situasi 4 buku teks memupuk semangat kejiranan yang utuh."
+      },
+      {
+        id: 39,
+        topic: "Budaya Hedonisme",
+        question: "Mengapakah sikap remaja yang menghabiskan seluruh hujung minggu di pusat hiburan dan mengabaikan ulang kaji pelajaran dikaitkan dengan budaya hedonisme?",
+        options: [
+          "Kerana mereka menjadikan keseronokan hidup sebagai matlamat utama tanpa memikirkan tanggungjawab",
+          "Kerana mereka sedang menyertai aktiviti kemasyarakatan yang sihat",
+          "Kerana pusat hiburan merupakan satu-satunya tempat untuk belajar",
+          "Kerana budaya hedonisme menggalakkan pengurusan masa yang cemerlang"
+        ],
+        answer: "Kerana mereka menjadikan keseronokan hidup sebagai matlamat utama tanpa memikirkan tanggungjawab",
+        explanation: "Hedonisme ialah pandangan hidup yang mementingkan keseronokan atau kesenangan hidup semata-mata hingga melalaikan tanggungjawab."
+      },
+      {
+        id: 40,
+        topic: "Contoh Budaya Hedonisme",
+        question: "Selain pergaulan bebas dan penyalahgunaan dadah, manakah antara berikut juga merupakan contoh amalan yang terpengaruh dengan budaya hedonisme?",
+        options: [
+          "Menyertai kegiatan lumba haram dan berpelesiran hingga awal pagi",
+          "Menyertai larian amal anjuran persatuan belia pada waktu pagi",
+          "Menonton filem dokumentari sejarah bersama ahli keluarga di rumah",
+          "Menghadiri kelas muzik tradisional pada hujung minggu"
+        ],
+        answer: "Menyertai kegiatan lumba haram dan berpelesiran hingga awal pagi",
+        explanation: "Lumba haram dan berpelesiran tanpa batas demi keseronokan sementara merupakan contoh gejala budaya hedonisme."
+      },
+      {
+        id: 41,
+        topic: "Kesan Budaya Hedonisme",
+        question: "Apakah kesan jangka panjang terhadap diri sendiri sekiranya seseorang remaja terus hanyut dalam budaya hedonisme?",
+        options: [
+          "Prestasi akademik merosot, masa depan terjejas dan mudah terjebak dengan gejala sosial",
+          "Dihormati oleh masyarakat sebagai pemimpin pelapis yang berwibawa",
+          "Hubungan dengan ibu bapa dan guru menjadi semakin erat",
+          "Tahap kesihatan fizikal dan mental meningkat secara mendadak"
+        ],
+        answer: "Prestasi akademik merosot, masa depan terjejas dan mudah terjebak dengan gejala sosial",
+        explanation: "Budaya hedonisme melalaikan pelajar, menjejaskan masa depan serta mendedahkan remaja kepada risiko keruntuhan akhlak."
+      },
+      {
+        id: 42,
+        topic: "Menangani Hedonisme",
+        question: "Apakah peranan paling utama ibu bapa dalam melindungi anak remaja daripada terjebak dalam budaya hedonisme?",
+        options: [
+          "Memberikan didikan agama dan moral yang kukuh serta memantau pergaulan anak dengan penuh kasih sayang",
+          "Memberikan wang saku tanpa had supaya anak tidak bosan di rumah",
+          "Membiarkan anak memilih gaya hidup sendiri tanpa sebarang bimbingan",
+          "Menyekat anak daripada berkawan dengan sesiapa pun di sekolah"
+        ],
+        answer: "Memberikan didikan agama dan moral yang kukuh serta memantau pergaulan anak dengan penuh kasih sayang",
+        explanation: "Asas agama, nilai moral dan perhatian penuh kasih sayang daripada ibu bapa menjadi benteng utama melawan hedonisme."
+      },
+      {
+        id: 43,
+        topic: "Dilema Moral",
+        question: "Rakan baik anda mengajak anda ponteng kelas tambahan petang untuk pergi ke pusat karaoke kerana tiketnya sudah dibayar oleh abangnya. Berdasarkan penaakulan moral, apakah keputusan terbaik anda?",
+        options: [
+          "Menolak ajakan tersebut secara berhemah dan tetap menghadiri kelas tambahan demi masa depan pelajaran",
+          "Mengikut ajakan rakan kerana tidak mahu memalukannya di hadapan abangnya",
+          "Ponteng kelas tambahan tetapi berjanji tidak akan mengulanginya lagi",
+          "Menipu ibu bapa dengan mengatakan kelas tambahan telah dibatalkan"
+        ],
+        answer: "Menolak ajakan tersebut secara berhemah dan tetap menghadiri kelas tambahan demi masa depan pelajaran",
+        explanation: "Penaakulan moral membantu remaja mengutamakan tanggungjawab pelajaran dan menolak hiburan yang melanggar peraturan."
+      },
+      {
+        id: 44,
+        topic: "Dimensi Moral",
+        question: "Zaki hadir ke majlis hari lahir seorang kenalan, namun menyedari terdapat unsur pengambilan bahan terlarang di situ. Tanpa teragak-agak, Zaki terus meninggalkan majlis tersebut dan pulang ke rumah. Komponen dimensi moral manakah yang paling jelas ditunjukkan oleh Zaki?",
+        options: [
+          "Perlakuan moral",
+          "Tekanan sosial",
+          "Sikap individualistik",
+          "Budaya hedonisme"
+        ],
+        answer: "Perlakuan moral",
+        explanation: "Tindakan nyata Zaki meninggalkan tempat yang tidak bermoral adalah manifestasi komponen Perlakuan Moral."
+      },
+      {
+        id: 45,
+        topic: "Dimensi Moral",
+        question: "Apabila rumah jiran dilanda banjir kilat, Wei Ming menyedari tanggungjawab sebagai jiran (penaakulan), berasa simpati melihat kesusahan mereka (emosi), lalu turun membantu membersihkan lumpur (perlakuan). Apakah kesimpulan terbaik daripada situasi ini?",
+        options: [
+          "Kesepaduan ketiga-tiga dimensi moral melahirkan amalan norma masyarakat yang tulus",
+          "Wei Ming hanya membantu kerana diarahkan oleh ketua kampung",
+          "Emosi moral tidak diperlukan selagi seseorang melakukan kerja fizikal",
+          "Norma masyarakat hanya perlu diamalkan ketika berlaku bencana alam"
+        ],
+        answer: "Kesepaduan ketiga-tiga dimensi moral melahirkan amalan norma masyarakat yang tulus",
+        explanation: "Insan bermoral menggabungkan penaakulan moral, emosi moral dan perlakuan moral secara sepadu dalam kehidupan harian."
+      },
+      {
+        id: 46,
+        topic: "KBAT: Norma Swafoto",
+        question: "Seorang rakan ingin mengambil swafoto sambil tersenyum ceria bersama pesakit yang sedang tenat di unit rawatan rapi (ICU) untuk dimuat naik ke media sosial. Mengapakah anda patut melarang perbuatannya?",
+        options: [
+          "Perbuatan itu tidak sensitif terhadap penderitaan pesakit, melanggar privasi dan bercanggah dengan norma kesopanan",
+          "Lampu kamera telefon pintar boleh menyebabkan hospital terputus bekalan elektrik",
+          "Swafoto hanya dibenarkan di luar bangunan hospital pada waktu malam sahaja",
+          "Media sosial melarang sebarang gambar yang diambil di dalam bangunan"
+        ],
+        answer: "Perbuatan itu tidak sensitif terhadap penderitaan pesakit, melanggar privasi dan bercanggah dengan norma kesopanan",
+        explanation: "Walaupun berswafoto semakin biasa, ia tetap tertakluk kepada batas adab, privasi serta sensitiviti keadaan dan perasaan orang lain."
+      },
+      {
+        id: 47,
+        topic: "KBAT: Permainan Digital",
+        question: "Sebuah kelab komuniti menganjurkan karnival yang menggabungkan permainan tradisional seperti congkak dan batu seremban di padang bersama bengkel mencipta permainan digital bertemakan budaya tempatan. Apakah kelebihan pendekatan ini?",
+        options: [
+          "Mengekalkan interaksi fizikal dan warisan tradisi sambil memanfaatkan minat generasi muda terhadap teknologi",
+          "Menghapuskan terus keperluan kanak-kanak untuk bermain di padang",
+          "Menggalakkan kanak-kanak bermain secara bersendirian di dalam bilik",
+          "Memastikan permainan tradisional tidak lagi dimainkan secara fizikal"
+        ],
+        answer: "Mengekalkan interaksi fizikal dan warisan tradisi sambil memanfaatkan minat generasi muda terhadap teknologi",
+        explanation: "Pendekatan seimbang ini memelihara norma interaksi bersemuka sambil menyesuaikan usaha pelestarian budaya dengan zaman digital."
+      },
+      {
+        id: 48,
+        topic: "KBAT: Perubahan Norma",
+        question: "Antara berikut, manakah contoh perubahan norma masyarakat yang **positif** dan seiring dengan perkembangan zaman?",
+        options: [
+          "Menggunakan mesyuarat dalam talian dengan tetap mematuhi adab berpakaian kemas dan menunggu giliran bercakap",
+          "Menghantar mesej ucapan terima kasih menggunakan bahasa singkatan kasar kepada guru",
+          "Mengabaikan tetamu yang datang ke rumah kerana sibuk bermain permainan video",
+          "Merakam pergaduhan di tempat awam untuk ditularkan tanpa membantu meleraikannya"
+        ],
+        answer: "Menggunakan mesyuarat dalam talian dengan tetap mematuhi adab berpakaian kemas dan menunggu giliran bercakap",
+        explanation: "Perubahan norma yang sihat menerima kemudahan teknologi moden sambil mengekalkan nilai teras seperti kesopanan dan hormat."
+      },
+      {
+        id: 49,
+        topic: "Amalan Harian & Refleksi",
+        question: "Guru Pendidikan Moral meminta murid menghasilkan jurnal bergambar atau video pendek tentang amalan norma masyarakat dalam keluarga masing-masing. Apakah tujuan utama aktiviti ini?",
+        options: [
+          "Menggalakkan murid menghayati, mengamalkan dan berkongsi teladan norma masyarakat secara kreatif",
+          "Membandingkan taraf kekayaan dan kemewahan rumah setiap murid di dalam kelas",
+          "Memastikan semua murid membeli peralatan kamera yang mahal",
+          "Menggantikan sepenuhnya amalan norma secara nyata dengan aktiviti rakaman sahaja"
+        ],
+        answer: "Menggalakkan murid menghayati, mengamalkan dan berkongsi teladan norma masyarakat secara kreatif",
+        explanation: "Jurnal bergambar dan video pendek membantu murid menyedari kepentingan norma, merasai kebanggaan mengamalkannya dan menyebarkan teladan baik."
+      },
+      {
+        id: 50,
+        topic: "KBAT: Penyelesaian Komuniti",
+        question: "Di kawasan kejiranan anda, segelintir remaja sering melepak hingga lewat malam di taman permainan sambil membuat bising dan meninggalkan sampah. Sebagai wakil belia setempat, apakah langkah penyelesaian paling berkesan yang mencerminkan pematuhan norma masyarakat?",
+        options: [
+          "Mengadakan dialog mesra bersama remaja tersebut, menganjurkan aktiviti sukan/gotong-royong berfaedah dan meletakkan papan tanda peringatan adab taman",
+          "Menghalau mereka dengan kata-kata kesat dan mengunci pintu pagar taman permainan buat selama-lamanya",
+          "Membiarkan sahaja keadaan itu kerana ia bukan berlaku di dalam halaman rumah sendiri",
+          "Menyebarkan gambar wajah remaja tersebut di media sosial untuk memalukan keluarga mereka"
+        ],
+        answer: "Mengadakan dialog mesra bersama remaja tersebut, menganjurkan aktiviti sukan/gotong-royong berfaedah dan meletakkan papan tanda peringatan adab taman",
+        explanation: "Pendekatan berhemah melalui dialog, aktiviti sihat dan kesedaran bersama dapat memulihkan norma masyarakat tanpa mencetuskan permusuhan."
+      }
+    ];
+
+    // Keadaan Aplikasi (Application State)
+    let state = {
+      studentName: "",
+      studentClass: "",
+      mode: "practice", // 'practice' | 'exam'
+      questions: [],
+      currentIndex: 0,
+      userAnswers: {}, // { [questionId]: selectedOptionString }
+      isFinished: false,
+      activeFilter: "all"
+    };
+
+    // Rujukan Elemen DOM
+    const el = {
+      screenStart: document.getElementById("screen-start"),
+      screenQuiz: document.getElementById("screen-quiz"),
+      screenResult: document.getElementById("screen-result"),
+      headerStatus: document.getElementById("header-status"),
+      headerModeBadge: document.getElementById("header-mode-badge"),
+      inputName: document.getElementById("input-name"),
+      inputClass: document.getElementById("input-class"),
+      toggleShuffle: document.getElementById("toggle-shuffle"),
+      cardModePractice: document.getElementById("card-mode-practice"),
+      cardModeExam: document.getElementById("card-mode-exam"),
+      btnStart: document.getElementById("btn-start"),
+      progressLabel: document.getElementById("progress-label"),
+      answeredLabel: document.getElementById("answered-label"),
+      progressBar: document.getElementById("progress-bar"),
+      questionNumberBadge: document.getElementById("question-number-badge"),
+      questionTopicBadge: document.getElementById("question-topic-badge"),
+      questionText: document.getElementById("question-text"),
+      optionsContainer: document.getElementById("options-container"),
+      feedbackBox: document.getElementById("feedback-box"),
+      feedbackTitle: document.getElementById("feedback-title"),
+      feedbackText: document.getElementById("feedback-text"),
+      btnPrev: document.getElementById("btn-prev"),
+      btnNext: document.getElementById("btn-next"),
+      btnFinishTrigger: document.getElementById("btn-finish-trigger"),
+      modalNav: document.getElementById("modal-nav"),
+      navGrid: document.getElementById("nav-grid"),
+      btnOpenNav: document.getElementById("btn-open-nav"),
+      btnCloseNav: document.getElementById("btn-close-nav"),
+      modalConfirm: document.getElementById("modal-confirm"),
+      confirmMessage: document.getElementById("confirm-message"),
+      btnConfirmCancel: document.getElementById("btn-confirm-cancel"),
+      btnConfirmSubmit: document.getElementById("btn-confirm-submit"),
+      resultStudentHeading: document.getElementById("result-student-heading"),
+      resultMeta: document.getElementById("result-meta"),
+      resultMessage: document.getElementById("result-message"),
+      scoreCorrect: document.getElementById("score-correct"),
+      scorePercent: document.getElementById("score-percent"),
+      scoreGrade: document.getElementById("score-grade"),
+      statCorrect: document.getElementById("stat-correct"),
+      statWrong: document.getElementById("stat-wrong"),
+      statUnanswered: document.getElementById("stat-unanswered"),
+      reviewContainer: document.getElementById("review-container"),
+      btnRestart: document.getElementById("btn-restart"),
+      btnPrint: document.getElementById("btn-print")
+    };
+
+    /**
+     * Fungsi utiliti untuk merawakkan tatasusunan (Fisher-Yates Shuffle)
+     */
+    function shuffleArray(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    /**
+     * Kemas kini gaya visual kad pemilihan mod kuiz
+     */
+    function updateModeCards() {
+      const selectedMode = document.querySelector('input[name="quiz-mode"]:checked').value;
+      if (selectedMode === "practice") {
+        el.cardModePractice.classList.add("border-teal-600", "bg-teal-50/50");
+        el.cardModePractice.classList.remove("border-slate-200", "bg-white");
+        el.cardModeExam.classList.remove("border-teal-600", "bg-teal-50/50");
+        el.cardModeExam.classList.add("border-slate-200", "bg-white");
+      } else {
+        el.cardModeExam.classList.add("border-teal-600", "bg-teal-50/50");
+        el.cardModeExam.classList.remove("border-slate-200", "bg-white");
+        el.cardModePractice.classList.remove("border-teal-600", "bg-teal-50/50");
+        el.cardModePractice.classList.add("border-slate-200", "bg-white");
+      }
+    }
+
+    document.querySelectorAll('input[name="quiz-mode"]').forEach((radio) => {
+      radio.addEventListener("change", updateModeCards);
+    });
+
+    /**
+     * Memulakan sesi kuiz baharu (Sesi 2 / Set 2)
+     */
+    function startQuiz() {
+      try {
+        state.studentName = el.inputName.value.trim();
+        state.studentClass = el.inputClass.value.trim();
+        state.mode = document.querySelector('input[name="quiz-mode"]:checked').value;
+        state.userAnswers = {};
+        state.currentIndex = 0;
+        state.isFinished = false;
+        state.activeFilter = "all";
+
+        // Rawakkan pilihan jawapan bagi setiap soalan agar kedudukan jawapan tepat sentiasa seimbang & berbeza
+        let prepared = RAW_QUESTIONS_SET2.map((q) => ({
+          ...q,
+          shuffledOptions: shuffleArray(q.options)
+        }));
+
+        // Rawakkan susunan soalan jika pengguna memilih pilihan tersebut
+        if (el.toggleShuffle.checked) {
+          prepared = shuffleArray(prepared);
+        }
+
+        state.questions = prepared;
+
+        // Kemas kini paparan skrin
+        el.headerModeBadge.textContent = state.mode === "practice" ? "Mod Latihan" : "Mod Ujian";
+        el.headerStatus.classList.remove("hidden");
+        el.headerStatus.classList.add("flex");
+        el.screenStart.classList.add("hidden");
+        el.screenResult.classList.add("hidden");
+        el.screenQuiz.classList.remove("hidden");
+
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch (error) {
+        console.error("Ralat semasa memulakan kuiz Sesi 2:", error);
+      }
+    }
+
+    /**
+     * Memaparkan soalan semasa beserta pilihan jawapan dan status kemajuan
+     */
+    function renderQuestion() {
+      const q = state.questions[state.currentIndex];
+      const total = state.questions.length;
+      const answeredCount = Object.keys(state.userAnswers).length;
+      const userChoice = state.userAnswers[q.id];
+      const letters = ["A", "B", "C", "D"];
+
+      // Kemas kini bar kemajuan
+      el.progressLabel.textContent = `Soalan ${state.currentIndex + 1} daripada ${total}`;
+      el.answeredLabel.textContent = `Dijawab: ${answeredCount} / ${total}`;
+      el.progressBar.style.width = `${((state.currentIndex + 1) / total) * 100}%`;
+
+      // Kemas kini maklumat kad soalan
+      el.questionNumberBadge.textContent = `Sesi 2 • Soalan ${state.currentIndex + 1}`;
+      el.questionTopicBadge.textContent = q.topic;
+      el.questionText.textContent = q.question;
+
+      // Bina butang pilihan jawapan
+      el.optionsContainer.innerHTML = "";
+      q.shuffledOptions.forEach((optText, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+
+        let baseClass =
+          "w-full text-left p-4 rounded-2xl border-2 transition flex items-start gap-3.5 group ";
+        let badgeClass =
+          "w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 transition ";
+
+        const isSelected = userChoice === optText;
+        const isCorrectOption = optText === q.answer;
+
+        if (state.mode === "practice" && userChoice) {
+          // Papar status betul/salah serta-merta dalam Mod Latihan
+          if (isCorrectOption) {
+            baseClass += "border-emerald-500 bg-emerald-50 text-emerald-950";
+            badgeClass += "bg-emerald-600 text-white";
+          } else if (isSelected && !isCorrectOption) {
+            baseClass += "border-rose-500 bg-rose-50 text-rose-950";
+            badgeClass += "bg-rose-600 text-white";
+          } else {
+            baseClass += "border-slate-200 bg-white text-slate-500 opacity-75";
+            badgeClass += "bg-slate-100 text-slate-500";
+          }
+          btn.disabled = true;
+        } else {
+          // Belum dijawab atau Mod Ujian
+          if (isSelected) {
+            baseClass += "border-teal-600 bg-teal-50 text-teal-950";
+            badgeClass += "bg-teal-600 text-white";
+          } else {
+            baseClass += "border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50 text-slate-800";
+            badgeClass += "bg-slate-100 text-slate-700 group-hover:bg-teal-100 group-hover:text-teal-700";
+          }
+        }
+
+        btn.className = baseClass;
+        btn.innerHTML = `
+          <span class="${badgeClass}">${letters[idx]}</span>
+          <span class="text-sm sm:text-base font-medium leading-snug">${optText}</span>
+        `;
+
+        btn.addEventListener("click", () => handleSelectOption(q.id, optText));
+        el.optionsContainer.appendChild(btn);
+      });
+
+      // Papar kotak maklum balas untuk Mod Latihan jika sudah dijawab
+      if (state.mode === "practice" && userChoice) {
+        const isCorrect = userChoice === q.answer;
+        el.feedbackBox.classList.remove(
+          "hidden",
+          "bg-emerald-50",
+          "border-emerald-200",
+          "bg-rose-50",
+          "border-rose-200"
+        );
+        if (isCorrect) {
+          el.feedbackBox.classList.add("bg-emerald-50", "border-emerald-200");
+          el.feedbackTitle.className = "font-bold mb-1 text-emerald-800";
+          el.feedbackTitle.textContent = "Jawapan Tepat!";
+        } else {
+          el.feedbackBox.classList.add("bg-rose-50", "border-rose-200");
+          el.feedbackTitle.className = "font-bold mb-1 text-rose-800";
+          el.feedbackTitle.textContent = `Kurang Tepat — Jawapan Sebenar: ${q.answer}`;
+        }
+        el.feedbackText.textContent = q.explanation;
+      } else {
+        el.feedbackBox.classList.add("hidden");
+      }
+
+      // Kawalan butang Sebelum / Seterusnya
+      el.btnPrev.disabled = state.currentIndex === 0;
+      if (state.currentIndex === total - 1) {
+        el.btnNext.classList.add("hidden");
+      } else {
+        el.btnNext.classList.remove("hidden");
+      }
+    }
+
+    /**
+     * Merekodkan jawapan yang dipilih oleh murid
+     */
+    function handleSelectOption(questionId, optionText) {
+      if (state.mode === "practice" && state.userAnswers[questionId]) {
+        return;
+      }
+      state.userAnswers[questionId] = optionText;
+      renderQuestion();
+    }
+
+    /**
+     * Menjana grid navigasi 1 - 50 dalam modal
+     */
+    function renderNavGrid() {
+      el.navGrid.innerHTML = "";
+      state.questions.forEach((q, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = idx + 1;
+
+        const userChoice = state.userAnswers[q.id];
+        let cls = "h-10 rounded-xl text-xs font-bold border transition ";
+
+        if (idx === state.currentIndex) {
+          cls += "bg-teal-600 text-white border-teal-600 shadow-xs";
+        } else if (userChoice) {
+          if (state.mode === "practice") {
+            cls +=
+              userChoice === q.answer
+                ? "bg-emerald-100 text-emerald-800 border-emerald-300"
+                : "bg-rose-100 text-rose-800 border-rose-300";
+          } else {
+            cls += "bg-emerald-100 text-emerald-800 border-emerald-300";
+          }
+        } else {
+          cls += "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100";
+        }
+
+        btn.className = cls;
+        btn.addEventListener("click", () => {
+          state.currentIndex = idx;
+          el.modalNav.classList.add("hidden");
+          renderQuestion();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
+        el.navGrid.appendChild(btn);
+      });
+    }
+
+    /**
+     * Menentukan gred berdasarkan peratusan markah SPM
+     */
+    function calculateGrade(percent) {
+      if (percent >= 90) return { grade: "A+", msg: "Cemerlang Tertinggi! Penguasaan Sesi 2 Unit 1 anda amat membanggakan." };
+      if (percent >= 80) return { grade: "A", msg: "Cemerlang! Anda menguasai konsep dan aplikasi norma masyarakat dengan sangat baik." };
+      if (percent >= 70) return { grade: "A-", msg: "Kepujian Tinggi! Teruskan momentum cemerlang ini untuk peperiksaan sebenar." };
+      if (percent >= 65) return { grade: "B+", msg: "Kepujian! Semak semula soalan yang salah untuk pemantapan." };
+      if (percent >= 60) return { grade: "B", msg: "Baik! Anda sudah memahami kebanyakan topik Unit 1 dengan jelas." };
+      if (percent >= 50) return { grade: "C", msg: "Memuaskan. Ulang kaji semula nilai universal, dimensi moral dan kesan pengabaian norma." };
+      if (percent >= 40) return { grade: "D", msg: "Lulus. Sila semak penerangan di bawah dan cuba jawab semula untuk markah lebih tinggi." };
+      return { grade: "G", msg: "Perlu penambahbaikan. Rujuk semula buku teks Unit 1 dan ulang latihan Sesi 2 ini." };
+    }
+
+    /**
+     * Memaparkan skrin keputusan dan semakan terperinci
+     */
+    function finishQuiz() {
+      state.isFinished = true;
+      el.modalConfirm.classList.add("hidden");
+      el.screenQuiz.classList.add("hidden");
+      el.headerStatus.classList.add("hidden");
+      el.headerStatus.classList.remove("flex");
+      el.screenResult.classList.remove("hidden");
+
+      let correct = 0;
+      let wrong = 0;
+      let unanswered = 0;
+
+      state.questions.forEach((q) => {
+        const ans = state.userAnswers[q.id];
+        if (!ans) {
+          unanswered++;
+        } else if (ans === q.answer) {
+          correct++;
+        } else {
+          wrong++;
+        }
+      });
+
+      const total = state.questions.length;
+      const percent = Math.round((correct / total) * 100);
+      const gradeInfo = calculateGrade(percent);
+
+      // Maklumat Murid & Tarikh
+      const now = new Date().toLocaleDateString("ms-MY", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+      el.resultStudentHeading.textContent = state.studentName
+        ? `Keputusan Sesi 2: ${state.studentName}`
+        : "Keputusan Latihan Sesi 2 Tamat!";
+      el.resultMeta.textContent = [
+        state.studentClass ? `Kelas: ${state.studentClass}` : null,
+        `Set: Sesi 2 (Set 2)`,
+        `Mod: ${state.mode === "practice" ? "Latihan" : "Ujian"}`,
+        `Tarikh: ${now}`
+      ]
+        .filter(Boolean)
+        .join("  •  ");
+
+      el.resultMessage.textContent = gradeInfo.msg;
+      el.scoreCorrect.textContent = correct;
+      el.scorePercent.textContent = `${percent}%`;
+      el.scoreGrade.textContent = gradeInfo.grade;
+      el.statCorrect.textContent = correct;
+      el.statWrong.textContent = wrong;
+      el.statUnanswered.textContent = unanswered;
+
+      renderReviewList("all");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    /**
+     * Menjana senarai semakan jawapan berdasarkan penapis ('all' | 'wrong' | 'correct')
+     */
+    function renderReviewList(filter) {
+      state.activeFilter = filter;
+      el.reviewContainer.innerHTML = "";
+
+      // Kemas kini gaya butang penapis
+      document.querySelectorAll(".filter-btn").forEach((btn) => {
+        if (btn.dataset.filter === filter) {
+          btn.className =
+            "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-600 text-white transition";
+        } else {
+          btn.className =
+            "filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+        }
+      });
+
+      const filtered = state.questions
+        .map((q, index) => ({ q, index }))
+        .filter(({ q }) => {
+          const ans = state.userAnswers[q.id];
+          const isCorrect = ans === q.answer;
+          if (filter === "correct") return isCorrect;
+          if (filter === "wrong") return !isCorrect;
+          return true;
+        });
+
+      if (filtered.length === 0) {
+        el.reviewContainer.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-500">
+            Tiada soalan dalam kategori ini.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(({ q, index }) => {
+        const userAns = state.userAnswers[q.id];
+        const isCorrect = userAns === q.answer;
+
+        const statusBadge = isCorrect
+          ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Betul</span>`
+          : userAns
+          ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800">Salah</span>`
+          : `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700">Tidak Dijawab</span>`;
+
+        const card = document.createElement("div");
+        card.className =
+          "bg-white rounded-2xl border border-slate-200 p-5 shadow-xs print-card";
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-2.5">
+            <span class="text-xs font-bold text-teal-700">Soalan ${index + 1} • ${q.topic}</span>
+            ${statusBadge}
+          </div>
+          <p class="text-sm sm:text-base font-bold text-slate-900 mb-3 leading-snug">${q.question}</p>
+          <div class="space-y-1.5 text-sm mb-3">
+            <p class="${isCorrect ? "text-emerald-700 font-semibold" : "text-rose-700 font-semibold"}">
+              Jawapan Anda: <span class="font-medium">${userAns || "Tiada jawapan dipilih"}</span>
+            </p>
+            ${
+              !isCorrect
+                ? `<p class="text-emerald-700 font-semibold">Jawapan Tepat: <span class="font-medium">${q.answer}</span></p>`
+                : ""
+            }
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <span class="font-semibold text-slate-700">Penerangan:</span> ${q.explanation}
+          </div>
+        `;
+
+        el.reviewContainer.appendChild(card);
+      });
+    }
+
+    // Pengendali Acara (Event Listeners)
+    el.btnStart.addEventListener("click", startQuiz);
+
+    el.btnPrev.addEventListener("click", () => {
+      if (state.currentIndex > 0) {
+        state.currentIndex--;
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    el.btnNext.addEventListener("click", () => {
+      if (state.currentIndex < state.questions.length - 1) {
+        state.currentIndex++;
+        renderQuestion();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    el.btnOpenNav.addEventListener("click", () => {
+      renderNavGrid();
+      el.modalNav.classList.remove("hidden");
+    });
+
+    el.btnCloseNav.addEventListener("click", () => {
+      el.modalNav.classList.add("hidden");
+    });
+
+    el.modalNav.addEventListener("click", (e) => {
+      if (e.target === el.modalNav) el.modalNav.classList.add("hidden");
+    });
+
+    el.btnFinishTrigger.addEventListener("click", () => {
+      const answeredCount = Object.keys(state.userAnswers).length;
+      const remaining = state.questions.length - answeredCount;
+      if (remaining > 0) {
+        el.confirmMessage.textContent = `Anda masih mempunyai ${remaining} soalan yang belum dijawab. Adakah anda pasti mahu menghantar jawapan Sesi 2 sekarang?`;
+      } else {
+        el.confirmMessage.textContent =
+          "Tahniah! Semua 50 soalan Sesi 2 telah dijawab. Klik 'Ya, Hantar Sekarang' untuk melihat markah dan semakan penuh.";
+      }
+      el.modalConfirm.classList.remove("hidden");
+    });
+
+    el.btnConfirmCancel.addEventListener("click", () => {
+      el.modalConfirm.classList.add("hidden");
+    });
+
+    el.btnConfirmSubmit.addEventListener("click", finishQuiz);
+
+    el.btnRestart.addEventListener("click", () => {
+      el.screenResult.classList.add("hidden");
+      el.screenStart.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    el.btnPrint.addEventListener("click", () => {
+      window.print();
+    });
+
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => renderReviewList(btn.dataset.filter));
+    });
+  </script>
+</body>
+</html>
