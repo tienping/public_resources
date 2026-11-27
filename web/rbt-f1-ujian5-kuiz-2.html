@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#142f29">
+<title>Kuiz RBT Tingkatan 1</title>
+<style>
+:root{color-scheme:light;--ink:#182c26;--muted:#4e6358;--green:#175847;--paper:#f5f6f0;--white:#fff;--line:#d5e0d7;--lime:#d7eea8;--dark:#142f29;--bad:#861f23}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}[hidden]{display:none!important}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #2874ae;outline-offset:3px}
+header{background:var(--dark);color:white} .head{max-width:1136px;margin:auto;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:15px}.brand{font-weight:800;letter-spacing:.02em;display:flex;gap:10px;align-items:center}.mark{width:30px;height:30px;background:var(--lime);color:var(--dark);display:grid;place-items:center;border-radius:9px;font-size:20px;line-height:1}.head small{color:#d5e8dd}
+main{max-width:1136px;margin:auto;padding:34px 24px 54px;min-height:calc(100vh - 150px)}h1,h2,h3,p{margin:0}h1,h2{line-height:1.17;letter-spacing:-.035em}h1{font-size:clamp(2.4rem,6.4vw,5rem)}h2{font-size:clamp(1.55rem,3.3vw,2.3rem)}h3{font-size:1rem}p+p{margin-top:8px}
+.hero{background:var(--dark);color:white;border-radius:24px;padding:clamp(24px,6vw,60px);display:grid;grid-template-columns:minmax(0,1fr) minmax(140px,270px);align-items:center;gap:30px;overflow:hidden}.hero p{color:#dfebe5;margin-top:18px;max-width:48ch}.hero h1 span{color:var(--lime)}.hero canvas{width:100%;max-width:275px;justify-self:center}.mode-title{margin:28px 0 14px}.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mode-card{text-align:left;padding:19px;border:1px solid var(--line);background:white;color:var(--ink);border-radius:15px;line-height:1.4;min-height:94px}.mode-card strong{display:block;margin-bottom:5px}.mode-card small{display:block;color:var(--muted);font-size:.89rem}.mode-card[aria-pressed=true]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green);background:#f0f7e7}
+.actions{margin-top:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.primary,.secondary{border:1px solid var(--green);padding:10px 17px;min-height:46px;border-radius:10px;font-weight:750}.primary{background:var(--green);color:white}.primary:hover{background:#103d32}.secondary{background:white;color:var(--green)}.secondary:hover{background:#eef5ef}.primary:disabled{opacity:.5;cursor:default}.muted{color:var(--muted)}.caption{font-size:.92rem}.intro-note{margin-top:16px;font-size:.92rem;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(215px,265px);gap:18px;align-items:start}.panel{background:white;border:1px solid var(--line);border-radius:20px;padding:clamp(17px,4vw,30px);min-width:0}.sidebar{padding:19px}.sidebar .modes{grid-template-columns:1fr;gap:7px;margin-top:10px}.sidebar .mode-card{min-height:auto;padding:10px 12px}.sidebar .mode-card small{font-size:.82rem}.sidebar p{margin-top:14px}.progress-meta,.qmeta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.progress-meta{font-weight:750}.track{height:8px;margin:9px 0 23px;border-radius:999px;background:#e8eee8;overflow:hidden}.fill{height:100%;background:var(--green);width:0;transition:width .22s}.qmeta{justify-content:flex-start;margin-bottom:13px}.tag{background:#e8f2e8;color:#244b3b;border-radius:999px;padding:3px 10px;font-size:.81rem;font-weight:760}.tag.level{background:#f1f3de;color:#435323}.question{font-size:clamp(1.22rem,2.65vw,1.7rem);line-height:1.4;letter-spacing:-.015em}.visual{display:block;margin:14px auto 0;max-width:100%;height:auto;background:#f4f8f4;border-radius:12px}.options{display:grid;gap:8px;margin-top:18px}.option{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:11px;min-height:51px;padding:10px 12px;cursor:pointer}.option:hover{background:#f4f8f3}.option input{width:18px;height:18px;margin:0;accent-color:var(--green);flex:none}.option .letter{color:var(--muted);font-weight:750;flex:none}.option.selected{background:#eef5ef;border-color:var(--green)}.option.right{background:#e6f4e8;border-color:#418353}.option.wrong{background:#fff0ec;border-color:#b86160}.option.locked{cursor:default}.hint,.feedback{padding:13px 15px;border-radius:10px;margin-top:14px;background:#f0f5e0;border-left:4px solid #6d8d3e}.feedback{background:#eaf5ec;border-color:#40805b}.feedback.miss{background:#fff0ec;border-color:#b86160}.feedback h3{margin-bottom:7px}.feedback.miss h3{color:var(--bad)}
+.term{display:inline;font:inherit;letter-spacing:inherit;color:#0f5b49;background:none;border:0;padding:0;text-decoration:underline dotted;text-underline-offset:4px;text-decoration-thickness:2px;overflow-wrap:anywhere}.gloss{position:fixed;margin:0;z-index:5;min-width:min(270px,calc(100vw - 20px));max-width:min(355px,calc(100vw - 20px));border:1px solid #94ae9e;border-radius:13px;padding:13px 14px;background:white;color:var(--ink);box-shadow:0 10px 32px #17352a30}.gloss-title{display:flex;justify-content:space-between;align-items:center;gap:6px}.icon-btn{border:1px solid var(--line);background:#f6f8f4;color:var(--ink);border-radius:8px;min-width:34px;min-height:34px}.term-list{display:grid;gap:7px;margin-top:8px}.term-row{display:grid;grid-template-columns:39px minmax(0,1fr) 35px;gap:8px;align-items:center}.term-row small{color:var(--muted)}.audio-note{font-size:.82rem;color:var(--bad);margin-top:6px}
+.result{max-width:800px;margin:auto}.result>p{margin-top:12px}.stats{margin:18px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{border-radius:12px;background:#edf4ec;padding:12px 15px}.stat strong{display:block;font-size:1.55rem}.topics{width:100%;border-collapse:collapse;margin:12px 0 18px}.topics th,.topics td{border-bottom:1px solid var(--line);padding:7px 4px;text-align:left}.topics th:nth-child(n+2),.topics td:nth-child(n+2){text-align:right}.name-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.name-form label{flex-basis:100%;font-weight:750}.name-form input{border:1px solid #879b90;border-radius:9px;flex:1;min-width:150px;padding:9px 11px}.cert{max-width:820px;margin:auto}.cert-paper{position:relative;text-align:center;background:#fdfdf7;border:2px solid #486b51;outline:1px solid #8da489;outline-offset:-8px;border-radius:12px;padding:clamp(22px,6vw,56px) clamp(15px,5vw,46px)}.seal{display:grid;place-items:center;margin:0 auto 12px;width:56px;height:56px;border:2px solid #779055;border-radius:50%;background:var(--lime);color:var(--dark);font-size:1.55rem}.cert-paper h2{font-family:Georgia,serif;color:var(--dark)}.cert-paper p{margin-top:8px}.student{font-size:clamp(1.35rem,4vw,2.5rem);font-weight:800;overflow-wrap:anywhere}.cert-score{font-weight:850;font-size:clamp(1.45rem,4vw,2.45rem);color:var(--green)}.cert .caption{margin-top:12px}.cert .topics{font-size:.88rem;margin-bottom:10px}.share-note{margin-top:16px}
+footer{text-align:center;padding:10px 16px 20px;color:var(--muted)}footer button{background:none;color:inherit;border:0;padding:8px 12px;font-size:.9rem;touch-action:manipulation;user-select:none}
+dialog{max-width:min(420px,calc(100% - 28px));border:1px solid var(--line);border-radius:16px;padding:24px;color:var(--ink);overflow-wrap:anywhere}dialog::backdrop{background:#132d25a0}dialog h2{margin-bottom:12px}
+@media(max-width:680px){main{padding:21px 13px 34px}.head{padding:13px 16px}.hero{grid-template-columns:1fr;gap:12px}.hero canvas{width:115px;justify-self:end;margin-top:-4px}.modes{grid-template-columns:1fr;gap:7px}.mode-card{padding:10px 13px;min-height:0}.layout{grid-template-columns:1fr;gap:12px}.sidebar{grid-row:1;padding:11px 13px}.sidebar .modes{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:6px}.sidebar .mode-card{padding:7px 4px;text-align:center;font-size:.78rem}.sidebar .mode-card small,.sidebar .caption{display:none}.sidebar .mode-card strong{margin:0}.option{align-items:flex-start}.option input{margin-top:4px}}
+@media print{header,footer,.share-note,.cert>.actions{display:none!important}main{padding:10px;min-height:0}.cert-paper{break-inside:avoid}}
+@media(prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="head"><div class="brand"><span class="mark" aria-hidden="true">◇</span> Bengkel RBT</div><small>Tingkatan 1</small></div></header>
+<main>
+<section id="intro">
+<div class="hero"><div><h1>Kuiz Ulang Kaji <span>RBT</span></h1><p>Jawab 50 soalan tentang lakaran piktorial, sistem fertigasi, reka bentuk fesyen dan penyelesaian masalah inventif.</p></div><canvas id="hero-art" width="280" height="206" aria-hidden="true"></canvas></div>
+<h2 class="mode-title">Pilih cara berlatih</h2>
+<div id="intro-modes" class="modes" role="group" aria-label="Mod latihan"></div>
+<div class="actions"><button id="start" class="primary">Mula kuiz <span aria-hidden="true">→</span></button></div>
+<p class="intro-note">Tekan istilah bergaris titik seperti <button type="button" class="term" data-term="fertigasi" aria-expanded="false" aria-controls="gloss">fertigasi</button> untuk terjemahan Mandarin dan Inggeris serta bacaan suara.</p>
+</section>
+<section id="quiz" class="layout" hidden>
+<div class="panel">
+<div class="progress-meta"><span id="progress-title"></span><span id="progress-count" class="caption"></span></div>
+<div class="track" role="progressbar" aria-label="Kemajuan pusingan" aria-valuemin="0"><div id="bar" class="fill"></div></div>
+<div class="qmeta"><span id="topic" class="tag"></span><span id="level" class="tag level"></span></div>
+<h2 id="question" class="question" tabindex="-1"></h2>
+<canvas id="diagram" class="visual" width="360" height="146" role="img" hidden></canvas>
+<div id="options" class="options" role="radiogroup" aria-labelledby="question"></div>
+<div id="hint" class="hint" hidden aria-live="polite"></div>
+<div id="feedback" class="feedback" hidden tabindex="-1"></div>
+<div class="actions"><button id="check" class="primary" disabled>Semak jawapan</button><button id="next" class="primary" hidden>Seterusnya →</button><button id="hint-btn" class="secondary" hidden>Petunjuk</button></div>
+</div>
+<aside class="panel sidebar"><h3>Mod latihan</h3><div id="quiz-modes" class="modes" role="group" aria-label="Tukar mod latihan"></div><p class="caption muted">Tekan istilah bergaris titik untuk terjemahan dan bacaan suara.</p></aside>
+</section>
+<section id="review" class="panel result" hidden>
+<h2 id="review-title" tabindex="-1"></h2><p id="review-copy"></p><div id="scores" class="stats"></div>
+<div id="topic-report"></div>
+<div class="actions" id="retry-actions" hidden><button id="retry" class="primary"></button></div>
+<form id="name-form" class="name-form" hidden><label for="student-name">Nama untuk sijil</label><input id="student-name" required maxlength="80" autocomplete="off"><button type="submit" class="primary">Jana sijil</button></form>
+</section>
+<section id="certificate" class="cert" hidden>
+<div class="cert-paper"><div class="seal" aria-hidden="true">✓</div><h2 id="cert-title" tabindex="-1">Sijil Pencapaian</h2><p>Kuiz Ulang Kaji RBT Tingkatan 1</p><p class="student" id="cert-name"></p><p>Skor akhir selepas latihan semula</p><div class="cert-score" id="cert-score"></div><p id="cert-first"></p><div id="cert-topics"></div><p class="caption" id="cert-date"></p></div>
+<p class="share-note"><strong>Ambil tangkapan skrin sijil ini dan kongsikan dalam kumpulan Telegram kelas.</strong></p>
+<div class="actions"><button id="back-review" class="secondary">Kembali ke laporan</button></div>
+</section>
+</main>
+<footer><button id="credit" type="button">© TienPing @ 2026</button></footer>
+<div id="gloss" class="gloss" role="dialog" aria-label="Terjemahan istilah" hidden></div>
+<dialog id="author"><h2>Lim Tien Ping</h2><p><a href="mailto:petwesley@gmail.com">petwesley@gmail.com</a></p><p><a href="mailto:g-39576509@moe-dl.edu.my">g-39576509@moe-dl.edu.my</a></p><form method="dialog" class="actions"><button class="secondary">Tutup</button></form></dialog>
+<script>
+const bank = [{"id": 1, "topic": "Lakaran piktorial", "level": 1, "diagram": "", "prompt": "Untuk berbincang dengan rakan, Iman mahu menunjukkan bukaan, sisi dan ketinggian bekas pensel dalam satu gambar. Apakah cara yang paling sesuai?", "hints": ["Fikirkan perbezaan antara gambar rata dengan gambar yang menunjukkan kedalaman.", "Cari pilihan yang menunjukkan lebih daripada satu muka objek pada masa yang sama."], "choices": [{"text": "Lakaran piktorial", "why": "Lakaran piktorial menunjukkan bentuk tiga dimensi, jadi beberapa muka boleh dilihat sekali gus.", "correct": true}, {"text": "Pandangan atas sahaja", "why": "Pandangan atas tidak menunjukkan ketinggian bekas.", "correct": false}, {"text": "Senarai ukuran", "why": "Senarai ukuran memberi nombor tetapi tidak menunjukkan rupa bekas.", "correct": false}, {"text": "Pandangan hadapan sahaja", "why": "Pandangan ini menyembunyikan kedalaman bekas.", "correct": false}]}, {"id": 2, "topic": "Lakaran piktorial", "level": 1, "diagram": "", "prompt": "Kedai meminta pandangan yang paling sesuai untuk menentukan kedudukan empat lubang pada penutup kotak. Dari arah mana pelukis patut melihat penutup?", "hints": ["Bayangkan mata berada betul-betul menghadap permukaan yang berlubang.", "Penutup terletak di permukaan paling tinggi kotak."], "choices": [{"text": "Dari atas", "why": "Pandangan atas jelas menunjukkan susunan lubang pada permukaan penutup.", "correct": true}, {"text": "Dari bawah", "why": "Bahagian bawah kotak menyembunyikan penutup.", "correct": false}, {"text": "Dari hadapan", "why": "Pandangan ini menunjukkan tinggi kotak, bukan susunan lubang pada permukaan atas.", "correct": false}, {"text": "Dari sisi", "why": "Pandangan sisi tidak menunjukkan kedudukan keempat-empat lubang dengan jelas.", "correct": false}]}, {"id": 3, "topic": "Lakaran piktorial", "level": 1, "diagram": "", "prompt": "Label pada lakaran berbunyi “panjang 24 cm”. Apakah maklumat yang disampaikan label itu?", "hints": ["Lihat unit yang digunakan.", "Sentimeter ialah unit untuk menyatakan saiz fizikal."], "choices": [{"text": "Dimensi produk", "why": "Dimensi ialah ukuran seperti panjang, lebar dan tinggi.", "correct": true}, {"text": "Jenis bahan", "why": "Jenis bahan menjelaskan sama ada produk dibuat daripada plastik, kayu atau bahan lain.", "correct": false}, {"text": "Fungsi produk", "why": "Fungsi menerangkan kegunaan produk.", "correct": false}, {"text": "Tekstur permukaan", "why": "Tekstur menerangkan rupa atau sifat permukaan, seperti kasar atau licin.", "correct": false}]}, {"id": 4, "topic": "Lakaran piktorial", "level": 2, "diagram": "iso", "prompt": "Lihat lakaran bongkah. Garis tegak kekal tegak. Garis kedalaman condong ke kiri dan kanan secara seimbang dan tidak menuju ke titik lenyap. Apakah teknik lakaran ini?", "hints": ["Perhatikan sama ada kedua-dua arah condong dilukis dengan cara yang sama.", "Kedua-dua arah condong lazimnya membentuk sudut 30° dengan garis mendatar."], "choices": [{"text": "Isometrik", "why": "Dalam lakaran isometrik, paksi tegak dikekalkan dan dua paksi condong dilukis secara simetri.", "correct": true}, {"text": "Oblik", "why": "Lakaran oblik mengekalkan muka hadapan rata dan menunjukkan kedalaman pada satu arah condong.", "correct": false}, {"text": "Perspektif dua titik", "why": "Garis kedalaman akan kelihatan menuju ke dua titik lenyap.", "correct": false}, {"text": "Pandangan atas", "why": "Pandangan atas sahaja tidak menunjukkan bentuk tiga dimensi bongkah.", "correct": false}]}, {"id": 5, "topic": "Lakaran piktorial", "level": 2, "diagram": "oblik", "prompt": "Dalam lakaran panel ini, muka hadapan berbentuk segi empat tepat dan semua garis yang membawa mata ke belakang adalah selari. Teknik manakah paling sesuai dengan ciri ini?", "hints": ["Kenal pasti muka yang kekal sama bentuk seperti objek asal.", "Muka hadapan melintang dan menegak, manakala arah kedalaman condong pada satu arah."], "choices": [{"text": "Oblik", "why": "Lakaran oblik mengekalkan bentuk muka hadapan dan menggunakan garisan condong selari untuk menunjukkan kedalaman.", "correct": true}, {"text": "Isometrik", "why": "Dalam isometrik, kedua-dua arah mendatar objek biasanya kelihatan condong pada kertas.", "correct": false}, {"text": "Perspektif satu titik", "why": "Garis kedalaman akan kelihatan bertemu pada satu titik lenyap.", "correct": false}, {"text": "Pandangan sisi", "why": "Pandangan sisi sahaja tidak menggambarkan muka hadapan dan kedalaman serentak.", "correct": false}]}, {"id": 6, "topic": "Lakaran piktorial", "level": 2, "diagram": "pers", "prompt": "Pelukis melakar laluan di antara dua deretan rak. Tepi bawah rak kiri dan kanan kelihatan menghala ke tempat yang sama jauh di hadapan. Apakah prinsip yang digunakan?", "hints": ["Ikut arah garis rak dengan mata sehingga ke hujungnya.", "Hitung bilangan titik tempat garis yang masuk ke dalam kelihatan bertemu."], "choices": [{"text": "Perspektif satu titik", "why": "Garisan kedalaman kelihatan bertemu di satu titik lenyap, menghasilkan kesan jauh.", "correct": true}, {"text": "Perspektif dua titik", "why": "Lakaran dua titik memerlukan dua arah garisan menuju ke dua titik lenyap.", "correct": false}, {"text": "Isometrik", "why": "Garisan searah dalam isometrik kekal selari.", "correct": false}, {"text": "Oblik", "why": "Garisan kedalaman dalam oblik kekal selari dan tidak bertemu.", "correct": false}]}, {"id": 7, "topic": "Lakaran piktorial", "level": 2, "diagram": "", "prompt": "Dua lakaran lampu mempunyai garis luar yang sama. Pelukis menambah tona cerah dan gelap pada lakaran kedua. Apakah manfaat utama perubahan ini?", "hints": ["Bayangkan bagaimana cahaya jatuh pada lampu sebenar.", "Bahagian yang kurang menerima cahaya tampak lebih gelap."], "choices": [{"text": "Bentuk dan kesan pencahayaan lebih mudah dibayangkan", "why": "Rendering dengan tona memberikan petunjuk tentang bentuk permukaan dan arah cahaya.", "correct": true}, {"text": "Saiz lampu boleh diketahui dengan tepat", "why": "Tona tidak menggantikan label ukuran.", "correct": false}, {"text": "Bahan lampu pasti dapat dikenal pasti", "why": "Tona boleh memberi gambaran, tetapi tanpa label bahannya tidak semestinya dikenal pasti dengan pasti.", "correct": false}, {"text": "Kuasa lampu boleh dikira terus", "why": "Kuasa elektrik tidak ditunjukkan oleh tona pada lakaran.", "correct": false}]}, {"id": 8, "topic": "Lakaran piktorial", "level": 2, "diagram": "", "prompt": "Guru meminta lakaran pemegang tablet yang boleh dibina oleh kumpulan lain. Lakaran A hanya berwarna. Lakaran B berlabel bahan, saiz dan cara penyokong berfungsi. Lakaran C hanya menunjukkan logo. Manakah pilihan terbaik?", "hints": ["Fikirkan maklumat yang diperlukan oleh pembina.", "Pembina perlu tahu apa yang digunakan, berapa besar dan bagaimana produk menyokong tablet."], "choices": [{"text": "Pilih B kerana maklumatnya membantu pembinaan", "why": "B menerangkan bahan, dimensi dan fungsi yang perlu diketahui oleh pembina.", "correct": true}, {"text": "Pilih A kerana warna menentukan semua ukuran", "why": "Warna tidak memberitahu pembina ukuran atau bahan.", "correct": false}, {"text": "Pilih C kerana logo menunjukkan cara pemasangan", "why": "Logo ialah tanda pengenalan dan tiada arahan tentang pemasangan.", "correct": false}, {"text": "Pilih A kerana lakaran berlabel lebih sukar digunakan", "why": "Label membolehkan pembina mentafsir reka bentuk dengan lebih tepat.", "correct": false}]}, {"id": 9, "topic": "Lakaran piktorial", "level": 3, "diagram": "", "prompt": "Sebuah lakaran silinder kelihatan seperti kepingan rata. Cahaya datang dari kiri. Bagaimanakah rendering boleh memperjelas bentuknya?", "hints": ["Bayangkan kecerahan pada permukaan yang melengkung.", "Gabungkan arah cahaya dengan peralihan tona secara beransur-ansur."], "choices": [{"text": "Tukar tona beransur-ansur daripada cerah di kiri kepada gelap di kanan", "why": "Peralihan tona membantu mata melihat kelengkungan dan selaras dengan arah cahaya.", "correct": true}, {"text": "Isi seluruh permukaan dengan satu tona", "why": "Satu tona tidak membezakan bahagian yang menerima cahaya daripada bahagian yang terlindung.", "correct": false}, {"text": "Letak tona paling gelap di kiri dan cerah di kanan", "why": "Pilihan ini menyongsangkan arah pencahayaan yang diberikan.", "correct": false}, {"text": "Tambah garis ukuran sahaja", "why": "Ukuran membantu menyatakan saiz tetapi tidak memberi kesan pencahayaan atau lengkung.", "correct": false}]}, {"id": 10, "topic": "Lakaran piktorial", "level": 3, "diagram": "", "prompt": "Dua lakaran kotak alatan sama kukuh. A mempunyai bucu tajam dan ruang besar. B mempunyai bucu bulat serta ruang yang masih cukup untuk alatan. Reka bentuk akan digunakan oleh murid kecil. Pilihan manakah paling wajar?", "hints": ["Bandingkan keselamatan dan ruang yang benar-benar diperlukan.", "Apabila kedua-dua kotak muat, lihat ciri yang mengurangkan risiko kecederaan."], "choices": [{"text": "Pilih B kerana bucu bulat lebih selamat dan ruang mencukupi", "why": "B memenuhi fungsi penyimpanan sambil mengurangkan risiko terkena bucu tajam.", "correct": true}, {"text": "Pilih A kerana kotak paling besar sentiasa paling sesuai", "why": "Ruang tambahan tidak menyelesaikan risiko pada bucu.", "correct": false}, {"text": "Pilih A kerana bucu tajam memudahkan ukuran", "why": "Kemudahan mengukur tidak mengatasi keperluan keselamatan pengguna.", "correct": false}, {"text": "Pilih B hanya jika bucu ditajamkan semula", "why": "Menajamkan bucu akan menghilangkan kelebihan keselamatannya.", "correct": false}]}, {"id": 11, "topic": "Lakaran piktorial", "level": 3, "diagram": "", "prompt": "Farid mahu menunjukkan panel kawalan dengan butang kekal berbentuk bulat dan pada masa sama menunjukkan sedikit ketebalan panel. Apakah rancangan lakaran terbaik?", "hints": ["Tentukan muka yang perlu kekal dengan bentuk asalnya.", "Cari teknik yang mengekalkan muka depan dan masih melukis kedalaman."], "choices": [{"text": "Lakar muka depan sebenar dengan butang bulat, kemudian unjurkan ketebalan secara oblik", "why": "Lakaran oblik membolehkan bulatan pada muka depan kekal bulat sambil menunjukkan arah kedalaman.", "correct": true}, {"text": "Lukis pandangan hadapan sahaja", "why": "Butang kekal bulat tetapi ketebalan panel tidak ditunjukkan.", "correct": false}, {"text": "Lukis pandangan atas sahaja", "why": "Pandangan ini boleh menunjukkan ketebalan tetapi tidak menunjukkan muka butang dengan jelas.", "correct": false}, {"text": "Lukis simbol bagi setiap butang tanpa bentuk panel", "why": "Simbol tidak menunjukkan bentuk dan ketebalan panel.", "correct": false}]}, {"id": 12, "topic": "Lakaran piktorial", "level": 3, "diagram": "", "prompt": "Dalam lakaran perspektif lorong, garisan menuju ke satu titik lenyap. Pintu yang lebih jauh dilukis sebesar pintu di hadapan. Apakah pembetulan terbaik jika semua pintu sebenar sama saiz?", "hints": ["Bezakan saiz sebenar dengan saiz yang kelihatan dari jauh.", "Bandingkan tinggi dan lebar pintu dekat dan pintu jauh pada kertas."], "choices": [{"text": "Lukis pintu lebih jauh kelihatan lebih kecil sambil mengekalkan arah garisan ke titik lenyap", "why": "Objek sama saiz kelihatan lebih kecil apabila semakin jauh dalam perspektif.", "correct": true}, {"text": "Besarkan pintu paling jauh supaya nampak mendalam", "why": "Membesarkan objek yang jauh bertentangan dengan kesan perspektif yang dikehendaki.", "correct": false}, {"text": "Padam titik lenyap dan kekalkan saiz pintu pada kertas", "why": "Langkah ini menghilangkan panduan untuk kedalaman tanpa menyelesaikan masalah saiz tampak.", "correct": false}, {"text": "Kecilkan pintu yang paling dekat sahaja", "why": "Perubahan itu membuat pintu dekat kelihatan lebih kecil berbanding pintu yang jauh.", "correct": false}]}, {"id": 13, "topic": "Sistem fertigasi", "level": 1, "diagram": "", "prompt": "Dalam projek kebun kelas, air dan nutrien terlarut dihantar kepada pokok melalui sistem pengairan yang sama. Apakah nama kaedah ini?", "hints": ["Perhatikan dua bahan yang dibekalkan bersama.", "Nutrien diberi kepada tanaman semasa pengairan."], "choices": [{"text": "Fertigasi", "why": "Fertigasi membekalkan baja terlarut kepada tanaman melalui sistem pengairan.", "correct": true}, {"text": "Pengairan air biasa", "why": "Air biasa membasahkan tanaman tetapi tidak mengandungi baja terlarut seperti dalam situasi ini.", "correct": false}, {"text": "Pembajaan tabur", "why": "Baja ditabur secara berasingan dan tidak dihantar melalui pengairan.", "correct": false}, {"text": "Pengudaraan", "why": "Pengudaraan melibatkan pergerakan udara dan bukan penghantaran baja melalui air.", "correct": false}]}, {"id": 14, "topic": "Sistem fertigasi", "level": 1, "diagram": "", "prompt": "Kumpulan mahu larutan baja keluar sedikit demi sedikit terus ke pangkal setiap pokok. Komponen akhir manakah diperlukan?", "hints": ["Cari alat yang mengawal cara larutan keluar di setiap pokok.", "Nama alat itu berkaitan dengan bentuk aliran yang keluar sedikit demi sedikit."], "choices": [{"text": "Penitis", "why": "Penitis mengeluarkan larutan secara titisan berhampiran zon akar.", "correct": true}, {"text": "Tangki", "why": "Tangki menyimpan larutan dan tidak menitis terus pada setiap pokok.", "correct": false}, {"text": "Pam", "why": "Pam menggerakkan larutan tetapi bukan komponen akhir di pangkal pokok.", "correct": false}, {"text": "Penapis", "why": "Penapis menahan bendasing sebelum larutan sampai ke penitis.", "correct": false}]}, {"id": 15, "topic": "Sistem fertigasi", "level": 1, "diagram": "", "prompt": "Guru mendapati butiran halus dalam tangki. Murid mahu mengurangkannya daripada sampai ke saluran kecil. Apakah komponen yang patut diperiksa dahulu?", "hints": ["Cari komponen yang mengasingkan butiran pepejal daripada aliran.", "Halangan patut dikesan sebelum larutan sampai ke penitis."], "choices": [{"text": "Penapis", "why": "Penapis menangkap bendasing yang boleh menyumbat saluran atau penitis.", "correct": true}, {"text": "Injap", "why": "Injap membuka, menutup atau mengawal aliran. Ia tidak direka untuk menangkap butiran.", "correct": false}, {"text": "Penyambung siku", "why": "Penyambung siku menukar arah paip, tanpa menahan bendasing secara terancang.", "correct": false}, {"text": "Bekas tanaman", "why": "Bekas tanaman memegang medium tanaman tetapi tidak menapis larutan sebelum masuk ke paip.", "correct": false}]}, {"id": 16, "topic": "Sistem fertigasi", "level": 1, "diagram": "", "prompt": "Satu laluan paip perlu bercabang ke dua baris tanaman dari satu titik sambungan. Penyambung manakah memberikan tiga bukaan dalam bentuk T?", "hints": ["Kira bukaan yang diperlukan untuk satu masuk dan dua keluar.", "Cari penyambung yang namanya menggambarkan bentuk simpang."], "choices": [{"text": "Penyambung Tee", "why": "Penyambung Tee mempunyai tiga bukaan untuk membentuk cabang paip.", "correct": true}, {"text": "Penyambung siku", "why": "Siku mempunyai dua bukaan dan mengubah arah satu laluan.", "correct": false}, {"text": "Penutup hujung", "why": "Penutup menamatkan laluan paip dan tidak mempunyai cabang.", "correct": false}, {"text": "Soket lurus", "why": "Soket menyambung dua bahagian paip pada satu laluan.", "correct": false}]}, {"id": 17, "topic": "Sistem fertigasi", "level": 2, "diagram": "", "prompt": "Dalam satu sistem fertigasi, pam berfungsi dan semua pokok mendapat titisan kecuali satu. Apakah tindakan semakan yang paling tepat dahulu?", "hints": ["Tentukan sama ada masalah melibatkan seluruh sistem atau satu tempat sahaja.", "Periksa bahagian yang hanya digunakan oleh pokok yang tidak mendapat larutan."], "choices": [{"text": "Periksa penitis dan saluran kecil pokok itu", "why": "Aliran pada pokok lain menunjukkan bekalan umum masih berfungsi. Gangguan mungkin setempat.", "correct": true}, {"text": "Ganti seluruh pam terus", "why": "Pam masih menghantar larutan ke pokok lain, jadi menukar pam bukan semakan awal yang paling tepat.", "correct": false}, {"text": "Alihkan semua pokok ke tempat teduh", "why": "Teduh tidak menentukan sama ada laluan larutan pada satu pokok tersumbat.", "correct": false}, {"text": "Tambah baja ke tangki", "why": "Baja tambahan tidak menguji atau membuka saluran yang mungkin tersumbat.", "correct": false}]}, {"id": 18, "topic": "Sistem fertigasi", "level": 2, "diagram": "", "prompt": "Kebun kerap menerima hujan lebat. Larutan dalam medium mudah dicairkan oleh hujan terus. Apakah pengubahsuaian yang paling langsung menanganinya tanpa menghalang semua cahaya?", "hints": ["Kenal pasti bendalir yang perlu dihalang daripada jatuh ke medium.", "Bandingkan bumbung lut cahaya dengan penutup yang menghalang cahaya."], "choices": [{"text": "Pasang Struktur Perlindungan Hujan berbumbung lut cahaya", "why": "Bumbung membantu menghalang hujan terus sambil membenarkan cahaya masuk.", "correct": true}, {"text": "Ganti penitis dengan penyembur", "why": "Penyembur mengubah cara larutan diberi tetapi tidak menghalang air hujan.", "correct": false}, {"text": "Gunakan bekas legap yang menutup semua tanaman", "why": "Penutup penuh juga menghalang cahaya yang diperlukan tanaman.", "correct": false}, {"text": "Tambah bilangan penitis pada setiap pokok", "why": "Titisan tambahan tidak mencegah hujan daripada mencairkan larutan.", "correct": false}]}, {"id": 19, "topic": "Sistem fertigasi", "level": 2, "diagram": "", "prompt": "Sebuah paip utama membentuk gelung tertutup. Larutan boleh menghampiri cabang dari dua arah. Apakah faedah susunan gegelang ini berbanding paip yang hanya mempunyai satu arah bekalan?", "hints": ["Bayangkan apa yang berlaku apabila titik bekalan boleh dicapai melalui dua laluan.", "Aliran dari dua arah boleh membantu mengurangkan perbezaan bekalan di sepanjang paip."], "choices": [{"text": "Pengagihan larutan berpotensi lebih seimbang", "why": "Laluan dari dua arah boleh membantu menyeimbangkan bekalan. Aliran sebenar tetap perlu diperiksa.", "correct": true}, {"text": "Semua penitis pasti mengalir sama walaupun tersumbat", "why": "Gelung tidak dapat menjamin aliran melalui penitis yang tersumbat.", "correct": false}, {"text": "Larutan boleh sampai tanpa sebarang beza tekanan", "why": "Aliran masih memerlukan beza tekanan, misalnya daripada pam atau ketinggian.", "correct": false}, {"text": "Penapis tidak lagi berguna", "why": "Gelung tidak mengasingkan bendasing daripada larutan.", "correct": false}]}, {"id": 20, "topic": "Sistem fertigasi", "level": 2, "diagram": "", "prompt": "Kelas membandingkan teknik aliran cetek (NFT) dengan teknik aliran dalam (DFT). Pemerhatian manakah paling sesuai untuk mengenal pasti DFT?", "hints": ["Bezakan lapisan larutan nipis dengan paras larutan yang lebih dalam.", "Perhatikan sama ada sebahagian akar berada dalam takungan larutan yang lebih dalam."], "choices": [{"text": "Sebahagian akar terendam dalam lapisan larutan yang lebih dalam", "why": "DFT mengekalkan paras larutan lebih dalam berbanding aliran nipis dalam NFT.", "correct": true}, {"text": "Akar disentuh oleh lapisan larutan yang sangat nipis di dasar saluran", "why": "Ciri ini lebih sepadan dengan NFT.", "correct": false}, {"text": "Larutan hanya disembur sebagai kabus pada akar yang tergantung", "why": "Situasi itu menerangkan bekalan secara kabus dan bukan aliran larutan dalam.", "correct": false}, {"text": "Pokok disiram hanya oleh hujan", "why": "Ini tidak menunjukkan ciri utama DFT atau NFT.", "correct": false}]}, {"id": 21, "topic": "Sistem fertigasi", "level": 3, "diagram": "", "prompt": "Tanaman di hujung baris kelihatan kurang menerima larutan. Murid mahu menyiasat kesamarataan bekalan. Kaedah manakah paling meyakinkan?", "hints": ["Rancang ujian yang membandingkan jumlah cecair yang sampai dalam tempoh sama.", "Gunakan bekas pengumpul pada beberapa lokasi dan kawal tempoh pengumpulan."], "choices": [{"text": "Kumpul titisan di awal, tengah dan hujung baris untuk tempoh sama, kemudian bandingkan isipadu", "why": "Isipadu pada tempoh sama menunjukkan perbezaan kadar aliran antara lokasi.", "correct": true}, {"text": "Periksa tinggi pokok tertinggi sahaja", "why": "Ketinggian juga dipengaruhi faktor lain dan tidak mengukur aliran larutan.", "correct": false}, {"text": "Kumpul di hujung lebih lama daripada di awal lalu bandingkan jumlah terus", "why": "Tempoh berlainan menyebabkan jumlah mentah tidak boleh dibanding terus.", "correct": false}, {"text": "Lihat warna tangki pada dua waktu", "why": "Warna tangki tidak menunjukkan agihan larutan pada setiap penitis.", "correct": false}]}, {"id": 22, "topic": "Sistem fertigasi", "level": 3, "diagram": "", "prompt": "Dua lakaran fertigasi sama panjang. Pada A, penapis dipasang sebelum larutan memasuki semua cabang. Pada B, penapis hanya dipasang pada satu cabang. Apakah pilihan terbaik untuk melindungi semua penitis daripada bendasing dari tangki?", "hints": ["Jejaki laluan larutan dari tangki ke setiap cabang.", "Cari kedudukan penapis yang dilalui larutan sebelum terbahagi."], "choices": [{"text": "A, kerana larutan untuk semua cabang melalui penapis", "why": "Satu penapis sebelum titik cabang menapis aliran bagi setiap cabang di hilirnya.", "correct": true}, {"text": "B, kerana penapis pada satu cabang turut menapis semua cabang lain", "why": "Aliran cabang lain tidak melalui penapis itu.", "correct": false}, {"text": "Kedua-duanya sama kerana panjang paip sama", "why": "Kedudukan penapis, bukan panjang paip sahaja, menentukan aliran yang ditapis.", "correct": false}, {"text": "B, kerana penitis paling hampir dengan tangki pasti bersih", "why": "Kedekatan dengan tangki tidak menghalang bendasing daripada memasuki penitis.", "correct": false}]}, {"id": 23, "topic": "Sistem fertigasi", "level": 3, "diagram": "", "prompt": "Kelas hendak menguji sama ada pembersihan penitis meningkatkan aliran di hujung baris. Ujian manakah paling adil?", "hints": ["Ubah satu faktor utama sahaja.", "Ambil bacaan pada penitis dan tempoh yang sama sebelum serta selepas pembersihan."], "choices": [{"text": "Ukur isipadu pada penitis yang sama sebelum dan selepas dibersihkan, dengan tempoh dan tetapan pam yang sama", "why": "Perbandingan terkawal mengurangkan kesan pemboleh ubah lain kepada bacaan.", "correct": true}, {"text": "Bandingkan penitis bersih pada pam laju dengan penitis kotor pada pam perlahan", "why": "Kelajuan pam juga berubah, jadi kesan pembersihan tidak dapat diasingkan.", "correct": false}, {"text": "Tukar pam dan bersihkan penitis serentak sebelum membuat bacaan kedua", "why": "Dua perubahan serentak menyukarkan murid mengenal pasti punca perubahan.", "correct": false}, {"text": "Uji warna larutan sebelum dan selepas", "why": "Warna tidak mengukur jumlah larutan yang keluar bagi suatu tempoh.", "correct": false}]}, {"id": 24, "topic": "Sistem fertigasi", "level": 3, "diagram": "", "prompt": "Sebuah lakaran menempatkan tangki di bawah penitis, tanpa pam dan tanpa sumber tekanan lain. Apakah perubahan yang membolehkan larutan sampai secara berterusan jika tangki kekal di situ?", "hints": ["Tentukan bagaimana larutan akan bergerak ke kedudukan lebih tinggi.", "Cari komponen yang menambah tekanan untuk menggerakkan larutan."], "choices": [{"text": "Pasang pam yang sesuai pada laluan bekalan", "why": "Pam menghasilkan tekanan untuk menaikkan dan mengalirkan larutan ke penitis.", "correct": true}, {"text": "Besarkan bekas tanaman sahaja", "why": "Perubahan saiz bekas tidak memberikan tenaga kepada larutan.", "correct": false}, {"text": "Tambah warna pada penutup tangki", "why": "Warna tidak mencipta tekanan atau memperbaiki laluan aliran.", "correct": false}, {"text": "Tambah satu Tee pada saluran sahaja", "why": "Cabang mengagihkan aliran yang sudah ada, tanpa menghasilkan tekanan.", "correct": false}]}, {"id": 25, "topic": "Reka bentuk fesyen", "level": 1, "diagram": "", "prompt": "Semasa menyusun katalog persembahan sekolah, Li Mei ingin meletakkan satu item di bawah kategori aksesori. Item manakah sesuai?", "hints": ["Fikirkan item tambahan yang melengkapkan penampilan.", "Item itu boleh ditambah pada pakaian yang sudah dipakai."], "choices": [{"text": "Bros pada kolar", "why": "Bros ialah aksesori yang melengkapi pakaian.", "correct": true}, {"text": "Kemeja", "why": "Kemeja ialah pakaian yang menutupi bahagian atas badan.", "correct": false}, {"text": "Seluar panjang", "why": "Seluar ialah pakaian yang menutupi bahagian bawah badan.", "correct": false}, {"text": "Gaun", "why": "Gaun ialah pakaian yang dipakai pada badan.", "correct": false}]}, {"id": 26, "topic": "Reka bentuk fesyen", "level": 1, "diagram": "", "prompt": "Alya mahu menanda garisan poket pada kain gelap sebelum menjahit. Tanda itu perlu mudah dibuang. Apakah alatan paling sesuai?", "hints": ["Fikirkan alat yang meninggalkan tanda sementara pada kain.", "Tanda berwarna cerah memberi kontras pada kain gelap."], "choices": [{"text": "Kapur tukang jahit berwarna cerah", "why": "Kapur tukang jahit memberikan tanda sementara yang mudah dilihat pada kain gelap.", "correct": true}, {"text": "Gunting fabrik", "why": "Gunting memotong fabrik dan tidak menghasilkan penandaan sementara.", "correct": false}, {"text": "Jarum peniti", "why": "Jarum peniti memegang lapisan kain, tanpa melukis garisan poket.", "correct": false}, {"text": "Pen penanda kekal", "why": "Dakwat kekal sukar ditanggalkan daripada kain.", "correct": false}]}, {"id": 27, "topic": "Reka bentuk fesyen", "level": 1, "diagram": "", "prompt": "Pengurus butik meminta kajian tentang gaya lampau dan jangkaan warna popular untuk musim akan datang. Siapakah yang paling sesuai menjalankan kajian ini?", "hints": ["Bezakan tugas menghasilkan pakaian dengan menjangka trend.", "Cari kerjaya yang membuat jangkaan berdasarkan pola perubahan fesyen."], "choices": [{"text": "Peramal fesyen", "why": "Peramal fesyen meneliti perubahan gaya, warna atau bahan untuk menjangka trend akan datang.", "correct": true}, {"text": "Tukang jahit", "why": "Tukang jahit menyiapkan atau mengubah suai pakaian mengikut ukuran dan reka bentuk.", "correct": false}, {"text": "Jurujual pakaian", "why": "Jurujual membantu pelanggan memilih dan membeli produk.", "correct": false}, {"text": "Jurugambar fesyen", "why": "Jurugambar menghasilkan foto produk atau koleksi fesyen.", "correct": false}]}, {"id": 28, "topic": "Reka bentuk fesyen", "level": 1, "diagram": "", "prompt": "Hana mahu menyambung dua bahagian fabrik untuk menghasilkan sarung kusyen yang digunakan setiap hari. Teknik asas manakah biasanya paling sesuai?", "hints": ["Pilih cantuman yang menyatukan dua tepi kain untuk kegunaan berulang.", "Alat utama teknik ini boleh berupa jarum dan benang."], "choices": [{"text": "Jahitan", "why": "Jahitan menyatukan dua tepi fabrik dengan benang dan sesuai untuk kegunaan berulang.", "correct": true}, {"text": "Sulaman hiasan di tengah kain", "why": "Sulaman hiasan di tengah tidak menyatukan dua tepi kain.", "correct": false}, {"text": "Tampalan hiasan pada satu muka", "why": "Hiasan pada satu muka tidak menyambung kedua-dua tepi.", "correct": false}, {"text": "Menekap pola", "why": "Menekap pola memindahkan garisan panduan, tanpa mencantum fabrik.", "correct": false}]}, {"id": 29, "topic": "Reka bentuk fesyen", "level": 2, "diagram": "", "prompt": "Kumpulan memindahkan tanda garisan pada pola kertas ke kain. Alat apakah yang sesuai digunakan bersama kertas karbon tukang jahit?", "hints": ["Fikirkan alat yang digerakkan sepanjang garis pola.", "Alat itu mempunyai roda kecil yang meninggalkan jejak pada kain."], "choices": [{"text": "Roda surih", "why": "Roda surih menekan jejak garisan melalui kertas karbon ke atas kain.", "correct": true}, {"text": "Pita ukur", "why": "Pita ukur mengambil ukuran tetapi tidak memindahkan jejak garisan pola.", "correct": false}, {"text": "Penetas jahitan", "why": "Penetas membuka jahitan sedia ada.", "correct": false}, {"text": "Gunting fabrik", "why": "Gunting digunakan untuk memotong kain selepas tanda tersedia.", "correct": false}]}, {"id": 30, "topic": "Reka bentuk fesyen", "level": 2, "diagram": "", "prompt": "Irfan mahu menambah motif timbul dengan menampal kepingan flanel berbentuk bintang pada kain. Bagaimanakah teknik ini paling tepat dihuraikan?", "hints": ["Perhatikan sama ada motif dibina daripada benang atau sekeping bahan yang sudah dibentuk.", "Bentuk bintang sudah dipotong sebelum dipasang pada kain."], "choices": [{"text": "Tampalan", "why": "Tampalan memasang kepingan bahan yang telah dibentuk pada permukaan fabrik.", "correct": true}, {"text": "Sulaman benang", "why": "Motif sulaman dibentuk dengan jahitan benang pada permukaan, sedangkan motif ini ialah kepingan flanel.", "correct": false}, {"text": "Menetas jahitan", "why": "Menetas bermaksud membuka jahitan, bukan memasang motif.", "correct": false}, {"text": "Mendraf pola", "why": "Mendraf menyediakan panduan bentuk dan ukuran, tanpa memasang motif.", "correct": false}]}, {"id": 31, "topic": "Reka bentuk fesyen", "level": 2, "diagram": "", "prompt": "Nadia sedang menghasilkan mock-up topi daripada kad nipis. Dia mahu dua lapisan kad bertindih dan kelihatan kemas, dengan cantuman hampir tidak kelihatan dari luar. Pilihan manakah sesuai?", "hints": ["Cari bahan cantuman yang boleh disorok di antara dua lapisan.", "Pilih pelekat yang melekat pada kad tanpa bahagian logam terdedah."], "choices": [{"text": "Pita pelekat dua muka di antara lapisan kad", "why": "Pita itu mencantumkan kad dan terlindung dalam bahagian bertindih.", "correct": true}, {"text": "Kokot logam pada muka luar", "why": "Kokot boleh mencantum kad tetapi biasanya kelihatan pada permukaan.", "correct": false}, {"text": "Ikatan tali pada luar topi", "why": "Tali dan lubang ikatan akan kelihatan dari luar.", "correct": false}, {"text": "Jarum peniti merentas kedua-dua lapisan", "why": "Peniti kelihatan dan hujung tajam kurang sesuai untuk mock-up yang dikendalikan.", "correct": false}]}, {"id": 32, "topic": "Reka bentuk fesyen", "level": 2, "diagram": "", "prompt": "Dalam dua lakaran baju, potongan dan warna sama. Lakaran A menggunakan jalur menegak dan B menggunakan jalur mendatar. Elemen reka bentuk manakah sengaja diubah?", "hints": ["Tumpukan perhatian pada arah jalur.", "Jalur menyampaikan arah melalui satu elemen laluan visual."], "choices": [{"text": "Garisan", "why": "Arah garisan membezakan kesan visual kedua-dua lakaran walaupun potongan dan warna kekal.", "correct": true}, {"text": "Warna", "why": "Warna dinyatakan sama dalam kedua-dua lakaran.", "correct": false}, {"text": "Bentuk", "why": "Potongan baju dikekalkan dan jalur sahaja berubah arah.", "correct": false}, {"text": "Tekstur", "why": "Tiada perubahan pada rupa kasar atau licin yang diterangkan.", "correct": false}]}, {"id": 33, "topic": "Reka bentuk fesyen", "level": 2, "diagram": "", "prompt": "Semasa pengujian apron, pengikat asyik terlucut apabila pemakai membongkok. Kumpulan memendekkan pengikat dan menggantikan gelangsar. Apakah fasa bagi tindakan mengubah reka bentuk itu?", "hints": ["Bezakan ketika masalah dikesan dengan ketika reka bentuk diubah.", "Kumpulan bertindak selepas hasil ujian diketahui."], "choices": [{"text": "Penambahbaikan produk", "why": "Kumpulan menggunakan dapatan ujian untuk mengubah ciri produk yang bermasalah.", "correct": true}, {"text": "Pengujian produk", "why": "Pengujian ialah ketika apron dicuba dan gelangsar didapati terlucut.", "correct": false}, {"text": "Pemilihan idea awal", "why": "Idea awal dipilih sebelum reka bentuk diuji dan diperbaiki.", "correct": false}, {"text": "Pengumpulan ukuran badan", "why": "Ukuran mungkin membantu reka bentuk tetapi tindakan yang diterangkan ialah pengubahsuaian.", "correct": false}]}, {"id": 34, "topic": "Reka bentuk fesyen", "level": 3, "diagram": "", "prompt": "Pasukan menghasilkan beg kain untuk membawa buku. Produk percubaan koyak di sambungan tali selepas diuji. Apakah perubahan paling tepat sambil mengekalkan reka bentuk beg?", "hints": ["Kenal pasti bahagian yang menerima tarikan semasa membawa buku.", "Cari cara mengagihkan beban dan mengukuhkan kawasan sambungan."], "choices": [{"text": "Kukuhkan kawasan tali dengan fabrik sokongan dan jahitan tambahan, kemudian uji semula", "why": "Sokongan dan jahitan tambahan menambah kekuatan di tempat kegagalan, manakala ujian mengesahkan kesannya.", "correct": true}, {"text": "Tukar warna aksesori beg", "why": "Warna tidak menguatkan sambungan tali.", "correct": false}, {"text": "Panjangkan tali tanpa mengubah sambungan", "why": "Sambungan yang koyak masih belum diperkukuh.", "correct": false}, {"text": "Kecilkan logo di muka beg", "why": "Saiz logo tidak menyelesaikan masalah kekuatan sambungan.", "correct": false}]}, {"id": 35, "topic": "Reka bentuk fesyen", "level": 3, "diagram": "", "prompt": "Sekumpulan pengguna memerlukan jaket yang muat untuk bergerak aktif. Apakah tindakan terbaik sebelum memilih potongan akhir?", "hints": ["Dapatkan bukti yang menunjukkan pergerakan pengguna sebenar.", "Uji potongan dengan gerakan yang akan dilakukan semasa memakai jaket."], "choices": [{"text": "Cuba mock-up pada pengguna sasaran dan perhatikan capaian tangan serta keselesaan", "why": "Ujian bersama pengguna menilai kesesuaian potongan untuk pergerakan sebenar.", "correct": true}, {"text": "Pilih jaket berdasarkan gambar katalog sahaja", "why": "Gambar membantu menilai rupa tetapi tidak menunjukkan keselesaan pengguna sasaran.", "correct": false}, {"text": "Pilih fabrik paling berkilat sebelum melihat potongan", "why": "Kilauan fabrik tidak mengesahkan kebebasan pergerakan.", "correct": false}, {"text": "Ukur panjang zip sahaja", "why": "Panjang zip tidak mencukupi untuk menilai ruang gerak pada bahu dan lengan.", "correct": false}]}, {"id": 36, "topic": "Reka bentuk fesyen", "level": 3, "diagram": "", "prompt": "Kumpulan membandingkan dua jenis fabrik bagi pakaian latihan yang perlu kerap dibasuh. Mereka mahu tahu sama ada saiz berubah selepas basuhan. Kaedah manakah memberi bukti terbaik?", "hints": ["Tukar hanya jenis fabrik, dengan cara basuhan yang sama.", "Rekod ukuran awal dan akhir supaya perubahan boleh dibandingkan."], "choices": [{"text": "Potong sampel sama saiz, basuh dengan cara sama dan ukur perubahan setiap sampel", "why": "Sampel dan basuhan yang setara membolehkan perubahan saiz dikaitkan dengan jenis fabrik.", "correct": true}, {"text": "Basuh satu sampel dengan air panas dan satu lagi dengan air sejuk", "why": "Suhu berbeza boleh mempengaruhi pengecutan dan mengganggu perbandingan.", "correct": false}, {"text": "Bandingkan warna fabrik selepas dilipat", "why": "Warna tidak mengukur perubahan dimensi.", "correct": false}, {"text": "Ukur sampel selepas basuhan sahaja walaupun saiz awal berbeza", "why": "Tanpa ukuran awal yang setara atau direkod, perubahan bagi setiap sampel tidak diketahui.", "correct": false}]}, {"id": 37, "topic": "Reka bentuk fesyen", "level": 3, "diagram": "", "prompt": "Pasukan mahu memilih pakaian persembahan luar. Ia perlu jelas dilihat dari jauh dan selesa apabila murid bergerak. Reka bentuk manakah memenuhi kedua-dua keperluan?", "hints": ["Senaraikan dua kriteria dan nilai setiap pilihan terhadap kedua-duanya.", "Perhatikan kontras warna dan ruang untuk pergerakan."], "choices": [{"text": "Pakaian dengan warna berkontras jelas dan potongan yang telah diuji ketika bergerak", "why": "Kontras menyokong keterlihatan dan ujian pergerakan memberikan bukti keselesaan potongan.", "correct": true}, {"text": "Pakaian dengan kontras tinggi tetapi lengan terlalu ketat", "why": "Ia mudah dilihat, tetapi lengan ketat menghalang pergerakan.", "correct": false}, {"text": "Pakaian yang longgar dengan warna hampir sama seperti latar pentas", "why": "Potongan memberi ruang bergerak, tetapi warna menyukarkan penonton melihat pemakai dari jauh.", "correct": false}, {"text": "Pakaian warna terang yang hanya dinilai ketika digantung", "why": "Keterlihatan mungkin baik, tetapi keselesaan pergerakan masih belum disemak.", "correct": false}]}, {"id": 38, "topic": "Penyelesaian masalah inventif", "level": 1, "diagram": "", "prompt": "Satu kaki meja longgar. Selepas skru diketatkan, meja stabil dan semua fungsi lain kekal seperti biasa. Apakah jenis penyelesaian yang sesuai dengan situasi ini?", "hints": ["Periksa sama ada pembaikan itu mencipta masalah baharu.", "Mengetatkan skru memulihkan fungsi tanpa menjejaskan ciri lain."], "choices": [{"text": "Penyelesaian masalah bukan inventif", "why": "Masalah diselesaikan secara langsung tanpa kesan sampingan baharu pada fungsi lain.", "correct": true}, {"text": "Penyelesaian masalah inventif", "why": "Ciri asasnya ialah menyelesaikan masalah tanpa mengabaikan percanggahan atau kesan sampingan yang timbul. Situasi ini tidak menyatakan kesan tersebut.", "correct": false}, {"text": "Pemisahan ruang", "why": "Teknik ini digunakan apabila sifat bertentangan diperlukan pada bahagian yang berbeza. Keperluan itu tidak timbul di sini.", "correct": false}, {"text": "Pemisahan masa", "why": "Tiada keperluan bertentangan yang perlu dipenuhi pada waktu berbeza.", "correct": false}]}, {"id": 39, "topic": "Penyelesaian masalah inventif", "level": 1, "diagram": "", "prompt": "Semasa menyemak sebuah pam sabun, murid mahu menyenaraikan satu komponennya. Antara berikut, yang manakah sebahagian daripada pam tersebut?", "hints": ["Bezakan bahagian alat, bahan yang mengalir dan pengguna.", "Cari bahagian yang mengembalikan kepala pam ke kedudukan asal."], "choices": [{"text": "Spring dalam pam", "why": "Spring ialah komponen pam yang membantu kepala pam kembali ke kedudukan asal.", "correct": true}, {"text": "Sabun yang keluar", "why": "Sabun ialah bahan yang disalurkan oleh pam.", "correct": false}, {"text": "Tangan pengguna", "why": "Tangan mengendalikan pam dan berada di luar produk.", "correct": false}, {"text": "Singki di bawahnya", "why": "Singki ialah objek berasingan di persekitaran pam.", "correct": false}]}, {"id": 40, "topic": "Penyelesaian masalah inventif", "level": 1, "diagram": "", "prompt": "Rak kelas kerap bergoyang, tetapi tiada pemerhatian direkodkan. Apakah tindakan awal yang paling membantu sebelum merancang pembaikan?", "hints": ["Bezakan perkara yang diperhatikan daripada punca yang masih disyaki.", "Nyatakan bila goyangan berlaku dan bahagian yang terlibat dahulu."], "choices": [{"text": "Kenal pasti dan terangkan masalah yang dapat diperhatikan", "why": "Penerangan masalah yang jelas memberi asas untuk menyiasat punca dan membandingkan penyelesaian.", "correct": true}, {"text": "Pilih jenis skru dahulu", "why": "Pemilihan bahagian sebelum mengenal pasti masalah boleh tersasar.", "correct": false}, {"text": "Nilai keberkesanan pembaikan terus", "why": "Penilaian memerlukan pembaikan yang sudah dicuba.", "correct": false}, {"text": "Cat rak dengan warna baharu", "why": "Warna tidak membantu menerangkan goyangan pada rak.", "correct": false}]}, {"id": 41, "topic": "Penyelesaian masalah inventif", "level": 1, "diagram": "", "prompt": "Dalam model fungsi jam dinding, murid menyatakan “motor menggerakkan jarum”. Perkataan manakah menerangkan fungsi motor terhadap jarum?", "hints": ["Fungsi menjawab soalan “apakah tindakan terhadap objek?”.", "Kenal pasti perbuatan dalam ayat itu."], "choices": [{"text": "Menggerakkan", "why": "Kata kerja “menggerakkan” menerangkan tindakan motor terhadap jarum.", "correct": true}, {"text": "Motor", "why": "Motor ialah komponen yang melakukan tindakan.", "correct": false}, {"text": "Jarum", "why": "Jarum ialah objek yang menerima tindakan.", "correct": false}, {"text": "Jam dinding", "why": "Jam dinding ialah nama produk secara keseluruhan.", "correct": false}]}, {"id": 42, "topic": "Penyelesaian masalah inventif", "level": 2, "diagram": "", "prompt": "Beg sekolah diberi pelapik yang lebih tebal. Buku lebih terlindung, tetapi beg kini terlalu berat untuk dibawa. Mengapakah situasi ini melibatkan masalah inventif?", "hints": ["Senaraikan satu manfaat dan satu kesan sampingan.", "Tanya apa yang merosot apabila perlindungan ditambah."], "choices": [{"text": "Penambahbaikan perlindungan menjejaskan kemudahan membawa beg", "why": "Satu ciri bertambah baik, manakala ciri lain merosot. Kedua-duanya perlu dipertimbangkan.", "correct": true}, {"text": "Semua pelapik baharu mesti ditolak", "why": "Tidak semua pelapik memberi kesan yang sama. Masalahnya ialah imbangan perlindungan dengan berat.", "correct": false}, {"text": "Berat tidak berkaitan dengan fungsi beg", "why": "Kemudahan membawa barang berkait secara langsung dengan berat beg.", "correct": false}, {"text": "Ia melibatkan penambahan bahan sahaja", "why": "Penambahan bahan bukan sebab utama. Kesan kepada ciri lain ialah perkara yang perlu diselesaikan.", "correct": false}]}, {"id": 43, "topic": "Penyelesaian masalah inventif", "level": 2, "diagram": "", "prompt": "Roda kerusi kecil tersekat. Pada model fungsi, gandar menyokong roda dan roda sepatutnya berputar. Ujian menunjukkan roda hanya tersekat apabila habuk terkumpul di sekeliling gandar. Apakah rumusan punca paling disokong?", "hints": ["Bezakan gejala “roda tersekat” daripada keadaan yang muncul ketika ia tersekat.", "Lihat faktor yang berubah antara roda bebas berputar dengan roda tersekat."], "choices": [{"text": "Habuk di sekitar gandar mengganggu putaran roda", "why": "Pemerhatian menghubungkan halangan pada gandar dengan putaran yang tersekat.", "correct": true}, {"text": "Warna roda mengganggu gandar", "why": "Tiada bukti warna berubah atau menghalang gandar.", "correct": false}, {"text": "Berat kerusi semestinya bertambah", "why": "Ujian mengaitkan sekatan dengan habuk dan tidak menunjukkan perubahan berat yang bermakna.", "correct": false}, {"text": "Gandar tiada fungsi dalam sistem", "why": "Gandar menyokong roda dan berkait dengan putarannya.", "correct": false}]}, {"id": 44, "topic": "Penyelesaian masalah inventif", "level": 2, "diagram": "", "prompt": "Meja lipat perlu luas semasa aktiviti berkumpulan dan sempit ketika disimpan. Bagaimanakah kedua-dua keperluan boleh dipenuhi?", "hints": ["Kenal pasti bila setiap keluasan diperlukan.", "Keperluan luas dan sempit berlaku pada masa berlainan."], "choices": [{"text": "Gunakan permukaan yang dibuka ketika digunakan dan dilipat ketika disimpan", "why": "Pemisahan masa memenuhi dua keperluan pada waktu yang berbeza.", "correct": true}, {"text": "Kekalkan permukaan luas sepanjang masa", "why": "Permukaan luas tidak memenuhi ruang simpanan yang terhad.", "correct": false}, {"text": "Kekalkan permukaan sempit sepanjang masa", "why": "Permukaan sempit tidak memenuhi keperluan aktiviti berkumpulan.", "correct": false}, {"text": "Tukar warna meja mengikut giliran", "why": "Warna tidak mengubah keluasan meja yang digunakan atau disimpan.", "correct": false}]}, {"id": 45, "topic": "Penyelesaian masalah inventif", "level": 2, "diagram": "", "prompt": "Alas papan pemotong perlu mencengkam meja, manakala muka atasnya perlu licin dan mudah dicuci. Apakah cara terbaik memenuhi dua sifat tersebut?", "hints": ["Tanya di bahagian mana setiap sifat diperlukan.", "Kedua-dua sifat diperlukan pada permukaan yang berlainan pada masa yang sama."], "choices": [{"text": "Letakkan bahan antiegelincir di bawah dan permukaan licin di atas", "why": "Pemisahan ruang memberikan sifat berbeza pada bahagian yang memerlukannya.", "correct": true}, {"text": "Jadikan kedua-dua permukaan licin", "why": "Alas yang licin mengurangkan cengkaman yang diperlukan pada meja.", "correct": false}, {"text": "Jadikan kedua-dua permukaan bergetah dan bercorak dalam", "why": "Muka atas tidak lagi memenuhi keperluan permukaan licin dan mudah dicuci.", "correct": false}, {"text": "Gilirkan penggunaan dua warna pada permukaan", "why": "Pertukaran warna tidak menyediakan cengkaman atau kelicinan yang diperlukan.", "correct": false}]}, {"id": 46, "topic": "Penyelesaian masalah inventif", "level": 2, "diagram": "", "prompt": "Kumpulan telah mendapati penutup botol bocor kerana gelang pengedap haus. Mereka membandingkan hasil sebelum dan selepas menggantikan gelang itu. Apakah tujuan langkah terakhir ini?", "hints": ["Bezakan peringkat menemukan punca dan memeriksa hasil pembaikan.", "Pembaikan sudah dibuat, jadi keputusan ujian menentukan sama ada sasaran tercapai."], "choices": [{"text": "Menilai keberkesanan penyelesaian", "why": "Perbandingan kebocoran sebelum dan selepas menunjukkan sama ada pembaikan berkesan.", "correct": true}, {"text": "Mengenal pasti masalah kali pertama", "why": "Masalah kebocoran sudah dikesan sebelum gelang diganti.", "correct": false}, {"text": "Menjana punca baharu tanpa bukti", "why": "Kumpulan menguji langkah yang telah diambil berdasarkan punca yang diketahui.", "correct": false}, {"text": "Memilih rupa botol", "why": "Pemeriksaan kebocoran menilai fungsi pengedap dan tidak menilai rupa.", "correct": false}]}, {"id": 47, "topic": "Penyelesaian masalah inventif", "level": 3, "diagram": "", "prompt": "Bekas makanan mudah dibuka, tetapi kerap terbuka dalam beg. Pasukan mencadangkan klip yang terbuka hanya apabila dua tab ditekan serentak. Apakah ujian terbaik untuk menilai cadangan itu?", "hints": ["Tentukan dua syarat yang mesti dipenuhi oleh bekas.", "Uji keadaan dalam beg dan penggunaan sengaja oleh murid."], "choices": [{"text": "Uji sama ada bekas kekal tertutup apabila digoncang dalam beg dan boleh dibuka dengan mudah menggunakan kedua-dua tab", "why": "Dua ujian membuktikan sama ada penutupan selamat dan kemudahan membuka dapat dikekalkan.", "correct": true}, {"text": "Uji bekas ketika duduk di meja sahaja", "why": "Ujian meja tidak mewakili risiko terbuka di dalam beg.", "correct": false}, {"text": "Tanya murid sama ada warna klip menarik", "why": "Pendapat tentang warna tidak menilai kekuatan penutupan atau cara tab dibuka.", "correct": false}, {"text": "Uji klip dengan pita tambahan sepanjang masa", "why": "Pita mengubah cara penutupan dan menyukarkan penilaian terhadap klip itu sendiri.", "correct": false}]}, {"id": 48, "topic": "Penyelesaian masalah inventif", "level": 3, "diagram": "", "prompt": "Murid mahu memperbaiki lampu meja yang melendut. Pemeriksaan menunjukkan tapak masih stabil, kepala lampu baik dan sendi lengan tergelincir apabila condong. Manakah tindakan paling berasas?", "hints": ["Bezakan komponen yang masih berfungsi daripada satu punca yang diperhatikan.", "Sasarkan bahagian yang gagal menahan sudut lengan."], "choices": [{"text": "Uji sendi yang lebih mencengkam dengan beban kepala lampu yang sama", "why": "Ujian mensasarkan punca melendut sambil mengekalkan beban yang dibandingkan.", "correct": true}, {"text": "Tukar lampu kepada mentol lebih terang", "why": "Kecerahan tidak meningkatkan daya cengkaman sendi.", "correct": false}, {"text": "Besarkan tapak sahaja", "why": "Tapak sudah stabil dan penambahan saiz tidak membaiki sendi.", "correct": false}, {"text": "Tukar sendi dan kepala lampu serentak tanpa menguji satu demi satu", "why": "Jika kedudukan bertambah baik, sukar mengetahui perubahan mana yang paling berkesan.", "correct": false}]}, {"id": 49, "topic": "Penyelesaian masalah inventif", "level": 3, "diagram": "", "prompt": "Seorang murid membina model masalah “penutup mesti terkunci ketika beg dibawa, tetapi cepat dibuka ketika digunakan”. Pernyataan manakah sudah menjadi penyelesaian khusus yang boleh dibina?", "hints": ["Bezakan pernyataan tentang keperluan, idea umum dan ciri produk tertentu.", "Cari cadangan yang menyatakan komponen dan cara ia berfungsi."], "choices": [{"text": "Pasang pengunci gelangsar yang hanya terlepas apabila butang sisi ditekan", "why": "Cadangan menamakan komponen dan menerangkan cara menggunakannya, jadi ia boleh dibina dan diuji.", "correct": true}, {"text": "Penutup masih perlu memenuhi dua keperluan yang bertentangan", "why": "Ini menyatakan masalah, tanpa cadangan mekanisme penyelesaian.", "correct": false}, {"text": "Gunakan kaedah pemisahan yang sesuai", "why": "Ini arahan umum dan belum menerangkan bagaimana penutup akan diubah.", "correct": false}, {"text": "Kaji semula punca penutup terbuka", "why": "Ini tindakan penyiasatan, belum menjadi reka bentuk yang boleh dilaksanakan.", "correct": false}]}, {"id": 50, "topic": "Penyelesaian masalah inventif", "level": 3, "diagram": "", "prompt": "Bekas alat perlu menghalang air hujan masuk dan membenarkan udara keluar ketika dikeringkan. Pasukan menambah penutup lubang udara yang boleh dibuka. Pernyataan manakah paling tepat menerangkan sebab reka bentuk itu sesuai?", "hints": ["Tentukan bila aliran udara diperlukan dan bila air perlu dihalang.", "Bandingkan keadaan lubang semasa hujan dengan keadaan semasa pengeringan."], "choices": [{"text": "Tutup lubang ketika terkena hujan dan buka ketika pengeringan, supaya ciri itu berubah mengikut masa", "why": "Ini menggunakan pemisahan masa untuk memenuhi dua keperluan pada keadaan penggunaan yang berlainan.", "correct": true}, {"text": "Buka lubang sepanjang masa supaya air tidak boleh masuk", "why": "Lubang terbuka masih boleh membenarkan air masuk ketika hujan.", "correct": false}, {"text": "Tutup lubang sepanjang masa supaya udara boleh keluar", "why": "Penutupan berterusan menyekat laluan udara ketika pengeringan.", "correct": false}, {"text": "Besarkan lubang tanpa mengubah cara ia digunakan", "why": "Lubang yang lebih besar boleh membantu pengudaraan tetapi masih memberi laluan kepada hujan.", "correct": false}]}];
+const glossary = {"lakaran piktorial": ["立体草图", "pictorial sketch"], "lakaran perspektif": ["透视草图", "perspective sketch"], "titik lenyap": ["消失点", "vanishing point"], "perspektif satu titik": ["一点透视", "one-point perspective"], "perspektif dua titik": ["两点透视", "two-point perspective"], "perspektif": ["透视", "perspective"], "isometrik": ["等轴测", "isometric"], "oblik": ["斜投影", "oblique projection"], "paksi": ["轴线", "axis"], "dimensi": ["尺寸", "dimensions"], "rendering": ["明暗与质感表现", "rendering"], "tona": ["色调", "tone"], "tekstur": ["质感", "texture"], "unjurkan": ["投影延伸", "project out"], "sistem fertigasi": ["水肥一体化系统", "fertigation system"], "fertigasi": ["水肥一体化", "fertigation"], "nutrien": ["养分", "nutrients"], "larutan baja": ["肥液", "fertiliser solution"], "pengairan": ["灌溉", "irrigation"], "penitis": ["滴头", "drip emitter"], "bendasing": ["杂质", "impurities"], "zon akar": ["根区", "root zone"], "injap": ["阀门", "valve"], "penyambung tee": ["三通接头", "tee fitting"], "penyambung siku": ["弯头接头", "elbow fitting"], "soket lurus": ["直通接头", "straight coupling"], "struktur perlindungan hujan": ["避雨设施", "rain shelter structure"], "lut cahaya": ["透光", "light-transmitting"], "legap": ["不透光", "opaque"], "gegelang": ["环形管路", "ring layout"], "teknik aliran cetek": ["营养液膜技术", "nutrient film technique"], "teknik aliran dalam": ["深液流技术", "deep flow technique"], "takungan": ["储液槽", "reservoir"], "isipadu": ["体积", "volume"], "pemboleh ubah": ["变量", "variable"], "aksesori": ["配饰", "accessory"], "bros": ["胸针", "brooch"], "kontras": ["对比", "contrast"], "fabrik": ["面料", "fabric"], "cantuman": ["连接", "joining"], "sulaman": ["刺绣", "embroidery"], "tampalan": ["贴布", "appliqué"], "menekap pola": ["描摹纸样", "trace a pattern"], "pola": ["纸样", "pattern"], "kertas karbon": ["复写纸", "carbon paper"], "roda surih": ["描线轮", "tracing wheel"], "jarum peniti": ["珠针", "dressmaking pin"], "penetas jahitan": ["拆线器", "seam ripper"], "menetas": ["拆线", "unpick stitches"], "mendraf": ["绘制初稿", "draft"], "flanel": ["法兰绒", "flannel"], "mock-up": ["样式模型", "mock-up"], "kokot": ["订书钉", "staple"], "gelangsar": ["滑动件", "slider"], "pengguna sasaran": ["目标用户", "target user"], "pengecutan": ["缩水", "shrinkage"], "inventif": ["需处理矛盾的创新型", "inventive"], "bukan inventif": ["非创新型", "non-inventive"], "pemisahan masa": ["时间分离", "separation in time"], "pemisahan ruang": ["空间分离", "separation in space"], "komponen": ["部件", "component"], "model fungsi": ["功能模型", "function model"], "model masalah": ["问题模型", "problem model"], "gandar": ["轮轴", "axle"], "gejala": ["表面现象", "symptom"], "antigelincir": ["防滑", "anti-slip"], "gelang pengedap": ["密封圈", "sealing ring"], "melendut": ["下垂", "sag"], "mekanisme": ["机构", "mechanism"], "pengudaraan": ["通风", "ventilation"]};
+const byId = id => document.getElementById(id);
+const make = (tag, content, className) => {
+  const element = document.createElement(tag);
+  if (content !== undefined) element.textContent = content;
+  if (className) element.className = className;
+  return element;
+};
+const shuffle = values => {
+  const shuffled = [...values];
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]];
+  }
+  return shuffled;
+};
+const topicNames = [...new Set(bank.map(item => item.topic))];
+const levelNames = ['Asas', 'Aplikasi', 'Analisis'];
+const modes = {
+  adapt: ['Adaptif', 'Tahap ikut jawapan anda. Petunjuk tersedia apabila anda perlukan.'],
+  hints: ['Petunjuk', 'Dua petunjuk bertahap tersedia pada setiap soalan.'],
+  challenge: ['Cabaran', 'Soalan lebih mencabar diutamakan dan petunjuk disembunyikan.']
+};
+const encouragement = [
+  'Teruskan. Satu kesilapan boleh membantu anda mengingati konsep ini.',
+  'Anda sedang berlatih. Cuba kaitkan sebab di bawah dengan situasi dalam soalan.',
+  'Percubaan yang baik. Perhatikan petunjuk dalam situasi itu dan cuba lagi dalam pusingan semula.',
+  'Ambil masa membaca sebabnya. Anda boleh gunakan idea ini pada soalan seterusnya.'
+];
+const confirmations = ['Tepat! Anda mengenal pasti konsep yang sesuai.', 'Bagus! Pilihan anda menepati situasi itu.', 'Betul! Semak sebabnya untuk mengukuhkan kefahaman.'];
+let mode = 'adapt';
+let skills = Object.fromEntries(topicNames.map(topic => [topic, {level:1, streak:0, needsHelp:false}]));
+let queue = [];
+let current;
+let displayed = [];
+let selected = null;
+let checked = false;
+let hintsUsed = 0;
+let pass = 0;
+let passTotal = 0;
+let passAnswered = 0;
+let lastTopic = '';
+let topicVisits = {};
+let first = new Map();
+let mastery = new Set();
+let activeTerm = null;
+let audioAttempt = 0;
+
+const alternatives = Object.keys(glossary).sort((left, right) => right.length - left.length)
+  .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+const termPattern = new RegExp('\\b(?:' + alternatives + ')\\b', 'gi');
+
+function writeTerms(element, value) {
+  const fragment = document.createDocumentFragment();
+  let offset = 0;
+  for (const match of value.matchAll(termPattern)) {
+    fragment.append(value.slice(offset, match.index));
+    const button = make('button', match[0], 'term');
+    button.type = 'button';
+    button.dataset.term = match[0].toLowerCase();
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-controls', 'gloss');
+    fragment.append(button);
+    offset = match.index + match[0].length;
+  }
+  fragment.append(value.slice(offset));
+  element.replaceChildren(fragment);
+}
+function positionGloss() {
+  if (!activeTerm) return;
+  const bubble = byId('gloss');
+  const anchor = activeTerm.getBoundingClientRect();
+  const left = Math.max(8, Math.min(anchor.left, innerWidth - bubble.offsetWidth - 8));
+  const below = anchor.bottom + 7;
+  const top = below + bubble.offsetHeight <= innerHeight - 8 ? below : Math.max(8, anchor.top - bubble.offsetHeight - 7);
+  bubble.style.left = left + 'px';
+  bubble.style.top = top + 'px';
+}
+function closeGloss(restoreFocus = false) {
+  if (!activeTerm) return;
+  activeTerm.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) activeTerm.focus();
+  activeTerm = null;
+  byId('gloss').hidden = true;
+  audioAttempt++;
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function playVoice(value, codes, status) {
+  status.textContent = '';
+  const unavailable = 'Suara untuk bahasa ini tidak tersedia pada peranti ini.';
+  if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+    status.textContent = unavailable;
+    return;
+  }
+  const attempt = ++audioAttempt;
+  const speech = window.speechSynthesis;
+  speech.cancel();
+  const voices = speech.getVoices();
+  const voice = codes.map(code => voices.find(candidate => candidate.lang.replace('_', '-').toLowerCase() === code.toLowerCase())).find(Boolean)
+    || voices.find(candidate => {
+      const language = candidate.lang.replace('_', '-').toLowerCase();
+      if (codes[0] === 'zh-CN') return /^(?:zh|cmn)(?:$|-(?:hans|hant)(?:-|$))/.test(language) && !/-(?:hk|mo)$/.test(language);
+      return language.split('-')[0] === codes[0].toLowerCase().split('-')[0];
+    });
+  if (voices.length && !voice) {
+    status.textContent = unavailable;
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(value);
+  utterance.lang = voice?.lang || codes[0];
+  if (voice) utterance.voice = voice;
+  utterance.rate = 0.88;
+  utterance.onerror = () => {
+    if (attempt === audioAttempt) status.textContent = unavailable;
+  };
+  speech.speak(utterance);
+}
+function openGloss(term) {
+  if (activeTerm === term) {
+    closeGloss(true);
+    return;
+  }
+  closeGloss();
+  const translations = glossary[term.dataset.term];
+  if (!translations) return;
+  activeTerm = term;
+  term.setAttribute('aria-expanded', 'true');
+  const bubble = byId('gloss');
+  const heading = make('div', undefined, 'gloss-title');
+  const close = make('button', '×', 'icon-btn');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Tutup terjemahan');
+  close.onclick = () => closeGloss(true);
+  heading.append(make('strong', 'Terjemahan dan bacaan'), close);
+  const list = make('div', undefined, 'term-list');
+  const status = make('p', '', 'audio-note');
+  status.setAttribute('role', 'status');
+  const rows = [
+    ['BM', 'Bahasa Melayu', term.textContent, ['ms-MY']],
+    ['中文', 'Mandarin', translations[0], ['zh-CN','cmn-CN','zh-SG','zh-TW']],
+    ['EN', 'Bahasa Inggeris', translations[1], ['en-GB','en-US','en-MY']]
+  ];
+  for (const [label, language, value, codes] of rows) {
+    const row = make('div', undefined, 'term-row');
+    const text = make('span', value);
+    text.lang = codes[0];
+    const speak = make('button', '🔊', 'icon-btn');
+    speak.type = 'button';
+    speak.setAttribute('aria-label', 'Dengar bacaan ' + language);
+    speak.onclick = () => playVoice(value, codes, status);
+    row.append(make('small', label), text, speak);
+    list.append(row);
+  }
+  bubble.replaceChildren(heading, list, status);
+  bubble.hidden = false;
+  positionGloss();
+  close.focus({preventScroll:true});
+}
+document.addEventListener('click', event => {
+  const term = event.target.closest('.term');
+  if (term) openGloss(term);
+  else if (!event.target.closest('#gloss')) closeGloss();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && activeTerm) {
+    event.preventDefault();
+    closeGloss(true);
+  }
+});
+window.addEventListener('resize', positionGloss);
+window.addEventListener('scroll', positionGloss, {passive:true});
+if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+
+function draw(canvas, type) {
+  const context = canvas.getContext('2d');
+  if (!context) return;
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.lineJoin = 'round';
+  context.lineCap = 'round';
+  function path(points, fill, stroke = '#276454', thickness = 2) {
+    context.beginPath();
+    points.forEach(([x,y], index) => index ? context.lineTo(x,y) : context.moveTo(x,y));
+    if (fill) {
+      context.closePath();
+      context.fillStyle = fill;
+      context.fill();
+    }
+    context.lineWidth = thickness;
+    context.strokeStyle = stroke;
+    context.stroke();
+  }
+  if (type === 'hero') {
+    for (let x = 28; x < 270; x += 16) {
+      for (let y = 17; y < 198; y += 16) {
+        context.fillStyle = '#446556';
+        context.fillRect(x,y,2,2);
+      }
+    }
+    path([[144,29],[218,72],[144,115],[70,72]], '#d7eea8','#142f29',3);
+    path([[70,72],[144,115],[144,186],[70,143]], '#82af79','#142f29',3);
+    path([[144,115],[218,72],[218,143],[144,186]], '#b0cb89','#142f29',3);
+    path([[144,47],[187,72],[144,97],[101,72]], '#183a31','#183a31',2);
+    path([[228,28],[248,28]], null,'#d7eea8');
+    path([[238,18],[238,38]], null,'#d7eea8');
+    path([[34,150],[54,150]], null,'#d7eea8');
+    path([[44,140],[44,160]], null,'#d7eea8');
+  } else if (type === 'iso') {
+    path([[180,10],[250,50],[180,90],[110,50]], '#d8edd1');
+    path([[110,50],[180,90],[180,133],[110,93]], '#b6d9b1');
+    path([[180,90],[250,50],[250,93],[180,133]], '#94c4a0');
+  } else if (type === 'oblik') {
+    path([[105,61],[150,24],[276,24],[231,61]], '#d8edd1');
+    path([[231,61],[276,24],[276,83],[231,120]], '#94c4a0');
+    path([[105,61],[231,61],[231,120],[105,120]], '#b6d9b1');
+  } else if (type === 'pers') {
+    path([[13,65],[347,65]], null, '#9db6a7', 1);
+    path([[18,32],[180,65],[18,134]], '#d8edd1');
+    path([[342,32],[180,65],[342,134]], '#b6d9b1');
+    for (const x of [48,90,128,155,205,232,270,312]) {
+      const amount = Math.abs(180 - x) / 162;
+      path([[x,65 - 33 * amount],[x,65 + 69 * amount]], null);
+    }
+    context.beginPath();
+    context.arc(180,65,4,0,Math.PI * 2);
+    context.fillStyle = '#142f29';
+    context.fill();
+  }
+}
+const diagramLabels = {
+  iso: 'Bongkah dengan tiga muka terlihat, garisan tegak dan dua arah garisan condong yang simetri.',
+  oblik: 'Panel dengan muka depan segi empat tepat dan garisan ke belakang yang selari.',
+  pers: 'Dua deretan rak kelihatan mengecil ke satu titik jauh di tengah.'
+};
+draw(byId('hero-art'), 'hero');
+
+function setScreen(id, focus) {
+  closeGloss();
+  for (const screen of ['intro','quiz','review','certificate']) byId(screen).hidden = screen !== id;
+  window.scrollTo(0,0);
+  if (focus) byId(focus).focus({preventScroll:true});
+}
+function setMode(value) {
+  mode = value;
+  for (const button of document.querySelectorAll('[data-mode]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.mode === mode));
+  }
+  if (!byId('quiz').hidden) renderHint();
+}
+for (const id of ['intro-modes','quiz-modes']) {
+  for (const [value,[label,description]] of Object.entries(modes)) {
+    const button = make('button', undefined, 'mode-card');
+    button.type = 'button';
+    button.dataset.mode = value;
+    button.append(make('strong', label), make('small', description));
+    button.onclick = () => setMode(value);
+    byId(id).append(button);
+  }
+}
+setMode(mode);
+
+function nextItem() {
+  const availableTopics = [...new Set(queue.map(item => item.topic))];
+  const eligible = availableTopics.length > 1 ? availableTopics.filter(topic => topic !== lastTopic) : availableTopics;
+  const fewestVisits = Math.min(...eligible.map(topic => topicVisits[topic]));
+  const topic = eligible.find(name => topicVisits[name] === fewestVisits);
+  topicVisits[topic]++;
+  const skill = skills[topic];
+  let preferred = skill.level;
+  if (mode === 'challenge') preferred = Math.min(3, preferred + 1);
+  if (mode === 'hints' && skill.needsHelp) preferred = Math.max(1, preferred - 1);
+  const candidates = queue.filter(item => item.topic === topic);
+  const nearest = Math.min(...candidates.map(item => Math.abs(item.level - preferred)));
+  const item = candidates.find(candidate => Math.abs(candidate.level - preferred) === nearest);
+  queue.splice(queue.indexOf(item), 1);
+  lastTopic = topic;
+  return item;
+}
+function updateProgress() {
+  byId('progress-title').textContent = pass ? 'Latihan semula ' + pass : 'Pusingan pertama';
+  byId('progress-count').textContent = 'Soalan ' + Math.min(passAnswered + (checked ? 0 : 1), passTotal) + ' / ' + passTotal;
+  byId('bar').style.width = 100 * passAnswered / passTotal + '%';
+  byId('bar').parentElement.setAttribute('aria-valuemax', String(passTotal));
+  byId('bar').parentElement.setAttribute('aria-valuenow', String(passAnswered));
+}
+function renderHint() {
+  const button = byId('hint-btn');
+  const panel = byId('hint');
+  button.hidden = checked || mode === 'challenge' || hintsUsed >= 2;
+  button.textContent = hintsUsed ? 'Petunjuk kedua' : 'Petunjuk';
+  panel.hidden = checked || mode === 'challenge' || hintsUsed === 0;
+  if (!checked && mode === 'adapt' && hintsUsed === 0 && skills[current.topic].needsHelp) {
+    button.textContent = 'Cuba petunjuk';
+  }
+}
+function loadQuestion() {
+  closeGloss();
+  current = nextItem();
+  displayed = shuffle(current.choices);
+  selected = null;
+  checked = false;
+  hintsUsed = 0;
+  byId('topic').textContent = current.topic;
+  byId('level').textContent = levelNames[current.level - 1];
+  writeTerms(byId('question'), current.prompt);
+  const canvas = byId('diagram');
+  canvas.hidden = !current.diagram;
+  if (current.diagram) {
+    canvas.setAttribute('aria-label', diagramLabels[current.diagram]);
+    draw(canvas, current.diagram);
+  }
+  byId('hint').replaceChildren();
+  byId('feedback').hidden = true;
+  byId('check').hidden = false;
+  byId('check').disabled = true;
+  byId('next').hidden = true;
+  const options = byId('options');
+  options.replaceChildren();
+  displayed.forEach((choice, index) => {
+    const row = make('div', undefined, 'option');
+    const radio = make('input');
+    radio.type = 'radio';
+    radio.name = 'answer';
+    radio.setAttribute('aria-label', String.fromCharCode(65 + index) + '. ' + choice.text);
+    const letter = make('span', String.fromCharCode(65 + index) + '.', 'letter');
+    letter.setAttribute('aria-hidden', 'true');
+    const label = make('span');
+    writeTerms(label, choice.text);
+    radio.addEventListener('change', () => {
+      selected = index;
+      byId('check').disabled = false;
+      Array.from(options.children).forEach((choiceRow, position) => choiceRow.classList.toggle('selected', position === index));
+    });
+    row.addEventListener('click', event => {
+      if (!checked && !event.target.closest('button,input')) {
+        radio.focus();
+        radio.click();
+      }
+    });
+    row.append(radio, letter, label);
+    options.append(row);
+  });
+  updateProgress();
+  renderHint();
+  window.scrollTo(0,0);
+  byId('question').focus({preventScroll:true});
+}
+function beginRound(items) {
+  queue = shuffle(items);
+  lastTopic = '';
+  topicVisits = Object.fromEntries(topicNames.map(topic => [topic, 0]));
+  passTotal = items.length;
+  passAnswered = 0;
+  setScreen('quiz');
+  loadQuestion();
+}
+byId('start').onclick = () => beginRound(bank);
+byId('hint-btn').onclick = () => {
+  const panel = byId('hint');
+  const text = make('p');
+  writeTerms(text, 'Petunjuk ' + (hintsUsed + 1) + ' · ' + current.hints[hintsUsed]);
+  panel.append(text);
+  hintsUsed++;
+  renderHint();
+  if (byId('hint-btn').hidden) byId('check').disabled ? byId('options').querySelector('input').focus() : byId('check').focus();
+};
+function feedbackLine(label, text) {
+  const line = make('p');
+  const explanation = make('span');
+  writeTerms(explanation,text);
+  line.append(make('strong', label + ' '), explanation);
+  return line;
+}
+byId('check').onclick = () => {
+  if (selected === null || checked) return;
+  closeGloss();
+  checked = true;
+  passAnswered++;
+  const choice = displayed[selected];
+  const good = choice.correct;
+  if (pass === 0) first.set(current.id, good);
+  if (good) mastery.add(current.id);
+  const skill = skills[current.topic];
+  skill.needsHelp = !good || hintsUsed > 0;
+  if (!good) {
+    skill.level = Math.max(1, skill.level - 1);
+    skill.streak = 0;
+  } else if (hintsUsed > 0) {
+    skill.streak = 0;
+  } else if (++skill.streak >= 2) {
+    skill.level = Math.min(3, skill.level + 1);
+    skill.streak = 0;
+  }
+  const rows = byId('options').children;
+  displayed.forEach((option, index) => {
+    rows[index].querySelector('input').disabled = true;
+    rows[index].classList.add('locked');
+    if (option.correct) rows[index].classList.add('right');
+    else if (index === selected) rows[index].classList.add('wrong');
+  });
+  const feedback = byId('feedback');
+  const messages = good ? confirmations : encouragement;
+  const correct = displayed.find(option => option.correct);
+  feedback.classList.toggle('miss', !good);
+  feedback.replaceChildren(make('h3', good ? 'Jawapan betul' : 'Jawapan belum tepat'), make('p', messages[(passAnswered - 1) % messages.length]));
+  if (!good) feedback.append(feedbackLine('Sebab pilihan anda kurang tepat.', choice.why));
+  feedback.append(feedbackLine('Jawapan yang tepat.', correct.text), feedbackLine('Ringkasan.', correct.why));
+  feedback.hidden = false;
+  byId('check').hidden = true;
+  byId('next').hidden = false;
+  byId('next').textContent = queue.length ? 'Seterusnya →' : 'Lihat laporan →';
+  renderHint();
+  updateProgress();
+  feedback.focus();
+};
+byId('next').onclick = () => queue.length ? loadQuestion() : showReview();
+
+const firstScore = () => [...first.values()].filter(Boolean).length;
+function scoreTable() {
+  const table = make('table', undefined, 'topics');
+  const heading = make('tr');
+  for (const label of ['Topik','Pertama','Akhir']) {
+    const th = make('th',label);
+    th.scope = 'col';
+    heading.append(th);
+  }
+  table.createTHead().append(heading);
+  const body = table.createTBody();
+  for (const topic of topicNames) {
+    const items = bank.filter(item => item.topic === topic);
+    const row = body.insertRow();
+    const name = make('th',topic);
+    name.scope = 'row';
+    row.append(name);
+    row.insertCell().textContent = items.filter(item => first.get(item.id)).length + '/' + items.length;
+    row.insertCell().textContent = items.filter(item => mastery.has(item.id)).length + '/' + items.length;
+  }
+  return table;
+}
+function showReview() {
+  const misses = bank.filter(item => !mastery.has(item.id));
+  const mustRetry = misses.length > 0 && pass === 0;
+  byId('review-title').textContent = mustRetry ? 'Pusingan pertama selesai' : 'Laporan kuiz anda';
+  byId('review-copy').textContent = mustRetry
+    ? 'Cuba semula ' + misses.length + ' soalan yang belum tepat. Jawapan yang telah betul dikekalkan dalam skor akhir.'
+    : misses.length ? 'Bagus, anda sudah selesai latihan semula. Anda boleh buat satu lagi pusingan untuk soalan yang masih belum tepat atau terus jana sijil.'
+    : 'Syabas! Anda telah menjawab semua 50 soalan dengan betul.';
+  byId('scores').replaceChildren(...[
+    ['Pusingan pertama', firstScore()], ['Skor akhir setakat ini', mastery.size]
+  ].map(([label, score]) => {
+    const stat = make('div', undefined, 'stat');
+    stat.append(make('span', label, 'caption'), make('strong', score + ' / ' + bank.length));
+    return stat;
+  }));
+  byId('topic-report').replaceChildren(scoreTable());
+  byId('retry-actions').hidden = !misses.length;
+  byId('retry').textContent = 'Cuba semula ' + misses.length + ' soalan';
+  byId('name-form').hidden = mustRetry;
+  setScreen('review','review-title');
+}
+byId('retry').onclick = () => {
+  pass++;
+  beginRound(bank.filter(item => !mastery.has(item.id)));
+};
+byId('name-form').onsubmit = event => {
+  event.preventDefault();
+  const input = byId('student-name');
+  const name = input.value.trim();
+  if (!name) {
+    input.setCustomValidity('Masukkan nama anda.');
+    input.reportValidity();
+    return;
+  }
+  byId('cert-name').textContent = name;
+  byId('cert-score').textContent = mastery.size + ' / ' + bank.length + '  ·  ' + Math.round(mastery.size / bank.length * 100) + '%';
+  byId('cert-first').textContent = 'Skor pusingan pertama · ' + firstScore() + ' / ' + bank.length;
+  byId('cert-topics').replaceChildren(scoreTable());
+  byId('cert-date').textContent = new Intl.DateTimeFormat('ms-MY', {dateStyle:'long', timeZone:'Asia/Kuching'}).format(new Date());
+  setScreen('certificate','cert-title');
+};
+byId('student-name').oninput = event => event.currentTarget.setCustomValidity('');
+byId('back-review').onclick = showReview;
+let creditClicks = [];
+byId('credit').onclick = () => {
+  const now = performance.now();
+  creditClicks = creditClicks.filter(time => now - time <= 2000);
+  creditClicks.push(now);
+  if (creditClicks.length >= 8) {
+    creditClicks = [];
+    closeGloss();
+    byId('author').showModal();
+  }
+};
+</script>
+</body>
+</html>
